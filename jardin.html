@@ -5,74 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Éonia - Cerisier Burlat</title>
     <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; --grey: #1a1a1a; }
+        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; --warning: #ff9f43; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
             background: var(--bg); color: #fff; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.6;
         }
 
-        /* --- PHOTO BOTANIQUE (Haut de page) --- */
-        .botanical-header {
-            width: 100%; height: 45vh;
+        .hero-botanical {
+            width: 100%; height: 35vh;
             background: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1200') center/cover;
             border-bottom: 1px solid #222;
         }
 
-        .container { padding: 40px 25px; max-width: 800px; margin: auto; }
+        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
 
-        /* --- TITRE LUXE --- */
-        .title-block { margin-bottom: 50px; }
-        .title-block h1 { font-size: 4rem; font-weight: 900; letter-spacing: -2px; text-transform: uppercase; line-height: 0.8; }
-        .title-block p { color: var(--accent); font-style: italic; font-size: 1.1rem; margin-top: 10px; }
+        .header-title { margin-bottom: 30px; }
+        .header-title h1 { font-size: 3rem; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; line-height: 0.9; }
+        .header-title p { color: var(--accent); font-size: 0.9rem; margin-top: 10px; letter-spacing: 2px; }
 
-        /* --- DASHBOARD CLIENT --- */
-        .client-card { background: var(--grey); padding: 25px; border-radius: 15px; margin-bottom: 50px; border: 1px solid #333; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        label { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        input, select { width: 100%; background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 8px; font-size: 0.9rem; }
+        .client-box { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; outline: none; }
 
-        /* --- SECTIONS TECHNIQUES (Toutes les infos) --- */
-        section { margin-bottom: 50px; }
-        h2 { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 25px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .menu-item { border-bottom: 1px solid #222; }
+        .menu-header { 
+            width: 100%; background: none; border: none; color: #fff; 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+        .menu-item.active .menu-header::after { content: '−'; }
         
-        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 25px; }
-        .data-item h3 { font-size: 0.7rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        .data-item p { font-size: 1rem; font-weight: 300; }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; color: var(--text-dim); font-size: 0.9rem; }
+        .menu-item.active .menu-content { max-height: 3000px; padding-bottom: 30px; }
 
-        .text-block { background: #111; padding: 25px; border-radius: 10px; margin-top: 20px; border-left: 3px solid var(--accent); }
-        .text-block h4 { font-size: 0.9rem; margin-bottom: 10px; color: var(--accent); }
+        .highlight { color: var(--accent); font-weight: 600; display: block; margin-bottom: 5px; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
+        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; font-size: 0.85rem; color: #eee; }
+        .avoid-box { background: rgba(255, 159, 67, 0.05); border-left: 2px solid var(--warning); padding: 12px; margin: 15px 0; font-size: 0.85rem; }
+        
+        ul { padding-left: 18px; margin: 10px 0; }
+        li { margin-bottom: 8px; }
+        li strong { color: #fff; font-weight: 600; }
 
-        /* --- GALERIE PHOTO INTERACTIVE --- */
-        .gallery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .add-photo-btn { background: var(--accent); color: #000; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .gallery-item { width: 100%; aspect-ratio: 1; background: #222; border-radius: 10px; object-fit: cover; border: 1px dashed #444; }
+        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 15px; }
+        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .photo-slot { width: 100%; aspect-ratio: 1; background: #111; border-radius: 10px; object-fit: cover; border: 1px solid #222; }
 
-        footer { text-align: center; padding: 80px 20px; opacity: 0.2; font-size: 0.6rem; letter-spacing: 5px; }
-        #fileInput { display: none; }
+        footer { text-align: center; padding: 40px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
+        #upload { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="botanical-header"></div>
+    <div class="hero-botanical"></div>
 
     <div class="container">
         
-        <div class="title-block">
-            <h1>Cerisier<br>Burlat</h1>
-            <p>Prunus avium • Rosacées</p>
+        <div class="header-title">
+            <p>Prunus avium • Burlat</p>
+            <h1>Cerisier</h1>
         </div>
 
-        <div class="client-card">
-            <div class="input-grid">
-                <div class="field">
-                    <label>Date de plantation</label>
+        <div class="client-box">
+            <div class="grid-inputs">
+                <div>
+                    <label>Plantation</label>
                     <input type="date" id="pDate" onchange="save()">
                 </div>
-                <div class="field">
+                <div>
                     <label>Exposition</label>
                     <select id="pExpo" onchange="save()">
                         <option>Plein Soleil</option>
@@ -82,451 +87,104 @@
             </div>
         </div>
 
-        <section>
-            <h2>Informations Générales</h2>
-            <div class="data-grid">
-                <div class="data-item"><h3>Variété / Cultivar</h3><p>Bigarreau Burlat</p></div>
-                <div class="data-item"><h3>Origine</h3><p>Asie Mineure</p></div>
-                <div class="data-item"><h3>Rusticité</h3><p>Très rustique (-15°C)</p></div>
-                <div class="data-item"><h3>Floraison</h3><p>Fin Mars - mi-Avril</p></div>
-                <div class="data-item"><h3>Hauteur maturité</h3><p>6 à 8 mètres</p></div>
-                <div class="data-item"><h3>Emplacement</h3><p>Entrée à gauche</p></div>
-            </div>
-        </section>
-
-        <section>
-            <h2>Le Fruit & Santé</h2>
-            <div class="text-block">
-                <h4>Aspect et Saveur</h4>
-                <p>Gros fruits charnus, rouge brillant. Chair ferme et très sucrée. Récolte dès fin mai.</p>
-            </div>
-            <div class="text-block" style="border-color: #ff9f43;">
-                <h4>⚠️ Point crucial : Pollinisation</h4>
-                <p>Le Burlat n'est pas autofertile. Il a besoin de voisins compatibles (Napoléon ou Reverchon) dans un rayon de 30m.</p>
-            </div>
-        </section>
-
-        <section>
-            <h2>Guide d'Entretien</h2>
-            <div class="data-grid">
-                <div class="data-item"><h3>Arrosage</h3><p>20L/semaine (2 ans)</p></div>
-                <div class="data-item"><h3>Taille</h3><p>Après récolte (Août)</p></div>
-                <div class="data-item"><h3>Fertilisation</h3><p>Compost au Printemps</p></div>
-                <div class="data-item"><h3>Compagnonnage</h3><p>Capucines & Romarin</p></div>
-            </div>
-        </section>
-
-        <section>
-            <div class="gallery-header">
-                <h2>Votre Galerie Photo</h2>
-                <label for="fileInput" class="add-photo-btn">+ Ajouter</label>
-                <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)">
-            </div>
-            <div class="gallery-grid" id="photoGallery">
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Sol & Fertilisation</button>
+            <div class="menu-content">
+                <p><strong>Type de sol :</strong> Frais, bien drainé, pas trop calcaire.</p>
+                <span class="highlight">Engrais Organiques</span>
+                <ul>
+                    <li><strong>Compost :</strong> Bien décomposé.</li>
+                    <li><strong>Corne broyée :</strong> Pour un apport d'azote lent.</li>
+                    <li><strong>Algues marines :</strong> Potassium et oligo-éléments.</li>
+                </ul>
+                <div class="tip-box">
+                    💡 <strong>Astuce :</strong> Les engrais organiques améliorent la structure du sol et sa capacité à retenir l’eau. Appliquez 5 à 10 kg en surface autour du tronc (à 30 cm du collet).
                 </div>
-        </section>
+                <span class="highlight">Fréquence Jeunes Arbres (1-3 ans)</span>
+                <p>1 fois par an au printemps (mars-avril).</p>
+                <span class="highlight">Fréquence Arbres Adultes (4 ans +)</span>
+                <p>2 fois par an : Fin d'hiver (préparation floraison) et Été après récolte (réserve hivernale).</p>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Paillage</button>
+            <div class="menu-content">
+                <span class="highlight">Jeune Arbre (2-3 ans)</span>
+                <p>20 à 30L tous les 10-15 jours en été. Arrosez au pied le soir.</p>
+                <span class="highlight">Arbre Adulte</span>
+                <p>Autonome, sauf en Mai (formation des fruits) ou en cas de canicule (1 gros arrosage par mois).</p>
+                <div class="tip-box">
+                    ⚠️ <strong>Le Paillage :</strong> C'est votre meilleur allié. Paille, écorces ou tontes sèches gardent l'humidité et nourrissent le sol.
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Compagnonnage</button>
+            <div class="menu-content">
+                <span class="highlight">Alliés des pollinisateurs</span>
+                <p>Le trèfle, la capucine, le souci, la lavande et le thym attirent les abeilles et boostent le rendement.</p>
+                <span class="highlight">Plantes répulsives</span>
+                <ul>
+                    <li><strong>Menthe :</strong> Éloigne pucerons et fourmis.</li>
+                    <li><strong>Ciboulette & Ail :</strong> Lutte contre les maladies fongiques.</li>
+                    <li><strong>Romarin :</strong> Répulsif naturel contre les insectes.</li>
+                </ul>
+                <div class="avoid-box">
+                    <strong>❌ À éviter :</strong> Pommes de terre, tomates (maladies communes) et noisetiers (inhibent la croissance). Évitez aussi le lierre envahissant.
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Taille & Protection</button>
+            <div class="menu-content">
+                <span class="highlight">Taille douce</span>
+                <p>Fin d'été (août). Supprimez bois mort et gourmands. Désinfectez vos outils.</p>
+                <span class="highlight">Santé</span>
+                <p><strong>Pucerons :</strong> Savon noir dilué. <strong>Moniliose :</strong> Ramassez les fruits au sol. <strong>Oiseaux :</strong> Pose de filets ou objets brillants.</p>
+            </div>
+        </div>
+
+        <div class="gallery-top">
+            <h2 style="font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color:#666;">Votre Journal Photo</h2>
+            <label for="upload" class="add-btn">+ Ajouter</label>
+            <input type="file" id="upload" accept="image/*" onchange="addPhoto(event)">
+        </div>
+        <div class="gallery-grid" id="gal"></div>
 
     </div>
 
-    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
+    <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-        // Sauvegarde des inputs
+        function toggleMenu(btn) { btn.parentElement.classList.toggle('active'); }
         function save() {
-            localStorage.setItem('eonia_date', document.getElementById('pDate').value);
-            localStorage.setItem('eonia_expo', document.getElementById('pExpo').value);
+            localStorage.setItem('eo_date', document.getElementById('pDate').value);
+            localStorage.setItem('eo_expo', document.getElementById('pExpo').value);
         }
-
-        // Gestion des photos personnelles du client
-        function handleImage(event) {
+        function addPhoto(e) {
             const reader = new FileReader();
             reader.onload = function() {
-                const gallery = document.getElementById('photoGallery');
                 const img = document.createElement('img');
-                img.src = reader.result;
-                img.className = 'gallery-item';
-                gallery.prepend(img);
-                
-                // Sauvegarde de l'image (limité en taille)
-                const photos = JSON.parse(localStorage.getItem('eonia_photos') || '[]');
-                photos.unshift(reader.result);
-                localStorage.setItem('eonia_photos', JSON.stringify(photos.slice(0, 4)));
+                img.src = reader.result; img.className = 'photo-slot';
+                document.getElementById('gal').prepend(img);
+                const store = JSON.parse(localStorage.getItem('eo_pics') || '[]');
+                store.unshift(reader.result);
+                localStorage.setItem('eo_pics', JSON.stringify(store.slice(0, 4)));
             }
-            reader.readAsDataURL(event.target.files[0]);
+            reader.readAsDataURL(e.target.files[0]);
         }
-
         window.onload = function() {
-            if(localStorage.getItem('eonia_date')) document.getElementById('pDate').value = localStorage.getItem('eonia_date');
-            if(localStorage.getItem('eonia_expo')) document.getElementById('pExpo').value = localStorage.getItem('eonia_expo');
-            
-            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos') || '[]');
-            savedPhotos.forEach(src => {
+            if(localStorage.getItem('eo_date')) document.getElementById('pDate').value = localStorage.getItem('eo_date');
+            if(localStorage.getItem('eo_expo')) document.getElementById('pExpo').value = localStorage.getItem('eo_expo');
+            const saved = JSON.parse(localStorage.getItem('eo_pics') || '[]');
+            saved.forEach(src => {
                 const img = document.createElement('img');
-                img.src = src;
-                img.className = 'gallery-item';
-                document.getElementById('photoGallery').appendChild(img);
+                img.src = src; img.className = 'photo-slot';
+                document.getElementById('gal').appendChild(img);
             });
-        }
-    </script>
-</body>
-</html>
-        }
-
-        .content { padding: 25px; }
-
-        /* --- TITRES --- */
-        h1 { 
-            font-size: 1.8rem; 
-            font-weight: 800; 
-            letter-spacing: 1px; 
-            color: #fff;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .subtitle { 
-            color: #4ade80; /* Vert émeraude */
-            font-size: 0.9rem; 
-            margin-bottom: 25px; 
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* --- GRILLE D'INFOS --- */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .info-box {
-            background: #252525;
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 3px solid #4ade80;
-        }
-        .info-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
-        .info-value { font-size: 0.9rem; font-weight: 600; color: #fff; margin-top: 3px; }
-
-        /* --- CHECKLIST ARROSAGE --- */
-        .section-title { font-size: 1rem; margin-bottom: 15px; color: #fff; font-weight: 600; }
-        
-        .check-list { list-style: none; }
-        .check-item {
-            display: flex;
-            align-items: center;
-            background: #252525;
-            margin-bottom: 8px;
-            padding: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .check-item input { margin-right: 15px; width: 18px; height: 18px; accent-color: #4ade80; }
-        .check-item span { font-size: 0.9rem; }
-
-        /* --- BOUTON RETOUR --- */
-        .btn-back {
-            display: block;
-            text-align: center;
-            margin-top: 30px;
-            color: #888;
-            text-decoration: none;
-            font-size: 0.8rem;
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Arbre - Éonia</title>
-    <style>
-        :root { --main-green: #4ade80; --bg-dark: #0f0f0f; --card-bg: #1a1a1a; }
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Cerisier Burlat</title>
-    <style>
-        :root { --accent: #4ade80; --card-bg: #1a1a1a; --border: #333; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background: #000; 
-            color: #fff; 
-            font-family: -apple-system, system-ui, sans-serif;
-            line-height: 1.5;
-        }
-
-        /* --- HEADER PHOTO --- */
-        .hero {
-            width: 100%; height: 50vh;
-            background: linear-gradient(to bottom, transparent, #000), 
-                        url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1000');
-            background-size: cover; background-position: center;
-            display: flex; align-items: flex-end; padding: 20px;
-        }
-
-        h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; text-transform: uppercase; }
-
-        .container { padding: 20px; max-width: 600px; margin: auto; }
-
-        /* --- TABLEAU DE BORD CLIENT --- */
-        .dashboard {
-            background: var(--card-bg); border-radius: 20px; padding: 20px;
-            margin-top: -40px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .input-row { margin-bottom: 15px; }
-        label { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        input, select { 
-            width: 100%; background: #222; border: 1px solid #444; color: #fff; 
-            padding: 12px; border-radius: 10px; font-size: 0.9rem; outline: none;
-        }
-
-        /* --- SECTIONS --- */
-        .section { margin-top: 40px; }
-        h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
-        
-        .info-list { list-style: none; }
-        .info-list li { margin-bottom: 12px; font-size: 0.95rem; font-weight: 300; }
-        .info-list strong { color: #ccc; font-weight: 600; }
-
-        /* --- CARTE FRUIT --- */
-        .fruit-card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; }
-        .fruit-card p { font-size: 0.9rem; color: #bbb; margin-bottom: 10px; }
-
-        /* --- GALERIE --- */
-        .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .gallery-img { width: 100%; aspect-ratio: 1; background: #222; border-radius: 10px; object-fit: cover; }
-
-        /* --- CHECKLIST --- */
-        .task { display: flex; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 8px; }
-        .task input { width: 20px; height: 20px; margin-right: 15px; accent-color: var(--accent); }
-
-        footer { text-align: center; padding: 50px 20px; opacity: 0.2; font-size: 0.6rem; letter-spacing: 3px; }
-    </style>
-</head>
-<body>
-
-    <div class="hero">
-        <h1>Cerisier Burlat</h1>
-    </div>
-
-    <div class="container">
-        <div class="dashboard">
-            <div class="input-row">
-                <label>Date de plantation</label>
-                <input type="date" id="d1" value="2026-03-29" onchange="s()">
-            </div>
-            <div class="input-row">
-                <label>Exposition</label>
-                <select id="s1" onchange="s()">
-                    <option>Plein Soleil</option>
-                    <option>Mi-ombre</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Informations Générales</h2>
-            <ul class="info-list">
-                <li><strong>Nom scientifique :</strong> Prunus avium</li>
-                <li><strong>Famille :</strong> Rosacées</li>
-                <li><strong>Origine :</strong> Asie Mineure</li>
-                <li><strong>Rusticité :</strong> Jusqu'à -15°C</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Les caractéristiques du fruit</h2>
-            <div class="fruit-card">
-                <p><strong>Aspect :</strong> Gros fruits charnus en forme de cœur, rouge brillant virant au pourpre.</p>
-                <p><strong>Saveur :</strong> Chair ferme, juteuse et très sucrée.</p>
-                <p><strong>💡 Point crucial :</strong> Le Burlat n'est pas autofertile. Il a besoin de voisins compatibles à proximité (20-30m).</p>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>À Faire / Suivi</h2>
-            <div class="task"><input type="checkbox" checked> <span>Arrosé le 03/04</span></div>
-            <div class="task"><input type="checkbox"> <span>Vérifier ravageurs</span></div>
-            <div class="task"><input type="checkbox"> <span>Fertilisation (Printemps)</span></div>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Cerisier Burlat</title>
-    <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            line-height: 1.7;
-        }
-
-        /* --- IMAGE DE COUVERTURE --- */
-        .hero {
-            width: 100%;
-            height: 70vh;
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, var(--bg) 100%),
-                        url('1000044205.jpg'); /* Ta photo de plantation */
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 40px 25px;
-        }
-
-        .hero h1 { 
-            font-size: 3.5rem; 
-            font-weight: 800; 
-            letter-spacing: -2px; 
-            text-transform: uppercase;
-            line-height: 0.9;
-        }
-
-        .hero .species { 
-            color: var(--accent); 
-            font-style: italic; 
-            font-size: 1.1rem; 
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .container { padding: 0 25px 100px 25px; max-width: 800px; margin: auto; }
-
-        /* --- SECTION ÉDITABLE DISCRÈTE --- */
-        .client-inputs {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 50px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #222;
-        }
-        .input-box { flex: 1; }
-        .input-box label { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
-        .input-box input, .input-box select {
-            width: 100%; background: transparent; border: none; color: var(--accent); font-size: 1rem; outline: none;
-        }
-
-        /* --- CONTENU STYLE FICHE --- */
-        section { margin-bottom: 60px; }
-        h2 { 
-            font-size: 0.7rem; 
-            letter-spacing: 4px; 
-            text-transform: uppercase; 
-            color: #444; 
-            margin-bottom: 25px;
-            border-left: 2px solid var(--accent);
-            padding-left: 15px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-        }
-
-        .info-item h3 { font-size: 0.8rem; color: #888; font-weight: 400; margin-bottom: 5px; }
-        .info-item p { font-size: 1rem; color: #eee; font-weight: 300; }
-
-        /* --- BLOC MISE EN AVANT --- */
-        .highlight-box {
-            background: #111;
-            padding: 30px;
-            border-radius: 5px;
-            border-right: 4px solid var(--accent);
-            margin: 40px 0;
-        }
-        .highlight-box h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
-
-        /* --- GALERIE --- */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .gallery-grid img { width: 100%; border-radius: 2px; opacity: 0.8; transition: 0.5s; }
-        .gallery-grid img:hover { opacity: 1; }
-
-        footer { text-align: center; padding: 60px; font-size: 0.6rem; letter-spacing: 5px; color: #333; }
-    </style>
-</head>
-<body>
-
-    <div class="hero">
-        <p class="species">Prunus avium • Burlat</p>
-        <h1>Cerisier</h1>
-    </div>
-
-    <div class="container">
-        
-        <div class="client-inputs">
-            <div class="input-box">
-                <label>Plantation</label>
-                <input type="date" id="d" value="2026-03-29" onchange="sv()">
-            </div>
-            <div class="input-box">
-                <label>Exposition</label>
-                <select id="e" onchange="sv()">
-                    <option>Plein Soleil</option>
-                    <option>Mi-ombre</option>
-                </select>
-            </div>
-        </div>
-
-        <section>
-            <h2>Informations Générales</h2>
-            <div class="info-grid">
-                <div class="info-item"><h3>Variété</h3><p>Bigarreau Burlat</p></div>
-                <div class="info-item"><h3>Floraison</h3><p>Fin mars à mi-avril</p></div>
-                <div class="info-item"><h3>Rusticité</h3><p>Très rustique (-15°C)</p></div>
-                <div class="info-item"><h3>Hauteur</h3><p>6 à 8 mètres</p></div>
-            </div>
-        </section>
-
-        <div class="highlight-box">
-            <h3>Le Fruit</h3>
-            <p>De gros fruits charnus en forme de cœur, rouge brillant. Chair ferme, juteuse et très sucrée. Récolte précoce dès fin mai.</p>
-        </div>
-
-        <section>
-            <h2>Conseils & Entretien</h2>
-            <div class="info-grid">
-                <div class="info-item">
-                    <h3>Pollinisation</h3>
-                    <p>Non autofertile. Nécessite un voisin compatible (Napoléon ou Reverchon) dans un rayon de 30m.</p>
-                </div>
-                <div class="info-item">
-                    <h3>Arrosage</h3>
-                    <p>Copieux les deux premières années. Paillage conseillé pour garder la fraîcheur.</p>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h2>Journal Visuel</h2>
-            <div class="gallery-grid">
-                <img src="1000044207.jpg" alt="Vue 1">
-                <img src="1000044205.jpg" alt="Vue 2">
-            </div>
-        </section>
-
-    </div>
-
-    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
-
-    <script>
-        function sv() {
-            localStorage.setItem('date_b', document.getElementById('d').value);
-            localStorage.setItem('expo_b', document.getElementById('e').value);
-        }
-        window.onload = function() {
-            if(localStorage.getItem('date_b')) document.getElementById('d').value = localStorage.getItem('date_b');
-            if(localStorage.getItem('expo_b')) document.getElementById('e').value = localStorage.getItem('expo_b');
         }
     </script>
 </body>
