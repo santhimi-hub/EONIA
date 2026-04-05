@@ -25,44 +25,45 @@
 
         /* CONFIGURATION DE TON LOGO */
         .logo-eonia {
-            width: 130px; /* Taille ajustable selon tes goûts */
+            width: 140px; /* Taille ajustable selon tes goûts */
             height: auto;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             /* Si ton logo est blanc, on ajoute une petite lueur pour le faire ressortir */
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
             animation: pulse 4s infinite;
         }
 
         h1 {
-            font-size: 3rem;
-            letter-spacing: 8px;
-            font-weight: 300;
-            margin-bottom: 15px;
+            font-size: 2.8rem;
+            letter-spacing: 10px;
+            font-weight: 200;
+            margin-bottom: 10px;
             text-transform: uppercase;
         }
 
         p {
-            font-size: 1.1rem;
-            margin-bottom: 40px;
+            font-size: 1rem;
+            margin-bottom: 60px;
             font-weight: 300;
-            font-style: italic;
-            opacity: 0.9;
+            font-style: 1px;
+            opacity: 0.8;
         }
 
         .btn-entrer {
-            background-color: white;
-            color: #333;
-            padding: 15px 60px;
+            background-color: rgba(255, 255, 0.9);
+            color: #1a1a1a;
+            padding: 16px 60px;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
             letter-spacing: 2px;
             display: inline-block;
             border: 2px solid white;
             transition: all 0.3s;
         }
 
-        .btn-entrer:hover {
+        .btn-entrer:active {
+            transform : scale(0.95);
             background-color: transparent;
             color: white;
         }
