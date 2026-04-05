@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Jardin - Éonia</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: sans-serif; padding: 50px; text-align: center; }
+        .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 50px; }
+        .plante { background: #2a2a2a; padding: 20px; border-radius: 15px; border: 1px solid #444; }
+        img { width: 100%; border-radius: 10px; }
+        a { color: #88ff88; text-decoration: none; margin-top: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Mon Catalogue de Plantes</h1>
+    <div class="grille">
+        <div class="plante">
+            <img src="https://images.unsplash.com/photo-1545239351-ef35f43d514b?w=200" alt="Monstera">
+            <h3>Monstera Deliciosa</h3>
+            <p>Arrosage : 1x / semaine</p>
+        </div>
+        <div class="plante">
+            <img src="https://images.unsplash.com/photo-1512428813824-f7139c89b85a?w=200" alt="Pilea">
+            <h3>Pilea</h3>
+            <p>Lumière : Indirecte</p>
+        </div>
+    </div>
+    <a href="index.html">← Retour à l'accueil</a>
+</body>
+</html>
