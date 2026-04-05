@@ -1,39 +1,175 @@
 <!DOCTYPE html>
 <html lang="fr">
-<!DOCTYPE html>
-<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Jardin - Éonia</title>
+    <title>Éonia - Cerisier Burlat</title>
     <style>
+        :root { --accent: #4ade80; --bg: #0a0a0a; --grey: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background: #0f0f0f; 
-            color: #e0e0e0; 
-            font-family: -apple-system, sans-serif; 
-            padding: 20px;
+            background: var(--bg); color: #fff; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
         }
 
-        /* --- CARTE PRINCIPALE --- */
-        .card {
-            background: #1a1a1a;
-            border-radius: 25px;
-            overflow: hidden;
-            max-width: 450px;
-            margin: 0 auto;
-            border: 1px solid #333;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        /* --- PHOTO BOTANIQUE (Haut de page) --- */
+        .botanical-header {
+            width: 100%; height: 45vh;
+            background: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1200') center/cover;
+            border-bottom: 1px solid #222;
         }
 
-        /* --- PHOTO DE L'ARBRE --- */
-        .tree-photo {
-            width: 100%;
-            height: 280px;
-            background-image: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1000');
-            background-size: cover;
-            background-position: center;
+        .container { padding: 40px 25px; max-width: 800px; margin: auto; }
+
+        /* --- TITRE LUXE --- */
+        .title-block { margin-bottom: 50px; }
+        .title-block h1 { font-size: 4rem; font-weight: 900; letter-spacing: -2px; text-transform: uppercase; line-height: 0.8; }
+        .title-block p { color: var(--accent); font-style: italic; font-size: 1.1rem; margin-top: 10px; }
+
+        /* --- DASHBOARD CLIENT --- */
+        .client-card { background: var(--grey); padding: 25px; border-radius: 15px; margin-bottom: 50px; border: 1px solid #333; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        label { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        input, select { width: 100%; background: #222; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 8px; font-size: 0.9rem; }
+
+        /* --- SECTIONS TECHNIQUES (Toutes les infos) --- */
+        section { margin-bottom: 50px; }
+        h2 { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 25px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 25px; }
+        .data-item h3 { font-size: 0.7rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .data-item p { font-size: 1rem; font-weight: 300; }
+
+        .text-block { background: #111; padding: 25px; border-radius: 10px; margin-top: 20px; border-left: 3px solid var(--accent); }
+        .text-block h4 { font-size: 0.9rem; margin-bottom: 10px; color: var(--accent); }
+
+        /* --- GALERIE PHOTO INTERACTIVE --- */
+        .gallery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .add-photo-btn { background: var(--accent); color: #000; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .gallery-item { width: 100%; aspect-ratio: 1; background: #222; border-radius: 10px; object-fit: cover; border: 1px dashed #444; }
+
+        footer { text-align: center; padding: 80px 20px; opacity: 0.2; font-size: 0.6rem; letter-spacing: 5px; }
+        #fileInput { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="botanical-header"></div>
+
+    <div class="container">
+        
+        <div class="title-block">
+            <h1>Cerisier<br>Burlat</h1>
+            <p>Prunus avium • Rosacées</p>
+        </div>
+
+        <div class="client-card">
+            <div class="input-grid">
+                <div class="field">
+                    <label>Date de plantation</label>
+                    <input type="date" id="pDate" onchange="save()">
+                </div>
+                <div class="field">
+                    <label>Exposition</label>
+                    <select id="pExpo" onchange="save()">
+                        <option>Plein Soleil</option>
+                        <option>Mi-ombre</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h2>Informations Générales</h2>
+            <div class="data-grid">
+                <div class="data-item"><h3>Variété / Cultivar</h3><p>Bigarreau Burlat</p></div>
+                <div class="data-item"><h3>Origine</h3><p>Asie Mineure</p></div>
+                <div class="data-item"><h3>Rusticité</h3><p>Très rustique (-15°C)</p></div>
+                <div class="data-item"><h3>Floraison</h3><p>Fin Mars - mi-Avril</p></div>
+                <div class="data-item"><h3>Hauteur maturité</h3><p>6 à 8 mètres</p></div>
+                <div class="data-item"><h3>Emplacement</h3><p>Entrée à gauche</p></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Le Fruit & Santé</h2>
+            <div class="text-block">
+                <h4>Aspect et Saveur</h4>
+                <p>Gros fruits charnus, rouge brillant. Chair ferme et très sucrée. Récolte dès fin mai.</p>
+            </div>
+            <div class="text-block" style="border-color: #ff9f43;">
+                <h4>⚠️ Point crucial : Pollinisation</h4>
+                <p>Le Burlat n'est pas autofertile. Il a besoin de voisins compatibles (Napoléon ou Reverchon) dans un rayon de 30m.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Guide d'Entretien</h2>
+            <div class="data-grid">
+                <div class="data-item"><h3>Arrosage</h3><p>20L/semaine (2 ans)</p></div>
+                <div class="data-item"><h3>Taille</h3><p>Après récolte (Août)</p></div>
+                <div class="data-item"><h3>Fertilisation</h3><p>Compost au Printemps</p></div>
+                <div class="data-item"><h3>Compagnonnage</h3><p>Capucines & Romarin</p></div>
+            </div>
+        </section>
+
+        <section>
+            <div class="gallery-header">
+                <h2>Votre Galerie Photo</h2>
+                <label for="fileInput" class="add-photo-btn">+ Ajouter</label>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)">
+            </div>
+            <div class="gallery-grid" id="photoGallery">
+                </div>
+        </section>
+
+    </div>
+
+    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
+
+    <script>
+        // Sauvegarde des inputs
+        function save() {
+            localStorage.setItem('eonia_date', document.getElementById('pDate').value);
+            localStorage.setItem('eonia_expo', document.getElementById('pExpo').value);
+        }
+
+        // Gestion des photos personnelles du client
+        function handleImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const gallery = document.getElementById('photoGallery');
+                const img = document.createElement('img');
+                img.src = reader.result;
+                img.className = 'gallery-item';
+                gallery.prepend(img);
+                
+                // Sauvegarde de l'image (limité en taille)
+                const photos = JSON.parse(localStorage.getItem('eonia_photos') || '[]');
+                photos.unshift(reader.result);
+                localStorage.setItem('eonia_photos', JSON.stringify(photos.slice(0, 4)));
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        window.onload = function() {
+            if(localStorage.getItem('eonia_date')) document.getElementById('pDate').value = localStorage.getItem('eonia_date');
+            if(localStorage.getItem('eonia_expo')) document.getElementById('pExpo').value = localStorage.getItem('eonia_expo');
+            
+            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos') || '[]');
+            savedPhotos.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'gallery-item';
+                document.getElementById('photoGallery').appendChild(img);
+            });
+        }
+    </script>
+</body>
+</html>
         }
 
         .content { padding: 25px; }
