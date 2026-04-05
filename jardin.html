@@ -95,50 +95,141 @@
             color: #888;
             text-decoration: none;
             font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Arbre - Éonia</title>
+    <style>
+        :root { --main-green: #4ade80; --bg-dark: #0f0f0f; --card-bg: #1a1a1a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-dark); color: #e0e0e0; font-family: -apple-system, sans-serif; line-height: 1.6; }
+
+        /* --- HEADER & PHOTO --- */
+        .hero-photo { 
+            width: 100%; height: 250px; 
+            background: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1000') center/cover;
+            position: relative;
         }
+        .overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, var(--bg-dark)); }
+        
+        /* --- INFOS MODIFIABLES --- */
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        .editable-section { background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
+        
+        label { display: block; font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { 
+            width: 100%; background: #252525; border: 1px solid #444; color: white; 
+            padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 1rem;
+        }
+
+        /* --- ONGLETS (TABS) --- */
+        .tabs { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 5px; }
+        .tab-btn { 
+            padding: 10px 20px; background: #252525; border: none; color: #888; 
+            border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--main-green); color: black; font-weight: bold; }
+        .tab-content { display: none; background: var(--card-bg); padding: 20px; border-radius: 15px; border: 1px solid #333; min-height: 200px; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+
+        h2 { color: var(--main-green); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; }
+        ul { padding-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; font-size: 0.95rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="tree-photo"></div>
-        
-        <div class="content">
-            <h1>CERISIER BURLAT</h1>
-            <p class="subtitle">Mémoire de Santhimi</p>
-
-            <div class="info-grid">
-                <div class="info-box">
-                    <div class="info-label">Planté le</div>
-                    <div class="info-value">12 Mars 2026</div>
-                </div>
-                <div class="info-box">
-                    <div class="info-label">Exposition</div>
-                    <div class="info-value">Plein Soleil ☀️</div>
-                </div>
-                <div class="info-box">
-                    <div class="info-label">Taille</div>
-                    <div class="info-value">1.20 m</div>
-                </div>
-                <div class="info-box">
-                    <div class="info-label">Prochain Soin</div>
-                    <div class="info-value">Taille d'été</div>
-                </div>
-            </div>
-
-            <p class="section-title">Suivi Arrosage (Avril)</p>
-            <ul class="check-list">
-                <li class="check-item"><input type="checkbox"> <span>Semaine 1 - Fait</span></li>
-                <li class="check-item"><input type="checkbox"> <span>Semaine 2 - En attente</span></li>
-                <li class="check-item"><input type="checkbox"> <span>Semaine 3 - En attente</span></li>
-                <li class="check-item"><input type="checkbox"> <span>Semaine 4 - En attente</span></li>
-            </ul>
-
-            <a href="index.html" class="btn-back">← Retour à l'accueil</a>
+    <div class="hero-photo">
+        <div class="overlay">
+            <h1 id="treeTitle">CERISIER BURLAT</h1>
         </div>
     </div>
+
+    <div class="container">
+        
+        <div class="editable-section">
+            <label>Date de plantation</label>
+            <input type="date" id="plantDate" onchange="saveData()">
+
+            <label>Exposition</label>
+            <select id="expoSelect" onchange="saveData()">
+                <option value="Soleil">Plein Soleil</option>
+                <option value="Mi-ombre">Mi-ombre</option>
+                <option value="Ombre">Ombre</option>
+            </select>
+
+            <label>Dernier Arrosage</label>
+            <input type="date" id="lastWater" onchange="saveData()">
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'general')">Présentation</button>
+            <button class="tab-btn" onclick="openTab(event, 'entretien')">Entretien & Eau</button>
+            <button class="tab-btn" onclick="openTab(event, 'sante')">Santé & Sol</button>
+            <button class="tab-btn" onclick="openTab(event, 'compagnon')">Compagnonnage</button>
+        </div>
+
+        <div id="general" class="tab-content active">
+            <h2>Généralités</h2>
+            <p>Le Cerisier Burlat est la star des vergers. Arbre vigoureux, il offre des fruits charnus, sucrés et d'un rouge profond dès la fin du mois de mai.</p>
+        </div>
+
+        <div id="entretien" class="tab-content">
+            <h2>Arrosage & Entretien</h2>
+            <ul>
+                <li><strong>Arrosage :</strong> Copieux les 2 premières années (20L/semaine).</li>
+                <li><strong>Protection :</strong> Installer un filet anti-oiseaux en mai.</li>
+                <li><strong>Taille :</strong> Taille douce après la récolte si nécessaire.</li>
+            </ul>
+        </div>
+
+        <div id="sante" class="tab-content">
+            <h2>Sol & Santé</h2>
+            <ul>
+                <li><strong>Sol :</strong> Drainant, riche, évite les terres trop calcaires.</li>
+                <li><strong>Fertilisation :</strong> Apport de compost au printemps.</li>
+                <li><strong>Santé :</strong> Surveiller les pucerons noirs sur les jeunes pousses.</li>
+            </ul>
+        </div>
+
+        <div id="compagnon" class="tab-content">
+            <h2>Plantes Associées</h2>
+            <p>Le cerisier aime la compagnie de la <strong>Capucine</strong> (éloigne les pucerons) et du <strong>Romarin</strong>.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Système d'onglets
+        function openTab(evt, tabName) {
+            let contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) contents[i].className = contents[i].className.replace(" active", "");
+            
+            let btns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < btns.length; i++) btns[i].className = btns[i].className.replace(" active", "");
+            
+            document.getElementById(tabName).className += " active";
+            evt.currentTarget.className += " active";
+        }
+
+        // Sauvegarde locale sur le téléphone
+        function saveData() {
+            localStorage.setItem('plantDate', document.getElementById('plantDate').value);
+            localStorage.setItem('expoSelect', document.getElementById('expoSelect').value);
+            localStorage.setItem('lastWater', document.getElementById('lastWater').value);
+        }
+
+        // Chargement des données au démarrage
+        window.onload = function() {
+            if(localStorage.getItem('plantDate')) document.getElementById('plantDate').value = localStorage.getItem('plantDate');
+            if(localStorage.getItem('expoSelect')) document.getElementById('expoSelect').value = localStorage.getItem('expoSelect');
+            if(localStorage.getItem('lastWater')) document.getElementById('lastWater').value = localStorage.getItem('lastWater');
+        }
+    </script>
 
 </body>
 </html>
