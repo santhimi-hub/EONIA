@@ -5,59 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Éonia - Cerisier Burlat</title>
     <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; --warning: #ff9f43; }
+        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            background: var(--bg); color: #fff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
-        }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; line-height: 1.6; }
 
+        /* HEADER IMAGE FIXE */
         .hero-botanical {
             width: 100%; height: 35vh;
             background: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1200') center/cover;
             border-bottom: 1px solid #222;
         }
 
-        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
+        .container { padding: 30px 20px; max-width: 700px; margin: auto; }
 
-        .header-title { margin-bottom: 30px; }
-        .header-title h1 { font-size: 3rem; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; line-height: 0.9; }
-        .header-title p { color: var(--accent); font-size: 0.9rem; margin-top: 10px; letter-spacing: 2px; }
+        .header-title h1 { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
+        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 30px; }
 
-        .client-box { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px; }
+        /* --- INFOS GÉNÉRALES --- */
+        .specs-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
+            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px;
+        }
+        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .spec-item p { font-size: 0.9rem; font-weight: 500; color: #eee; }
+
+        /* --- DASHBOARD CLIENT (SAUVEGARDE) --- */
+        .client-box { background: #1a1a1a; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid var(--accent); }
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        label { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; background: #222; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.85rem; outline: none; }
+        label { display: block; font-size: 0.65rem; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
 
+        /* --- MENUS DÉROULANTS --- */
         .menu-item { border-bottom: 1px solid #222; }
         .menu-header { 
             width: 100%; background: none; border: none; color: #fff; 
             display: flex; justify-content: space-between; align-items: center;
-            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
         }
-        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+        .menu-header::after { content: '+'; color: var(--accent); }
         .menu-item.active .menu-header::after { content: '−'; }
-        
-        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; color: var(--text-dim); font-size: 0.9rem; }
-        .menu-item.active .menu-content { max-height: 3000px; padding-bottom: 30px; }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; color: var(--text-dim); font-size: 0.9rem; }
+        .menu-item.active .menu-content { max-height: 2000px; padding-bottom: 25px; }
 
-        .highlight { color: var(--accent); font-weight: 600; display: block; margin-bottom: 5px; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
-        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; font-size: 0.85rem; color: #eee; }
-        .avoid-box { background: rgba(255, 159, 67, 0.05); border-left: 2px solid var(--warning); padding: 12px; margin: 15px 0; font-size: 0.85rem; }
-        
-        ul { padding-left: 18px; margin: 10px 0; }
-        li { margin-bottom: 8px; }
-        li strong { color: #fff; font-weight: 600; }
-
-        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 15px; }
-        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        /* --- GALERIE --- */
+        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
+        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
         .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-slot { width: 100%; aspect-ratio: 1; background: #111; border-radius: 10px; object-fit: cover; border: 1px solid #222; }
+        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 10px; object-fit: cover; border: 1px solid #222; }
 
-        footer { text-align: center; padding: 40px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
-        #upload { display: none; }
+        footer { text-align: center; padding: 60px; opacity: 0.3; font-size: 0.6rem; letter-spacing: 4px; }
     </style>
 </head>
 <body>
@@ -67,125 +63,109 @@
     <div class="container">
         
         <div class="header-title">
-            <p>Prunus avium • Burlat</p>
-            <h1>Cerisier</h1>
+            <h1>Cerisier Burlat</h1>
+            <p>Prunus avium • Rosacées</p>
+        </div>
+
+        <div class="specs-grid">
+            <div class="spec-item"><span>Variété</span><p>Bigarreau Burlat</p></div>
+            <div class="spec-item"><span>Rusticité</span><p>-15°C à -20°C</p></div>
+            <div class="spec-item"><span>Floraison</span><p>Fin Mars / Avril</p></div>
+            <div class="spec-item"><span>Récolte</span><p>Fin Mai / Juin</p></div>
+            <div class="spec-item"><span>Hauteur</span><p>5 à 8 mètres</p></div>
+            <div class="spec-item"><span>Pollinisation</span><p>Non autofertile</p></div>
         </div>
 
         <div class="client-box">
             <div class="grid-inputs">
                 <div>
-                    <label>Plantation</label>
-                    <input type="date" id="pDate" onchange="save()">
+                    <label>Date Plantation</label>
+                    <input type="date" id="pDate" onchange="saveData()">
                 </div>
                 <div>
                     <label>Exposition</label>
-                    <select id="pExpo" onchange="save()">
-                        <option>Plein Soleil</option>
-                        <option>Mi-ombre</option>
+                    <select id="pExpo" onchange="saveData()">
+                        <option value="">Choisir...</option>
+                        <option value="Soleil">Plein Soleil</option>
+                        <option value="Mi-ombre">Mi-ombre</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Sol & Fertilisation</button>
+            <button class="menu-header" onclick="toggleMenu(this)">Entretien & Taille</button>
             <div class="menu-content">
-                <p><strong>Type de sol :</strong> Frais, bien drainé, pas trop calcaire.</p>
-                <span class="highlight">Engrais Organiques</span>
-                <ul>
-                    <li><strong>Compost :</strong> Bien décomposé.</li>
-                    <li><strong>Corne broyée :</strong> Pour un apport d'azote lent.</li>
-                    <li><strong>Algues marines :</strong> Potassium et oligo-éléments.</li>
-                </ul>
-                <div class="tip-box">
-                    💡 <strong>Astuce :</strong> Les engrais organiques améliorent la structure du sol et sa capacité à retenir l’eau. Appliquez 5 à 10 kg en surface autour du tronc (à 30 cm du collet).
-                </div>
-                <span class="highlight">Fréquence Jeunes Arbres (1-3 ans)</span>
-                <p>1 fois par an au printemps (mars-avril).</p>
-                <span class="highlight">Fréquence Arbres Adultes (4 ans +)</span>
-                <p>2 fois par an : Fin d'hiver (préparation floraison) et Été après récolte (réserve hivernale).</p>
+                <p>Le cerisier déteste la taille sévère. Intervenez fin août pour une meilleure cicatrisation et éviter la gommose.</p>
             </div>
         </div>
 
         <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Paillage</button>
+            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Sol</button>
             <div class="menu-content">
-                <span class="highlight">Jeune Arbre (2-3 ans)</span>
-                <p>20 à 30L tous les 10-15 jours en été. Arrosez au pied le soir.</p>
-                <span class="highlight">Arbre Adulte</span>
-                <p>Autonome, sauf en Mai (formation des fruits) ou en cas de canicule (1 gros arrosage par mois).</p>
-                <div class="tip-box">
-                    ⚠️ <strong>Le Paillage :</strong> C'est votre meilleur allié. Paille, écorces ou tontes sèches gardent l'humidité et nourrissent le sol.
-                </div>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Compagnonnage</button>
-            <div class="menu-content">
-                <span class="highlight">Alliés des pollinisateurs</span>
-                <p>Le trèfle, la capucine, le souci, la lavande et le thym attirent les abeilles et boostent le rendement.</p>
-                <span class="highlight">Plantes répulsives</span>
-                <ul>
-                    <li><strong>Menthe :</strong> Éloigne pucerons et fourmis.</li>
-                    <li><strong>Ciboulette & Ail :</strong> Lutte contre les maladies fongiques.</li>
-                    <li><strong>Romarin :</strong> Répulsif naturel contre les insectes.</li>
-                </ul>
-                <div class="avoid-box">
-                    <strong>❌ À éviter :</strong> Pommes de terre, tomates (maladies communes) et noisetiers (inhibent la croissance). Évitez aussi le lierre envahissant.
-                </div>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Taille & Protection</button>
-            <div class="menu-content">
-                <span class="highlight">Taille douce</span>
-                <p>Fin d'été (août). Supprimez bois mort et gourmands. Désinfectez vos outils.</p>
-                <span class="highlight">Santé</span>
-                <p><strong>Pucerons :</strong> Savon noir dilué. <strong>Moniliose :</strong> Ramassez les fruits au sol. <strong>Oiseaux :</strong> Pose de filets ou objets brillants.</p>
+                <p>Jeune arbre : 20L tous les 10 jours en été. Privilégiez un sol bien drainé et riche en compost.</p>
             </div>
         </div>
 
         <div class="gallery-top">
-            <h2 style="font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color:#666;">Votre Journal Photo</h2>
-            <label for="upload" class="add-btn">+ Ajouter</label>
-            <input type="file" id="upload" accept="image/*" onchange="addPhoto(event)">
+            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Vos Photos</h2>
+            <label for="upload" class="add-btn">AJOUTER</label>
+            <input type="file" id="upload" accept="image/*" style="display:none" onchange="addPhoto(event)">
         </div>
         <div class="gallery-grid" id="gal"></div>
 
     </div>
 
-    <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
+    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
 
     <script>
+        // Toggle menu
         function toggleMenu(btn) { btn.parentElement.classList.toggle('active'); }
-        function save() {
-            localStorage.setItem('eo_date', document.getElementById('pDate').value);
-            localStorage.setItem('eo_expo', document.getElementById('pExpo').value);
+
+        // Sauvegarde Date et Expo
+        function saveData() {
+            const data = {
+                date: document.getElementById('pDate').value,
+                expo: document.getElementById('pExpo').value
+            };
+            localStorage.setItem('eonia_storage', JSON.stringify(data));
         }
+
+        // Ajout photo avec sauvegarde sécurisée
         function addPhoto(e) {
+            const file = e.target.files[0];
             const reader = new FileReader();
-            reader.onload = function() {
+            reader.onloadend = function() {
+                const base64String = reader.result;
                 const img = document.createElement('img');
-                img.src = reader.result; img.className = 'photo-slot';
+                img.src = base64String;
+                img.className = 'photo-slot';
                 document.getElementById('gal').prepend(img);
-                const store = JSON.parse(localStorage.getItem('eo_pics') || '[]');
-                store.unshift(reader.result);
-                localStorage.setItem('eo_pics', JSON.stringify(store.slice(0, 4)));
+                
+                // Sauvegarde locale des photos
+                let photos = JSON.parse(localStorage.getItem('eonia_photos') || "[]");
+                photos.unshift(base64String);
+                localStorage.setItem('eonia_photos', JSON.stringify(photos.slice(0, 4)));
             }
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
+
+        // Chargement automatique au démarrage
         window.onload = function() {
-            if(localStorage.getItem('eo_date')) document.getElementById('pDate').value = localStorage.getItem('eo_date');
-            if(localStorage.getItem('eo_expo')) document.getElementById('pExpo').value = localStorage.getItem('eo_expo');
-            const saved = JSON.parse(localStorage.getItem('eo_pics') || '[]');
-            saved.forEach(src => {
+            // Charger Texte
+            const savedData = JSON.parse(localStorage.getItem('eonia_storage'));
+            if (savedData) {
+                document.getElementById('pDate').value = savedData.date || "";
+                document.getElementById('pExpo').value = savedData.expo || "";
+            }
+            // Charger Photos
+            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos') || "[]");
+            savedPhotos.forEach(src => {
                 const img = document.createElement('img');
                 img.src = src; img.className = 'photo-slot';
                 document.getElementById('gal').appendChild(img);
             });
-        }
+        };
     </script>
 </body>
 </html>
