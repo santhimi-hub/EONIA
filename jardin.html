@@ -8,181 +8,19 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
+        #status-msg { text-align: center; padding: 50px; color: #4ade80; }
         #plant-details { display: none; max-width: 1000px; margin: 0 auto; }
-
-        /* --- STYLE COUVERTURE --- */
-        .main-img-container { 
-            width: 100%; 
-            height: 50vh; /* L'image prend la moitié de l'écran en hauteur */
-            overflow: hidden; 
-            position: relative;
-            border-bottom: 2px solid #4ade80;
-        }
-        #main-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; /* Remplit tout l'espace sans déformer */
-        }
-
-        /* --- STYLE TEXTE AVEC MARGES --- */
-        .content-padding { 
-            padding: 30px 20px; /* Marges pour le texte sur les côtés */
-        }
-
+        .main-img-container { width: 100%; height: 50vh; overflow: hidden; border-bottom: 2px solid #4ade80; }
+        #main-img { width: 100%; height: 100%; object-fit: cover; }
+        .content-padding { padding: 30px 20px; }
         header { margin-bottom: 20px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-
-        .title-section { margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; }
-        
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; margin-bottom: 5px; }
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .info-item { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #222; }
         .label { font-size: 0.6rem; text-transform: uppercase; color: #666; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .value { font-size: 0.85rem; font-weight: 500; color: #eee; }
-
-        .description-box { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #222; }
-    </style>
-</head>
-<body>
-
-    <div id="status-msg">Connexion à la mémoire végétale...</div>
-
-    <div id="plant-details">
-        <div class="main-img-container">
-            <img id="main-img" src="" alt="Plante">
-        </div>
-
-        <div class="content-padding">
-            <header>
-                <a href="catalogue.html" class="back-btn">← Retour au catalogue</a>
-            </header>
-
-            <div class="title-section">
-                <h1 id="nom-commun">...</h1>
-                <p id="surnom-plante" style="opacity: 0.6; font-style: italic; font-size: 0.9rem;"></p>
-            </div>
-
-            <div class="grid-info">
-                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
-                <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
-                <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
-                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
-                <div class="info-item"><span class="label">Arrosage</span><span id="info-arrosage" class="value"></span></div>
-                <div class="info-item"><span class="label">Taille</span><span id="taille" class="value"></span></div>
-            </div>
-
-            <div class="description-box">
-                <div id="espace-proprietaire" style="display: none; margin-top: 30px;">
-    <h2 style="font-weight: 200; color: #4ade80; font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px;">
-        Votre Suivi Privé
-    </h2>
-    
-    <div class="grid-info">
-        <div class="info-item">
-            <span class="label">Dernier Arrosage</span>
-            <span id="last-water" class="value">12 Oct. 2023</span>
-        </div>
-        <div class="info-item">
-            <span class="label">Prochain Rappel</span>
-            <span id="next-reminder" class="value">Demain</span>
-        </div>
-    </div>
-
-    <div class="description-box" style="border-color: #4ade80;">
-        <span class="label">Notes de suivi</span>
-        <p id="suivi-notes" style="margin-top:10px; font-size:0.9rem; color: #eee;">
-            "La plante se porte bien, les bourgeons apparaissent."
-        </p>
-    </div>
-</div>
-
-<div id="msg-visiteur" style="margin-top: 30px; text-align: center; opacity: 0.5; font-size: 0.8rem;">
-    <p>Cette plante appartient à un jardin privé.<br>Le suivi détaillé n'est pas public.</p>
-</div>
-
-                <span class="label">Description & Entretien</span>
-                <p id="desc-text" style="margin-top:10px; font-size:0.9rem; color: #ccc;"></p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-
-    async function load() {
-        const params = new URLSearchParams(window.location.search);
-        const plaqueNum = params.get('plaque'); 
-        const container = document.getElementById('plant-details');
-        const statusMsg = document.getElementById('status-msg');
-
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-
-            // On cherche la plante correspondante
-            const page = data.results.find(p => {
-                const prop = p.properties["ID_Plaque"];
-                const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
-                return val.toString().trim() === plaqueNum?.toString().trim();
-            });
-
-            if (!page) {
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Ma Plante</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
-        #plant-details { display: none; max-width: 1000px; margin: 0 auto; }
-
-        /* --- STYLE COUVERTURE --- */
-        .main-img-container { 
-            width: 100%; 
-            height: 50vh; 
-            overflow: hidden; 
-            position: relative;
-            border-bottom: 2px solid #4ade80;
-        }
-        #main-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-
-        /* --- STYLE TEXTE AVEC MARGES --- */
-        .content-padding { 
-            padding: 30px 20px; 
-        }
-
-        header { margin-bottom: 20px; }
-        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-
-        .title-section { margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; }
-        
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .info-item { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #222; }
-        .label { font-size: 0.6rem; text-transform: uppercase; color: #666; letter-spacing: 1px; display: block; margin-bottom: 5px; }
-        .value { font-size: 0.85rem; font-weight: 500; color: #eee; }
-
         .description-box { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px; }
-        
-        /* Style spécifique pour l'espace proprio */
-        #espace-proprietaire { 
-            border: 1px solid #4ade80; 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin-top: 20px; 
-            background: rgba(74, 222, 128, 0.05);
-        }
     </style>
 </head>
 <body>
@@ -195,14 +33,10 @@
         </div>
 
         <div class="content-padding">
-            <header>
-                <a href="catalogue.html" class="back-btn">← Retour au catalogue</a>
-            </header>
-
-            <div class="title-section">
-                <h1 id="nom-commun">...</h1>
-                <p id="surnom-plante" style="opacity: 0.6; font-style: italic; font-size: 0.9rem;"></p>
-            </div>
+            <header><a href="catalogue.html" class="back-btn">← Retour</a></header>
+            
+            <h1><span id="nom-commun">Chargement...</span></h1>
+            <p id="surnom-plante" style="opacity: 0.6; font-style: italic; margin-bottom: 30px;"></p>
 
             <div class="grid-info">
                 <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
@@ -214,32 +48,8 @@
             </div>
 
             <div class="description-box">
-                <span class="label">Description & Entretien</span>
+                <span class="label">Description</span>
                 <p id="desc-text" style="margin-top:10px; font-size:0.9rem; color: #ccc;"></p>
-            </div>
-
-            <div id="espace-proprietaire" style="display: none;">
-                <h2 style="font-weight: 200; color: #4ade80; font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px;">
-                    Votre Suivi Privé
-                </h2>
-                <div class="grid-info" style="margin-bottom: 15px;">
-                    <div class="info-item">
-                        <span class="label">Dernier Arrosage</span>
-                        <span id="last-water" class="value">En attente...</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Prochain Rappel</span>
-                        <span id="next-reminder" class="value">À définir</span>
-                    </div>
-                </div>
-                <span class="label">Notes de suivi</span>
-                <p id="suivi-notes" style="margin-top:10px; font-size:0.9rem; color: #eee; font-style: italic;">
-                    "Aucune note pour le moment."
-                </p>
-            </div>
-
-            <div id="msg-visiteur" style="display: none; margin-top: 20px; text-align: center; opacity: 0.5; font-size: 0.8rem;">
-                <p>Cette plante appartient à un jardin privé.<br>Le suivi détaillé n'est pas public.</p>
             </div>
         </div>
     </div>
@@ -250,9 +60,7 @@
     async function load() {
         const params = new URLSearchParams(window.location.search);
         const plaqueNum = params.get('plaque'); 
-        const container = document.getElementById('plant-details');
-        const statusMsg = document.getElementById('status-msg');
-
+        
         try {
             const response = await fetch(API_URL);
             const data = await response.json();
@@ -264,58 +72,41 @@
             });
 
             if (!page) {
-                statusMsg.innerHTML = "Plante introuvable.";
+                document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable.";
                 return;
             }
 
             const p = page.properties;
-            const getTxt = (name) => {
-                const pr = p[name];
-                if (!pr) return "NC";
-                if (pr.rich_text) return pr.rich_text[0]?.plain_text || "NC";
-                if (pr.title) return pr.title[0]?.plain_text || "NC";
-                if (pr.select) return pr.select.name || "NC";
-                if (pr.email) return pr.email || ""; 
+
+            // MÉTHODE DE LECTURE ULTRA-SIMPLE (Celle qui marchait avant)
+            const getV = (name) => {
+                const target = p[name];
+                if (!target) return "NC";
+                if (target.title && target.title.length > 0) return target.title[0].plain_text;
+                if (target.rich_text && target.rich_text.length > 0) return target.rich_text[0].plain_text;
+                if (target.select) return target.select.name;
                 return "NC";
             };
 
-            // REMPLISSAGE DES DONNÉES
-            document.getElementById('nom-commun').innerText = getTxt("Nom commun");
-            document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
+            // Affichage direct
+            document.getElementById('nom-commun').innerText = getV("Nom commun");
+            document.getElementById('surnom-plante').innerText = getV("Surnom de ma plante");
             document.getElementById('id-plaque').innerText = plaqueNum;
-            document.getElementById('famille').innerText = getTxt("Famille");
-            document.getElementById('exposition').innerText = getTxt("Exposition");
-            document.getElementById('rusticite').innerText = getTxt("Rusticite");
-            document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
-            document.getElementById('taille').innerText = getTxt("Taille à maturite");
-            document.getElementById('desc-text').innerText = getTxt("Description");
+            document.getElementById('famille').innerText = getV("Famille");
+            document.getElementById('exposition').innerText = getV("Exposition");
+            document.getElementById('rusticite').innerText = getV("Rusticite");
+            document.getElementById('info-arrosage').innerText = getV("Arrosage");
+            document.getElementById('taille').innerText = getV("Taille à maturite");
+            document.getElementById('desc-text').innerText = getV("Description");
 
             const imgCol = p["Photo"]?.files?.[0];
             document.getElementById('main-img').src = imgCol?.file?.url || imgCol?.external?.url || "";
 
-            // LOGIQUE DE DROITS
-            const userEmail = localStorage.getItem('user_email');
-            const ownerEmail = getTxt("Client_Email"); 
-
-            const zonePrivee = document.getElementById('espace-proprietaire');
-            const zoneVisiteur = document.getElementById('msg-visiteur');
-
-            if (userEmail && ownerEmail && userEmail.toLowerCase() === ownerEmail.toLowerCase()) {
-                zonePrivee.style.display = 'block';
-                zoneVisiteur.style.display = 'none';
-                // On remplit les notes privées si elles existent dans Notion
-                const notes = getTxt("Notes_Suivi");
-                if (notes !== "NC") document.getElementById('suivi-notes').innerText = notes;
-            } else {
-                zonePrivee.style.display = 'none';
-                zoneVisiteur.style.display = 'block';
-            }
-
-            statusMsg.style.display = 'none';
-            container.style.display = 'block';
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('plant-details').style.display = 'block';
 
         } catch (e) {
-            statusMsg.innerText = "Erreur de connexion.";
+            document.getElementById('status-msg').innerText = "Erreur de connexion au jardin.";
         }
     }
     load();
