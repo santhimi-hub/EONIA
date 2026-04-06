@@ -87,39 +87,48 @@
 container.innerHTML = data.results.map(page => {
     const p = page.properties;
     
-    // --- MAPPAGE DE TES COLONNES NOTION ---
-    // On récupère le texte de "nom commun"
-    const nom = p["Nom commun"]?.title[0]?.plain_text || "Plante sans nom";
+    // Fonction robuste pour extraire le texte peu importe le type (Titre, Texte, Menu)
+    const getTxt = (prop) => {
+        if (!prop) return "";
+        try {
+            if (prop.title) return prop.title[0]?.plain_text || "";
+            if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
+            if (prop.select) return prop.select.name || "";
+            if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ');
+        } catch(e) { return ""; }
+        return "";
+    };
+
+    // --- On utilise tes noms avec Majuscules ---
+    const nom = getTxt(p["Nom commun"]) || "Plante sans nom";
+    const surnom = getTxt(p["Surnom de ma plante"]);
     
-    // On récupère le surnom
-    const surnom = p["Surnom de ma plante"]?.rich_text[0]?.plain_text || "";
+    // Gestion de l'image (Colonne Photo ou Image de couverture Notion)
+    const imgCol = p["Photo"]?.files?.[0];
+    const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "https://via.placeholder.com/400x500?text=EONIA";
     
-    // On récupère l'image depuis ta colonne "Photo" (Type Files & Media)
-    const imageCol = p["Photo"]?.files?.[0];
-    const image = imageCol?.file?.url || imageCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x500?text=EONIA";
-    
-    // On récupère les badges (Exposition et Difficulté par exemple)
-    const expo = p["Exposition"]?.select?.name || "Non précisée";
-    const diff = p["Difficulte"]?.select?.name || "Standard";
-    const rust = p["Rusticite"]?.rich_text[0]?.plain_text || "NC";
+    const expo = getTxt(p["Exposition"]) || "Standard";
+    const diff = getTxt(p["Difficulte"]) || "NC";
+    const rust = getTxt(p["Rusticite"]) || "NC";
 
     return `
-        <a href="jardin.html?id=${page.id}" class="plant-card">
+        <div class="plant-card">
             <div class="img-container">
-                <img src="${image}" class="plant-img" alt="${nom}">
+                <img src="${image}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info">
                 <div class="plant-name">${nom}</div>
-                <div style="color: #666; font-size: 0.8rem; margin-top:-10px; margin-bottom:10px;">${surnom}</div>
+                ${surnom ? `<div style="color:#888; font-size:0.8rem; margin-top:-5px; margin-bottom:10px;">${surnom}</div>` : ''}
                 <div class="badges">
                     <span class="badge">☀️ ${expo}</span>
                     <span class="badge">💪 ${diff}</span>
                     <span class="badge">❄️ ${rust}</span>
                 </div>
             </div>
-        </a>
+        </div>
     `;
 }).join('');
+
 ;
 
             } catch (error) {
