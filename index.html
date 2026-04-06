@@ -65,7 +65,8 @@
     <input type="email" placeholder="Votre Email" id="email">
     <input type="password" placeholder="Créer votre mot de passe" id="pass">
     
-    <button class="btn-main" onclick="activerPlaque()">Activer & Entrer</button>
+    <button class="btn-main" onclick="validerConnexion()">Entrer</button>
+
 </div>
 
 
@@ -107,6 +108,32 @@
             window.location.href = "jardin.html?id=cerisier";
         } else {
             alert("Veuillez remplir les deux champs.");
+        }
+    }
+</script>
+    
+<script>
+    function validerConnexion() {
+        const email = document.getElementById('email').value;
+        const urlParams = new URLSearchParams(window.location.search);
+        const plaqueID = urlParams.get('id'); // On récupère l'ID du QR Code
+
+        if (!email) {
+            alert("Veuillez entrer votre email.");
+            return;
+        }
+
+        // LOGIQUE ÉONIA :
+        // Si c'est une nouvelle plaque (on simulera avec un test), 
+        // on l'envoie vers le catalogue.
+        
+        if (plaqueID) {
+            console.log("Connexion pour la plaque : " + plaqueID);
+            // Redirection vers le catalogue pour choisir le végétal
+            window.location.href = "catalogue.html?id=" + plaqueID;
+        } else {
+            // Si pas d'ID (accès direct au site), on va au jardin par défaut
+            window.location.href = "jardin.html";
         }
     }
 </script>
