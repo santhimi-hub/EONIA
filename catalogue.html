@@ -67,6 +67,18 @@
 
     <div id="status-msg">Connexion à la mémoire végétale...</div>
     <div id="catalog" class="catalog-container"></div>
+<button onclick="logout()" style="background: none; border: 1px solid #333; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; margin-top: 20px; cursor: pointer;">
+    Quitter le jardin
+</button>
+
+<script>
+    function logout() {
+        // On supprime la clé d'accès du téléphone
+        localStorage.removeItem('eonia_access');
+        // On renvoie à l'accueil
+        window.location.href = "index.html";
+    }
+</script>
 
     <script>
 const API_URL = "https://eonia-api.santhimi.workers.dev";
