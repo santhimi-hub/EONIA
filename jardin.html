@@ -152,6 +152,96 @@
                     <label>Plantation</label>
                     <input type="date" id="pDate" onchange="saveData()">
                 </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA — Mémoire Végétale</title>
+    <style>
+        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; }
+
+        /* HEADER LOGO (Ton identité d'origine) */
+        header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
+        .logo-top { width: 100px; filter: invert(1); margin-bottom: 10px; }
+        .brand { font-size: 1.2rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 200; }
+
+        /* PHOTO DE L'ESPÈCE (Celle que TU intègres en haut) */
+        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 1px solid #222; }
+
+        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
+
+        .header-title h1 { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
+        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
+
+        /* INFOS GÉNÉRALES */
+        .specs-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
+            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
+        }
+        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
+        .spec-item p { font-size: 0.85rem; color: #eee; }
+
+        /* BLOC RÉGLAGES (Visible par tous, mais vide pour le visiteur) */
+        .client-box { background: #111; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #333; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; outline: none; }
+
+        /* ACCORDÉONS (Tes menus) */
+        .menu-item { border-bottom: 1px solid #222; }
+        .menu-header { 
+            width: 100%; background: none; border: none; color: #fff; 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+        .menu-item.active .menu-header::after { content: '−'; }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; color: var(--text-dim); font-size: 0.9rem; }
+        .menu-item.active .menu-content { max-height: 2500px; padding-bottom: 30px; }
+
+        .highlight { color: var(--accent); font-weight: 600; display: block; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
+        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; border-radius: 4px; }
+        
+        /* GALERIE PERSONNELLE */
+        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
+        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
+        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid #222; }
+
+        footer { text-align: center; padding: 60px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="1000043768.png" class="logo-top">
+        <div class="brand">ÉONIA</div>
+    </header>
+
+    <img src="1000044205.jpg" id="mainImg" class="hero-img">
+
+    <div class="container">
+        <div class="header-title">
+            <h1 id="plantName">Cerisier</h1>
+            <p id="plantSci">Prunus avium • Burlat</p>
+        </div>
+
+        <div class="specs-grid">
+            <div class="spec-item"><span>Famille</span><p>Rosacées</p></div>
+            <div class="spec-item"><span>Rusticité</span><p>-15°C / -20°C</p></div>
+            <div class="spec-item"><span>Hauteur</span><p>5 à 8 mètres</p></div>
+            <div class="spec-item"><span>Pollinisation</span><p>Non autofertile</p></div>
+        </div>
+
+        <div class="client-box">
+            <div class="grid-inputs">
+                <div>
+                    <label>Date Plantation</label>
+                    <input type="date" id="pDate" onchange="saveData()">
+                </div>
                 <div>
                     <label>Exposition</label>
                     <select id="pExpo" onchange="saveData()">
@@ -165,53 +255,14 @@
         <div class="menu-item">
             <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Paillage</button>
             <div class="menu-content">
-                <span class="highlight">1. L'arbre jeune (2-3 ans)</span>
-                <ul>
-                    <li><strong>Fréquence :</strong> 20 à 30L tous les 10-15 jours en été.</li>
-                    <li><strong>Méthode :</strong> Au pied, le soir uniquement.</li>
-                </ul>
-                <span class="highlight">2. L'arbre adulte</span>
-                <p>Autonome sauf en Mai (formation des cerises) et canicule (1 gros arrosage/mois).</p>
-                <div class="tip-box">
-                    <strong>Le Paillage :</strong> Votre meilleur allié. Paille ou tontes sèches pour garder l'humidité. Attention : si les feuilles jaunissent en sol détrempé = excès d'eau !
-                </div>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Sol & Fertilisation</button>
-            <div class="menu-content">
-                <p>Sol frais, drainé, peu calcaire. Engrais organiques (Compost, Corne broyée, Algues).</p>
-                <span class="highlight">Jeunes arbres (1-3 ans)</span>
-                <p>1 fois/an en Mars-Avril.</p>
-                <span class="highlight">Arbres adultes (4 ans+)</span>
-                <p>2 fois/an : Fin d'hiver et après récolte (5-10kg de compost).</p>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Compagnonnage</button>
-            <div class="menu-content">
-                <span class="highlight">Alliés (Abeilles & Santé)</span>
-                <p>Trèfle, Capucine (pucerons), Souci, Lavande, Thym, Bourrache, Menthe, Ail, Romarin.</p>
-                <div class="avoid-box">
-                    <strong>❌ À ÉVITER :</strong> Pommes de terre, Tomates, Noisetiers, Lierre envahissant.
-                </div>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Taille & Protection</button>
-            <div class="menu-content">
-                <span class="highlight">La Taille</span>
-                <p>Août/Septembre. Branches mortes et gourmands. Cicatrisant obligatoire.</p>
-                <span class="highlight">Santé</span>
-                <p><strong>Pucerons :</strong> Savon noir. <strong>Moniliose :</strong> Ramasser fruits au sol. <strong>Oiseaux :</strong> Filet ou CD brillants.</p>
+                <span class="highlight">L'arbre jeune (2-3 ans)</span>
+                <p>20 à 30L tous les 10-15 jours en été. Arrosez le soir.</p>
+                <div class="tip-box">Le Paillage est votre meilleur allié pour garder l'humidité.</div>
             </div>
         </div>
 
         <div class="gallery-top">
-            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Journal de bord</h2>
+            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Votre Galerie Personnelle</h2>
             <label for="upload" class="add-btn">AJOUTER</label>
             <input type="file" id="upload" accept="image/*" style="display:none" onchange="addPhoto(event)">
         </div>
@@ -219,14 +270,19 @@
 
     </div>
 
-    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
+    <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
+        // Identification de la plante via l'URL (ex: jardin.html?id=cerisier)
+        const params = new URLSearchParams(window.location.search);
+        const plantID = params.get('id') || 'cerisier'; // par défaut
+
         function toggleMenu(btn) { btn.parentElement.classList.toggle('active'); }
 
+        // Sauvegarde spécifique à CHAQUE plante
         function saveData() {
             const data = { date: document.getElementById('pDate').value, expo: document.getElementById('pExpo').value };
-            localStorage.setItem('eonia_cerisier', JSON.stringify(data));
+            localStorage.setItem('eonia_' + plantID, JSON.stringify(data));
         }
 
         function addPhoto(e) {
@@ -235,20 +291,21 @@
                 const img = document.createElement('img');
                 img.src = reader.result; img.className = 'photo-slot';
                 document.getElementById('gal').prepend(img);
-                let photos = JSON.parse(localStorage.getItem('eonia_photos_cerisier') || "[]");
+                let photos = JSON.parse(localStorage.getItem('photos_' + plantID) || "[]");
                 photos.unshift(reader.result);
-                localStorage.setItem('eonia_photos_cerisier', JSON.stringify(photos.slice(0, 4)));
+                localStorage.setItem('photos_' + plantID, JSON.stringify(photos.slice(0, 4)));
             }
             reader.readAsDataURL(e.target.files[0]);
         }
 
         window.onload = function() {
-            const saved = JSON.parse(localStorage.getItem('eonia_cerisier'));
+            // Charger les données propres au téléphone qui consulte
+            const saved = JSON.parse(localStorage.getItem('eonia_' + plantID));
             if (saved) {
                 document.getElementById('pDate').value = saved.date || "";
                 document.getElementById('pExpo').value = saved.expo || "";
             }
-            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos_cerisier') || "[]");
+            const savedPhotos = JSON.parse(localStorage.getItem('photos_' + plantID) || "[]");
             savedPhotos.forEach(src => {
                 const img = document.createElement('img');
                 img.src = src; img.className = 'photo-slot';
