@@ -58,18 +58,88 @@
 </head>
 <body>
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éonia - Mon Jardin</title>
+    <style>
+        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; --warning: #ff9f43; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; line-height: 1.6; }
+
+        .nav-bar { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .back-link { color: var(--accent); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .hero-botanical { width: 100%; height: 30vh; background: url('1000044205.jpg') center/cover; border-bottom: 1px solid #222; }
+
+        .container { padding: 20px; max-width: 700px; margin: auto; }
+
+        .header-title h1 { font-size: 2.8rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
+        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
+
+        /* --- INFOS GÉNÉRALES --- */
+        .specs-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
+            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
+        }
+        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
+        .spec-item p { font-size: 0.85rem; font-weight: 500; color: #eee; }
+
+        /* --- SAUVEGARDE CLIENT --- */
+        .client-box { background: #111; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #333; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        input:focus { border-color: var(--accent); }
+
+        /* --- ACCORDÉONS --- */
+        .menu-item { border-bottom: 1px solid #222; }
+        .menu-header { 
+            width: 100%; background: none; border: none; color: #fff; 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+        .menu-item.active .menu-header::after { content: '−'; }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; color: var(--text-dim); font-size: 0.9rem; }
+        .menu-item.active .menu-content { max-height: 2500px; padding-bottom: 30px; }
+
+        .highlight { color: var(--accent); font-weight: 600; display: block; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
+        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; border-radius: 4px; }
+        .avoid-box { background: rgba(255, 159, 67, 0.05); border-left: 2px solid var(--warning); padding: 12px; margin: 15px 0; border-radius: 4px; }
+
+        ul { padding-left: 18px; margin: 10px 0; }
+        li { margin-bottom: 8px; }
+
+        /* --- GALERIE --- */
+        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
+        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
+        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid #222; }
+
+        footer { text-align: center; padding: 60px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="index.html" class="back-link">← Mon Jardin</a>
+        <span style="font-size:0.6rem; letter-spacing:2px; opacity:0.5;">ÉONIA CONNECT</span>
+    </nav>
+
     <div class="hero-botanical"></div>
 
     <div class="container">
-        
         <div class="header-title">
-            <h1>Cerisier Burlat</h1>
-            <p>Prunus avium • Rosacées</p>
+            <h1>Cerisier</h1>
+            <p>Prunus avium • Burlat</p>
         </div>
 
         <div class="specs-grid">
-            <div class="spec-item"><span>Variété</span><p>Bigarreau Burlat</p></div>
-            <div class="spec-item"><span>Rusticité</span><p>-15°C à -20°C</p></div>
+            <div class="spec-item"><span>Famille</span><p>Rosacées</p></div>
+            <div class="spec-item"><span>Rusticité</span><p>-15°C / -20°C</p></div>
             <div class="spec-item"><span>Floraison</span><p>Fin Mars / Avril</p></div>
             <div class="spec-item"><span>Récolte</span><p>Fin Mai / Juin</p></div>
             <div class="spec-item"><span>Hauteur</span><p>5 à 8 mètres</p></div>
@@ -79,13 +149,12 @@
         <div class="client-box">
             <div class="grid-inputs">
                 <div>
-                    <label>Date Plantation</label>
+                    <label>Plantation</label>
                     <input type="date" id="pDate" onchange="saveData()">
                 </div>
                 <div>
                     <label>Exposition</label>
                     <select id="pExpo" onchange="saveData()">
-                        <option value="">Choisir...</option>
                         <option value="Soleil">Plein Soleil</option>
                         <option value="Mi-ombre">Mi-ombre</option>
                     </select>
@@ -94,21 +163,55 @@
         </div>
 
         <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Entretien & Taille</button>
+            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Paillage</button>
             <div class="menu-content">
-                <p>Le cerisier déteste la taille sévère. Intervenez fin août pour une meilleure cicatrisation et éviter la gommose.</p>
+                <span class="highlight">1. L'arbre jeune (2-3 ans)</span>
+                <ul>
+                    <li><strong>Fréquence :</strong> 20 à 30L tous les 10-15 jours en été.</li>
+                    <li><strong>Méthode :</strong> Au pied, le soir uniquement.</li>
+                </ul>
+                <span class="highlight">2. L'arbre adulte</span>
+                <p>Autonome sauf en Mai (formation des cerises) et canicule (1 gros arrosage/mois).</p>
+                <div class="tip-box">
+                    <strong>Le Paillage :</strong> Votre meilleur allié. Paille ou tontes sèches pour garder l'humidité. Attention : si les feuilles jaunissent en sol détrempé = excès d'eau !
+                </div>
             </div>
         </div>
 
         <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Sol</button>
+            <button class="menu-header" onclick="toggleMenu(this)">Sol & Fertilisation</button>
             <div class="menu-content">
-                <p>Jeune arbre : 20L tous les 10 jours en été. Privilégiez un sol bien drainé et riche en compost.</p>
+                <p>Sol frais, drainé, peu calcaire. Engrais organiques (Compost, Corne broyée, Algues).</p>
+                <span class="highlight">Jeunes arbres (1-3 ans)</span>
+                <p>1 fois/an en Mars-Avril.</p>
+                <span class="highlight">Arbres adultes (4 ans+)</span>
+                <p>2 fois/an : Fin d'hiver et après récolte (5-10kg de compost).</p>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Compagnonnage</button>
+            <div class="menu-content">
+                <span class="highlight">Alliés (Abeilles & Santé)</span>
+                <p>Trèfle, Capucine (pucerons), Souci, Lavande, Thym, Bourrache, Menthe, Ail, Romarin.</p>
+                <div class="avoid-box">
+                    <strong>❌ À ÉVITER :</strong> Pommes de terre, Tomates, Noisetiers, Lierre envahissant.
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <button class="menu-header" onclick="toggleMenu(this)">Taille & Protection</button>
+            <div class="menu-content">
+                <span class="highlight">La Taille</span>
+                <p>Août/Septembre. Branches mortes et gourmands. Cicatrisant obligatoire.</p>
+                <span class="highlight">Santé</span>
+                <p><strong>Pucerons :</strong> Savon noir. <strong>Moniliose :</strong> Ramasser fruits au sol. <strong>Oiseaux :</strong> Filet ou CD brillants.</p>
             </div>
         </div>
 
         <div class="gallery-top">
-            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Vos Photos</h2>
+            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Journal de bord</h2>
             <label for="upload" class="add-btn">AJOUTER</label>
             <input type="file" id="upload" accept="image/*" style="display:none" onchange="addPhoto(event)">
         </div>
@@ -119,47 +222,33 @@
     <footer>ÉONIA — CONNECTER LE VIVANT</footer>
 
     <script>
-        // Toggle menu
         function toggleMenu(btn) { btn.parentElement.classList.toggle('active'); }
 
-        // Sauvegarde Date et Expo
         function saveData() {
-            const data = {
-                date: document.getElementById('pDate').value,
-                expo: document.getElementById('pExpo').value
-            };
-            localStorage.setItem('eonia_storage', JSON.stringify(data));
+            const data = { date: document.getElementById('pDate').value, expo: document.getElementById('pExpo').value };
+            localStorage.setItem('eonia_cerisier', JSON.stringify(data));
         }
 
-        // Ajout photo avec sauvegarde sécurisée
         function addPhoto(e) {
-            const file = e.target.files[0];
             const reader = new FileReader();
-            reader.onloadend = function() {
-                const base64String = reader.result;
+            reader.onload = function() {
                 const img = document.createElement('img');
-                img.src = base64String;
-                img.className = 'photo-slot';
+                img.src = reader.result; img.className = 'photo-slot';
                 document.getElementById('gal').prepend(img);
-                
-                // Sauvegarde locale des photos
-                let photos = JSON.parse(localStorage.getItem('eonia_photos') || "[]");
-                photos.unshift(base64String);
-                localStorage.setItem('eonia_photos', JSON.stringify(photos.slice(0, 4)));
+                let photos = JSON.parse(localStorage.getItem('eonia_photos_cerisier') || "[]");
+                photos.unshift(reader.result);
+                localStorage.setItem('eonia_photos_cerisier', JSON.stringify(photos.slice(0, 4)));
             }
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(e.target.files[0]);
         }
 
-        // Chargement automatique au démarrage
         window.onload = function() {
-            // Charger Texte
-            const savedData = JSON.parse(localStorage.getItem('eonia_storage'));
-            if (savedData) {
-                document.getElementById('pDate').value = savedData.date || "";
-                document.getElementById('pExpo').value = savedData.expo || "";
+            const saved = JSON.parse(localStorage.getItem('eonia_cerisier'));
+            if (saved) {
+                document.getElementById('pDate').value = saved.date || "";
+                document.getElementById('pExpo').value = saved.expo || "";
             }
-            // Charger Photos
-            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos') || "[]");
+            const savedPhotos = JSON.parse(localStorage.getItem('eonia_photos_cerisier') || "[]");
             savedPhotos.forEach(src => {
                 const img = document.createElement('img');
                 img.src = src; img.className = 'photo-slot';
