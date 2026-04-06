@@ -3,115 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Mémoire Végétale</title>
+    <title>ÉONIA — Votre Jardin Connecté</title>
     <style>
+        :root { --accent: #4ade80; --bg: #0a0a0a; --grey: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                        url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1000');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            text-align: center;
-        }
-
-        .container { padding: 20px; animation: fadeIn 2s ease-out; }
-
-        /* CONFIGURATION DE TON LOGO */
-        .logo-eonia {
-            width: 130px; /* Taille ajustable selon tes goûts */
-            height: auto;
-            margin-top: 100px; /* Descend le logo */
-            margin-bottom: 20px;
-            /* Si ton logo est blanc, on ajoute une petite lueur pour le faire ressortir */
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-            animation: pulse 4s infinite;
-        }
-
-                h1 {
-            font-size: 3.5rem; /* Taille un peu plus grande */
-            letter-spacing: 2px; /* Espacement réduit (était à 10px) */
-            font-weight: 800; /* Beaucoup plus gras */
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            /* Petit effet de relief pour que le gras ressorte bien sur la forêt */
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-        }
-
-
-        p {
-            font-size: 1rem;
-            margin-bottom: 60px;
-            font-weight: 300;
-            font-style: 1px;
-            opacity: 0.8;
-        }
-
-        .btn-entrer {
-            background-color: transparent; /* Font vide */
-            color: white; /* Texte blanc */
-            padding: 16px 60px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 400;
-            letter-spacing: 3px;
-            display: inline-block;
-            border: 1px solid white;
-            transition: all 0.4s;
-        }
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Catalogue</title>
-    <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
         
-        .logo { width: 80px; margin-bottom: 20px; filter: invert(1); }
-        h1 { font-size: 1.2rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px; color: #666; }
+        body { 
+            background: var(--bg); color: #fff; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
 
-        /* Grille du catalogue */
-        .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 500px; margin: auto; }
+        /* --- LOGO ÉONIA --- */
+        header { padding: 60px 20px; text-align: center; width: 100%; }
+        .logo { 
+            width: 140px; margin-bottom: 20px; 
+            filter: brightness(0) invert(1); /* Pour que le logo soit blanc sur fond noir */
+        }
+        .brand-name { font-size: 1.5rem; letter-spacing: 8px; text-transform: uppercase; font-weight: 200; }
+        .tagline { font-size: 0.6rem; color: var(--accent); letter-spacing: 3px; margin-top: 10px; opacity: 0.8; }
+
+        /* --- CATALOGUE / MON JARDIN --- */
+        .container { width: 100%; max-width: 600px; padding: 0 25px 80px 25px; }
+        h2 { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: #444; margin-bottom: 30px; text-align: center; }
+
+        .garden-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         
         .plant-card { 
-            background: #161616; border-radius: 15px; overflow: hidden; 
+            background: var(--grey); border-radius: 20px; overflow: hidden; 
             text-decoration: none; color: #fff; border: 1px solid #222;
-            transition: 0.3s;
+            transition: all 0.4s ease; position: relative;
         }
-        .plant-card:active { transform: scale(0.95); border-color: var(--accent); }
+        .plant-card:active { transform: scale(0.96); border-color: var(--accent); }
         
-        .plant-img { width: 100%; aspect-ratio: 1; object-fit: cover; opacity: 0.7; }
-        .plant-name { padding: 12px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .plant-img { width: 100%; aspect-ratio: 0.9; object-fit: cover; opacity: 0.6; }
+        .plant-info { padding: 15px; text-align: center; }
+        .plant-info h3 { font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
+        .plant-info span { font-size: 0.6rem; color: #666; font-style: italic; }
 
-        footer { margin-top: 60px; font-size: 0.6rem; letter-spacing: 3px; opacity: 0.3; }
+        /* Badge pour indiquer une plante déjà configurée */
+        .configured-badge { 
+            position: absolute; top: 10px; right: 10px; 
+            width: 8px; height: 8px; background: var(--accent); 
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent);
+            display: none; /* S'affichera si le client a déjà rempli des infos */
+        }
+
+        footer { margin-top: auto; padding: 40px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 5px; }
     </style>
 </head>
 <body>
 
-    <img src="logo-eonia.png" alt="Éonia" class="logo"> <h1>Sélectionnez votre espèce</h1>
+    <header>
+        <img src="1000043768.png" alt="ÉONIA" class="logo">
+        <div class="brand-name">ÉONIA</div>
+        <p class="tagline">CONNECTER LE VIVANT</p>
+    </header>
 
-    <div class="catalog-grid">
-        <a href="jardin.html?species=cerisier" class="plant-card">
-            <img src="https://images.unsplash.com/photo-1528669835002-86927958f278?w=300" class="plant-img">
-            <div class="plant-name">Cerisier Burlat</div>
-        </a>
+    <div class="container">
+        <h2>Votre Collection</h2>
 
-        <a href="olivier.html" class="plant-card">
-            <img src="https://images.unsplash.com/photo-1541533848490-bc8115cd6522?w=300" class="plant-img">
-            <div class="plant-name">Olivier</div>
-        </a>
-        
-        </div>
+        <div class="garden-grid">
+            <a href="jardin.html" class="plant-card">
+                <div class="configured-badge" id="badge-cerisier"></div>
+                <img src="1000044205.jpg" class="plant-img">
+                <div class="plant-info">
+                    <h3>Cerisier</h3>
+                    <span>Prunus avium</span>
+                </div>
+            </a>
 
-    <footer>ÉONIA — CONNECTER LE VIVANT</footer>
+            <a href="#" class="plant-card" style="opacity: 0.4;">
+                <img src="1000044207.jpg" class="plant-img">
+                <div class="plant-info">
+                    <h3>Olivier</h3>
+                    <span>Olea europaea</span>
+                </div>
+            </a>
+            
+            </div>
+    </div>
 
+    <footer>ÉONIA — LUXE & MÉMOIRE VÉGÉTALE</footer>
+
+    <script>
+        // Ce petit script vérifie si le client a déjà configuré son cerisier 
+        // pour mettre un petit point vert brillant sur la carte
+        window.onload = function() {
+            if(localStorage.getItem('eonia_cerisier')) {
+                document.getElementById('badge-cerisier').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
