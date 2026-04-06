@@ -87,55 +87,73 @@
     <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        async function loadDetails() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (!id) return;
+    async function loadDetails() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (!id) return;
 
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                const page = data.results.find(p => p.id === id);
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            const page = data.results.find(p => p.id === id);
 
-                if (page) {
-                    const p = page.properties;
-                    const getTxt = (name) => {
-                        const prop = p[name];
-                        if (!prop) return "NC";
-                        if (prop.title) return prop.title[0]?.plain_text || "";
-                        if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
-                        if (prop.select) return prop.select.name || "";
-                        return "NC";
-                    };
+            if (page) {
+                const p = page.properties;
 
-                    // Remplissage des champs
-                    document.getElementById('plant-name').innerText = getTxt("Nom commun");
-                    document.getElementById('plant-surnom').innerText = getTxt("Surnom de ma plante");
-                    document.getElementById('info-famille').innerText = getTxt("Famille");
-                    document.getElementById('info-expo').innerText = getTxt("Exposition");
-                    document.getElementById('info-rust').innerText = getTxt("Rusticite");
-                    document.getElementById('info-diff').innerText = getTxt("Difficulte");
-                    document.getElementById('desc-text').innerText = getTxt("Description");
-                    document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
-                    document.getElementById('info-entretien').innerText = getTxt("Entretien");
-                    document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
+                // FONCTION MAGIQUE : Elle extrait le texte peu importe le format Notion
+                const getTxt = (name) => {
+                    const prop = p[name];
+                    if (!prop) return "Non renseigné";
+                    
+                    // Si c'est un Titre ou du Texte Riche
+                    if (prop.title) return prop.title.map(t => t.plain_text).join('') || "NC";
+                    if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('') || "NC";
+                    
+                    // Si c'est un Menu Déroulant (Select)
+                    if (prop.select) return prop.select.name || "NC";
+                    
+                    // Si c'est un Menu Multi-sélection
+                    if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ') || "NC";
+                    
+                    return "NC";
+                };
 
-                    // Image
-                    const imgCol = p["Photo"]?.files?.[0];
-                    const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "";
-                    if (imgUrl) document.getElementById('main-img').src = imgUrl;
+                // --- REMPLISSAGE DES CHAMPS ---
+                document.getElementById('plant-name').innerText = getTxt("Nom commun");
+                document.getElementById('plant-surnom').innerText = getTxt("Surnom de ma plante");
+                
+                // Infos du haut
+                document.getElementById('info-famille').innerText = getTxt("Famille");
+                document.getElementById('info-expo').innerText = getTxt("Exposition");
+                document.getElementById('info-rust').innerText = getTxt("Rusticite");
+                document.getElementById('info-diff').innerText = getTxt("Difficulte");
 
-                    // Affichage
-                    document.getElementById('status-msg').style.display = 'none';
-                    document.getElementById('plant-details').style.display = 'block';
+                // Menus déroulants (Accordéons)
+                document.getElementById('desc-text').innerText = getTxt("Description");
+                document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
+                document.getElementById('info-entretien').innerText = getTxt("Entretien");
+                document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
+
+                // GESTION DE L'IMAGE
+                const imgCol = p["Photo"]?.files?.[0];
+                const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "";
+                if (imgUrl) {
+                    document.getElementById('main-img').src = imgUrl;
                 }
-            } catch (e) {
-                document.getElementById('status-msg').innerText = "Erreur de connexion";
+
+                // Affichage final
+                document.getElementById('status-msg').style.display = 'none';
+                document.getElementById('plant-details').style.display = 'block';
             }
+        } catch (e) {
+            document.getElementById('status-msg').innerText = "Erreur de connexion aux données.";
+            console.error(e);
         }
-        loadDetails();
-    </script>
+    }
+    loadDetails();
+</script>
+
 </body>
 </html>
