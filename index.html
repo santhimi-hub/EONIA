@@ -3,99 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Ma Mémoire Végétale</title>
+    <title>ÉONIA — Accès Propriétaire</title>
     <style>
-    /* LE FOND DE FORÊT ÉONIA */
-    .hero {
-        position: relative; 
-        height: 100vh; 
-        width: 100%;
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center; 
-        align-items: center;
-        text-align: center;
-        /* IMAGE DE FORÊT HAUTE DÉFINITION */
-        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.75)), 
-                    url('[attachment_0](attachment)') center/cover no-repeat;
-        overflow: hidden;
-    }
+        :root { --accent: #4ade80; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html { height: 100%; overflow: hidden; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #000; }
 
-    .logo-main { 
-        width: 180px; 
-        filter: brightness(0) invert(1); /* Force le logo en blanc */
-        margin-bottom: 20px;
-        opacity: 0.9;
-    }
+        /* FOND FORÊT LUMINEUSE */
+        .hero-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000') center/cover no-repeat;
+            z-index: -1;
+        }
 
-    .brand {
-        font-size: 2.5rem;
-        letter-spacing: 12px;
-        text-transform: uppercase;
-        font-weight: 200;
-        color: #ffffff;
-        text-shadow: 0 4px 10px rgba(0,0,0,0.8); /* Ombre pour détacher le texte du fond */
-    }
+        .overlay {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
 
-    .tagline {
-        color: #4ade80; /* Ton vert Éonia */
-        font-size: 0.7rem;
-        letter-spacing: 6px;
-        text-transform: uppercase;
-        margin-top: 10px;
-    }
-</style>
+        .logo-main {
+            width: 160px;
+            filter: brightness(0) invert(1);
+            margin-bottom: 10px;
+        }
 
+        .brand-title {
+            font-size: 2.2rem;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            font-weight: 200;
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+
+        /* BLOC DE CONNEXION */
+        .login-box {
+            width: 100%;
+            max-width: 300px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            color: #fff;
+            margin-bottom: 10px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        input::placeholder { color: rgba(255,255,255,0.5); }
+
+        .btn-enter {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-enter:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .guest-link {
+            margin-top: 20px;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
 
-    <section class="hero">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
-        <h1 class="brand">ÉONIA</h1>
+    <div class="hero-bg"></div>
+
+    <div class="overlay">
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
+        
+        <h1 class="brand-title">ÉONIA</h1>
         <p class="tagline">Connecter le vivant</p>
 
-        <div class="auth-card">
-            <p style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 15px; color: #888;">ESPACE PROPRIÉTAIRE</p>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="pass" placeholder="Mot de passe">
-            <button class="btn-login" onclick="location.href='jardin.html?id=cerisier'">Entrer</button>
+        <div class="login-box">
+            <input type="email" placeholder="Email Client" id="userEmail">
+            <input type="password" placeholder="Mot de passe" id="userPass">
+            <button class="btn-enter" onclick="validerConnexion()">Entrer</button>
         </div>
 
-        <div class="scroll-indicator">Découvrir le concept ↓</div>
-    </section>
+        <a href="jardin.html?id=cerisier&mode=guest" class="guest-link">Continuer en tant qu'invité</a>
+    </div>
 
-    <section class="section">
-        <h2>Le Concept</h2>
-        <p class="concept-text">
-            ÉONIA fusionne l'élégance millénaire de l'ardoise avec la mémoire du numérique. 
-            Chaque plaque gravée est le gardien d'une histoire : la vôtre. <br><br>
-            En scannant votre arbre, vous accédez à un journal de bord vivant, 
-            transmettez vos conseils de culture et immortalisez l'évolution de votre jardin 
-            pour les générations futures.
-        </p>
-    </section>
-
-    <section class="section" style="background: #050505;">
-        <h2>Le Catalogue</h2>
-        <div class="catalog-grid">
-            <a href="jardin.html?id=cerisier&mode=guest" class="plant-card">
-                <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/1000044205.jpg" class="plant-img">
-                <div class="plant-info">
-                    <h3>Cerisier Burlat</h3>
-                    <p>Prunus avium</p>
-                </div>
-            </a>
-            <a href="#" class="plant-card">
-                <img src="https://images.unsplash.com/photo-1541533848490-bc8115cd6522?w=500" class="plant-img">
-                <div class="plant-info">
-                    <h3>Olivier</h3>
-                    <p>Olea europaea</p>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    <footer>ÉONIA — LUXE & MÉMOIRE VÉGÉTALE</footer>
+    <script>
+        function validerConnexion() {
+            const email = document.getElementById('userEmail').value;
+            if(email !== "") {
+                // Pour l'instant, on laisse entrer. Firebase sécurisera cela plus tard.
+                window.location.href = "jardin.html?id=cerisier";
+            } else {
+                alert("Veuillez entrer votre email.");
+            }
+        }
+    </script>
 
 </body>
 </html>
