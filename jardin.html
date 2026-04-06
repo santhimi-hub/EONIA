@@ -3,157 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Mémoire Végétale</title>
+    <title>ÉONIA — Fiche Botanique</title>
     <style>
         :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; }
-
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; line-height: 1.6; }
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
-        .back-nav { display: block; margin-top: 10px; color: var(--accent); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 1px solid #222; background: #111; }
-
-        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
-
-        #plant-name { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
-        #plant-surnom { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
-
-        .specs-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
-            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
-        }
-        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
-        .spec-item p { font-size: 0.85rem; color: #eee; font-weight: 500; }
-
+        .back-nav { display: inline-block; margin-top: 10px; color: var(--accent); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-bottom: 1px solid #222; background: #111; }
+        .container { padding: 30px 20px 80px 20px; max-width: 800px; margin: auto; }
+        h1 { font-size: 2.5rem; font-weight: 800; text-transform: uppercase; line-height: 1; margin-bottom: 5px; }
+        .surnom { color: var(--accent); font-size: 1rem; font-style: italic; margin-bottom: 30px; opacity: 0.8; }
+        .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .spec-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; }
+        .spec-card span { display: block; font-size: 0.65rem; color: #666; text-transform: uppercase; margin-bottom: 4px; }
+        .spec-card p { font-size: 0.9rem; color: #eee; font-weight: 500; }
         .menu-item { border-bottom: 1px solid #222; }
-        .menu-header { 
-            width: 100%; background: none; border: none; color: #fff; 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
-        }
-        .menu-header::after { content: '+'; color: var(--accent); }
-        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; color: var(--text-dim); font-size: 0.9rem; padding-right: 10px; }
-        .menu-item.active .menu-content { max-height: 1000px; padding-bottom: 25px; }
+        .menu-header { width: 100%; background: none; border: none; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; color: var(--text-dim); font-size: 0.95rem; }
+        .menu-item.active .menu-content { max-height: 2000px; padding-bottom: 25px; }
         .menu-item.active .menu-header::after { content: '−'; }
-
-        #status-msg { text-align: center; padding: 50px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
-        footer { text-align: center; padding: 60px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
+        #status-msg { text-align: center; padding: 100px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        footer { text-align: center; padding: 40px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
     </style>
 </head>
 <body>
-
     <header>
-        <div style="font-size: 1.2rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 200;">ÉONIA</div>
+        <div style="font-size: 1.2rem; letter-spacing: 8px; font-weight: 200;">ÉONIA</div>
         <a href="catalogue.html" class="back-nav">← Retour au catalogue</a>
     </header>
 
-    <div id="status-msg">Chargement de la mémoire végétale...</div>
+    <div id="status-msg">Initialisation de la mémoire végétale...</div>
 
     <div id="plant-details" style="display:none;">
         <img src="" id="main-img" class="hero-img">
-        
         <div class="container">
-            <h1 id="plant-name"></h1>
-            <p id="plant-surnom"></p>
+            <h1 id="nom-commun"></h1>
+            <p id="surnom-plante" class="surnom"></p>
 
             <div class="specs-grid">
-                <div class="spec-item"><span>Famille</span><p id="info-famille"></p></div>
-                <div class="spec-item"><span>Exposition</span><p id="info-expo"></p></div>
-                <div class="spec-item"><span>Rusticité</span><p id="info-rust"></p></div>
-                <div class="spec-item"><span>Difficulté</span><p id="info-diff"></p></div>
+                <div class="spec-card"><span>Famille</span><p id="famille"></p></div>
+                <div class="spec-card"><span>Origine</span><p id="origine"></p></div>
+                <div class="spec-card"><span>Difficulté</span><p id="difficulte"></p></div>
+                <div class="spec-card"><span>Exposition</span><p id="exposition"></p></div>
+                <div class="spec-card"><span>Rusticité</span><p id="rusticite"></p></div>
+                <div class="spec-card"><span>Style Jardin</span><p id="style-jardin"></p></div>
+                <div class="spec-card"><span>Taille Maturité</span><p id="taille"></p></div>
+                <div class="spec-card"><span>Floraison</span><p id="floraison"></p></div>
+                <div class="spec-card"><span>Type de sol</span><p id="type-sol"></p></div>
+                <div class="spec-card"><span>Persistance</span><p id="persistance"></p></div>
+                <div class="spec-card"><span>Type</span><p id="type"></p></div>
+                <div class="spec-card"><span>ID Plaque</span><p id="id-plaque"></p></div>
             </div>
 
-            <div class="menu-item">
-                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Description</button>
-                <div class="menu-content" id="desc-text"></div>
-            </div>
-
-            <div class="menu-item">
-                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Entretien & Arrosage</button>
-                <div class="menu-content">
-                    <p><strong>Arrosage :</strong> <span id="info-arrosage"></span></p><br>
-                    <p><strong>Entretien :</strong> <span id="info-entretien"></span></p>
-                </div>
-            </div>
-            
-            <div class="menu-item">
-                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Sol & Fertilisation</button>
-                <div class="menu-content" id="info-sol"></div>
-            </div>
+            <div id="menus-container"></div>
         </div>
     </div>
-
     <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
+        const API_URL = "https://eonia-api.santhimi.workers.dev";
+        const menus = [
+            { id: "description", label: "Description", col: "Description" },
+            { id: "entretien", label: "Entretien", col: "Entretien" },
+            { id: "sante", label: "Protection & Santé", col: "Protection et sante" },
+            { id: "arrosage", label: "Arrosage", col: "Arrosage" },
+            { id: "fertilisation", label: "Sol & Fertilisation", col: "Sol et fertilisation" },
+            { id: "compagnonnage", label: "Compagnonnage", col: "Campagnonnage / Plantes associees" }
+        ];
 
-    async function loadDetails() {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        if (!id) return;
+        async function load() {
+            const id = new URLSearchParams(window.location.search).get('id');
+            if (!id) return;
 
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-            const page = data.results.find(p => p.id === id);
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const page = data.results.find(p => p.id === id);
 
-            if (page) {
-                const p = page.properties;
+                if (page) {
+                    const props = page.properties;
+                    const getTxt = (name) => {
+                        const pr = props[name];
+                        if (!pr) return "Non renseigné";
+                        if (pr.title) return pr.title[0]?.plain_text || "NC";
+                        if (pr.rich_text) return pr.rich_text.map(t => t.plain_text).join('') || "NC";
+                        if (pr.select) return pr.select.name || "NC";
+                        return "NC";
+                    };
 
-                // FONCTION MAGIQUE : Elle extrait le texte peu importe le format Notion
-                const getTxt = (name) => {
-                    const prop = p[name];
-                    if (!prop) return "Non renseigné";
+                    // Remplissage identité
+                    document.getElementById('nom-commun').innerText = getTxt("Nom commun");
+                    document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
                     
-                    // Si c'est un Titre ou du Texte Riche
-                    if (prop.title) return prop.title.map(t => t.plain_text).join('') || "NC";
-                    if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('') || "NC";
-                    
-                    // Si c'est un Menu Déroulant (Select)
-                    if (prop.select) return prop.select.name || "NC";
-                    
-                    // Si c'est un Menu Multi-sélection
-                    if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ') || "NC";
-                    
-                    return "NC";
-                };
+                    // Remplissage specs
+                    document.getElementById('famille').innerText = getTxt("Famille");
+                    document.getElementById('origine').innerText = getTxt("Origine");
+                    document.getElementById('difficulte').innerText = getTxt("Difficulte");
+                    document.getElementById('exposition').innerText = getTxt("Exposition");
+                    document.getElementById('rusticite').innerText = getTxt("Rusticite");
+                    document.getElementById('style-jardin').innerText = getTxt("Style jardin");
+                    document.getElementById('taille').innerText = getTxt("Taille à maturite");
+                    document.getElementById('floraison').innerText = getTxt("Floraison");
+                    document.getElementById('type-sol').innerText = getTxt("Type de sol");
+                    document.getElementById('persistance').innerText = getTxt("Persistance");
+                    document.getElementById('type').innerText = getTxt("Type");
+                    document.getElementById('id-plaque').innerText = getTxt("ID_Plaque");
 
-                // --- REMPLISSAGE DES CHAMPS ---
-                document.getElementById('plant-name').innerText = getTxt("Nom commun");
-                document.getElementById('plant-surnom').innerText = getTxt("Surnom de ma plante");
-                
-                // Infos du haut
-                document.getElementById('info-famille').innerText = getTxt("Famille");
-                document.getElementById('info-expo').innerText = getTxt("Exposition");
-                document.getElementById('info-rust').innerText = getTxt("Rusticite");
-                document.getElementById('info-diff').innerText = getTxt("Difficulte");
+                    // Génération des menus accordéons
+                    const menusHTML = menus.map(m => `
+                        <div class="menu-item">
+                            <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">${m.label}</button>
+                            <div class="menu-content"><p>${getTxt(m.col)}</p></div>
+                        </div>
+                    `).join('');
+                    document.getElementById('menus-container').innerHTML = menusHTML;
 
-                // Menus déroulants (Accordéons)
-                document.getElementById('desc-text').innerText = getTxt("Description");
-                document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
-                document.getElementById('info-entretien').innerText = getTxt("Entretien");
-                document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
+                    // Image
+                    const img = props["Photo"]?.files?.[0];
+                    const url = img?.file?.url || img?.external?.url || page.cover?.external?.url || "";
+                    if (url) document.getElementById('main-img').src = url;
 
-                // GESTION DE L'IMAGE
-                const imgCol = p["Photo"]?.files?.[0];
-                const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "";
-                if (imgUrl) {
-                    document.getElementById('main-img').src = imgUrl;
+                    document.getElementById('status-msg').style.display = 'none';
+                    document.getElementById('plant-details').style.display = 'block';
                 }
-
-                // Affichage final
-                document.getElementById('status-msg').style.display = 'none';
-                document.getElementById('plant-details').style.display = 'block';
-            }
-        } catch (e) {
-            document.getElementById('status-msg').innerText = "Erreur de connexion aux données.";
-            console.error(e);
+            } catch (e) { document.getElementById('status-msg').innerText = "Erreur de chargement"; }
         }
-    }
-    loadDetails();
-</script>
-
+        load();
+    </script>
 </body>
 </html>
