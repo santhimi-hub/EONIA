@@ -78,20 +78,29 @@
 
             const p = page.properties;
 
-            // MÉTHODE DE LECTURE ULTRA-SIMPLE (Celle qui marchait avant)
+            // --- LA FONCTION MAGIQUE : ELLE LIT TOUT (Texte, Puces, Sélections) ---
             const getV = (name) => {
                 const target = p[name];
-                if (!target) return "NC";
+                if (!target) return "Non renseigné";
+                
+                // Si c'est du texte riche (comme ton Exposition avec la puce)
+                if (target.rich_text && target.rich_text.length > 0) {
+                    return target.rich_text.map(t => t.plain_text).join(""); 
+                }
+                // Si c'est le titre
                 if (target.title && target.title.length > 0) return target.title[0].plain_text;
-                if (target.rich_text && target.rich_text.length > 0) return target.rich_text[0].plain_text;
+                // Si c'est un menu déroulant
                 if (target.select) return target.select.name;
+                
                 return "NC";
             };
 
-            // Affichage direct
+            // Affichage des données
             document.getElementById('nom-commun').innerText = getV("Nom commun");
             document.getElementById('surnom-plante').innerText = getV("Surnom de ma plante");
             document.getElementById('id-plaque').innerText = plaqueNum;
+            
+            // On utilise les noms EXACTS de ton Notion (sans accents comme sur ta photo)
             document.getElementById('famille').innerText = getV("Famille");
             document.getElementById('exposition').innerText = getV("Exposition");
             document.getElementById('rusticite').innerText = getV("Rusticite");
@@ -110,6 +119,7 @@
         }
     }
     load();
-    </script>
+</script>
+
 </body>
 </html>
