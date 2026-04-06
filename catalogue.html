@@ -87,38 +87,39 @@
 container.innerHTML = data.results.map(page => {
     const p = page.properties;
     
-    // Fonction robuste pour extraire le texte peu importe le type (Titre, Texte, Menu)
-    const getTxt = (prop) => {
-        if (!prop) return "";
+    // Fonction de sécurité : si la colonne n'existe pas, on ne plante pas
+    const getSafe = (name) => {
+        const prop = p[name];
+        if (!prop) return ""; 
         try {
             if (prop.title) return prop.title[0]?.plain_text || "";
             if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
             if (prop.select) return prop.select.name || "";
-            if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ');
+            return "";
         } catch(e) { return ""; }
-        return "";
     };
 
-    // --- On utilise tes noms avec Majuscules ---
-    const nom = getTxt(p["Nom commun"]) || "Plante sans nom";
-    const surnom = getTxt(p["Surnom de ma plante"]);
-    
-    // Gestion de l'image (Colonne Photo ou Image de couverture Notion)
+    // On récupère tes colonnes avec les noms EXACTS
+    // ATTENTION : J'ai ajouté l'accent à "Difficulté" et "Rusticité" 
+    // car tu les as écrits comme ça dans ta liste !
+    const nom = getSafe("Nom commun") || "Plante sans nom";
+    const surnom = getSafe("Surnom de ma plante");
+    const expo = getSafe("Exposition") || "Standard";
+    const diff = getSafe("Difficulté") || "NC"; 
+    const rust = getSafe("Rusticité") || "NC";
+
+    // Gestion de l'image (Colonne Photo ou Cover)
     const imgCol = p["Photo"]?.files?.[0];
-    const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "https://via.placeholder.com/400x500?text=EONIA";
-    
-    const expo = getTxt(p["Exposition"]) || "Standard";
-    const diff = getTxt(p["Difficulte"]) || "NC";
-    const rust = getTxt(p["Rusticite"]) || "NC";
+    const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x500?text=EONIA";
 
     return `
         <div class="plant-card">
             <div class="img-container">
-                <img src="${image}" class="plant-img" loading="lazy">
+                <img src="${image}" class="plant-img">
             </div>
             <div class="plant-info">
                 <div class="plant-name">${nom}</div>
-                ${surnom ? `<div style="color:#888; font-size:0.8rem; margin-top:-5px; margin-bottom:10px;">${surnom}</div>` : ''}
+                ${surnom ? `<div style="color:#888; font-size:0.8rem; margin-bottom:10px;">${surnom}</div>` : ''}
                 <div class="badges">
                     <span class="badge">☀️ ${expo}</span>
                     <span class="badge">💪 ${diff}</span>
@@ -128,7 +129,6 @@ container.innerHTML = data.results.map(page => {
         </div>
     `;
 }).join('');
-
 ;
 
             } catch (error) {
