@@ -2,17 +2,15 @@
 <html lang="fr">
 <head>
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob:; connect-src *;">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Le Catalogue</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; padding-bottom: 50px; }
+        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; padding-bottom: 50px; text-align: center; }
 
-        header { padding: 60px 20px; text-align: center; }
-        .logo-small { width: 60px; margin-bottom: 15px; opacity: 0.8; }
+        header { padding: 60px 20px; }
         h1 { font-weight: 200; letter-spacing: 8px; text-transform: uppercase; font-size: 1.5rem; color: #4ade80; }
 
         .catalog-container {
@@ -22,120 +20,126 @@
             padding: 20px;
             max-width: 1100px;
             margin: 0 auto;
+            text-align: left; /* Pour que le texte des cartes reste à gauche */
         }
 
         .plant-card {
             background: #111;
             border-radius: 12px;
             overflow: hidden;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.4s ease;
             border: 1px solid #222;
             text-decoration: none;
             color: inherit;
+            display: block;
         }
-        .plant-card:hover { transform: translateY(-8px); border-color: #4ade80; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .plant-card:hover { transform: translateY(-8px); border-color: #4ade80; }
         
-        .img-container { width: 100%; height: 280px; overflow: hidden; background: #1a1a1a; }
-        .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .plant-card:hover .plant-img { transform: scale(1.05); }
+        .img-container { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #1a1a1a; position: relative; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; }
         
-        .plant-info { padding: 25px; }
-        .plant-name { font-size: 1.3rem; font-weight: 500; margin-bottom: 12px; color: #fff; }
-        
-        .badges { display: flex; gap: 8px; flex-wrap: wrap; }
-        .badge { 
-            font-size: 0.6rem; padding: 5px 12px; 
-            background: rgba(255,255,255,0.05); 
-            color: #ccc; border: 1px solid #333; 
-            border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;
+        .plaque-badge { 
+            position: absolute; top: 10px; right: 10px; 
+            background: #4ade80; color: #000; 
+            padding: 4px 8px; border-radius: 5px; 
+            font-size: 0.7rem; font-weight: bold; 
         }
 
-        #status-msg { text-align: center; padding: 40px; color: #666; font-size: 0.9rem; }
+        .plant-info { padding: 20px; }
+        .plant-name { font-size: 1.1rem; font-weight: 500; margin-bottom: 5px; text-transform: uppercase; }
+        .plant-surnom { color: #666; font-size: 0.8rem; }
+
+        #status-msg { padding: 40px; color: #4ade80; font-size: 0.9rem; letter-spacing: 2px; }
+        
+        .logout-btn { 
+            background: none; border: 1px solid #333; color: #666; 
+            padding: 10px 20px; border-radius: 5px; font-size: 0.7rem; 
+            margin-top: 40px; cursor: pointer; text-transform: uppercase;
+        }
+        .logout-btn:hover { color: #fff; border-color: #fff; }
     </style>
 </head>
 <body>
 
     <header>
-    <a href="index.html" style="text-decoration: none; color: inherit;">
-        <div style="font-size: 1.2rem; letter-spacing: 8px; font-weight: 200; cursor: pointer;">ÉONIA</div>
-    </a>
-    <p style="font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; margin-top: 10px; text-transform: uppercase;">
-        Mon Jardin Privé
-    </p>
-</header>
-
+        <a href="index.html" style="text-decoration: none; color: inherit;">
+            <div style="font-size: 1.2rem; letter-spacing: 8px; font-weight: 200; cursor: pointer;">ÉONIA</div>
+        </a>
+        <p style="font-size: 0.6rem; letter-spacing: 2px; opacity: 0.5; margin-top: 10px; text-transform: uppercase;">
+            Mon Jardin Privé
+        </p>
+    </header>
 
     <div id="status-msg">Connexion à la mémoire végétale...</div>
-    <div id="catalog" class="catalog-container"></div>
-<button onclick="logout()" style="background: none; border: 1px solid #333; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; margin-top: 20px; cursor: pointer;">
-    Quitter le jardin
-</button>
+    
+    <div id="catalogue-grid" class="catalog-container"></div>
 
-<script>
-    function logout() {
-        // On supprime la clé d'accès du téléphone
-        localStorage.removeItem('eonia_access');
-        // On renvoie à l'accueil
-        window.location.href = "index.html";
-    }
-<script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    <button class="logout-btn" onclick="logout()">Quitter le jardin</button>
 
-    async function loadCatalogue() {
-        const container = document.getElementById('catalogue-grid');
-        const statusMsg = document.getElementById('status-msg');
-
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error("Erreur API");
-            const data = await response.json();
-
-            container.innerHTML = "";
-
-            data.results.forEach(page => {
-                const p = page.properties;
-
-                // --- SÉCURITÉ : On vérifie si les colonnes existent avant de lire ---
-                const name = p["Nom commun"]?.title?.[0]?.plain_text || "Plante sans nom";
-                const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
-                
-                // Récupération ID_Plaque (vérifie bien l'orthographe ici !)
-                const plaqueNum = p["ID_Plaque"]?.title?.[0]?.plain_text || 
-                                 p["ID_Plaque"]?.rich_text?.[0]?.plain_text || "";
-
-                // Image par défaut si vide
-                const imgCol = p["Photo"]?.files?.[0];
-                const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x400?text=EONIA";
-
-                // On ne crée la carte que si le nom n'est pas vide (évite les lignes fantômes)
-                if (name !== "Plante sans nom") {
-                    const card = document.createElement('div');
-                    card.style.cursor = "pointer";
-                    card.innerHTML = `
-                        <a href="jardin.html?plaque=${plaqueNum}" style="text-decoration:none; color:inherit;">
-                            <div style="position:relative; overflow:hidden; border-radius:15px; background:#111;">
-                                <img src="${image}" style="width:100%; aspect-ratio:1; object-fit:cover; display:block;">
-                                ${plaqueNum ? `<span style="position:absolute; top:10px; right:10px; background:#4ade80; color:#000; padding:3px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold;">#${plaqueNum}</span>` : ''}
-                            </div>
-                            <h3 style="margin-top:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">${name}</h3>
-                            <p style="color:#666; font-size:0.75rem; margin-bottom:20px;">${surnom}</p>
-                        </a>
-                    `;
-                    container.appendChild(card);
-                }
-            });
-
-            if (statusMsg) statusMsg.style.display = 'none';
-
-        } catch (error) {
-            console.error("Détails de l'erreur:", error);
-            if (statusMsg) statusMsg.innerText = "Erreur technique : Vérifiez vos noms de colonnes Notion.";
+    <script>
+        // --- FONCTION DE DECONNEXION ---
+        function logout() {
+            localStorage.removeItem('eonia_access');
+            window.location.href = "index.html";
         }
-    }
 
-    loadCatalogue();
-</script>
+        // --- CHARGEMENT DU CATALOGUE ---
+        const API_URL = "https://eonia-api.santhimi.workers.dev";
 
+        async function loadCatalogue() {
+            const container = document.getElementById('catalogue-grid');
+            const statusMsg = document.getElementById('status-msg');
 
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("Erreur API");
+                const data = await response.json();
+
+                container.innerHTML = "";
+
+                data.results.forEach(page => {
+                    const p = page.properties;
+
+                    // Extraction des textes (Sécurité si vide)
+                    const name = p["Nom commun"]?.title?.[0]?.plain_text || "Plante sans nom";
+                    const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
+                    
+                    // Extraction ID_Plaque
+                    const plaqueNum = p["ID_Plaque"]?.title?.[0]?.plain_text || 
+                                     p["ID_Plaque"]?.rich_text?.[0]?.plain_text || "";
+
+                    // Image
+                    const imgCol = p["Photo"]?.files?.[0];
+                    const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x400?text=EONIA";
+
+                    // On n'affiche que les lignes qui ont un nom
+                    if (name !== "Plante sans nom") {
+                        const card = document.createElement('a');
+                        card.href = `jardin.html?plaque=${plaqueNum}`;
+                        card.className = "plant-card";
+                        card.innerHTML = `
+                            <div class="img-container">
+                                <img src="${image}" class="plant-img">
+                                ${plaqueNum ? `<div class="plaque-badge">#${plaqueNum}</div>` : ''}
+                            </div>
+                            <div class="plant-info">
+                                <div class="plant-name">${name}</div>
+                                <div class="plant-surnom">${surnom}</div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+
+                if (statusMsg) statusMsg.style.display = 'none';
+
+            } catch (error) {
+                console.error("Erreur:", error);
+                if (statusMsg) statusMsg.innerText = "Erreur de chargement. Vérifiez votre connexion.";
+            }
+        }
+
+        loadCatalogue();
+    </script>
 </body>
 </html>
