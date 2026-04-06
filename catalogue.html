@@ -54,69 +54,64 @@
     <button class="logout-btn" onclick="logout()">Quitter le jardin</button>
 
     <script>
-        // --- 1. LE GARDE-BARRIÈRE ---
-        // On vérifie si l'utilisateur est passé par l'accueil (index.html)
-        if (!localStorage.getItem('eonia_access')) {
-            window.location.href = "index.html"; // Pas de clé ? Hop, retour à l'accueil !
+    // 1. Garde-barrière : Personne n'entre sans au moins un statut
+    const accessStatus = localStorage.getItem('eonia_access');
+    if (!accessStatus) {
+        window.location.href = "index.html";
+    }
+
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+    async function loadCatalogue() {
+        const container = document.getElementById('catalogue-grid');
+        const statusMsg = document.getElementById('status-msg');
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            container.innerHTML = "";
+
+            data.results.forEach(page => {
+                const p = page.properties;
+                const name = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
+                const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
+                const plaqueNum = p["ID_Plaque"]?.rich_text?.[0]?.plain_text || 
+                                 p["ID_Plaque"]?.title?.[0]?.plain_text || "";
+                
+                const imgCol = p["Photo"]?.files?.[0];
+                const image = imgCol?.file?.url || imgCol?.external?.url || "https://via.placeholder.com/400?text=EONIA";
+
+                if (name !== "Sans nom") {
+                    const card = document.createElement('a');
+                    // On envoie vers la fiche avec le numéro de plaque
+                    card.href = `jardin.html?plaque=${plaqueNum}`;
+                    card.className = "plant-card";
+                    card.innerHTML = `
+                        <div class="img-container">
+                            <img src="${image}" class="plant-img">
+                            <div class="plaque-badge">#${plaqueNum}</div>
+                        </div>
+                        <div class="plant-info">
+                            <div class="plant-name">${name}</div>
+                            <div class="plant-surnom">${surnom}</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+            statusMsg.style.display = 'none';
+        } catch (error) {
+            statusMsg.innerText = "Erreur de chargement du catalogue.";
         }
+    }
+    
+    function logout() {
+        localStorage.clear();
+        window.location.href = "index.html";
+    }
 
-        // --- 2. FONCTION DE DÉCONNEXION ---
-        function logout() {
-            localStorage.removeItem('eonia_access'); // On efface la clé
-            window.location.href = "index.html";
-        }
+    loadCatalogue();
+</script>
 
-        // --- 3. CHARGEMENT DES DONNÉES NOTION ---
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
-
-        async function loadCatalogue() {
-            const container = document.getElementById('catalogue-grid');
-            const statusMsg = document.getElementById('status-msg');
-
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                container.innerHTML = "";
-
-                data.results.forEach(page => {
-                    const p = page.properties;
-                    
-                    // On récupère le Nom, le Surnom et l'ID_Plaque
-                    const name = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
-                    const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
-                    const plaqueNum = p["ID_Plaque"]?.rich_text?.[0]?.plain_text || 
-                                     p["ID_Plaque"]?.title?.[0]?.plain_text || "";
-
-                    // On récupère l'image
-                    const imgCol = p["Photo"]?.files?.[0];
-                    const image = imgCol?.file?.url || imgCol?.external?.url || "https://via.placeholder.com/400?text=EONIA";
-
-                    if (name !== "Sans nom") {
-                        const card = document.createElement('a');
-                        card.href = `jardin.html?plaque=${plaqueNum}`;
-                        card.className = "plant-card";
-                        card.innerHTML = `
-                            <div class="img-container">
-                                <img src="${image}" class="plant-img">
-                                ${plaqueNum ? `<div class="plaque-badge">#${plaqueNum}</div>` : ''}
-                            </div>
-                            <div class="plant-info">
-                                <div class="plant-name">${name}</div>
-                                <div class="plant-surnom">${surnom}</div>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    }
-                });
-
-                statusMsg.style.display = 'none';
-
-            } catch (error) {
-                statusMsg.innerText = "Erreur de connexion aux plantes.";
-            }
-        }
-
-        loadCatalogue();
-    </script>
 </body>
 </html>
