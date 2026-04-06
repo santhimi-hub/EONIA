@@ -3,70 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Bienvenue</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+    <title>ÉONIA — Accueil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #050505; color: #fff; 
-            font-family: 'Raleway', sans-serif; 
-            height: 100vh; display: flex; align-items: center; justify-content: center; 
-            text-align: center; padding: 20px;
+        /* RESET ET BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; } 
+        body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            /* Vérifie que ton image s'appelle bien background.jpg sur GitHub */
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat;
         }
-        .login-box { max-width: 400px; width: 100%; }
-        h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; color: #4ade80; margin-bottom: 10px; }
-        p { font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6; text-transform: uppercase; margin-bottom: 40px; }
+
+        .logo-main { width: 120px; margin-bottom: 25px; }
+
+        /* TON TITRE CORRIGÉ : GRAND ET FIN */
+        .brand-title {
+            font-family: 'Raleway', sans-serif;
+            font-size: 4rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1;
+        }
+
+        /* TA PHRASE CORRIGÉE : PETITE ET LISIBLE */
+        .tagline {
+            font-family: 'Raleway', sans-serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.9rem;
+            text-transform: none;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin-top: 35px; /* L'espacement que tu voulais */
+            margin-bottom: 45px;
+        }
+
+        /* STYLES FORMULAIRE */
+        .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; }
+        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 2px; }
+
+        .forgot-pass {font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
+        .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
+        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; }
+        .bottom-nav a:hover {border-bottom: 1px solid #4ade80; }
+
+        .content-section { padding: 100px 30px; text-align: center; background: #050505; }
+        .content-section h2 { color: #4ade80; /* VERT EONIA */ font-weight: 300; 
+                             text-transform: uppercase letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
+        .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
         
-        input { 
-            width: 100%; background: #111; border: 1px solid #333; 
-            padding: 15px; border-radius: 10px; color: #fff; 
-            font-family: inherit; margin-bottom: 15px; outline: none;
-            transition: 0.3s;
-        }
-        input:focus { border-color: #4ade80; }
-        
-        button { 
-            width: 100%; background: #4ade80; color: #000; 
-            border: none; padding: 15px; border-radius: 10px; 
-            font-weight: bold; cursor: pointer; letter-spacing: 1px;
-            text-transform: uppercase; transition: 0.3s;
-        }
-        button:hover { background: #38c16d; transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-    <div class="login-box">
-        <h1>ÉONIA</h1>
-        <p>Accès à votre Jardin Privé</p>
-
-        <input type="email" id="email-input" placeholder="Entrez votre adresse mail">
+    <div class="hero">
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
         
-        <button onclick="validerAcces()">Entrer dans le jardin</button>
+        <h1 class="brand-title">ÉONIA</h1>
+        
+        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+
+        <div class="auth-container">
+            <p id="welcome-msg" style="font-size: 0.8rem; color: #4ade80; margin-bottom: 10px; display: none;">
+                Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
+            </p>
+            <input type="email" placeholder="Votre Email" id="email">
+            <input type="password" placeholder="Créer votre mot de passe" id="pass">
+            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
+            <a href="#"
+                class="forgot-pass">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="bottom-nav">
+            <a href="catalogue.html?id=cerisier&mode=guest">Visiter en tant qu'invité</a>
+            <span>|</span>
+            <a href="#concept">Notre Concept</a>
+        </div>
     </div>
 
+    <section class="content-section" id="concept">
+        <h2>Notre Concept</h2>
+        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre. Scanner, Cultiver, Admirer.</p>
+        <div style="height: 80px;"></div>
+        <h2>L'âme d'ÉONIA</h2>
+        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
+    </section>
+
     <script>
-        // 1. Si on est déjà connecté, on gagne du temps et on va direct au catalogue
-        if (localStorage.getItem('eonia_access')) {
+    // --- 1. SÉCURITÉ : SI DÉJÀ CONNECTÉ, ON PASSE L'ACCUEIL ---
+    // Si le téléphone se souvient du mail, on envoie direct au catalogue
+    if (localStorage.getItem('eonia_access')) {
+        window.location.href = "catalogue.html";
+    }
+
+    // --- 2. FONCTION DE VALIDATION DU BOUTON ---
+    function validerAcces() {
+        const mailSaisi = document.getElementById('email-input').value; // Vérifie que ton ID d'input est bien 'email-input'
+        
+        if (mailSaisi.includes('@')) { // Vérification simple du format mail
+            // On enregistre l'accès dans la mémoire du téléphone
+            localStorage.setItem('eonia_access', 'true');
+            localStorage.setItem('user_email', mailSaisi);
+
+            // On redirige vers le catalogue
             window.location.href = "catalogue.html";
+        } else {
+            alert("Merci d'entrer une adresse mail valide pour accéder au jardin.");
         }
-
-        // 2. La fonction qui ouvre la porte
-        function validerAcces() {
-            const mail = document.getElementById('email-input').value;
-
-            if (mail.includes('@') && mail.length > 5) {
-                // ON CRÉE LA CLÉ (Le Garde-barrière du catalogue la cherchera)
-                localStorage.setItem('eonia_access', 'true');
-                localStorage.setItem('user_email', mail);
-
-                // ON REDIRIGE
-                window.location.href = "catalogue.html";
-            } else {
-                alert("Veuillez entrer une adresse mail valide.");
-            }
-        }
-    </script>
+    }
+</script>
 
 </body>
 </html>
