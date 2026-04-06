@@ -103,22 +103,28 @@
     </section>
 
     <script>
-        function validerConnexion() {
-            const email = document.getElementById('email').value;
-            const urlParams = new URLSearchParams(window.location.search);
-            const plaqueID = urlParams.get('id');
+    // --- 1. SÉCURITÉ : SI DÉJÀ CONNECTÉ, ON PASSE L'ACCUEIL ---
+    // Si le téléphone se souvient du mail, on envoie direct au catalogue
+    if (localStorage.getItem('eonia_access')) {
+        window.location.href = "catalogue.html";
+    }
 
-            if (!email) {
-                alert("Veuillez entrer votre email.");
-                return;
-            }
-            
-            if (plaqueID) {
-                window.location.href = "catalogue.html?id=" + plaqueID;
-            } else {
-                window.location.href = "catalogue.html";
-            }
+    // --- 2. FONCTION DE VALIDATION DU BOUTON ---
+    function validerAcces() {
+        const mailSaisi = document.getElementById('email-input').value; // Vérifie que ton ID d'input est bien 'email-input'
+        
+        if (mailSaisi.includes('@')) { // Vérification simple du format mail
+            // On enregistre l'accès dans la mémoire du téléphone
+            localStorage.setItem('eonia_access', 'true');
+            localStorage.setItem('user_email', mailSaisi);
+
+            // On redirige vers le catalogue
+            window.location.href = "catalogue.html";
+        } else {
+            alert("Merci d'entrer une adresse mail valide pour accéder au jardin.");
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
