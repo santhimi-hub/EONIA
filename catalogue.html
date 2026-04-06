@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob:; connect-src *;">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Le Catalogue</title>
@@ -62,82 +64,60 @@
     <div id="catalog" class="catalog-container"></div>
 
     <script>
-        // REMPLACE CETTE URL PAR LA TIENNE (Cloudflare)
-        const API_URL = "https://eonia-api.santhimi.workers.dev"; 
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        async function fetchCatalogue() {
-            const container = document.getElementById('catalog');
-            const status = document.getElementById('status-msg');
+async function loadPlants() {
+    const container = document.getElementById('catalog');
+    const statusMsg = document.getElementById('status-msg');
 
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
 
-                if (!data.results || data.results.length === 0) {
-                    status.innerHTML = "Le catalogue est vide pour le moment.";
-                    return;
-                }
-
-                status.style.display = "none";
-
-                container.innerHTML = data.results.map(page => {
-                    const p = page.properties;
-                    
-                    // On récupère les infos selon tes colonnes Notion
-container.innerHTML = data.results.map(page => {
-    const p = page.properties;
-    
-    // Fonction de sécurité : si la colonne n'existe pas, on ne plante pas
-    const getSafe = (name) => {
-        const prop = p[name];
-        if (!prop) return ""; 
-        try {
-            if (prop.title) return prop.title[0]?.plain_text || "";
-            if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
-            if (prop.select) return prop.select.name || "";
-            return "";
-        } catch(e) { return ""; }
-    };
-
-    // On récupère tes colonnes avec les noms EXACTS
-    // ATTENTION : J'ai ajouté l'accent à "Difficulté" et "Rusticité" 
-    // car tu les as écrits comme ça dans ta liste !
-    const nom = getSafe("Nom commun") || "Plante sans nom";
-    const surnom = getSafe("Surnom de ma plante");
-    const expo = getSafe("Exposition") || "Standard";
-    const diff = getSafe("Difficulté") || "NC"; 
-    const rust = getSafe("Rusticité") || "NC";
-
-    // Gestion de l'image (Colonne Photo ou Cover)
-    const imgCol = p["Photo"]?.files?.[0];
-    const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x500?text=EONIA";
-
-    return `
-        <div class="plant-card">
-            <div class="img-container">
-                <img src="${image}" class="plant-img">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${nom}</div>
-                ${surnom ? `<div style="color:#888; font-size:0.8rem; margin-bottom:10px;">${surnom}</div>` : ''}
-                <div class="badges">
-                    <span class="badge">☀️ ${expo}</span>
-                    <span class="badge">💪 ${diff}</span>
-                    <span class="badge">❄️ ${rust}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}).join('');
-;
-
-            } catch (error) {
-                console.error("Erreur:", error);
-                status.innerHTML = "Impossible de charger le catalogue. Vérifie ta connexion.";
-            }
+        if (!data.results || data.results.length === 0) {
+            statusMsg.innerHTML = "Aucune plante trouvée dans Notion.";
+            return;
         }
 
-        fetchCatalogue();
-    </script>
+        container.innerHTML = data.results.map(page => {
+            const p = page.properties;
+            
+            // On récupère les textes sans risquer de planter
+            const nom = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
+            const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
+            const expo = p["Exposition"]?.select?.name || "NC";
+            const diff = p["Difficulte"]?.select?.name || p["Difficulté"]?.select?.name || "NC";
+
+            // Photo : On teste la colonne "Photo", puis la couverture Notion
+            const imgFile = p["Photo"]?.files?.[0];
+            const image = imgFile?.file?.url || imgFile?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "https://via.placeholder.com/400?text=EONIA";
+
+            return `
+                <div class="plant-card">
+                    <div class="img-container">
+                        <img src="${image}" class="plant-img" loading="lazy">
+                    </div>
+                    <div class="plant-info">
+                        <div class="plant-name">${nom}</div>
+                        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">${surnom}</div>
+                        <div class="badges">
+                            <span class="badge">☀️ ${expo}</span>
+                            <span class="badge">💪 ${diff}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        statusMsg.style.display = 'none'; // On cache le message de chargement
+    } catch (error) {
+        console.error("Erreur détaillée:", error);
+        statusMsg.innerHTML = "Erreur de connexion. Vérifiez la console (F12).";
+    }
+}
+
+loadPlants();
+</script>
+
 </body>
 </html>
