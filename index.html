@@ -86,5 +86,31 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
+<script>
+    // On vérifie si c'est un premier scan (ex: l'URL contient ?action=init)
+    const urlParams = new URLSearchParams(window.location.search);
+    const estPremierScan = urlParams.get('new') === 'true';
+
+    if (estPremierScan) {
+        document.getElementById('welcome-msg').style.display = 'block';
+        document.querySelector('.btn-main').innerText = 'Activer ma plaque';
+        document.getElementById('pass').placeholder = 'Créer un mot de passe';
+    }
+
+    function activerPlaque() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+
+        if(email && pass) {
+            // Ici, on enregistrera plus tard dans Firebase
+            alert("Compte créé ! Bienvenue dans votre jardin.");
+            window.location.href = "jardin.html?id=cerisier";
+        } else {
+            alert("Veuillez remplir les deux champs.");
+        }
+    }
+</script>
+
+
 </body>
 </html>
