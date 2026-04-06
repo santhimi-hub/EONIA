@@ -6,51 +6,31 @@
     <title>ÉONIA — Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,300&display=swap" rel="stylesheet">
 
-    <style>
-        :root { --accent: #4ade80; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #050505; color: #fff; scroll-behavior: smooth; }
+    /* Style du Titre Principal */
+.brand-title {
+    font-size: 4.5rem;          /* Très grand pour l'impact */
+    font-weight: 100;           /* Ultra-fin (Style luxe) */
+    letter-spacing: 25px;       /* Très aéré, comme sur les logos premium */
+    text-transform: uppercase;
+    color: #ffffff;
+    margin-bottom: 5px;         /* Rapproche un peu du texte suivant */
+    line-height: 1.2;
+}
 
-        .hero {
-            position: relative; height: 100vh; width: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), 
-                        url('background.jpg') center/cover no-repeat;
-        }
+/* Style de la Phrase de Bienvenue */
+.tagline {
+    font-family: 'Raleway', sans-serif;
+    font-style: italic;
+    font-weight: 500;           /* Plus épais (Medium) pour la visibilité */
+    font-size: 0.75rem;         /* Plus petit que précédemment */
+    text-transform: none;       /* Garde les minuscules du modèle */
+    letter-spacing: 2px;        /* Un peu d'espace pour la clarté */
+    color: rgba(255, 255, 255, 1); /* Blanc pur (100% visible) */
+    margin-top: 40px;           /* Bel espacement avec ÉONIA */
+    margin-bottom: 60px;
+    display: block;             /* S'assure que la phrase prend bien sa place */
+}
 
-        .logo-main { width: 140px; filter: brightness(0) invert(1); margin-bottom: 20px; }
-        .brand-title { font-size: 3.5rem; letter-spacing: 20px; font-weight: 100; text-transform: uppercase; margin-bottom: 10px; }
-        .tagline { font-size: 0.7rem; letter-spacing: 5px; color: var(--accent); text-transform: uppercase; margin-bottom: 40px; }
-
-        /* BLOC CONNEXION EXACTEMENT COMME TA PHOTO */
-        .auth-container {
-            width: 90%; max-width: 330px;
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
-            padding: 35px 25px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1);
-        }
-        input {
-            width: 100%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 16px; border-radius: 15px; color: #fff; margin-bottom: 12px; outline: none; font-size: 0.95rem;
-        }
-        .btn-main {
-            display: block; width: 100%; padding: 18px; background: var(--accent); color: #000;
-            text-transform: uppercase; letter-spacing: 3px; font-weight: 800;
-            border-radius: 35px; border: none; cursor: pointer; font-size: 0.9rem; margin-top: 10px;
-        }
-
-        /* LIENS EN BAS DE L'IMAGE */
-        .bottom-nav {
-            position: absolute; bottom: 30px; width: 100%;
-            display: flex; justify-content: center; gap: 15px;
-            font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5);
-        }
-        .bottom-nav a { color: inherit; text-decoration: none; }
-
-        /* SECTIONS TEXTE */
-        .content-section { padding: 80px 25px; background: #050505; text-align: center; }
-        .content-section h2 { font-size: 1.1rem; letter-spacing: 6px; color: var(--accent); margin-bottom: 25px; text-transform: uppercase; }
-        .content-section p { max-width: 600px; margin: auto; line-height: 1.8; color: #aaa; font-size: 1rem; }
-    </style>
 </head>
 <body>
 
