@@ -70,74 +70,90 @@
     <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
-        const menus = [
-            { id: "description", label: "Description", col: "Description" },
-            { id: "entretien", label: "Entretien", col: "Entretien" },
-            { id: "sante", label: "Protection & Santé", col: "Protection et sante" },
-            { id: "arrosage", label: "Arrosage", col: "Arrosage" },
-            { id: "fertilisation", label: "Sol & Fertilisation", col: "Sol et fertilisation" },
-            { id: "compagnonnage", label: "Compagnonnage", col: "Campagnonnage / Plantes associees" }
-        ];
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        async function load() {
-            const id = new URLSearchParams(window.location.search).get('id');
-            if (!id) return;
+    async function load() {
+        // 1. On récupère le numéro de plaque dans l'URL (ex: ?plaque=01)
+        const params = new URLSearchParams(window.location.search);
+        const plaqueNum = params.get('plaque'); 
 
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                const page = data.results.find(p => p.id === id);
+        const container = document.getElementById('plant-details');
+        const statusMsg = document.getElementById('status-msg');
 
-                if (page) {
-                    const props = page.properties;
-                    const getTxt = (name) => {
-                        const pr = props[name];
-                        if (!pr) return "Non renseigné";
-                        if (pr.title) return pr.title[0]?.plain_text || "NC";
-                        if (pr.rich_text) return pr.rich_text.map(t => t.plain_text).join('') || "NC";
-                        if (pr.select) return pr.select.name || "NC";
-                        return "NC";
-                    };
-
-                    // Remplissage identité
-                    document.getElementById('nom-commun').innerText = getTxt("Nom commun");
-                    document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
-                    
-                    // Remplissage specs
-                    document.getElementById('famille').innerText = getTxt("Famille");
-                    document.getElementById('origine').innerText = getTxt("Origine");
-                    document.getElementById('difficulte').innerText = getTxt("Difficulte");
-                    document.getElementById('exposition').innerText = getTxt("Exposition");
-                    document.getElementById('rusticite').innerText = getTxt("Rusticite");
-                    document.getElementById('style-jardin').innerText = getTxt("Style jardin");
-                    document.getElementById('taille').innerText = getTxt("Taille à maturite");
-                    document.getElementById('floraison').innerText = getTxt("Floraison");
-                    document.getElementById('type-sol').innerText = getTxt("Type de sol");
-                    document.getElementById('persistance').innerText = getTxt("Persistance");
-                    document.getElementById('type').innerText = getTxt("Type");
-                    document.getElementById('id-plaque').innerText = getTxt("ID_Plaque");
-
-                    // Génération des menus accordéons
-                    const menusHTML = menus.map(m => `
-                        <div class="menu-item">
-                            <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">${m.label}</button>
-                            <div class="menu-content"><p>${getTxt(m.col)}</p></div>
-                        </div>
-                    `).join('');
-                    document.getElementById('menus-container').innerHTML = menusHTML;
-
-                    // Image
-                    const img = props["Photo"]?.files?.[0];
-                    const url = img?.file?.url || img?.external?.url || page.cover?.external?.url || "";
-                    if (url) document.getElementById('main-img').src = url;
-
-                    document.getElementById('status-msg').style.display = 'none';
-                    document.getElementById('plant-details').style.display = 'block';
-                }
-            } catch (e) { document.getElementById('status-msg').innerText = "Erreur de chargement"; }
+        if (!plaqueNum) {
+            statusMsg.innerText = "Erreur : Aucune plaque détectée. Scannez un QR Code ÉONIA.";
+            return;
         }
-        load();
-    </script>
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // 2. RECHERCHE PAR PLAQUE : On cherche la ligne où ID_Plaque correspond
+            const page = data.results.find(p => {
+                const prop = p.properties["ID_Plaque"];
+                // On vérifie dans le titre OU le texte riche (selon comment c'est rempli)
+                const val = prop?.title?.[0]?.plain_text || prop?.rich_text?.[0]?.plain_text || "";
+                return val.trim() === plaqueNum.trim();
+            });
+
+            if (!page) {
+                statusMsg.innerText = `La plaque n°${plaqueNum} n'est pas encore reliée à une plante dans votre jardin.`;
+                return;
+            }
+
+            const p = page.properties;
+
+            // Fonction pour extraire le texte (Textes, Sélections, Titres)
+            const getTxt = (name) => {
+                const prop = p[name];
+                if (!prop) return "Non renseigné";
+                if (prop.title) return prop.title[0]?.plain_text || "NC";
+                if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('') || "NC";
+                if (prop.select) return prop.select.name || "NC";
+                if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ') || "NC";
+                return "NC";
+            };
+
+            // 3. REMPLISSAGE DES 22 COLONNES (Identité)
+            document.getElementById('nom-commun').innerText = getTxt("Nom commun");
+            document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
+            document.getElementById('famille').innerText = getTxt("Famille");
+            document.getElementById('origine').innerText = getTxt("Origine");
+            document.getElementById('difficulte').innerText = getTxt("Difficulte");
+            document.getElementById('exposition').innerText = getTxt("Exposition");
+            document.getElementById('rusticite').innerText = getTxt("Rusticite");
+            document.getElementById('style-jardin').innerText = getTxt("Style jardin");
+            document.getElementById('taille').innerText = getTxt("Taille à maturite");
+            document.getElementById('floraison').innerText = getTxt("Floraison");
+            document.getElementById('type-sol').innerText = getTxt("Type de sol");
+            document.getElementById('persistance').innerText = getTxt("Persistance");
+            document.getElementById('type').innerText = getTxt("Type");
+            document.getElementById('id-plaque').innerText = getTxt("ID_Plaque");
+
+            // Remplissage des menus (Description, Arrosage, etc.)
+            document.getElementById('desc-text').innerText = getTxt("Description");
+            document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
+            document.getElementById('info-entretien').innerText = getTxt("Entretien");
+            document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
+
+            // Image
+            const imgCol = p["Photo"]?.files?.[0];
+            const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "";
+            if (imgUrl) document.getElementById('main-img').src = imgUrl;
+
+            // Affichage
+            statusMsg.style.display = 'none';
+            container.style.display = 'block';
+
+        } catch (error) {
+            statusMsg.innerText = "Erreur de connexion aux données.";
+            console.error(error);
+        }
+    }
+
+    load();
+</script>
+
 </body>
 </html>
