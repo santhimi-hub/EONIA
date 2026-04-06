@@ -102,29 +102,32 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
-    <script>
+        <script>
     // --- 1. SÉCURITÉ : SI DÉJÀ CONNECTÉ, ON PASSE L'ACCUEIL ---
-    // Si le téléphone se souvient du mail, on envoie direct au catalogue
     if (localStorage.getItem('eonia_access')) {
         window.location.href = "catalogue.html";
     }
 
-    // --- 2. FONCTION DE VALIDATION DU BOUTON ---
-    function validerAcces() {
-        const mailSaisi = document.getElementById('email-input').value; // Vérifie que ton ID d'input est bien 'email-input'
+    // --- 2. FONCTION DE VALIDATION (Mise en lien avec tes ID 'email' et 'pass') ---
+    function validerConnexion() {
+        const mailSaisi = document.getElementById('email').value;
+        const passSaisi = document.getElementById('pass').value;
         
-        if (mailSaisi.includes('@')) { // Vérification simple du format mail
-            // On enregistre l'accès dans la mémoire du téléphone
+        // On vérifie que le mail contient un @ et que le mot de passe n'est pas vide
+        if (mailSaisi.includes('@') && passSaisi.length > 0) {
+            
+            // On crée la clé magique pour le catalogue
             localStorage.setItem('eonia_access', 'true');
             localStorage.setItem('user_email', mailSaisi);
 
             // On redirige vers le catalogue
             window.location.href = "catalogue.html";
         } else {
-            alert("Merci d'entrer une adresse mail valide pour accéder au jardin.");
+            alert("Merci d'entrer votre mail et votre mot de passe pour accéder au jardin.");
         }
     }
-</script>
+    </script>
+
 
 </body>
 </html>
