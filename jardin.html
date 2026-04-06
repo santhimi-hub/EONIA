@@ -273,45 +273,88 @@
     <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-        // Identification de la plante via l'URL (ex: jardin.html?id=cerisier)
-        const params = new URLSearchParams(window.location.search);
-        const plantID = params.get('id') || 'cerisier'; // par défaut
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        function toggleMenu(btn) { btn.parentElement.classList.toggle('active'); }
+async function loadPlantDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const plantId = params.get('id');
+    const container = document.getElementById('plant-details');
 
-        // Sauvegarde spécifique à CHAQUE plante
-        function saveData() {
-            const data = { date: document.getElementById('pDate').value, expo: document.getElementById('pExpo').value };
-            localStorage.setItem('eonia_' + plantID, JSON.stringify(data));
+    if (!plantId) {
+        container.innerHTML = "<p>Plante non trouvée.</p>";
+        return;
+    }
+
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const page = data.results.find(p => p.id === plantId);
+
+        if (!page) {
+            container.innerHTML = "<p>Plante introuvable dans la base.</p>";
+            return;
         }
 
-        function addPhoto(e) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const img = document.createElement('img');
-                img.src = reader.result; img.className = 'photo-slot';
-                document.getElementById('gal').prepend(img);
-                let photos = JSON.parse(localStorage.getItem('photos_' + plantID) || "[]");
-                photos.unshift(reader.result);
-                localStorage.setItem('photos_' + plantID, JSON.stringify(photos.slice(0, 4)));
-            }
-            reader.readAsDataURL(e.target.files[0]);
-        }
+        const p = page.properties;
 
-        window.onload = function() {
-            // Charger les données propres au téléphone qui consulte
-            const saved = JSON.parse(localStorage.getItem('eonia_' + plantID));
-            if (saved) {
-                document.getElementById('pDate').value = saved.date || "";
-                document.getElementById('pExpo').value = saved.expo || "";
-            }
-            const savedPhotos = JSON.parse(localStorage.getItem('photos_' + plantID) || "[]");
-            savedPhotos.forEach(src => {
-                const img = document.createElement('img');
-                img.src = src; img.className = 'photo-slot';
-                document.getElementById('gal').appendChild(img);
-            });
+        // Fonction pour extraire le texte proprement
+        const getTxt = (prop) => {
+            if (!prop) return "";
+            if (prop.title) return prop.title[0]?.plain_text || "";
+            if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
+            if (prop.select) return prop.select.name || "";
+            return "";
         };
-    </script>
+
+        // Extraction de l'image
+        const imgFile = p["Photo"]?.files?.[0];
+        const image = imgFile?.file?.url || imgFile?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/600x400?text=EONIA";
+
+        // Affichage structuré
+        container.innerHTML = `
+            <div class="detail-header">
+                <img src="${image}" class="detail-img" alt="Photo">
+                <h1>${getTxt(p["Nom commun"])}</h1>
+                <p style="font-style:italic; color:#888;">${getTxt(p["Surnom de ma plante"])}</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card"><h3>🌿 Identité</h3>
+                    <p><b>Famille :</b> ${getTxt(p["Famille"])}</p>
+                    <p><b>Origine :</b> ${getTxt(p["Origine"])}</p>
+                    <p><b>Type :</b> ${getTxt(p["Type"])}</p>
+                </div>
+                
+                <div class="info-card"><h3>☀️ Besoins</h3>
+                    <p><b>Exposition :</b> ${getTxt(p["Exposition"])}</p>
+                    <p><b>Rusticité :</b> ${getTxt(p["Rusticite"])}</p>
+                    <p><b>Sol :</b> ${getTxt(p["Type de sol"])}</p>
+                </div>
+            </div>
+
+            <div class="description-section">
+                <h3>📝 Description</h3>
+                <p>${getTxt(p["Description"])}</p>
+                
+                <h3>💧 Entretien & Arrosage</h3>
+                <p><b>Arrosage :</b> ${getTxt(p["Arrosage"])}</p>
+                <p><b>Entretien :</b> ${getTxt(p["Entretien"])}</p>
+                <p><b>Santé :</b> ${getTxt(p["Protection et sante"])}</p>
+            </div>
+
+            <div class="technical-info">
+                <p><b>Floraison :</b> ${getTxt(p["Floraison"])} | <b>Taille à maturité :</b> ${getTxt(p["Taille à maturite"])}</p>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p>Erreur lors du chargement des détails.</p>";
+    }
+}
+
+loadPlantDetails();
+</script>
+
 </body>
 </html>
