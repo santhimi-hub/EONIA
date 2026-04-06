@@ -78,9 +78,7 @@
         // On renvoie à l'accueil
         window.location.href = "index.html";
     }
-</script>
-
-    <script>
+<script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function loadCatalogue() {
@@ -89,51 +87,55 @@
 
         try {
             const response = await fetch(API_URL);
+            if (!response.ok) throw new Error("Erreur API");
             const data = await response.json();
 
-            // On vide le message de chargement
             container.innerHTML = "";
 
             data.results.forEach(page => {
                 const p = page.properties;
 
-                // 1. On extrait les infos de base
-                const name = p["Nom commun"]?.title[0]?.plain_text || "Plante sans nom";
-                const surnom = p["Surnom de ma plante"]?.rich_text[0]?.plain_text || "";
+                // --- SÉCURITÉ : On vérifie si les colonnes existent avant de lire ---
+                const name = p["Nom commun"]?.title?.[0]?.plain_text || "Plante sans nom";
+                const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
                 
-                // 2. On récupère le NUMÉRO DE PLAQUE (C'est lui qui fera le lien !)
+                // Récupération ID_Plaque (vérifie bien l'orthographe ici !)
                 const plaqueNum = p["ID_Plaque"]?.title?.[0]?.plain_text || 
                                  p["ID_Plaque"]?.rich_text?.[0]?.plain_text || "";
 
-                // 3. On récupère l'image
+                // Image par défaut si vide
                 const imgCol = p["Photo"]?.files?.[0];
-                const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x300?text=EONIA";
+                const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x400?text=EONIA";
 
-                // 4. On crée la carte avec le lien vers ?plaque=XX
-                const card = document.createElement('div');
-                card.innerHTML = `
-                    <a href="jardin.html?plaque=${plaqueNum}" class="plant-card" style="text-decoration:none; color:inherit;">
-                        <div style="position:relative;">
-                            <img src="${image}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:15px;">
-                            ${plaqueNum ? `<span style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:5px; font-size:0.6rem; color:#4ade80;">#${plaqueNum}</span>` : ''}
-                        </div>
-                        <h3 style="margin-top:10px; font-size:1rem; text-transform:uppercase;">${name}</h3>
-                        <p style="color:#666; font-size:0.8rem;">${surnom}</p>
-                    </a>
-                `;
-                container.appendChild(card);
+                // On ne crée la carte que si le nom n'est pas vide (évite les lignes fantômes)
+                if (name !== "Plante sans nom") {
+                    const card = document.createElement('div');
+                    card.style.cursor = "pointer";
+                    card.innerHTML = `
+                        <a href="jardin.html?plaque=${plaqueNum}" style="text-decoration:none; color:inherit;">
+                            <div style="position:relative; overflow:hidden; border-radius:15px; background:#111;">
+                                <img src="${image}" style="width:100%; aspect-ratio:1; object-fit:cover; display:block;">
+                                ${plaqueNum ? `<span style="position:absolute; top:10px; right:10px; background:#4ade80; color:#000; padding:3px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold;">#${plaqueNum}</span>` : ''}
+                            </div>
+                            <h3 style="margin-top:12px; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">${name}</h3>
+                            <p style="color:#666; font-size:0.75rem; margin-bottom:20px;">${surnom}</p>
+                        </a>
+                    `;
+                    container.appendChild(card);
+                }
             });
 
-            if(statusMsg) statusMsg.style.display = 'none';
+            if (statusMsg) statusMsg.style.display = 'none';
 
         } catch (error) {
-            console.error(error);
-            if(statusMsg) statusMsg.innerText = "Erreur de chargement du catalogue.";
+            console.error("Détails de l'erreur:", error);
+            if (statusMsg) statusMsg.innerText = "Erreur technique : Vérifiez vos noms de colonnes Notion.";
         }
     }
 
     loadCatalogue();
 </script>
+
 
 </body>
 </html>
