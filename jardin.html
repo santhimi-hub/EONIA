@@ -3,39 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Cerisier Burlat</title>
+    <title>ÉONIA — Mémoire Végétale</title>
     <style>
         :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; line-height: 1.6; }
+        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; }
 
-        /* HEADER IMAGE FIXE */
-        .hero-botanical {
-            width: 100%; height: 35vh;
-            background: url('https://images.unsplash.com/photo-1528669835002-86927958f278?q=80&w=1200') center/cover;
-            border-bottom: 1px solid #222;
-        }
+        header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
+        .back-nav { display: block; margin-top: 10px; color: var(--accent); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 1px solid #222; background: #111; }
 
-        .container { padding: 30px 20px; max-width: 700px; margin: auto; }
+        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
 
-        .header-title h1 { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
-        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 30px; }
+        #plant-name { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
+        #plant-surnom { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
 
-        /* --- INFOS GÉNÉRALES --- */
         .specs-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
-            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
+            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
         }
-        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-        .spec-item p { font-size: 0.9rem; font-weight: 500; color: #eee; }
+        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
+        .spec-item p { font-size: 0.85rem; color: #eee; font-weight: 500; }
 
-        /* --- DASHBOARD CLIENT (SAUVEGARDE) --- */
-        .client-box { background: #1a1a1a; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid var(--accent); }
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        label { display: block; font-size: 0.65rem; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
-
-        /* --- MENUS DÉROULANTS --- */
         .menu-item { border-bottom: 1px solid #222; }
         .menu-header { 
             width: 100%; background: none; border: none; color: #fff; 
@@ -43,313 +33,109 @@
             padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
         }
         .menu-header::after { content: '+'; color: var(--accent); }
+        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; color: var(--text-dim); font-size: 0.9rem; padding-right: 10px; }
+        .menu-item.active .menu-content { max-height: 1000px; padding-bottom: 25px; }
         .menu-item.active .menu-header::after { content: '−'; }
-        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; color: var(--text-dim); font-size: 0.9rem; }
-        .menu-item.active .menu-content { max-height: 2000px; padding-bottom: 25px; }
 
-        /* --- GALERIE --- */
-        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
-        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
-        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 10px; object-fit: cover; border: 1px solid #222; }
-
-        footer { text-align: center; padding: 60px; opacity: 0.3; font-size: 0.6rem; letter-spacing: 4px; }
-    </style>
-</head>
-<body>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éonia - Mon Jardin</title>
-    <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; --warning: #ff9f43; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; line-height: 1.6; }
-
-        .nav-bar { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-        .back-link { color: var(--accent); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        .hero-botanical { width: 100%; height: 30vh; background: url('1000044205.jpg') center/cover; border-bottom: 1px solid #222; }
-
-        .container { padding: 20px; max-width: 700px; margin: auto; }
-
-        .header-title h1 { font-size: 2.8rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
-        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
-
-        /* --- INFOS GÉNÉRALES --- */
-        .specs-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
-            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
-        }
-        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
-        .spec-item p { font-size: 0.85rem; font-weight: 500; color: #eee; }
-
-        /* --- SAUVEGARDE CLIENT --- */
-        .client-box { background: #111; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #333; }
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        label { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; outline: none; }
-        input:focus { border-color: var(--accent); }
-
-        /* --- ACCORDÉONS --- */
-        .menu-item { border-bottom: 1px solid #222; }
-        .menu-header { 
-            width: 100%; background: none; border: none; color: #fff; 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
-        .menu-item.active .menu-header::after { content: '−'; }
-        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; color: var(--text-dim); font-size: 0.9rem; }
-        .menu-item.active .menu-content { max-height: 2500px; padding-bottom: 30px; }
-
-        .highlight { color: var(--accent); font-weight: 600; display: block; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
-        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; border-radius: 4px; }
-        .avoid-box { background: rgba(255, 159, 67, 0.05); border-left: 2px solid var(--warning); padding: 12px; margin: 15px 0; border-radius: 4px; }
-
-        ul { padding-left: 18px; margin: 10px 0; }
-        li { margin-bottom: 8px; }
-
-        /* --- GALERIE --- */
-        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
-        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
-        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid #222; }
-
-        footer { text-align: center; padding: 60px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
-    </style>
-</head>
-<body>
-
-    <nav class="nav-bar">
-        <a href="index.html" class="back-link">← Mon Jardin</a>
-        <span style="font-size:0.6rem; letter-spacing:2px; opacity:0.5;">ÉONIA CONNECT</span>
-    </nav>
-
-    <div class="hero-botanical"></div>
-
-    <div class="container">
-        <div class="header-title">
-            <h1>Cerisier</h1>
-            <p>Prunus avium • Burlat</p>
-        </div>
-
-        <div class="specs-grid">
-            <div class="spec-item"><span>Famille</span><p>Rosacées</p></div>
-            <div class="spec-item"><span>Rusticité</span><p>-15°C / -20°C</p></div>
-            <div class="spec-item"><span>Floraison</span><p>Fin Mars / Avril</p></div>
-            <div class="spec-item"><span>Récolte</span><p>Fin Mai / Juin</p></div>
-            <div class="spec-item"><span>Hauteur</span><p>5 à 8 mètres</p></div>
-            <div class="spec-item"><span>Pollinisation</span><p>Non autofertile</p></div>
-        </div>
-
-        <div class="client-box">
-            <div class="grid-inputs">
-                <div>
-                    <label>Plantation</label>
-                    <input type="date" id="pDate" onchange="saveData()">
-                </div>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Mémoire Végétale</title>
-    <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; --card: #161616; --text-dim: #aaa; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; }
-
-        /* HEADER LOGO (Ton identité d'origine) */
-        header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #1a1a1a; }
-        .logo-top { width: 100px; filter: invert(1); margin-bottom: 10px; }
-        .brand { font-size: 1.2rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 200; }
-
-        /* PHOTO DE L'ESPÈCE (Celle que TU intègres en haut) */
-        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 1px solid #222; }
-
-        .container { padding: 30px 20px 80px 20px; max-width: 700px; margin: auto; }
-
-        .header-title h1 { font-size: 3rem; font-weight: 800; text-transform: uppercase; line-height: 0.9; margin-bottom: 5px; }
-        .header-title p { color: var(--accent); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; }
-
-        /* INFOS GÉNÉRALES */
-        .specs-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
-            background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px;
-        }
-        .spec-item span { display: block; font-size: 0.6rem; color: #666; text-transform: uppercase; }
-        .spec-item p { font-size: 0.85rem; color: #eee; }
-
-        /* BLOC RÉGLAGES (Visible par tous, mais vide pour le visiteur) */
-        .client-box { background: #111; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 1px solid #333; }
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        label { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; outline: none; }
-
-        /* ACCORDÉONS (Tes menus) */
-        .menu-item { border-bottom: 1px solid #222; }
-        .menu-header { 
-            width: 100%; background: none; border: none; color: #fff; 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 22px 0; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .menu-header::after { content: '+'; color: var(--accent); font-size: 1.2rem; }
-        .menu-item.active .menu-header::after { content: '−'; }
-        .menu-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; color: var(--text-dim); font-size: 0.9rem; }
-        .menu-item.active .menu-content { max-height: 2500px; padding-bottom: 30px; }
-
-        .highlight { color: var(--accent); font-weight: 600; display: block; margin-top: 15px; text-transform: uppercase; font-size: 0.75rem; }
-        .tip-box { background: rgba(74, 222, 128, 0.05); border-left: 2px solid var(--accent); padding: 12px; margin: 15px 0; border-radius: 4px; }
-        
-        /* GALERIE PERSONNELLE */
-        .gallery-top { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 15px; }
-        .add-btn { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
-        .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-slot { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid #222; }
-
+        #status-msg { text-align: center; padding: 50px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
         footer { text-align: center; padding: 60px; opacity: 0.2; font-size: 0.5rem; letter-spacing: 4px; }
     </style>
 </head>
 <body>
 
     <header>
-        <img src="1000043768.png" class="logo-top">
-        <div class="brand">ÉONIA</div>
+        <div style="font-size: 1.2rem; letter-spacing: 6px; text-transform: uppercase; font-weight: 200;">ÉONIA</div>
+        <a href="catalogue.html" class="back-nav">← Retour au catalogue</a>
     </header>
 
-    <img src="1000044205.jpg" id="mainImg" class="hero-img">
+    <div id="status-msg">Chargement de la mémoire végétale...</div>
 
-    <div class="container">
-        <div class="header-title">
-            <h1 id="plantName">Cerisier</h1>
-            <p id="plantSci">Prunus avium • Burlat</p>
-        </div>
+    <div id="plant-details" style="display:none;">
+        <img src="" id="main-img" class="hero-img">
+        
+        <div class="container">
+            <h1 id="plant-name"></h1>
+            <p id="plant-surnom"></p>
 
-        <div class="specs-grid">
-            <div class="spec-item"><span>Famille</span><p>Rosacées</p></div>
-            <div class="spec-item"><span>Rusticité</span><p>-15°C / -20°C</p></div>
-            <div class="spec-item"><span>Hauteur</span><p>5 à 8 mètres</p></div>
-            <div class="spec-item"><span>Pollinisation</span><p>Non autofertile</p></div>
-        </div>
+            <div class="specs-grid">
+                <div class="spec-item"><span>Famille</span><p id="info-famille"></p></div>
+                <div class="spec-item"><span>Exposition</span><p id="info-expo"></p></div>
+                <div class="spec-item"><span>Rusticité</span><p id="info-rust"></p></div>
+                <div class="spec-item"><span>Difficulté</span><p id="info-diff"></p></div>
+            </div>
 
-        <div class="client-box">
-            <div class="grid-inputs">
-                <div>
-                    <label>Date Plantation</label>
-                    <input type="date" id="pDate" onchange="saveData()">
-                </div>
-                <div>
-                    <label>Exposition</label>
-                    <select id="pExpo" onchange="saveData()">
-                        <option value="Soleil">Plein Soleil</option>
-                        <option value="Mi-ombre">Mi-ombre</option>
-                    </select>
+            <div class="menu-item">
+                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Description</button>
+                <div class="menu-content" id="desc-text"></div>
+            </div>
+
+            <div class="menu-item">
+                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Entretien & Arrosage</button>
+                <div class="menu-content">
+                    <p><strong>Arrosage :</strong> <span id="info-arrosage"></span></p><br>
+                    <p><strong>Entretien :</strong> <span id="info-entretien"></span></p>
                 </div>
             </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-header" onclick="toggleMenu(this)">Arrosage & Paillage</button>
-            <div class="menu-content">
-                <span class="highlight">L'arbre jeune (2-3 ans)</span>
-                <p>20 à 30L tous les 10-15 jours en été. Arrosez le soir.</p>
-                <div class="tip-box">Le Paillage est votre meilleur allié pour garder l'humidité.</div>
+            
+            <div class="menu-item">
+                <button class="menu-header" onclick="this.parentElement.classList.toggle('active')">Sol & Fertilisation</button>
+                <div class="menu-content" id="info-sol"></div>
             </div>
         </div>
-
-        <div class="gallery-top">
-            <h2 style="font-size: 0.8rem; text-transform: uppercase;">Votre Galerie Personnelle</h2>
-            <label for="upload" class="add-btn">AJOUTER</label>
-            <input type="file" id="upload" accept="image/*" style="display:none" onchange="addPhoto(event)">
-        </div>
-        <div class="gallery-grid" id="gal"></div>
-
     </div>
 
     <footer>ÉONIA — MÉMOIRE VÉGÉTALE</footer>
 
     <script>
-const API_URL = "https://eonia-api.santhimi.workers.dev";
+        const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-async function loadPlantDetails() {
-    const container = document.getElementById('plant-details');
-    const statusMsg = document.getElementById('status-msg');
+        async function loadDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) return;
 
-    // 1. On récupère l'ID précis dans l'adresse de la page
-    const params = new URLSearchParams(window.location.search);
-    const plantId = params.get('id');
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const page = data.results.find(p => p.id === id);
 
-    if (!plantId) {
-        container.innerHTML = "<h2>Aucune plante sélectionnée.</h2>";
-        return;
-    }
+                if (page) {
+                    const p = page.properties;
+                    const getTxt = (name) => {
+                        const prop = p[name];
+                        if (!prop) return "NC";
+                        if (prop.title) return prop.title[0]?.plain_text || "";
+                        if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
+                        if (prop.select) return prop.select.name || "";
+                        return "NC";
+                    };
 
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
+                    // Remplissage des champs
+                    document.getElementById('plant-name').innerText = getTxt("Nom commun");
+                    document.getElementById('plant-surnom').innerText = getTxt("Surnom de ma plante");
+                    document.getElementById('info-famille').innerText = getTxt("Famille");
+                    document.getElementById('info-expo').innerText = getTxt("Exposition");
+                    document.getElementById('info-rust').innerText = getTxt("Rusticite");
+                    document.getElementById('info-diff').innerText = getTxt("Difficulte");
+                    document.getElementById('desc-text').innerText = getTxt("Description");
+                    document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
+                    document.getElementById('info-entretien').innerText = getTxt("Entretien");
+                    document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
 
-        // 2. On cherche LA plante qui correspond exactement à cet ID
-        const page = data.results.find(item => item.id === plantId);
+                    // Image
+                    const imgCol = p["Photo"]?.files?.[0];
+                    const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "";
+                    if (imgUrl) document.getElementById('main-img').src = imgUrl;
 
-        if (!page) {
-            container.innerHTML = "<h2>Plante introuvable.</h2>";
-            return;
+                    // Affichage
+                    document.getElementById('status-msg').style.display = 'none';
+                    document.getElementById('plant-details').style.display = 'block';
+                }
+            } catch (e) {
+                document.getElementById('status-msg').innerText = "Erreur de connexion";
+            }
         }
-
-        const p = page.properties;
-
-        // Fonction pour extraire le texte
-        const getTxt = (name) => {
-            const prop = p[name];
-            if (!prop) return "Non précisé";
-            if (prop.title) return prop.title[0]?.plain_text || "";
-            if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
-            if (prop.select) return prop.select.name || "";
-            return "";
-        };
-
-        // Image
-        const imgCol = p["Photo"]?.files?.[0];
-        const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/600";
-
-        // 3. On injecte les bonnes infos
-        container.innerHTML = `
-            <div class="detail-container">
-                <img src="${image}" class="detail-img">
-                <h1>${getTxt("Nom commun")}</h1>
-                <p class="surnom">${getTxt("Surnom de ma plante")}</p>
-                
-                <div class="grid">
-                    <div class="card"><h3>🌿 Infos</h3>
-                        <p><b>Famille:</b> ${getTxt("Famille")}</p>
-                        <p><b>Origine:</b> ${getTxt("Origine")}</p>
-                    </div>
-                    <div class="card"><h3>☀️ Culture</h3>
-                        <p><b>Exposition:</b> ${getTxt("Exposition")}</p>
-                        <p><b>Sol:</b> ${getTxt("Type de sol")}</p>
-                    </div>
-                </div>
-
-                <div class="description">
-                    <h3>📖 Description</h3>
-                    <p>${getTxt("Description")}</p>
-                </div>
-            </div>
-        `;
-        
-        if(statusMsg) statusMsg.style.display = 'none';
-
-    } catch (e) {
-        container.innerHTML = "<h2>Erreur de chargement.</h2>";
-    }
-}
-
-loadPlantDetails();
-</script>
-
+        loadDetails();
+    </script>
 </body>
 </html>
