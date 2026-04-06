@@ -73,7 +73,6 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function load() {
-        // 1. On récupère le numéro de plaque dans l'URL (ex: ?plaque=01)
         const params = new URLSearchParams(window.location.search);
         const plaqueNum = params.get('plaque'); 
 
@@ -81,7 +80,7 @@
         const statusMsg = document.getElementById('status-msg');
 
         if (!plaqueNum) {
-            statusMsg.innerText = "Erreur : Aucune plaque détectée. Scannez un QR Code ÉONIA.";
+            statusMsg.innerText = "Scanner une plaque pour voir la plante.";
             return;
         }
 
@@ -89,33 +88,36 @@
             const response = await fetch(API_URL);
             const data = await response.json();
 
-            // 2. RECHERCHE PAR PLAQUE : On cherche la ligne où ID_Plaque correspond
+            // RECHERCHE ULTRA-PRÉCISE
             const page = data.results.find(p => {
-                const prop = p.properties["ID_Plaque"];
-                // On vérifie dans le titre OU le texte riche (selon comment c'est rempli)
-                const val = prop?.title?.[0]?.plain_text || prop?.rich_text?.[0]?.plain_text || "";
-                return val.trim() === plaqueNum.trim();
+                // On cherche la colonne ID_Plaque ou ID_plaque ou id_plaque
+                const prop = p.properties["ID_Plaque"] || p.properties["ID_plaque"] || p.properties["id_plaque"];
+                if (!prop) return false;
+
+                const val = prop.title?.[0]?.plain_text || prop.rich_text?.[0]?.plain_text || "";
+                // .trim() enlève les espaces cachés avant ou après le chiffre
+                return val.toString().trim() === plaqueNum.toString().trim();
             });
 
             if (!page) {
-                statusMsg.innerText = `La plaque n°${plaqueNum} n'est pas encore reliée à une plante dans votre jardin.`;
+                statusMsg.innerHTML = `La plaque <b>#${plaqueNum}</b> n'est pas encore attribuée.<br><br>Attribuez ce numéro dans votre tableau Notion (colonne ID_Plaque).`;
                 return;
             }
 
             const p = page.properties;
 
-            // Fonction pour extraire le texte (Textes, Sélections, Titres)
+            // Fonction d'extraction robuste
             const getTxt = (name) => {
-                const prop = p[name];
-                if (!prop) return "Non renseigné";
-                if (prop.title) return prop.title[0]?.plain_text || "NC";
-                if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('') || "NC";
-                if (prop.select) return prop.select.name || "NC";
-                if (prop.multi_select) return prop.multi_select.map(s => s.name).join(', ') || "NC";
+                const pr = p[name];
+                if (!pr) return "NC";
+                if (pr.title) return pr.title[0]?.plain_text || "NC";
+                if (pr.rich_text) return pr.rich_text.map(t => t.plain_text).join('') || "NC";
+                if (pr.select) return pr.select.name || "NC";
+                if (pr.multi_select) return pr.multi_select.map(s => s.name).join(', ') || "NC";
                 return "NC";
             };
 
-            // 3. REMPLISSAGE DES 22 COLONNES (Identité)
+            // Remplissage des champs (Vérifie bien les accents ici)
             document.getElementById('nom-commun').innerText = getTxt("Nom commun");
             document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
             document.getElementById('famille').innerText = getTxt("Famille");
@@ -131,7 +133,6 @@
             document.getElementById('type').innerText = getTxt("Type");
             document.getElementById('id-plaque').innerText = getTxt("ID_Plaque");
 
-            // Remplissage des menus (Description, Arrosage, etc.)
             document.getElementById('desc-text').innerText = getTxt("Description");
             document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
             document.getElementById('info-entretien').innerText = getTxt("Entretien");
@@ -142,18 +143,17 @@
             const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "";
             if (imgUrl) document.getElementById('main-img').src = imgUrl;
 
-            // Affichage
             statusMsg.style.display = 'none';
             container.style.display = 'block';
 
-        } catch (error) {
-            statusMsg.innerText = "Erreur de connexion aux données.";
-            console.error(error);
+        } catch (e) {
+            statusMsg.innerText = "Connexion perdue. Vérifiez votre réseau.";
+            console.error(e);
         }
     }
-
     load();
 </script>
+
 
 </body>
 </html>
