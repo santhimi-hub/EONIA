@@ -105,66 +105,121 @@
 
         /* SECTION CONCEPT (EN BAS) */
         .concept-section {
-            padding: 100px 20px;
-            background: #050505;
-            text-align: center;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA — Mémoire Végétale</title>
+    <style>
+        :root { --accent: #4ade80; --glass: rgba(255, 255, 255, 0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            background-color: #050505; color: #fff; scroll-behavior: smooth;
         }
 
-        .concept-content {
-            max-width: 700px;
-            margin: 0 auto;
+        /* SECTION HERO */
+        .hero {
+            position: relative; height: 100vh; width: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.85)), 
+                        url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
         }
 
-        .concept-content h2 {
-            font-size: 1rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 30px;
+        .logo-main { width: 140px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+        
+        .brand-title {
+            font-size: 2.8rem; letter-spacing: 10px; text-transform: uppercase;
+            font-weight: 700; /* RÉGLÉ SUR 700 COMME DEMANDÉ */
+            margin-bottom: 5px; text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
 
-        .concept-content p {
-            line-height: 1.8;
-            color: #aaa;
-            font-weight: 300;
-            font-size: 1.05rem;
+        .tagline {
+            font-size: 0.7rem; letter-spacing: 6px; color: var(--accent);
+            text-transform: uppercase; margin-bottom: 30px;
         }
 
-        .scroll-hint {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.6rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.5;
+        /* BOITE DE CONNEXION / INSCRIPTION */
+        .auth-container {
+            width: 90%; max-width: 340px;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px);
+            padding: 30px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.15);
         }
+
+        input {
+            width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px; border-radius: 12px; color: #fff; margin-bottom: 12px; outline: none;
+        }
+
+        .btn-main {
+            display: block; width: 100%; padding: 14px; background: #fff; color: #000;
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+            border-radius: 50px; border: none; cursor: pointer; transition: 0.3s;
+        }
+        .btn-main:hover { background: var(--accent); transform: scale(1.02); }
+
+        .forgot-pass { display: block; font-size: 0.65rem; color: #888; text-decoration: none; margin: 5px 0 15px 0; }
+
+        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0; }
+
+        .btn-create {
+            font-size: 0.7rem; color: var(--accent); text-decoration: none;
+            text-transform: uppercase; letter-spacing: 1px; font-weight: bold;
+        }
+
+        /* LIEN INVITÉ PLUS VISIBLE ET ESPACÉ */
+        .btn-guest {
+            margin-top: 50px; padding: 12px 30px; border: 1px solid #fff;
+            border-radius: 50px; color: #fff; text-decoration: none;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+        }
+        .btn-guest:hover { background: #fff; color: #000; }
+
+        /* BOUTON CONCEPT PLUS BAS */
+        .scroll-hint { margin-top: 80px; font-size: 0.7rem; letter-spacing: 4px; color: #888; text-decoration: none; text-transform: uppercase; }
+
+        /* SECTION CONCEPT */
+        .concept-section { padding: 120px 25px; background: #050505; text-align: center; }
+        .concept-content h2 { font-size: 1.2rem; letter-spacing: 8px; color: var(--accent); margin-bottom: 40px; text-transform: uppercase; }
+        .concept-content p { max-width: 650px; margin: auto; line-height: 2; color: #ccc; font-weight: 300; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
     <div class="hero">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
-        
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="Logo ÉONIA" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
-        <p class="tagline">Mon jardin connecté</p>
+        <p class="tagline">Connecter le vivant</p>
 
-        <div class="login-box">
-            <input type="email" placeholder="Email Propriétaire" id="userEmail">
-            <input type="password" placeholder="Mot de passe" id="userPass">
-            <button class="btn-enter" onclick="window.location.href='jardin.html?id=cerisier'">Entrer</button>
+        <div class="auth-container">
+            <input type="email" placeholder="Email Propriétaire" id="email">
+            <input type="password" placeholder="Mot de passe" id="pass">
+            <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
+            
+            <button class="btn-main" onclick="window.location.href='jardin.html?id=cerisier'">Entrer</button>
+            
+            <div class="divider"></div>
+            
+            <p style="font-size: 0.7rem; color: #666; margin-bottom: 10px;">Première connexion ?</p>
+            <a href="#" class="btn-create">Créer ma fiche</a>
         </div>
 
-        <a href="jardin.html?id=cerisier&mode=guest" class="guest-link">Continuer en tant qu'invité</a>
+        <a href="jardin.html?id=cerisier&mode=guest" class="btn-guest">Visiter en invité</a>
 
-        <div class="scroll-hint">Découvrir le concept ↓</div>
+        <a href="#concept" class="scroll-hint">Notre Concept ↓</a>
     </div>
 
     <section class="concept-section" id="concept">
         <div class="concept-content">
-            <h2>Notre Vision</h2>
+            <h2>L'âme d'ÉONIA</h2>
             <p>
-                ÉONIA naît de l’alliance entre l’ardoise naturelle et l’intelligence numérique. <br><br>
-                Chaque plaque gravée devient le gardien d’une mémoire vivante. Scannez, racontez, et transmettez l’histoire de vos plantations aux générations futures. Un journal de bord pour vos arbres, une empreinte pour l'éternité.
+                ÉONIA fusionne l'élégance millénaire de l'ardoise et la puissance du numérique. 
+                Chaque plaque gravée est le gardien d'une histoire : la vôtre. <br><br>
+                En scannant votre arbre, vous accédez à un journal de bord vivant, 
+                partagez vos conseils de culture et immortalisez l'évolution de votre jardin 
+                pour les générations futures.
             </p>
         </div>
     </section>
