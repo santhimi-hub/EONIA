@@ -34,6 +34,23 @@
         summary { padding: 15px; cursor: pointer; color: #4ade80; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; outline: none; list-style: none; }
         summary::-webkit-details-marker { display: none; }
         .details-content { padding: 0 15px 15px 15px; font-size: 0.9rem; color: #ccc; border-top: 1px solid #222; padding-top: 10px; }
+<div id="suivi-interactif" style="display:none; background: #111; padding: 20px; border-radius: 15px; border: 1px dashed #4ade80; margin-bottom: 20px;">
+    <h3 style="color:#4ade80; font-size:0.8rem; margin-bottom:15px; letter-spacing:1px;">GESTION DE MA PLANTE</h3>
+    
+    <div id="meteo-box" style="font-size:0.8rem; margin-bottom:15px; color:#aaa;">
+        ☀️ Chargement de la météo locale...
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <span class="label">Date de plantation :</span>
+        <input type="date" id="input-date-plant" style="background:#000; border:1px solid #333; color:white; padding:5px; border-radius:5px; width:100%;">
+    </div>
+
+    <button onclick="enregistrerArrosage()" style="background:#4ade80; color:black; border:none; padding:10px; width:100%; border-radius:5px; font-weight:bold; cursor:pointer;">
+        💧 J'ai arrosé aujourd'hui
+    </button>
+    <p id="rappel-status" style="font-size:0.7rem; margin-top:10px; text-align:center;"></p>
+</div>
 
         /* --- ESPACE PROPRIÉTAIRE --- */
         #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 15px; margin-top: 30px; background: rgba(74, 222, 128, 0.05); }
