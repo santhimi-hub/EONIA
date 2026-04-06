@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA — Le Catalogue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; }
+
+        header { padding: 60px 20px; text-align: center; }
+        .logo-small { width: 60px; margin-bottom: 15px; }
+        h1 { font-weight: 200; letter-spacing: 8px; text-transform: uppercase; font-size: 1.8rem; color: #4ade80; }
+
+        /* GRILLE DU CATALOGUE */
+        .catalog-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* CARTE PLANTE */
+        .plant-card {
+            background: #111;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: 1px solid #222;
+            cursor: pointer;
+        }
+        .plant-card:hover { transform: translateY(-5px); border-color: #4ade80; }
+        
+        .plant-img { width: 100%; height: 250px; object-fit: cover; filter: grayscale(20%); }
+        
+        .plant-info { padding: 20px; }
+        .plant-name { font-size: 1.2rem; font-weight: 500; margin-bottom: 10px; letter-spacing: 1px; }
+        
+        /* PETITS BADGES (Exposition, Rusticité) */
+        .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .badge { 
+            font-size: 0.65rem; padding: 5px 10px; 
+            background: rgba(74, 222, 128, 0.1); 
+            color: #4ade80; border: 1px solid #4ade80; 
+            border-radius: 50px; text-transform: uppercase;
+        }
+
+        .loading { text-align: center; padding: 50px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-small">
+        <h1>Catalogue ÉONIA</h1>
+    </header>
+
+    <div id="catalog" class="catalog-container">
+        <div class="loading">Chargement de la mémoire végétale...</div>
+    </div>
+
+    <script>
+        // C'est ici qu'on mettra la fonction qui "aspire" ton Notion
+        // On va d'abord tester avec une plante "fictive" pour voir si le design te plaît
+        const fakePlants = [
+            { nom: "Olivier Centenaire", img: "https://images.unsplash.com/photo-1501084817091-a4f3d1d19e07?auto=format&fit=crop&w=800&q=80", expo: "Soleil", rust: "-15°C" },
+            { nom: "Cerisier du Japon", img: "https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=800&q=80", expo: "Mi-ombre", rust: "-20°C" }
+        ];
+
+        const container = document.getElementById('catalog');
+        container.innerHTML = fakePlants.map(p => `
+            <div class="plant-card">
+                <img src="${p.img}" class="plant-img">
+                <div class="plant-info">
+                    <div class="plant-name">${p.nom}</div>
+                    <div class="badges">
+                        <span class="badge">☀️ ${p.expo}</span>
+                        <span class="badge">❄️ ${p.rust}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
