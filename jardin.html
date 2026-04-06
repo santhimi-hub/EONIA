@@ -80,65 +80,75 @@
         const statusMsg = document.getElementById('status-msg');
 
         if (!plaqueNum) {
-            statusMsg.innerText = "Scanner une plaque pour voir la plante.";
+            statusMsg.innerText = "Scanner une plaque ÉONIA pour continuer.";
             return;
         }
 
         try {
             const response = await fetch(API_URL);
+            if (!response.ok) throw new Error("Réponse réseau incorrecte");
             const data = await response.json();
 
-            // RECHERCHE ULTRA-PRÉCISE
+            // RECHERCHE DE LA PLAQUE
             const page = data.results.find(p => {
-                // On cherche la colonne ID_Plaque ou ID_plaque ou id_plaque
-                const prop = p.properties["ID_Plaque"] || p.properties["ID_plaque"] || p.properties["id_plaque"];
+                // On cherche la colonne ID_Plaque en ignorant la casse (majuscules/minuscules)
+                const propName = Object.keys(p.properties).find(k => k.toLowerCase().trim() === "id_plaque");
+                const prop = p.properties[propName];
                 if (!prop) return false;
 
                 const val = prop.title?.[0]?.plain_text || prop.rich_text?.[0]?.plain_text || "";
-                // .trim() enlève les espaces cachés avant ou après le chiffre
                 return val.toString().trim() === plaqueNum.toString().trim();
             });
 
             if (!page) {
-                statusMsg.innerHTML = `La plaque <b>#${plaqueNum}</b> n'est pas encore attribuée.<br><br>Attribuez ce numéro dans votre tableau Notion (colonne ID_Plaque).`;
+                statusMsg.innerHTML = `La plaque <b>#${plaqueNum}</b> n'est pas encore reliée à une plante.<br><small>Vérifiez la colonne ID_Plaque dans Notion.</small>`;
                 return;
             }
 
             const p = page.properties;
 
-            // Fonction d'extraction robuste
-            const getTxt = (name) => {
-                const pr = p[name];
-                if (!pr) return "NC";
-                if (pr.title) return pr.title[0]?.plain_text || "NC";
-                if (pr.rich_text) return pr.rich_text.map(t => t.plain_text).join('') || "NC";
-                if (pr.select) return pr.select.name || "NC";
-                if (pr.multi_select) return pr.multi_select.map(s => s.name).join(', ') || "NC";
+            // FONCTION DE SÉCURITÉ : Elle ne crash pas si la colonne n'existe pas
+            const getSafeTxt = (names) => {
+                // On lui donne une liste de noms possibles (ex: avec ou sans accent)
+                let foundProp = null;
+                for (let name of names) {
+                    if (p[name]) { foundProp = p[name]; break; }
+                }
+                
+                if (!foundProp) return "NC";
+                
+                try {
+                    if (foundProp.title) return foundProp.title[0]?.plain_text || "NC";
+                    if (foundProp.rich_text) return foundProp.rich_text.map(t => t.plain_text).join('') || "NC";
+                    if (foundProp.select) return foundProp.select.name || "NC";
+                    if (foundProp.multi_select) return foundProp.multi_select.map(s => s.name).join(', ') || "NC";
+                } catch (e) { return "NC"; }
                 return "NC";
             };
 
-            // Remplissage des champs (Vérifie bien les accents ici)
-            document.getElementById('nom-commun').innerText = getTxt("Nom commun");
-            document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
-            document.getElementById('famille').innerText = getTxt("Famille");
-            document.getElementById('origine').innerText = getTxt("Origine");
-            document.getElementById('difficulte').innerText = getTxt("Difficulte");
-            document.getElementById('exposition').innerText = getTxt("Exposition");
-            document.getElementById('rusticite').innerText = getTxt("Rusticite");
-            document.getElementById('style-jardin').innerText = getTxt("Style jardin");
-            document.getElementById('taille').innerText = getTxt("Taille à maturite");
-            document.getElementById('floraison').innerText = getTxt("Floraison");
-            document.getElementById('type-sol').innerText = getTxt("Type de sol");
-            document.getElementById('persistance').innerText = getTxt("Persistance");
-            document.getElementById('type').innerText = getTxt("Type");
-            document.getElementById('id-plaque').innerText = getTxt("ID_Plaque");
+            // REMPLISSAGE (On essaie plusieurs orthographes pour éviter les erreurs)
+            document.getElementById('nom-commun').innerText = getSafeTxt(["Nom commun"]);
+            document.getElementById('surnom-plante').innerText = getSafeTxt(["Surnom de ma plante"]);
+            document.getElementById('famille').innerText = getSafeTxt(["Famille"]);
+            document.getElementById('origine').innerText = getSafeTxt(["Origine"]);
+            document.getElementById('difficulte').innerText = getSafeTxt(["Difficulte", "Difficulté"]);
+            document.getElementById('exposition').innerText = getSafeTxt(["Exposition"]);
+            document.getElementById('rusticite').innerText = getSafeTxt(["Rusticite", "Rusticité"]);
+            document.getElementById('style-jardin').innerText = getSafeTxt(["Style jardin"]);
+            document.getElementById('taille').innerText = getSafeTxt(["Taille à maturite", "Taille à maturité"]);
+            document.getElementById('floraison').innerText = getSafeTxt(["Floraison"]);
+            document.getElementById('type-sol').innerText = getSafeTxt(["Type de sol"]);
+            document.getElementById('persistance').innerText = getSafeTxt(["Persistance"]);
+            document.getElementById('type').innerText = getSafeTxt(["Type"]);
+            document.getElementById('id-plaque').innerText = getSafeTxt(["ID_Plaque"]);
 
-            document.getElementById('desc-text').innerText = getTxt("Description");
-            document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
-            document.getElementById('info-entretien').innerText = getTxt("Entretien");
-            document.getElementById('info-sol').innerText = getTxt("Sol et fertilisation");
+            // Menus
+            document.getElementById('desc-text').innerText = getSafeTxt(["Description"]);
+            document.getElementById('info-arrosage').innerText = getSafeTxt(["Arrosage"]);
+            document.getElementById('info-entretien').innerText = getSafeTxt(["Entretien"]);
+            document.getElementById('info-sol').innerText = getSafeTxt(["Sol et fertilisation"]);
 
-            // Image
+            // Gestion de l'image
             const imgCol = p["Photo"]?.files?.[0];
             const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "";
             if (imgUrl) document.getElementById('main-img').src = imgUrl;
@@ -146,13 +156,14 @@
             statusMsg.style.display = 'none';
             container.style.display = 'block';
 
-        } catch (e) {
-            statusMsg.innerText = "Connexion perdue. Vérifiez votre réseau.";
-            console.error(e);
+        } catch (error) {
+            statusMsg.innerText = "Erreur de connexion. Vérifiez votre tableau Notion.";
+            console.error("Erreur détaillée :", error);
         }
     }
     load();
 </script>
+
 
 
 </body>
