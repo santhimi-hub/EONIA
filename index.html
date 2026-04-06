@@ -5,59 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Ma Mémoire Végétale</title>
     <style>
-        :root { --accent: #4ade80; --bg: #0a0a0a; --glass: rgba(255, 255, 255, 0.03); }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Helvetica, sans-serif; scroll-behavior: smooth; }
+    /* LE FOND DE FORÊT ÉONIA */
+    .hero {
+        position: relative; 
+        height: 100vh; 
+        width: 100%;
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center;
+        text-align: center;
+        /* IMAGE DE FORÊT HAUTE DÉFINITION */
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.75)), 
+                    url('[attachment_0](attachment)') center/cover no-repeat;
+        overflow: hidden;
+    }
 
-        /* SECTION 1 : ACCUEIL IMMERSIF */
-        .hero {
-            position: relative; height: 100vh; width: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), 
-                        url('https://raw.githubusercontent.com/santhimi-hub/EONIA/main/1000044205.jpg') center/cover no-repeat;
-            text-align: center; border-bottom: 1px solid #222;
-        }
+    .logo-main { 
+        width: 180px; 
+        filter: brightness(0) invert(1); /* Force le logo en blanc */
+        margin-bottom: 20px;
+        opacity: 0.9;
+    }
 
-        .logo-main { width: 160px; filter: brightness(0) invert(1); margin-bottom: 15px; }
-        .brand { font-size: 2.5rem; letter-spacing: 15px; text-transform: uppercase; font-weight: 200; }
-        .tagline { color: var(--accent); font-size: 0.7rem; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 40px; }
+    .brand {
+        font-size: 2.5rem;
+        letter-spacing: 12px;
+        text-transform: uppercase;
+        font-weight: 200;
+        color: #ffffff;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.8); /* Ombre pour détacher le texte du fond */
+    }
 
-        /* BOX CONNEXION DISCRÈTE */
-        .auth-card {
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px);
-            padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            width: 90%; max-width: 320px;
-        }
-        input { 
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid #333; 
-            padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; outline: none;
-        }
-        .btn-login { 
-            width: 100%; background: #fff; color: #000; padding: 12px; border-radius: 50px; 
-            border: none; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; cursor: pointer;
-        }
+    .tagline {
+        color: #4ade80; /* Ton vert Éonia */
+        font-size: 0.7rem;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        margin-top: 10px;
+    }
+</style>
 
-        .scroll-indicator { position: absolute; bottom: 30px; font-size: 0.6rem; letter-spacing: 3px; opacity: 0.5; text-transform: uppercase; }
-
-        /* SECTION 2 : LE CONCEPT */
-        .section { padding: 80px 25px; max-width: 900px; margin: auto; text-align: center; }
-        .section h2 { font-size: 0.8rem; letter-spacing: 5px; text-transform: uppercase; color: var(--accent); margin-bottom: 30px; }
-        .concept-text { font-size: 1.1rem; font-weight: 300; line-height: 1.8; color: #ccc; margin-bottom: 50px; }
-
-        /* SECTION 3 : CATALOGUE */
-        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .plant-card { 
-            background: var(--glass); border: 1px solid #222; border-radius: 20px; overflow: hidden;
-            text-decoration: none; color: #fff; transition: 0.3s;
-        }
-        .plant-card:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .plant-img { width: 100%; aspect-ratio: 1; object-fit: cover; opacity: 0.8; }
-        .plant-info { padding: 20px; }
-        .plant-info h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
-        .plant-info p { font-size: 0.7rem; color: #666; font-style: italic; }
-
-        footer { padding: 60px; text-align: center; opacity: 0.2; font-size: 0.6rem; letter-spacing: 5px; }
-    </style>
 </head>
 <body>
 
