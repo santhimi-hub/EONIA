@@ -84,26 +84,43 @@
                     const p = page.properties;
                     
                     // On récupère les infos selon tes colonnes Notion
-                    const nom = p.Nom?.title[0]?.plain_text || "Plante sans nom";
-                    const image = page.cover?.external?.url || page.cover?.file?.url || "https://via.placeholder.com/400x500?text=EONIA";
-                    const expo = p.Exposition?.select?.name || "Standard";
-                    const rust = p.Rusticite?.rich_text[0]?.plain_text || "Non précisée";
+container.innerHTML = data.results.map(page => {
+    const p = page.properties;
+    
+    // --- MAPPAGE DE TES COLONNES NOTION ---
+    // On récupère le texte de "nom commun"
+    const nom = p["Nom commun"]?.title[0]?.plain_text || "Plante sans nom";
+    
+    // On récupère le surnom
+    const surnom = p["Surnom de ma plante"]?.rich_text[0]?.plain_text || "";
+    
+    // On récupère l'image depuis ta colonne "Photo" (Type Files & Media)
+    const imageCol = p["Photo"]?.files?.[0];
+    const image = imageCol?.file?.url || imageCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x500?text=EONIA";
+    
+    // On récupère les badges (Exposition et Difficulté par exemple)
+    const expo = p["Exposition"]?.select?.name || "Non précisée";
+    const diff = p["Difficulte"]?.select?.name || "Standard";
+    const rust = p["Rusticite"]?.rich_text[0]?.plain_text || "NC";
 
-                    return `
-                        <a href="jardin.html?id=${page.id}" class="plant-card">
-                            <div class="img-container">
-                                <img src="${image}" class="plant-img" alt="${nom}">
-                            </div>
-                            <div class="plant-info">
-                                <div class="plant-name">${nom}</div>
-                                <div class="badges">
-                                    <span class="badge">☀️ ${expo}</span>
-                                    <span class="badge">❄️ ${rust}</span>
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                }).join('');
+    return `
+        <a href="jardin.html?id=${page.id}" class="plant-card">
+            <div class="img-container">
+                <img src="${image}" class="plant-img" alt="${nom}">
+            </div>
+            <div class="plant-info">
+                <div class="plant-name">${nom}</div>
+                <div style="color: #666; font-size: 0.8rem; margin-top:-10px; margin-bottom:10px;">${surnom}</div>
+                <div class="badges">
+                    <span class="badge">☀️ ${expo}</span>
+                    <span class="badge">💪 ${diff}</span>
+                    <span class="badge">❄️ ${rust}</span>
+                </div>
+            </div>
+        </a>
+    `;
+}).join('');
+;
 
             } catch (error) {
                 console.error("Erreur:", error);
