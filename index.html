@@ -4,69 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Accueil</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;1,500&display=swap" rel="stylesheet">
 
-    /* Style du Titre Principal */
-.brand-title {
-    font-size: 4.5rem;          /* Très grand pour l'impact */
-    font-weight: 100;           /* Ultra-fin (Style luxe) */
-    letter-spacing: 25px;       /* Très aéré, comme sur les logos premium */
-    text-transform: uppercase;
-    color: #ffffff;
-    margin-bottom: 5px;         /* Rapproche un peu du texte suivant */
-    line-height: 1.2;
-}
+    <style>
+        /* RESET ET BASE */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: #000; color: #fff; }
 
-/* Style de la Phrase de Bienvenue */
-.tagline {
-    font-family: 'Raleway', sans-serif;
-    font-style: italic;
-    font-weight: 500;           /* Plus épais (Medium) pour la visibilité */
-    font-size: 0.75rem;         /* Plus petit que précédemment */
-    text-transform: none;       /* Garde les minuscules du modèle */
-    letter-spacing: 2px;        /* Un peu d'espace pour la clarté */
-    color: rgba(255, 255, 255, 1); /* Blanc pur (100% visible) */
-    margin-top: 40px;           /* Bel espacement avec ÉONIA */
-    margin-bottom: 60px;
-    display: block;             /* S'assure que la phrase prend bien sa place */
-}
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            /* Vérifie que ton image s'appelle bien background.jpg sur GitHub */
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat;
+        }
 
+        .logo-main { width: 80px; margin-bottom: 20px; }
+
+        /* TON TITRE CORRIGÉ : GRAND ET FIN */
+        .brand-title {
+            font-family: 'Raleway', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 100;
+            letter-spacing: 25px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* TA PHRASE CORRIGÉE : PETITE ET LISIBLE */
+        .tagline {
+            font-family: 'Raleway', sans-serif;
+            font-style: italic;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: none;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-top: 40px; /* L'espacement que tu voulais */
+            margin-bottom: 50px;
+        }
+
+        /* STYLES FORMULAIRE */
+        .auth-container { display: flex; flex-direction: column; gap: 10px; width: 280px; }
+        input { padding: 12px; border-radius: 5px; border: none; background: rgba(255,255,255,0.1); color: white; }
+        .btn-main { padding: 12px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        
+        .bottom-nav { margin-top: 30px; font-size: 0.8rem; }
+        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; }
+
+        .content-section { padding: 80px 20px; text-align: center; background: #0a0a0a; }
+        .content-section h2 { font-weight: 300; letter-spacing: 5px; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
 
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
+        
         <h1 class="brand-title">ÉONIA</h1>
-        <p style="
-    font-family: 'Raleway', sans-serif; 
-    font-style: italic; 
-    font-weight: 300; 
-    text-transform: none; 
-    font-size: 0.95rem; 
-    letter-spacing: 1.5px; 
-    color: rgba(255,255,255,0.75); 
-    margin-top: 25px; 
-    margin-bottom: 50px;
-">
-    Bienvenue dans votre mémoire végétale.
-</p>
-
-
-
-
+        
+        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
 
         <div class="auth-container">
-    <p id="welcome-msg" style="font-size: 0.8rem; color: #4ade80; margin-bottom: 15px; display: none;">
-        Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
-    </p>
-
-    <input type="email" placeholder="Votre Email" id="email">
-    <input type="password" placeholder="Créer votre mot de passe" id="pass">
-    
-    <button class="btn-main" onclick="validerConnexion()">Entrer</button>
-
-</div>
-
+            <p id="welcome-msg" style="font-size: 0.8rem; color: #4ade80; margin-bottom: 15px; display: none;">
+                Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
+            </p>
+            <input type="email" placeholder="Votre Email" id="email">
+            <input type="password" placeholder="Créer votre mot de passe" id="pass">
+            <button class="btn-main" onclick="validerConnexion()">Entrer</button>
+        </div>
 
         <div class="bottom-nav">
             <a href="jardin.html?id=cerisier&mode=guest">Visiter en tant qu'invité</a>
@@ -77,65 +87,29 @@
 
     <section class="content-section" id="concept">
         <h2>Notre Concept</h2>
-        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante à une histoire. Racontez la vôtre. Scannez-Cultivez-Admirez.</p>
-        
+        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre.</p>
         <div style="height: 60px;"></div>
-
         <h2>L'âme d'ÉONIA</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
+        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité.</p>
     </section>
 
-<script>
-    // On vérifie si c'est un premier scan (ex: l'URL contient ?action=init)
-    const urlParams = new URLSearchParams(window.location.search);
-    const estPremierScan = urlParams.get('new') === 'true';
+    <script>
+        function validerConnexion() {
+            const email = document.getElementById('email').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const plaqueID = urlParams.get('id');
 
-    if (estPremierScan) {
-        document.getElementById('welcome-msg').style.display = 'block';
-        document.querySelector('.btn-main').innerText = 'Activer ma plaque';
-        document.getElementById('pass').placeholder = 'Créer un mot de passe';
-    }
-
-    function activerPlaque() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-
-        if(email && pass) {
-            // Ici, on enregistrera plus tard dans Firebase
-            alert("Compte créé ! Bienvenue dans votre jardin.");
-            window.location.href = "jardin.html?id=cerisier";
-        } else {
-            alert("Veuillez remplir les deux champs.");
+            if (!email) {
+                alert("Veuillez entrer votre email.");
+                return;
+            }
+            
+            if (plaqueID) {
+                window.location.href = "catalogue.html?id=" + plaqueID;
+            } else {
+                window.location.href = "jardin.html";
+            }
         }
-    }
-</script>
-    
-<script>
-    function validerConnexion() {
-        const email = document.getElementById('email').value;
-        const urlParams = new URLSearchParams(window.location.search);
-        const plaqueID = urlParams.get('id'); // On récupère l'ID du QR Code
-
-        if (!email) {
-            alert("Veuillez entrer votre email.");
-            return;
-        }
-
-        // LOGIQUE ÉONIA :
-        // Si c'est une nouvelle plaque (on simulera avec un test), 
-        // on l'envoie vers le catalogue.
-        
-        if (plaqueID) {
-            console.log("Connexion pour la plaque : " + plaqueID);
-            // Redirection vers le catalogue pour choisir le végétal
-            window.location.href = "catalogue.html?id=" + plaqueID;
-        } else {
-            // Si pas d'ID (accès direct au site), on va au jardin par défaut
-            window.location.href = "jardin.html";
-        }
-    }
-</script>
-
-
+    </script>
 </body>
 </html>
