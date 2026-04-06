@@ -6,50 +6,96 @@
     <title>ÉONIA — Ma Plante</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
+        /* --- STYLE GÉNÉRAL --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; }
-        #plant-details { display: none; max-width: 1000px; margin: 0 auto; }
-        .main-img-container { width: 100%; height: 50vh; overflow: hidden; border-bottom: 2px solid #4ade80; }
+        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
+        #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
+
+        /* --- COUVERTURE --- */
+        .main-img-container { width: 100%; height: 50vh; overflow: hidden; position: relative; border-bottom: 2px solid #4ade80; }
         #main-img { width: 100%; height: 100%; object-fit: cover; }
+
         .content-padding { padding: 30px 20px; }
         header { margin-bottom: 20px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; margin-bottom: 5px; }
+
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; }
+        .surnom { opacity: 0.6; font-style: italic; margin-bottom: 30px; font-size: 0.9rem; }
+
+        /* --- GRILLE D'INFOS --- */
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .info-item { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #222; }
         .label { font-size: 0.6rem; text-transform: uppercase; color: #666; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .value { font-size: 0.85rem; font-weight: 500; color: #eee; }
-        .description-box { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #222; margin-bottom: 30px; }
+
+        /* --- ACCORDÉONS (MENUS DÉROULANTS) --- */
+        details { background: #111; border: 1px solid #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        summary { padding: 15px; cursor: pointer; color: #4ade80; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; outline: none; list-style: none; }
+        summary::-webkit-details-marker { display: none; }
+        .details-content { padding: 0 15px 15px 15px; font-size: 0.9rem; color: #ccc; border-top: 1px solid #222; padding-top: 10px; }
+
+        /* --- ESPACE PROPRIÉTAIRE --- */
+        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 15px; margin-top: 30px; background: rgba(74, 222, 128, 0.05); }
     </style>
 </head>
 <body>
 
-    <div id="status-msg">Connexion à la mémoire végétale...</div>
+    <div id="status-msg">Chargement de la mémoire végétale...</div>
 
     <div id="plant-details">
-        <div class="main-img-container">
-            <img id="main-img" src="" alt="Plante">
-        </div>
+        <div class="main-img-container"><img id="main-img" src="" alt="Plante"></div>
 
         <div class="content-padding">
-            <header><a href="catalogue.html" class="back-btn">← Retour</a></header>
-            
-            <h1><span id="nom-commun">Chargement...</span></h1>
-            <p id="surnom-plante" style="opacity: 0.6; font-style: italic; margin-bottom: 30px;"></p>
+            <header><a href="catalogue.html" class="back-btn">← Catalogue</a></header>
+
+            <h1 id="nom-commun">...</h1>
+            <div id="surnom-plante" class="surnom"></div>
 
             <div class="grid-info">
-                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
+                <div class="info-item"><span class="label">Plaque</span><span id="id-plaque" class="value"></span></div>
                 <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
                 <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
                 <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
-                <div class="info-item"><span class="label">Arrosage</span><span id="info-arrosage" class="value"></span></div>
-                <div class="info-item"><span class="label">Taille</span><span id="taille" class="value"></span></div>
+                <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
+                <div class="info-item"><span class="label">Taille maturité</span><span id="taille" class="value"></span></div>
+                <div class="info-item"><span class="label">Origine</span><span id="origine" class="value"></span></div>
+                <div class="info-item"><span class="label">Difficulté</span><span id="difficulte" class="value"></span></div>
             </div>
 
-            <div class="description-box">
-                <span class="label">Description</span>
-                <p id="desc-text" style="margin-top:10px; font-size:0.9rem; color: #ccc;"></p>
+            <details>
+                <summary>✿ Informations Générales</summary>
+                <div class="details-content" id="info-gen"></div>
+            </details>
+
+            <details>
+                <summary>✂ Entretien & Taille</summary>
+                <div class="details-content" id="entretien"></div>
+            </details>
+
+            <details>
+                <summary>🛡 Protection & Santé</summary>
+                <div class="details-content" id="sante"></div>
+            </details>
+
+            <details>
+                <summary>🌿 Compagnonnage</summary>
+                <div class="details-content" id="compagnons"></div>
+            </details>
+
+            <details>
+                <summary>🧪 Sol & Fertilisation</summary>
+                <div class="details-content" id="sol"></div>
+            </details>
+
+            <div id="espace-proprietaire" style="display:none;">
+                <h2 style="color:#4ade80; font-size:1rem; margin-bottom:15px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
+                <span class="label">Notes de suivi</span>
+                <p id="notes-suivi" style="font-size:0.9rem; color:#eee;"></p>
+            </div>
+
+            <div id="msg-visiteur" style="text-align:center; opacity:0.4; font-size:0.7rem; margin-top:30px;">
+                Fiche en mode consultation publique.
             </div>
         </div>
     </div>
@@ -71,55 +117,61 @@
                 return val.toString().trim() === plaqueNum?.toString().trim();
             });
 
-            if (!page) {
-                document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable.";
-                return;
-            }
+            if (!page) { document.getElementById('status-msg').innerText = "Plante introuvable."; return; }
 
             const p = page.properties;
 
-            // --- LA FONCTION MAGIQUE : ELLE LIT TOUT (Texte, Puces, Sélections) ---
-            const getV = (name) => {
-                const target = p[name];
-                if (!target) return "Non renseigné";
-                
-                // Si c'est du texte riche (comme ton Exposition avec la puce)
-                if (target.rich_text && target.rich_text.length > 0) {
-                    return target.rich_text.map(t => t.plain_text).join(""); 
-                }
-                // Si c'est le titre
-                if (target.title && target.title.length > 0) return target.title[0].plain_text;
-                // Si c'est un menu déroulant
-                if (target.select) return target.select.name;
-                
-                return "NC";
+            // --- LECTEUR UNIVERSEL (Gère Texte, Sélection, Email) ---
+            const read = (name) => {
+                const f = p[name];
+                if (!f) return "Non renseigné";
+                if (f.title) return f.title[0]?.plain_text || "";
+                if (f.rich_text) return f.rich_text.map(t => t.plain_text).join("") || "Non renseigné";
+                if (f.select) return f.select.name || "Non renseigné";
+                if (f.multi_select) return f.multi_select.map(s => s.name).join(", ");
+                if (f.email) return f.email || "";
+                return "";
             };
 
-            // Affichage des données
-            document.getElementById('nom-commun').innerText = getV("Nom commun");
-            document.getElementById('surnom-plante').innerText = getV("Surnom de ma plante");
+            // Remplissage
+            document.getElementById('nom-commun').innerText = read("Nom commun");
+            document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
             document.getElementById('id-plaque').innerText = plaqueNum;
-            
-            // On utilise les noms EXACTS de ton Notion (sans accents comme sur ta photo)
-            document.getElementById('famille').innerText = getV("Famille");
-            document.getElementById('exposition').innerText = getV("Exposition");
-            document.getElementById('rusticite').innerText = getV("Rusticite");
-            document.getElementById('info-arrosage').innerText = getV("Arrosage");
-            document.getElementById('taille').innerText = getV("Taille à maturite");
-            document.getElementById('desc-text').innerText = getV("Description");
+            document.getElementById('famille').innerText = read("Famille");
+            document.getElementById('exposition').innerText = read("Exposition");
+            document.getElementById('rusticite').innerText = read("Rusticite");
+            document.getElementById('arrosage').innerText = read("Arrosage");
+            document.getElementById('taille').innerText = read("Taille à maturite");
+            document.getElementById('origine').innerText = read("Origine");
+            document.getElementById('difficulte').innerText = read("Difficulte");
 
-            const imgCol = p["Photo"]?.files?.[0];
-            document.getElementById('main-img').src = imgCol?.file?.url || imgCol?.external?.url || "";
+            // Contenu des menus déroulants
+            document.getElementById('info-gen').innerText = read("Informations generales");
+            document.getElementById('entretien').innerText = read("Entretien");
+            document.getElementById('sante').innerText = read("Protection et sante");
+            document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées");
+            document.getElementById('sol').innerText = read("Sol et fertilisation");
+
+            // Image
+            const img = p["Photo"]?.files?.[0];
+            document.getElementById('main-img').src = img?.file?.url || img?.external?.url || "";
+
+            // LOGIQUE PROPRIÉTAIRE
+            const userEmail = localStorage.getItem('user_email');
+            const ownerEmail = read("Client_Email");
+
+            if (userEmail && ownerEmail && userEmail.toLowerCase() === ownerEmail.toLowerCase()) {
+                document.getElementById('espace-proprietaire').style.display = 'block';
+                document.getElementById('notes-suivi').innerText = read("Notes_Suivi");
+                document.getElementById('msg-visiteur').style.display = 'none';
+            }
 
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('plant-details').style.display = 'block';
 
-        } catch (e) {
-            document.getElementById('status-msg').innerText = "Erreur de connexion au jardin.";
-        }
+        } catch (e) { document.getElementById('status-msg').innerText = "Erreur de connexion."; }
     }
     load();
-</script>
-
+    </script>
 </body>
 </html>
