@@ -8,76 +8,75 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
+        
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
-        #plant-details { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
-        header { text-align: center; padding: 40px 0; }
-                .main-img-container { 
-            width: 100%; 
-            height: 60vh; /* L'image prendra 60% de la hauteur de l'écran */
-            overflow: hidden; 
-            margin-bottom: 0; /* On colle l'image au titre */
-            border-bottom: 2px solid #4ade80; /* Petite ligne verte de finition */
-        }
+        #plant-details { display: none; max-width: 1000px; margin: 0 auto; }
 
+        /* --- STYLE COUVERTURE --- */
+        .main-img-container { 
+            width: 100%; 
+            height: 50vh; /* L'image prend la moitié de l'écran en hauteur */
+            overflow: hidden; 
+            position: relative;
+            border-bottom: 2px solid #4ade80;
+        }
         #main-img { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* C'est ce paramètre qui crée l'effet "Couverture" sans déformer */
-            display: block; 
+            object-fit: cover; /* Remplit tout l'espace sans déformer */
         }
 
-        /* On ajuste le texte pour qu'il ne soit pas collé sur les bords sur mobile */
-        #plant-details { 
-            display: none; 
-            padding: 0; /* On enlève le padding ici pour que l'image touche les bords */
-            max-width: 1000px; 
-            margin: 0 auto; 
+        /* --- STYLE TEXTE AVEC MARGES --- */
+        .content-padding { 
+            padding: 30px 20px; /* Marges pour le texte sur les côtés */
         }
 
-        .content-padding {
-            padding: 30px 20px; /* On remet du padding uniquement pour le texte */
-        }
+        header { margin-bottom: 20px; }
+        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
 
         .title-section { margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; }
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; font-size: 1.8rem; }
+        
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .info-item { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #222; }
-        .label { font-size: 0.6rem; text-transform: uppercase; color: #666; letter-spacing: 1px; display: block; }
-        .value { font-size: 0.9rem; font-weight: 500; }
-        .description-box { background: #111; padding: 25px; border-radius: 15px; margin-top: 20px; border: 1px solid #222; }
-        .back-btn { display: inline-block; margin-top: 20px; color: #4ade80; text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .label { font-size: 0.6rem; text-transform: uppercase; color: #666; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .value { font-size: 0.85rem; font-weight: 500; color: #eee; }
+
+        .description-box { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <div id="status-msg">Lecture de la plaque en cours...</div>
+    <div id="status-msg">Connexion à la mémoire végétale...</div>
 
     <div id="plant-details">
-        <header>
-            <a href="catalogue.html" class="back-btn">← Retour au jardin</a>
-        </header>
-
         <div class="main-img-container">
             <img id="main-img" src="" alt="Plante">
         </div>
 
-        <div class="title-section">
-            <h1 id="nom-commun">Chargement...</h1>
-            <p id="surnom-plante" style="opacity: 0.6; font-style: italic;"></p>
-        </div>
+        <div class="content-padding">
+            <header>
+                <a href="catalogue.html" class="back-btn">← Retour au catalogue</a>
+            </header>
 
-        <div class="grid-info">
-            <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
-            <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
-            <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
-            <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
-            <div class="info-item"><span class="label">Arrosage</span><span id="info-arrosage" class="value"></span></div>
-            <div class="info-item"><span class="label">Taille</span><span id="taille" class="value"></span></div>
-        </div>
+            <div class="title-section">
+                <h1 id="nom-commun">...</h1>
+                <p id="surnom-plante" style="opacity: 0.6; font-style: italic; font-size: 0.9rem;"></p>
+            </div>
 
-        <div class="description-box">
-            <span class="label">Description & Entretien</span>
-            <p id="desc-text" style="margin-top:10px; font-size:0.9rem;"></p>
+            <div class="grid-info">
+                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
+                <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
+                <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
+                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
+                <div class="info-item"><span class="label">Arrosage</span><span id="info-arrosage" class="value"></span></div>
+                <div class="info-item"><span class="label">Taille</span><span id="taille" class="value"></span></div>
+            </div>
+
+            <div class="description-box">
+                <span class="label">Description & Entretien</span>
+                <p id="desc-text" style="margin-top:10px; font-size:0.9rem; color: #ccc;"></p>
+            </div>
         </div>
     </div>
 
@@ -91,7 +90,7 @@
             const statusMsg = document.getElementById('status-msg');
 
             if (!plaqueNum) {
-                statusMsg.innerText = "Aucune plaque détectée.";
+                statusMsg.innerText = "Scanner une plaque pour voir les détails.";
                 return;
             }
 
@@ -99,29 +98,20 @@
                 const response = await fetch(API_URL);
                 const data = await response.json();
 
-                // RECHERCHE SPÉCIALE FORMAT "TEXTE" (Basé sur ta photo)
                 const page = data.results.find(p => {
                     const prop = p.properties["ID_Plaque"];
                     if (!prop) return false;
-                    
-                    // On lit le format 'rich_text' que l'on voit sur ta capture
-                    const val = (prop.rich_text && prop.rich_text.length > 0) 
-                                ? prop.rich_text[0].plain_text 
-                                : (prop.title && prop.title.length > 0) 
-                                    ? prop.title[0].plain_text 
-                                    : "";
-                    
+                    const val = (prop.rich_text && prop.rich_text.length > 0) ? prop.rich_text[0].plain_text : 
+                                (prop.title && prop.title.length > 0) ? prop.title[0].plain_text : "";
                     return val.toString().trim() === plaqueNum.toString().trim();
                 });
 
                 if (!page) {
-                    statusMsg.innerHTML = `Plaque <b>#${plaqueNum}</b> non attribuée dans Notion.`;
+                    statusMsg.innerHTML = `Plaque #${plaqueNum} non attribuée.`;
                     return;
                 }
 
                 const p = page.properties;
-
-                // Fonction d'extraction sécurisée
                 const getTxt = (name) => {
                     const pr = p[name];
                     if (!pr) return "NC";
@@ -131,7 +121,7 @@
                     return "NC";
                 };
 
-                // Remplissage
+                // Remplissage des données
                 document.getElementById('nom-commun').innerText = getTxt("Nom commun");
                 document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
                 document.getElementById('famille').innerText = getTxt("Famille");
@@ -142,7 +132,7 @@
                 document.getElementById('id-plaque').innerText = plaqueNum;
                 document.getElementById('desc-text').innerText = getTxt("Description");
 
-                // Image
+                // Image en couverture
                 const imgCol = p["Photo"]?.files?.[0];
                 const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "";
                 if (imgUrl) document.getElementById('main-img').src = imgUrl;
@@ -151,7 +141,7 @@
                 container.style.display = 'block';
 
             } catch (e) {
-                statusMsg.innerText = "Erreur de connexion aux données.";
+                statusMsg.innerText = "Erreur de connexion.";
                 console.error(e);
             }
         }
