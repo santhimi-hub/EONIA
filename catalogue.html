@@ -79,35 +79,43 @@ async function loadPlants() {
             return;
         }
 
-        container.innerHTML = data.results.map(page => {
+                container.innerHTML = data.results.map(page => {
             const p = page.properties;
             
-            // On récupère les textes sans risquer de planter
+            // 1. Récupération des textes
             const nom = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
             const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
             const expo = p["Exposition"]?.select?.name || "NC";
             const diff = p["Difficulte"]?.select?.name || p["Difficulté"]?.select?.name || "NC";
 
-            // Photo : On teste la colonne "Photo", puis la couverture Notion
+            // 2. Récupération de l'image (priorité à la colonne "Photo")
+            let image = "https://via.placeholder.com/400x500?text=EONIA";
             const imgFile = p["Photo"]?.files?.[0];
-            const image = imgFile?.file?.url || imgFile?.external?.url || page.cover?.external?.url || page.cover?.file?.url || "https://via.placeholder.com/400?text=EONIA";
+            
+            if (imgFile) {
+                image = imgFile.file?.url || imgFile.external?.url;
+            } else if (page.cover) {
+                image = page.cover.external?.url || page.cover.file?.url;
+            }
 
+            // 3. On rend la carte CLIQUABLE vers jardin.html
             return `
-                <div class="plant-card">
+                <a href="jardin.html?id=${page.id}" class="plant-card" style="text-decoration: none; color: inherit;">
                     <div class="img-container">
-                        <img src="${image}" class="plant-img" loading="lazy">
+                        <img src="${image}" class="plant-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+non+trouvée'">
                     </div>
                     <div class="plant-info">
                         <div class="plant-name">${nom}</div>
-                        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">${surnom}</div>
+                        <div style="font-size:0.85rem; color:#aaa; margin-bottom:10px; font-style: italic;">${surnom}</div>
                         <div class="badges">
                             <span class="badge">☀️ ${expo}</span>
                             <span class="badge">💪 ${diff}</span>
                         </div>
                     </div>
-                </div>
+                </a>
             `;
         }).join('');
+
 
         statusMsg.style.display = 'none'; // On cache le message de chargement
     } catch (error) {
