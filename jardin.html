@@ -109,71 +109,76 @@
     </div>
 
     <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        async function load() {
-            const params = new URLSearchParams(window.location.search);
-            const plaqueNum = params.get('plaque'); 
-            const container = document.getElementById('plant-details');
-            const statusMsg = document.getElementById('status-msg');
+    async function load() {
+        const params = new URLSearchParams(window.location.search);
+        const plaqueNum = params.get('plaque'); 
+        const container = document.getElementById('plant-details');
+        const statusMsg = document.getElementById('status-msg');
 
-            if (!plaqueNum) {
-                statusMsg.innerText = "Scanner une plaque pour voir les détails.";
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // On cherche la plante correspondante
+            const page = data.results.find(p => {
+                const prop = p.properties["ID_Plaque"];
+                const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
+                return val.toString().trim() === plaqueNum?.toString().trim();
+            });
+
+            if (!page) {
+                statusMsg.innerHTML = "Plante introuvable.";
                 return;
             }
 
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
+            const p = page.properties;
+            const getTxt = (name) => {
+                const pr = p[name];
+                if (!pr) return "";
+                if (pr.rich_text) return pr.rich_text[0]?.plain_text || "";
+                if (pr.title) return pr.title[0]?.plain_text || "";
+                if (pr.email) return pr.email || ""; // Pour la colonne Client_Email
+                return "";
+            };
 
-                const page = data.results.find(p => {
-                    const prop = p.properties["ID_Plaque"];
-                    if (!prop) return false;
-                    const val = (prop.rich_text && prop.rich_text.length > 0) ? prop.rich_text[0].plain_text : 
-                                (prop.title && prop.title.length > 0) ? prop.title[0].plain_text : "";
-                    return val.toString().trim() === plaqueNum.toString().trim();
-                });
+            // Remplissage des infos publiques
+            document.getElementById('nom-commun').innerText = getTxt("Nom commun");
+            document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
+            document.getElementById('id-plaque').innerText = plaqueNum;
+            // ... (Ajoute ici tes autres champs publics : exposition, famille, etc.)
 
-                if (!page) {
-                    statusMsg.innerHTML = `Plaque #${plaqueNum} non attribuée.`;
-                    return;
-                }
+            const imgCol = p["Photo"]?.files?.[0];
+            document.getElementById('main-img').src = imgCol?.file?.url || imgCol?.external?.url || "";
 
-                const p = page.properties;
-                const getTxt = (name) => {
-                    const pr = p[name];
-                    if (!pr) return "NC";
-                    if (pr.rich_text) return pr.rich_text.map(t => t.plain_text).join('') || "NC";
-                    if (pr.title) return pr.title[0]?.plain_text || "NC";
-                    if (pr.select) return pr.select.name || "NC";
-                    return "NC";
-                };
+            // --- LOGIQUE DE DROITS D'ACCÈS ---
+            const userEmail = localStorage.getItem('user_email');
+            const ownerEmail = getTxt("Client_Email"); // Doit être le nom exact de ta colonne Notion
 
-                // Remplissage des données
-                document.getElementById('nom-commun').innerText = getTxt("Nom commun");
-                document.getElementById('surnom-plante').innerText = getTxt("Surnom de ma plante");
-                document.getElementById('famille').innerText = getTxt("Famille");
-                document.getElementById('exposition').innerText = getTxt("Exposition");
-                document.getElementById('rusticite').innerText = getTxt("Rusticite");
-                document.getElementById('info-arrosage').innerText = getTxt("Arrosage");
-                document.getElementById('taille').innerText = getTxt("Taille à maturite");
-                document.getElementById('id-plaque').innerText = plaqueNum;
-                document.getElementById('desc-text').innerText = getTxt("Description");
+            const zonePrivee = document.getElementById('espace-proprietaire');
+            const zoneVisiteur = document.getElementById('msg-visiteur');
 
-                // Image en couverture
-                const imgCol = p["Photo"]?.files?.[0];
-                const imgUrl = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "";
-                if (imgUrl) document.getElementById('main-img').src = imgUrl;
-
-                statusMsg.style.display = 'none';
-                container.style.display = 'block';
-
-            } catch (e) {
-                statusMsg.innerText = "Erreur de connexion.";
-                console.error(e);
+            // Si le mail correspond (et n'est pas vide dans Notion)
+            if (userEmail && ownerEmail && userEmail.toLowerCase() === ownerEmail.toLowerCase()) {
+                zonePrivee.style.display = 'block';
+                zoneVisiteur.style.display = 'none';
+                // Optionnel : remplir les notes privées
+                // document.getElementById('suivi-notes').innerText = getTxt("Notes_Suivi");
+            } else {
+                zonePrivee.style.display = 'none';
+                zoneVisiteur.style.display = 'block';
             }
+
+            statusMsg.style.display = 'none';
+            container.style.display = 'block';
+
+        } catch (e) {
+            statusMsg.innerText = "Erreur de connexion.";
         }
-        load();
-    </script>
+    }
+    load();
+</script>
+
 </body>
 </html>
