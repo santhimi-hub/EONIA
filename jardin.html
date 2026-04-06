@@ -6,26 +6,30 @@
     <title>ÉONIA — Ma Plante</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
+        /* --- STYLE GÉNÉRAL --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
+        
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
         #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
 
+        /* --- COUVERTURE --- */
         .main-img-container { width: 100%; height: 45vh; overflow: hidden; position: relative; border-bottom: 2px solid #4ade80; }
         #main-img { width: 100%; height: 100%; object-fit: cover; }
+
         .content-padding { padding: 25px 20px; }
-        
         header { margin-bottom: 15px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
 
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
         .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
 
-        /* --- NOUVEAU : BARRE MÉTÉO --- */
-        .meteo-bar { background: #111; padding: 15px; border-radius: 12px; border-left: 3px solid #4ade80; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; display: none; }
+        /* --- BARRE MÉTÉO --- */
+        .meteo-bar { background: #111; padding: 15px; border-radius: 12px; border-left: 3px solid #4ade80; margin-bottom: 25px; display: none; align-items: center; justify-content: space-between; }
         .meteo-temp { font-weight: bold; color: #4ade80; font-size: 1.2rem; }
         .meteo-conseil { font-size: 0.75rem; color: #888; font-style: italic; }
 
+        /* --- GRILLE D'INFOS --- */
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
         .label { font-size: 0.55rem; text-transform: uppercase; color: #555; letter-spacing: 1px; display: block; margin-bottom: 4px; }
@@ -36,11 +40,11 @@
         summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; list-style: none; outline: none; }
         .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; }
 
-        /* --- ESPACE PRIVÉ & RAPPELS --- */
+        /* --- ESPACE PRIVÉ & BADGES --- */
         #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
-        .status-ok { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid #4ade80; }
-        .status-alert { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
+        .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
+        .status-alert { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
     </style>
 </head>
 <body>
@@ -48,7 +52,9 @@
     <div id="status-msg">Synchronisation avec le jardin...</div>
 
     <div id="plant-details">
-        <div class="main-img-container"><img id="main-img" src="" alt="Plante"></div>
+        <div class="main-img-container">
+            <img id="main-img" src="" alt="Plante">
+        </div>
 
         <div class="content-padding">
             <header><a href="catalogue.html" class="back-btn">← Retour au Jardin</a></header>
@@ -73,7 +79,7 @@
                 <div class="info-item"><span class="label">Taille maturité</span><span id="taille" class="value"></span></div>
             </div>
 
-            <details><summary>✿ Infos Générales</summary><div class="details-content" id="info-gen"></div></details>
+            <details><summary>✿ Informations Générales</summary><div class="details-content" id="info-gen"></div></details>
             <details><summary>✂ Entretien & Taille</summary><div class="details-content" id="entretien"></div></details>
             <details><summary>🛡 Protection & Santé</summary><div class="details-content" id="sante"></div></details>
             <details><summary>🌿 Compagnonnage</summary><div class="details-content" id="compagnons"></div></details>
@@ -81,8 +87,148 @@
             <div id="espace-proprietaire" style="display:none;">
                 <h2 style="color:#4ade80; font-size:0.9rem; margin-bottom:10px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
                 
-                <div id="arrosage-badge" class="status-badge">Analyse de l'arrosage...</div>
+                <div id="arrosage-badge" class="status-badge">Analyse...</div>
 
                 <div class="grid-info" style="margin-bottom:15px;">
                     <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-- / --</span></div>
-                    <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --
+                    <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --</span></div>
+                </div>
+
+                <span class="label">Notes de suivi</span>
+                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
+            </div>
+
+            <div id="msg-visiteur" style="text-align:center; opacity:0.3; font-size:0.65rem; margin-top:30px;">
+                Mode consultation publique — ÉONIA
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+    // --- FONCTION MÉTÉO ---
+    async function updateMeteo() {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
+                const d = await res.json();
+                const t = Math.round(d.current_weather.temperature);
+                const container = document.getElementById('meteo-container');
+                if(container) {
+                    container.style.display = 'flex';
+                    document.getElementById('meteo-temp').innerText = t + "°C";
+                    let msg = "Conditions normales.";
+                    if (t > 28) msg = "⚠️ Forte chaleur : Arrosez ce soir !";
+                    if (t < 4) msg = "❄️ Risque de gel : Protégez le pied.";
+                    document.getElementById('meteo-text').innerText = msg;
+                }
+            } catch(e) { console.warn("Météo indisponible"); }
+        });
+    }
+
+    async function load() {
+        const params = new URLSearchParams(window.location.search);
+        const plaqueNum = params.get('plaque'); 
+        
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            
+            // Recherche de la plaque dans Notion
+            const page = data.results.find(p => {
+                const prop = p.properties["ID_Plaque"];
+                const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
+                return val.toString().trim() === plaqueNum?.toString().trim();
+            });
+
+            if (!page) { 
+                document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable."; 
+                return; 
+            }
+
+            const p = page.properties;
+
+            // --- LECTEUR SÉCURISÉ DES DONNÉES ---
+            const read = (name) => {
+                const f = p[name];
+                if (!f) return "";
+                if (f.title && f.title.length > 0) return f.title[0].plain_text;
+                if (f.rich_text && f.rich_text.length > 0) return f.rich_text.map(t => t.plain_text).join("");
+                if (f.select) return f.select.name;
+                if (f.date) return f.date.start || "";
+                if (f.number !== undefined && f.number !== null) return f.number;
+                if (f.email) return f.email || "";
+                return "";
+            };
+
+            // AFFICHAGE PUBLIC
+            document.getElementById('nom-commun').innerText = read("Nom commun") || "Plante Eonia";
+            document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
+            document.getElementById('id-plaque').innerText = plaqueNum;
+            document.getElementById('famille').innerText = read("Famille");
+            document.getElementById('exposition').innerText = read("Exposition");
+            document.getElementById('rusticite').innerText = read("Rusticite");
+            document.getElementById('arrosage').innerText = read("Arrosage");
+            document.getElementById('taille').innerText = read("Taille à maturite");
+
+            document.getElementById('info-gen').innerText = read("Informations generales") || "Aucune information disponible.";
+            document.getElementById('entretien').innerText = read("Entretien") || "Aucune consigne spécifique.";
+            document.getElementById('sante').innerText = read("Protection et sante") || "Pas d'infos santé.";
+            document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées") || "Non renseigné.";
+
+            // IMAGE DE COUVERTURE
+            const img = p["Photo"]?.files?.[0];
+            if(img) document.getElementById('main-img').src = img.file?.url || img.external?.url || "";
+
+            // LOGIQUE PROPRIÉTAIRE & ALERTES
+            const userEmail = localStorage.getItem('user_email');
+            const ownerEmail = read("Client_Email");
+
+            // On compare les emails pour ouvrir l'espace privé
+            if (userEmail && ownerEmail && userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
+                document.getElementById('espace-proprietaire').style.display = 'block';
+                if(document.getElementById('msg-visiteur')) document.getElementById('msg-visiteur').style.display = 'none';
+                
+                document.getElementById('notes-suivi').innerText = read("Notes_Suivi") || "Aucune note pour le moment.";
+                document.getElementById('date-plant').innerText = read("Date_Plantation") || "-- / --";
+                
+                const lastWater = read("Dernier_Arrosage");
+                document.getElementById('last-water').innerText = lastWater || "Jamais";
+
+                // --- CALCUL DU RAPPEL D'ARROSAGE ---
+                const freq = p["Frequence_Arrosage"]?.number;
+                const badge = document.getElementById('arrosage-badge');
+
+                if (freq && lastWater) {
+                    const dateL = new Date(lastWater);
+                    const diff = Math.floor((new Date() - dateL) / (1000 * 60 * 60 * 24));
+                    
+                    if (diff >= freq) {
+                        badge.innerText = "🚨 Soif ! Arrosage en retard";
+                        badge.className = "status-badge status-alert";
+                    } else {
+                        badge.innerText = "💧 Hydratation OK";
+                        badge.className = "status-badge status-ok";
+                    }
+                } else {
+                    badge.innerText = "Définissez votre fréquence d'arrosage";
+                    badge.className = "status-badge";
+                }
+            }
+
+            // Affichage de la page une fois chargée
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('plant-details').style.display = 'block';
+            updateMeteo();
+
+        } catch (e) { 
+            console.error("Erreur critique:", e);
+            document.getElementById('status-msg').innerText = "Erreur de connexion. Vérifiez votre connexion internet."; 
+        }
+    }
+    load();
+    </script>
+</body>
+</html>
