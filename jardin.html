@@ -276,80 +276,75 @@
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 
 async function loadPlantDetails() {
+    const container = document.getElementById('plant-details');
+    const statusMsg = document.getElementById('status-msg');
+
+    // 1. On récupère l'ID précis dans l'adresse de la page
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    const container = document.getElementById('plant-details');
 
     if (!plantId) {
-        container.innerHTML = "<p>Plante non trouvée.</p>";
+        container.innerHTML = "<h2>Aucune plante sélectionnée.</h2>";
         return;
     }
 
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        const page = data.results.find(p => p.id === plantId);
+
+        // 2. On cherche LA plante qui correspond exactement à cet ID
+        const page = data.results.find(item => item.id === plantId);
 
         if (!page) {
-            container.innerHTML = "<p>Plante introuvable dans la base.</p>";
+            container.innerHTML = "<h2>Plante introuvable.</h2>";
             return;
         }
 
         const p = page.properties;
 
-        // Fonction pour extraire le texte proprement
-        const getTxt = (prop) => {
-            if (!prop) return "";
+        // Fonction pour extraire le texte
+        const getTxt = (name) => {
+            const prop = p[name];
+            if (!prop) return "Non précisé";
             if (prop.title) return prop.title[0]?.plain_text || "";
             if (prop.rich_text) return prop.rich_text[0]?.plain_text || "";
             if (prop.select) return prop.select.name || "";
             return "";
         };
 
-        // Extraction de l'image
-        const imgFile = p["Photo"]?.files?.[0];
-        const image = imgFile?.file?.url || imgFile?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/600x400?text=EONIA";
+        // Image
+        const imgCol = p["Photo"]?.files?.[0];
+        const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/600";
 
-        // Affichage structuré
+        // 3. On injecte les bonnes infos
         container.innerHTML = `
-            <div class="detail-header">
-                <img src="${image}" class="detail-img" alt="Photo">
-                <h1>${getTxt(p["Nom commun"])}</h1>
-                <p style="font-style:italic; color:#888;">${getTxt(p["Surnom de ma plante"])}</p>
-            </div>
-
-            <div class="info-grid">
-                <div class="info-card"><h3>🌿 Identité</h3>
-                    <p><b>Famille :</b> ${getTxt(p["Famille"])}</p>
-                    <p><b>Origine :</b> ${getTxt(p["Origine"])}</p>
-                    <p><b>Type :</b> ${getTxt(p["Type"])}</p>
-                </div>
+            <div class="detail-container">
+                <img src="${image}" class="detail-img">
+                <h1>${getTxt("Nom commun")}</h1>
+                <p class="surnom">${getTxt("Surnom de ma plante")}</p>
                 
-                <div class="info-card"><h3>☀️ Besoins</h3>
-                    <p><b>Exposition :</b> ${getTxt(p["Exposition"])}</p>
-                    <p><b>Rusticité :</b> ${getTxt(p["Rusticite"])}</p>
-                    <p><b>Sol :</b> ${getTxt(p["Type de sol"])}</p>
+                <div class="grid">
+                    <div class="card"><h3>🌿 Infos</h3>
+                        <p><b>Famille:</b> ${getTxt("Famille")}</p>
+                        <p><b>Origine:</b> ${getTxt("Origine")}</p>
+                    </div>
+                    <div class="card"><h3>☀️ Culture</h3>
+                        <p><b>Exposition:</b> ${getTxt("Exposition")}</p>
+                        <p><b>Sol:</b> ${getTxt("Type de sol")}</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="description-section">
-                <h3>📝 Description</h3>
-                <p>${getTxt(p["Description"])}</p>
-                
-                <h3>💧 Entretien & Arrosage</h3>
-                <p><b>Arrosage :</b> ${getTxt(p["Arrosage"])}</p>
-                <p><b>Entretien :</b> ${getTxt(p["Entretien"])}</p>
-                <p><b>Santé :</b> ${getTxt(p["Protection et sante"])}</p>
-            </div>
-
-            <div class="technical-info">
-                <p><b>Floraison :</b> ${getTxt(p["Floraison"])} | <b>Taille à maturité :</b> ${getTxt(p["Taille à maturite"])}</p>
+                <div class="description">
+                    <h3>📖 Description</h3>
+                    <p>${getTxt("Description")}</p>
+                </div>
             </div>
         `;
+        
+        if(statusMsg) statusMsg.style.display = 'none';
 
-    } catch (error) {
-        console.error(error);
-        container.innerHTML = "<p>Erreur lors du chargement des détails.</p>";
+    } catch (e) {
+        container.innerHTML = "<h2>Erreur de chargement.</h2>";
     }
 }
 
