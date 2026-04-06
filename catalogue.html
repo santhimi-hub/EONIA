@@ -81,67 +81,58 @@
 </script>
 
     <script>
-const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-async function loadPlants() {
-    const container = document.getElementById('catalog');
-    const statusMsg = document.getElementById('status-msg');
+    async function loadCatalogue() {
+        const container = document.getElementById('catalogue-grid');
+        const statusMsg = document.getElementById('status-msg');
 
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
 
-        if (!data.results || data.results.length === 0) {
-            statusMsg.innerHTML = "Aucune plante trouvée dans Notion.";
-            return;
-        }
+            // On vide le message de chargement
+            container.innerHTML = "";
 
-                container.innerHTML = data.results.map(page => {
-            const p = page.properties;
-            
-            // 1. Récupération des textes
-            const nom = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
-            const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
-            const expo = p["Exposition"]?.select?.name || "NC";
-            const diff = p["Difficulte"]?.select?.name || p["Difficulté"]?.select?.name || "NC";
+            data.results.forEach(page => {
+                const p = page.properties;
 
-            // 2. Récupération de l'image (priorité à la colonne "Photo")
-            let image = "https://via.placeholder.com/400x500?text=EONIA";
-            const imgFile = p["Photo"]?.files?.[0];
-            
-            if (imgFile) {
-                image = imgFile.file?.url || imgFile.external?.url;
-            } else if (page.cover) {
-                image = page.cover.external?.url || page.cover.file?.url;
-            }
+                // 1. On extrait les infos de base
+                const name = p["Nom commun"]?.title[0]?.plain_text || "Plante sans nom";
+                const surnom = p["Surnom de ma plante"]?.rich_text[0]?.plain_text || "";
+                
+                // 2. On récupère le NUMÉRO DE PLAQUE (C'est lui qui fera le lien !)
+                const plaqueNum = p["ID_Plaque"]?.title?.[0]?.plain_text || 
+                                 p["ID_Plaque"]?.rich_text?.[0]?.plain_text || "";
 
-            // 3. On rend la carte CLIQUABLE vers jardin.html
-            return `
-                <a href="jardin.html?id=${page.id}" class="plant-card" style="text-decoration: none; color: inherit;">
-                    <div class="img-container">
-                        <img src="${image}" class="plant-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+non+trouvée'">
-                    </div>
-                    <div class="plant-info">
-                        <div class="plant-name">${nom}</div>
-                        <div style="font-size:0.85rem; color:#aaa; margin-bottom:10px; font-style: italic;">${surnom}</div>
-                        <div class="badges">
-                            <span class="badge">☀️ ${expo}</span>
-                            <span class="badge">💪 ${diff}</span>
+                // 3. On récupère l'image
+                const imgCol = p["Photo"]?.files?.[0];
+                const image = imgCol?.file?.url || imgCol?.external?.url || page.cover?.external?.url || "https://via.placeholder.com/400x300?text=EONIA";
+
+                // 4. On crée la carte avec le lien vers ?plaque=XX
+                const card = document.createElement('div');
+                card.innerHTML = `
+                    <a href="jardin.html?plaque=${plaqueNum}" class="plant-card" style="text-decoration:none; color:inherit;">
+                        <div style="position:relative;">
+                            <img src="${image}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:15px;">
+                            ${plaqueNum ? `<span style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:5px; font-size:0.6rem; color:#4ade80;">#${plaqueNum}</span>` : ''}
                         </div>
-                    </div>
-                </a>
-            `;
-        }).join('');
+                        <h3 style="margin-top:10px; font-size:1rem; text-transform:uppercase;">${name}</h3>
+                        <p style="color:#666; font-size:0.8rem;">${surnom}</p>
+                    </a>
+                `;
+                container.appendChild(card);
+            });
 
+            if(statusMsg) statusMsg.style.display = 'none';
 
-        statusMsg.style.display = 'none'; // On cache le message de chargement
-    } catch (error) {
-        console.error("Erreur détaillée:", error);
-        statusMsg.innerHTML = "Erreur de connexion. Vérifiez la console (F12).";
+        } catch (error) {
+            console.error(error);
+            if(statusMsg) statusMsg.innerText = "Erreur de chargement du catalogue.";
+        }
     }
-}
 
-loadPlants();
+    loadCatalogue();
 </script>
 
 </body>
