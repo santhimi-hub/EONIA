@@ -24,10 +24,16 @@
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
         .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
 
-        /* --- BARRE MÉTÉO --- */
-        .meteo-bar { background: #111; padding: 15px; border-radius: 12px; border-left: 3px solid #4ade80; margin-bottom: 25px; display: none; flex-direction: column; }
-        .meteo-temp { font-weight: bold; color: #4ade80; font-size: 1.2rem; }
-        .meteo-conseil { font-size: 0.75rem; color: #888; font-style: italic; }
+        /* --- BARRE MÉTÉO ÉLÉGANTE --- */
+        .meteo-bar { 
+            background: #0c0c0c; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #1a1a1a; 
+            margin-bottom: 25px; 
+            display: none; 
+            flex-direction: column; 
+        }
 
         /* --- GRILLE D'INFOS --- */
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
@@ -68,9 +74,11 @@
                         <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
                         <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
                     </div>
-                    <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Analyse du ciel...</div>
+                    <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Chargement...</div>
                 </div>
-                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
+                
+                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;">
+                    </div>
             </div>
 
             <div class="grid-info">
@@ -107,46 +115,54 @@
     <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // --- FONCTION MÉTÉO AVEC PRÉVISIONS ---
+    // --- FONCTION MÉTÉO CORRIGÉE ---
     async function updateMeteo() {
         if (!navigator.geolocation) return;
+        
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
-                // Appel avec prévisions journalières (daily)
+                
+                // Appel API avec Daily Temperature (Prévisions)
                 const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
                 const d = await res.json();
                 
-                const t = Math.round(d.current_weather.temperature);
                 const container = document.getElementById('meteo-container');
-                
-                if(container) {
-                    container.style.display = 'flex';
-                    document.getElementById('meteo-temp').innerText = t + "°C";
-                    
-                    let msg = "Conditions normales.";
-                    if (t > 28) msg = "⚠️ Forte chaleur : Arrosez ce soir !";
-                    if (t < 4) msg = "❄️ Risque de gel : Protégez le pied.";
-                    document.getElementById('meteo-text').innerText = msg;
+                if(!container) return;
 
-                    // Génération des prévisions sur 3 jours
-                    const forecastDiv = document.getElementById('forecast-container');
-                    forecastDiv.innerHTML = ""; 
-                    for (let i = 1; i <= 3; i++) {
-                        const date = new Date(d.daily.time[i]);
-                        const jourNom = date.toLocaleDateString('fr-FR', { weekday: 'short' });
-                        const max = Math.round(d.daily.temperature_2m_max[i]);
-                        const min = Math.round(d.daily.temperature_2m_min[i]);
-                        forecastDiv.innerHTML += `
-                            <div style="text-align: center;">
-                                <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jourNom}</div>
-                                <div style="font-size: 0.8rem; color: #ddd; margin: 4px 0;">${max}° / ${min}°</div>
-                            </div>
-                        `;
-                    }
+                container.style.display = 'flex';
+                
+                // Température Actuelle
+                const tCurrent = Math.round(d.current_weather.temperature);
+                document.getElementById('meteo-temp').innerText = tCurrent + "°C";
+                
+                let msg = "Conditions stables.";
+                if (tCurrent > 28) msg = "⚠️ Chaleur intense.";
+                if (tCurrent < 4) msg = "❄️ Risque de gel.";
+                document.getElementById('meteo-text').innerText = msg;
+
+                // Remplissage des 3 jours de prévisions
+                const forecastDiv = document.getElementById('forecast-container');
+                forecastDiv.innerHTML = ""; // Clear
+                
+                for (let i = 1; i <= 3; i++) {
+                    const date = new Date(d.daily.time[i]);
+                    const joursNom = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                    const jourNom = joursNom[date.getDay()];
+                    const max = Math.round(d.daily.temperature_2m_max[i]);
+                    const min = Math.round(d.daily.temperature_2m_min[i]);
+                    
+                    forecastDiv.innerHTML += `
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing:1px;">${jourNom}</div>
+                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${max}° / ${min}°</div>
+                        </div>
+                    `;
                 }
-            } catch(e) { console.warn("Météo indisponible"); }
+            } catch(e) { console.warn("Erreur API Météo"); }
+        }, (err) => {
+            console.log("Géolocalisation refusée.");
         });
     }
 
@@ -234,11 +250,13 @@
 
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('plant-details').style.display = 'block';
+            
+            // On lance la météo à la fin
             updateMeteo();
 
         } catch (e) { 
-            console.error("Erreur critique:", e);
-            document.getElementById('status-msg').innerText = "Erreur de connexion. Vérifiez votre connexion internet."; 
+            console.error(e);
+            document.getElementById('status-msg').innerText = "Erreur de chargement."; 
         }
     }
     load();
