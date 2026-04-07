@@ -6,47 +6,25 @@
     <title>ÉONIA — Ma Plante</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
-        /* --- STYLE GÉNÉRAL --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
         #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-
-        /* --- COUVERTURE --- */
         .main-img-container { width: 100%; height: 45vh; overflow: hidden; position: relative; border-bottom: 2px solid #4ade80; }
         #main-img { width: 100%; height: 100%; object-fit: cover; }
-
         .content-padding { padding: 25px 20px; }
         header { margin-bottom: 15px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
         .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
-
-        /* --- BARRE MÉTÉO ÉLÉGANTE --- */
-        .meteo-bar { 
-            background: #0c0c0c; 
-            padding: 20px; 
-            border-radius: 12px; 
-            border: 1px solid #1a1a1a; 
-            margin-bottom: 25px; 
-            display: none; 
-            flex-direction: column; 
-        }
-
-        /* --- GRILLE D'INFOS --- */
+        .meteo-bar { background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px; display: none; flex-direction: column; }
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
         .label { font-size: 0.55rem; text-transform: uppercase; color: #555; letter-spacing: 1px; display: block; margin-bottom: 4px; }
         .value { font-size: 0.8rem; font-weight: 500; color: #ddd; }
-
-        /* --- ACCORDÉONS --- */
         details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
         summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; list-style: none; outline: none; }
-        .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; }
-
-        /* --- ESPACE PRIVÉ & BADGES --- */
+        .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; white-space: pre-line; }
         #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
         .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
         .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
@@ -76,9 +54,7 @@
                     </div>
                     <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Chargement...</div>
                 </div>
-                
-                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;">
-                    </div>
+                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
             </div>
 
             <div class="grid-info">
@@ -115,274 +91,54 @@
     <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // --- FONCTION MÉTÉO CORRIGÉE ---
     async function updateMeteo() {
         if (!navigator.geolocation) return;
-        
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
-                
-                // Appel API avec Daily Temperature (Prévisions)
                 const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
                 const d = await res.json();
-                
-                const container = document.getElementById('meteo-container');
-                if(!container) return;
-
-                container.style.display = 'flex';
-                
-                // Température Actuelle
+                document.getElementById('meteo-container').style.display = 'flex';
                 const tCurrent = Math.round(d.current_weather.temperature);
                 document.getElementById('meteo-temp').innerText = tCurrent + "°C";
-                
-                let msg = "Conditions stables.";
-                if (tCurrent > 28) msg = "⚠️ Chaleur intense.";
-                if (tCurrent < 4) msg = "❄️ Risque de gel.";
-                document.getElementById('meteo-text').innerText = msg;
+                document.getElementById('meteo-text').innerText = tCurrent > 28 ? "⚠️ Chaleur intense." : (tCurrent < 4 ? "❄️ Risque de gel." : "Conditions stables.");
 
-                // Remplissage des 3 jours de prévisions
                 const forecastDiv = document.getElementById('forecast-container');
-                forecastDiv.innerHTML = ""; // Clear
-                
+                forecastDiv.innerHTML = "";
+                const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
                 for (let i = 1; i <= 3; i++) {
                     const date = new Date(d.daily.time[i]);
-                    const joursNom = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-                    const jourNom = joursNom[date.getDay()];
-                    const max = Math.round(d.daily.temperature_2m_max[i]);
-                    const min = Math.round(d.daily.temperature_2m_min[i]);
-                    
                     forecastDiv.innerHTML += `
                         <div style="text-align: center;">
-                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing:1px;">${jourNom}</div>
-                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${max}° / ${min}°</div>
-                        </div>
-                    `;
+                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
+                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}° / ${Math.round(d.daily.temperature_2m_min[i])}°</div>
+                        </div>`;
                 }
-            } catch(e) { console.warn("Erreur API Météo"); }
-        }, (err) => {
-            console.log("Géolocalisation refusée.");
+            } catch(e) { console.warn("Erreur météo"); }
         });
     }
 
     async function load() {
         const params = new URLSearchParams(window.location.search);
+        // On cherche par ID (recommandé) ou par Plaque
+        const plantId = params.get('id');
         const plaqueNum = params.get('plaque'); 
         
         try {
             const response = await fetch(API_URL);
-            const data = await response.json();
+            const plants = await response.json();
             
-            const page = data.results.find(p => {
-                const prop = p.properties["ID_Plaque"];
-                const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
-                return val.toString().trim() === plaqueNum?.toString().trim();
-            });
+            // On trouve la plante soit par son ID technique, soit par son numéro de plaque
+            const p = plants.find(item => item.id === plantId || item["ID_Plaque"] == plaqueNum);
 
-            if (!page) { 
-                document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable."; 
+            if (!p) { 
+                document.getElementById('status-msg').innerText = "Plante introuvable."; 
                 return; 
             }
 
-            const p = page.properties;
-
-            const read = (name) => {
-                const f = p[name];
-                if (!f) return "";
-                if (f.title && f.title.length > 0) return f.title[0].plain_text;
-                if (f.rich_text && f.rich_text.length > 0) return f.rich_text.map(t => t.plain_text).join("");
-                if (f.select) return f.select.name;
-                if (f.date) return f.date.start || "";
-                if (f.number !== undefined && f.number !== null) return f.number;
-                if (f.email) return f.email || "";
-                return "";
-            };
-
-            document.getElementById('nom-commun').innerText = read("Nom commun") || "Plante Eonia";
-            document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
-            document.getElementById('id-plaque').innerText = plaqueNum;
-            document.getElementById('famille').innerText = read("Famille");
-            document.getElementById('exposition').innerText = read("Exposition");
-            document.getElementById('rusticite').innerText = read("Rusticite");
-            document.getElementById('arrosage').innerText = read("Arrosage");
-            document.getElementById('taille').innerText = read("Taille à maturite");
-
-            document.getElementById('info-gen').innerText = read("Informations generales") || "Aucune information disponible.";
-            document.getElementById('entretien').innerText = read("Entretien") || "Aucune consigne spécifique.";
-            document.getElementById('sante').innerText = read("Protection et sante") || "Pas d'infos santé.";
-            document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées") || "Non renseigné.";
-
-            const img = p["Photo"]?.files?.[0];
-            if(img) document.getElementById('main-img').src = img.file?.url || img.external?.url || "";
-
-            const userEmail = localStorage.getItem('user_email');
-            const ownerEmail = read("Client_Email");
-
-            if (userEmail && ownerEmail && userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
-                document.getElementById('espace-proprietaire').style.display = 'block';
-                if(document.getElementById('msg-visiteur')) document.getElementById('msg-visiteur').style.display = 'none';
-                
-                document.getElementById('notes-suivi').innerText = read("Notes_Suivi") || "Aucune note pour le moment.";
-                document.getElementById('date-plant').innerText = read("Date_Plantation") || "-- / --";
-                
-                const lastWater = read("Dernier_Arrosage");
-                document.getElementById('last-water').innerText = lastWater || "Jamais";
-
-                const freq = p["Frequence_Arrosage"]?.number;
-                const badge = document.getElementById('arrosage-badge');
-<script>
-const API_URL = "https://eonia-api.santhimi.workers.dev";
-
-// --- FONCTION MÉTÉO SÉCURISÉE ---
-async function updateMeteo() {
-    const container = document.getElementById('meteo-container');
-    const meteoText = document.getElementById('meteo-text');
-    const forecastDiv = document.getElementById('forecast-container');
-
-    if (!navigator.geolocation) {
-        if(meteoText) meteoText.innerText = "GPS non supporté";
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-        try {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            
-            // On force l'affichage du bloc dès qu'on a la position
-            container.style.display = 'flex';
-            meteoText.innerText = "Récupération...";
-
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
-            const d = await res.json();
-
-            if (!d.current_weather) throw new Error("Données vides");
-
-            // 1. Température Actuelle
-            const tCurrent = Math.round(d.current_weather.temperature);
-            document.getElementById('meteo-temp').innerText = tCurrent + "°C";
-            
-            let msg = "Ciel stable.";
-            if (tCurrent > 28) msg = "⚠️ Chaleur intense.";
-            if (tCurrent < 4) msg = "❄️ Risque de gel.";
-            meteoText.innerText = msg;
-
-            // 2. Prévisions sur 3 jours
-            forecastDiv.innerHTML = ""; 
-            const joursNom = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-            
-            for (let i = 1; i <= 3; i++) {
-                const date = new Date(d.daily.time[i]);
-                const jourNom = joursNom[date.getDay()];
-                const max = Math.round(d.daily.temperature_2m_max[i]);
-                const min = Math.round(d.daily.temperature_2m_min[i]);
-                
-                forecastDiv.innerHTML += `
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jourNom}</div>
-                        <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${max}° / ${min}°</div>
-                    </div>
-                `;
-            }
-        } catch(e) { 
-            meteoText.innerText = "Erreur météo";
-            console.error("Détail erreur:", e);
-        }
-    }, (err) => {
-        meteoText.innerText = "Position refusée";
-    }, { timeout: 10000 }); // On attend max 10 sec le GPS
-}
-
-async function load() {
-    const params = new URLSearchParams(window.location.search);
-    const plaqueNum = params.get('plaque'); 
-    
-    try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        
-        const page = data.results.find(p => {
-            const prop = p.properties["ID_Plaque"];
-            const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
-            return val.toString().trim() === plaqueNum?.toString().trim();
-        });
-
-        if (!page) { 
-            document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable."; 
-            return; 
-        }
-
-        const p = page.properties;
-        const read = (name) => {
-            const f = p[name];
-            if (!f) return "";
-            if (f.title?.length > 0) return f.title[0].plain_text;
-            if (f.rich_text?.length > 0) return f.rich_text.map(t => t.plain_text).join("");
-            if (f.select) return f.select.name;
-            if (f.date) return f.date.start || "";
-            if (f.number !== undefined) return f.number;
-            if (f.email) return f.email || "";
-            return "";
-        };
-
-        // Remplissage Public
-        document.getElementById('nom-commun').innerText = read("Nom commun") || "Plante Eonia";
-        document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
-        document.getElementById('id-plaque').innerText = plaqueNum;
-        document.getElementById('famille').innerText = read("Famille");
-        document.getElementById('exposition').innerText = read("Exposition");
-        document.getElementById('rusticite').innerText = read("Rusticite");
-        document.getElementById('arrosage').innerText = read("Arrosage");
-        document.getElementById('taille').innerText = read("Taille à maturite");
-        document.getElementById('info-gen').innerText = read("Informations generales");
-        document.getElementById('entretien').innerText = read("Entretien");
-        document.getElementById('sante').innerText = read("Protection et sante");
-        document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées");
-
-        const img = p["Photo"]?.files?.[0];
-        if(img) document.getElementById('main-img').src = img.file?.url || img.external?.url || "";
-
-        // Propriétaire
-        const userEmail = localStorage.getItem('user_email');
-        const ownerEmail = read("Client_Email");
-
-        if (userEmail && ownerEmail && userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
-            document.getElementById('espace-proprietaire').style.display = 'block';
-            if(document.getElementById('msg-visiteur')) document.getElementById('msg-visiteur').style.display = 'none';
-            document.getElementById('notes-suivi').innerText = read("Notes_Suivi");
-            document.getElementById('date-plant').innerText = read("Date_Plantation");
-            const lastWater = read("Dernier_Arrosage");
-            document.getElementById('last-water').innerText = lastWater || "Jamais";
-
-            const freq = p["Frequence_Arrosage"]?.number;
-            const badge = document.getElementById('arrosage-badge');
-            if (freq && lastWater) {
-                const dateL = new Date(lastWater);
-                const diff = Math.floor((new Date() - dateL) / (1000 * 60 * 60 * 24));
-                if (diff >= freq) {
-                    badge.innerText = "🚨 Soif ! Arrosage en retard";
-                    badge.className = "status-badge status-alert";
-                } else {
-                    badge.innerText = "💧 Hydratation OK";
-                    badge.className = "status-badge status-ok";
-                }
-            }
-        }
-
-        document.getElementById('status-msg').style.display = 'none';
-        document.getElementById('plant-details').style.display = 'block';
-        
-        // On lance la météo à la toute fin
-        updateMeteo();
-
-    } catch (e) { 
-        console.error(e);
-        document.getElementById('status-msg').innerText = "Erreur de chargement."; 
-    }
-}
-load();
-</script>
-
-</body>
-</html>
+            // Remplissage avec les données simplifiées du Worker
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Eonia";
+            document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
+            document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "-";
+            document.getElementById
