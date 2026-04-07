@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <script>
+    // LE VIDEUR : On vérifie qui entre
+    const access = localStorage.getItem('eonia_access');
+    const userEmail = localStorage.getItem('user_email');
+
+    if (!access || !userEmail) {
+        // Personne n'est connecté -> Retour à l'accueil
+        window.location.href = "index.html";
+    }
+
+    // Si c'est un invité, on cache les éléments privés après le chargement
+    if (access === 'guest') {
+        document.addEventListener('DOMContentLoaded', () => {
+            // On cache les boutons d'édition ou les zones sensibles
+            const privee = document.querySelectorAll('.zone-privee'); 
+            privee.forEach(el => el.style.display = 'none');
+            
+            console.log("Mode Invité : Accès restreint.");
+        });
+    }
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Le Catalogue</title>
