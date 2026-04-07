@@ -62,13 +62,19 @@
             <h1 id="nom-commun">...</h1>
             <div id="surnom-plante" class="surnom"></div>
 
-            <div id="meteo-container" class="meteo-bar">
-                <div style="flex:1;">
-                    <div id="meteo-city" style="font-size:0.8rem;">📍 Météo locale</div>
-                    <div id="meteo-text" class="meteo-conseil">Analyse du ciel...</div>
-                </div>
-                <div id="meteo-temp" class="meteo-temp">--°C</div>
-            </div>
+            <div id="meteo-container" class="meteo-bar" style="display:none; background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
+            <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
+        </div>
+        <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Analyse du ciel...</div>
+    </div>
+    
+    <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;">
+        </div>
+</div>
+
 
             <div class="grid-info">
                 <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
