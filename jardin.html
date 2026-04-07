@@ -1,95 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Ma Plante</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
-        #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-        .main-img-container { width: 100%; height: 45vh; overflow: hidden; position: relative; border-bottom: 2px solid #4ade80; }
-        #main-img { width: 100%; height: 100%; object-fit: cover; }
-        .content-padding { padding: 25px 20px; }
-        header { margin-bottom: 15px; }
-        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
-        .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
-        .meteo-bar { background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px; display: none; flex-direction: column; }
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; letter-spacing: 1px; display: block; margin-bottom: 4px; }
-        .value { font-size: 0.8rem; font-weight: 500; color: #ddd; }
-        details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
-        summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; list-style: none; outline: none; }
-        .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; white-space: pre-line; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
-        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
-        .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
-        .status-alert { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
-    </style>
-</head>
-<body>
-
-    <div id="status-msg">Synchronisation avec le jardin...</div>
-
-    <div id="plant-details">
-        <div class="main-img-container">
-            <img id="main-img" src="" alt="Plante">
-        </div>
-
-        <div class="content-padding">
-            <header><a href="catalogue.html" class="back-btn">← Retour au Jardin</a></header>
-
-            <h1 id="nom-commun">...</h1>
-            <div id="surnom-plante" class="surnom"></div>
-
-            <div id="meteo-container" class="meteo-bar">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
-                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
-                    </div>
-                    <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Chargement...</div>
-                </div>
-                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
-            </div>
-
-            <div class="grid-info">
-                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
-                <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
-                <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
-                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
-                <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
-                <div class="info-item"><span class="label">Taille maturité</span><span id="taille" class="value"></span></div>
-            </div>
-
-            <details><summary>✿ Informations Générales</summary><div class="details-content" id="info-gen"></div></details>
-            <details><summary>✂ Entretien & Taille</summary><div class="details-content" id="entretien"></div></details>
-            <details><summary>🛡 Protection & Santé</summary><div class="details-content" id="sante"></div></details>
-            <details><summary>🌿 Compagnonnage</summary><div class="details-content" id="compagnons"></div></details>
-
-            <div id="espace-proprietaire" style="display:none;">
-                <h2 style="color:#4ade80; font-size:0.9rem; margin-bottom:10px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
-                <div id="arrosage-badge" class="status-badge">Analyse...</div>
-                <div class="grid-info" style="margin-bottom:15px;">
-                    <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-- / --</span></div>
-                    <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --</span></div>
-                </div>
-                <span class="label">Notes de suivi</span>
-                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
-            </div>
-
-            <div id="msg-visiteur" style="text-align:center; opacity:0.3; font-size:0.65rem; margin-top:30px;">
-                Mode consultation publique — ÉONIA
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+    // 1. Charger la météo au démarrage
+    updateMeteo();
 
     async function updateMeteo() {
         if (!navigator.geolocation) return;
@@ -121,24 +34,60 @@
 
     async function load() {
         const params = new URLSearchParams(window.location.search);
-        // On cherche par ID (recommandé) ou par Plaque
         const plantId = params.get('id');
-        const plaqueNum = params.get('plaque'); 
+        const userEmail = localStorage.getItem('user_email'); // On récupère l'email stocké
         
         try {
-            const response = await fetch(API_URL);
+            // APPEL CORRIGÉ : On envoie l'email pour débloquer les infos "Propriétaire"
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail })
+            });
+
             const plants = await response.json();
-            
-            // On trouve la plante soit par son ID technique, soit par son numéro de plaque
-            const p = plants.find(item => item.id === plantId || item["ID_Plaque"] == plaqueNum);
+            const p = plants.find(item => item.id === plantId);
 
             if (!p) { 
                 document.getElementById('status-msg').innerText = "Plante introuvable."; 
                 return; 
             }
 
-            // Remplissage avec les données simplifiées du Worker
-            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Eonia";
+            // Affichage des éléments
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('plant-details').style.display = 'block';
+
+            document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x400";
+            document.getElementById('nom-commun').innerText = p["Nom commun"];
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
             document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "-";
-            document.getElementById
+            document.getElementById('famille').innerText = p["Famille"] || "-";
+            document.getElementById('exposition').innerText = p["Exposition"] || "-";
+            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
+            
+            // Remplissage des détails (Textes)
+            document.getElementById('info-gen').innerText = p["Type"]?.join(', ') || "Informations non renseignées.";
+            document.getElementById('entretien').innerText = p["Entretien"] || "Connectez-vous pour voir les conseils.";
+            document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée de santé.";
+            document.getElementById('compagnons').innerText = p["Sol et fertilisation"] || "Données non disponibles.";
+
+            // ESPACE PROPRIÉTAIRE : On affiche seulement si le Worker confirme qu'on possède la plante
+            if (p.estProprietaire) {
+                document.getElementById('espace-proprietaire').style.display = 'block';
+                document.getElementById('msg-visiteur').style.display = 'none';
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note pour le moment.";
+                
+                // Badge Arrosage (Petit bonus visuel)
+                const badge = document.getElementById('arrosage-badge');
+                badge.innerText = "À JOUR";
+                badge.className = "status-badge status-ok";
+            }
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('status-msg').innerText = "Erreur de synchronisation.";
+        }
+    }
+
+    load();
+</script>
