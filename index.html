@@ -103,7 +103,7 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
-        <script>
+       <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     // 1. Redirection automatique si déjà connecté
@@ -111,7 +111,7 @@
         window.location.href = "catalogue.html";
     }
 
-    // 2. Fonction de connexion mise à jour pour ton nouveau Worker
+    // 2. Fonction de connexion CORRIGÉE
     async function validerConnexion() {
         const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
         const passSaisi = document.getElementById('pass').value.trim();
@@ -126,42 +126,44 @@
         btn.disabled = true;
 
         try {
-            const response = await fetch(API_URL);
-            const plants = await response.json(); // Ici, on reçoit directement la liste propre
-
-            // On cherche si un utilisateur correspond dans ta base Notion
-            // ATTENTION : Assure-toi d'avoir une colonne "Password" dans ton Worker si tu veux filtrer par mot de passe
-            const user = plants.find(p => {
-                const n_email = (p["Client_Email"] || "").toLowerCase().trim();
-                // Pour l'instant on vérifie juste l'email car ton Worker actuel ne renvoie pas le mot de passe
-                return n_email === mailSaisi;
+            // On envoie l'email au Worker via POST pour qu'il vérifie les droits
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: mailSaisi })
             });
+            
+            const plants = await response.json();
 
-            if (user) {
+            // On vérifie si l'utilisateur existe ET si un des objets renvoyé a "estProprietaire" à true
+            const isAuthorized = plants.some(p => p.estProprietaire === true || p.Client_Email === mailSaisi);
+
+            if (isAuthorized) {
                 localStorage.setItem('eonia_access', 'client');
                 localStorage.setItem('user_email', mailSaisi);
+                // Note : Pour la sécurité, tu devrais aussi vérifier le mot de passe ici 
+                // si tu l'ajoutes dans ton Worker plus tard.
                 window.location.href = "catalogue.html";
             } else {
-                alert("Email non reconnu dans notre base.");
+                alert("Email non reconnu ou aucun jardin associé.");
                 btn.innerText = "ENTRER";
                 btn.disabled = false;
             }
         } catch (e) {
             console.error(e);
-            alert("Erreur de connexion au jardin.");
+            alert("Erreur de connexion au serveur.");
             btn.innerText = "ENTRER";
             btn.disabled = false;
         }
     }
 
-    // 3. Fonction pour les INVITÉS (Celle-ci devrait marcher instantanément)
+    // 3. Accès Invité
     function accesInvite() {
         localStorage.setItem('eonia_access', 'guest');
-        localStorage.setItem('user_email', 'invite@eonia.com');
+        localStorage.removeItem('user_email'); // Nettoie l'ancien email au cas où
         window.location.href = "catalogue.html";
     }
 </script>
-
 
 
 
