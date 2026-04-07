@@ -104,32 +104,55 @@
     </section>
 
         <script>
-    // 1. Redirection automatique si déjà connecté
-    if (localStorage.getItem('eonia_access')) {
-        window.location.href = "catalogue.html";
-    }
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // 2. Fonction pour les CLIENTS (Accès complet)
-    function validerConnexion() {
-        const mailSaisi = document.getElementById('email').value;
-        const passSaisi = document.getElementById('pass').value;
-        
-        if (mailSaisi.includes('@') && passSaisi.length > 0) {
-            localStorage.setItem('eonia_access', 'client'); // Statut Client
-            localStorage.setItem('user_email', mailSaisi);
-            window.location.href = "catalogue.html";
-        } else {
-            alert("Merci d'entrer votre mail et votre mot de passe.");
+    async function login() {
+        const email = document.getElementById('email').value.toLowerCase().trim();
+        const pass = document.getElementById('password').value.trim();
+        const btn = document.querySelector('button');
+        const msg = document.getElementById('login-msg'); // Ajoute un <p id="login-msg"></p> dans ton HTML pour les erreurs
+
+        if(!email || !pass) {
+            alert("Veuillez remplir tous les champs.");
+            return;
+        }
+
+        btn.innerText = "VÉRIFICATION...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // On cherche si un client a cet email ET ce mot de passe dans Notion
+            const user = data.results.find(p => {
+                const n_email = p.properties["Client_Email"]?.email || "";
+                const n_pass = p.properties["Password"]?.rich_text?.[0]?.plain_text || "";
+                return n_email.toLowerCase() === email && n_pass === pass;
+            });
+
+            if (user) {
+                // Succès : On stocke l'email et on redirige
+                localStorage.setItem('user_email', email);
+                window.location.href = "catalogue.html";
+            } else {
+                alert("Email ou mot de passe incorrect.");
+            }
+        } catch (e) {
+            alert("Erreur de connexion au serveur.");
+        } finally {
+            btn.innerText = "SE CONNECTER";
+            btn.disabled = false;
         }
     }
 
-    // 3. Fonction pour les INVITÉS (Accès limité)
-    function accesInvite() {
-        localStorage.setItem('eonia_access', 'guest'); // Statut Invité
-        localStorage.setItem('user_email', 'invite@eonia.com');
-        window.location.href = "catalogue.html";
+    function forgotPassword() {
+        // Solution simple : ouvre un mail pré-rempli vers toi
+        const emailContact = "ton-email@domaine.com"; // REMPLACE PAR TON MAIL
+        window.location.href = `mailto:${emailContact}?subject=Récupération de mot de passe ÉONIA&body=Bonjour, j'ai oublié mon mot de passe pour l'adresse : `;
     }
 </script>
+
 
 
 
