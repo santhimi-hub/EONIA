@@ -111,11 +111,11 @@
         window.location.href = "catalogue.html";
     }
 
-    // 2. Ta fonction de connexion mise à jour pour Notion
+    // 2. Fonction de connexion mise à jour pour ton nouveau Worker
     async function validerConnexion() {
         const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
         const passSaisi = document.getElementById('pass').value.trim();
-        const btn = document.querySelector('.btn-main'); // Cible ton bouton blanc
+        const btn = document.querySelector('.btn-main');
         
         if (!mailSaisi || !passSaisi) {
             alert("Merci d'entrer votre mail et votre mot de passe.");
@@ -127,17 +127,14 @@
 
         try {
             const response = await fetch(API_URL);
-            const data = await response.json();
+            const plants = await response.json(); // Ici, on reçoit directement la liste propre
 
-            // On vérifie dans ta base Notion
-            const user = data.results.find(p => {
-                const props = p.properties;
-                const n_email = props["Client_Email"]?.email || 
-                                props["Client_Email"]?.rich_text?.[0]?.plain_text || "";
-                const n_pass = props["Password"]?.rich_text?.[0]?.plain_text || 
-                               props["Password"]?.title?.[0]?.plain_text || "";
-                
-                return n_email.toLowerCase().trim() === mailSaisi && n_pass === passSaisi;
+            // On cherche si un utilisateur correspond dans ta base Notion
+            // ATTENTION : Assure-toi d'avoir une colonne "Password" dans ton Worker si tu veux filtrer par mot de passe
+            const user = plants.find(p => {
+                const n_email = (p["Client_Email"] || "").toLowerCase().trim();
+                // Pour l'instant on vérifie juste l'email car ton Worker actuel ne renvoie pas le mot de passe
+                return n_email === mailSaisi;
             });
 
             if (user) {
@@ -145,24 +142,26 @@
                 localStorage.setItem('user_email', mailSaisi);
                 window.location.href = "catalogue.html";
             } else {
-                alert("Email ou mot de passe incorrect.");
+                alert("Email non reconnu dans notre base.");
                 btn.innerText = "ENTRER";
                 btn.disabled = false;
             }
         } catch (e) {
+            console.error(e);
             alert("Erreur de connexion au jardin.");
             btn.innerText = "ENTRER";
             btn.disabled = false;
         }
     }
 
-    // 3. Fonction pour les INVITÉS
+    // 3. Fonction pour les INVITÉS (Celle-ci devrait marcher instantanément)
     function accesInvite() {
         localStorage.setItem('eonia_access', 'guest');
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
 </script>
+
 
 
 
