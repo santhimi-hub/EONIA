@@ -28,6 +28,10 @@
         #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
         .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
         .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
+        
+        /* Lien météo */
+        .meteo-link { color: #4ade80; text-decoration: none; font-size: 0.55rem; border: 1px solid #222; padding: 4px 8px; border-radius: 4px; transition: 0.3s; display: inline-block; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .meteo-link:hover { background: #4ade80; color: #000; }
     </style>
 </head>
 <body>
@@ -48,10 +52,13 @@
             <div id="meteo-container" class="meteo-bar">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <div>
-                        <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
-                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
+                        <div style="font-size: 0.55rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px; margin-bottom: 5px;">Météo Locale</div>
+                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200; line-height: 1.2;">--°C</div>
                     </div>
-                    <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Chargement...</div>
+                    <div style="text-align: right;">
+                        <div id="meteo-text" style="font-size: 0.75rem; color: #fff; font-weight: 500;">Chargement...</div>
+                        <div id="meteo-link-box"></div>
+                    </div>
                 </div>
                 <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
             </div>
@@ -89,50 +96,67 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
+    let plantData = null;
 
     window.onload = () => {
         load();
-        updateMeteo();
     };
 
-    async function updateMeteo() {
+    function getWeatherIcon(code) {
+        if (code === 0) return "☀️";
+        if (code >= 1 && code <= 3) return "⛅";
+        if (code >= 45 && code <= 48) return "🌫️";
+        if (code >= 51 && code <= 67) return "🌧️";
+        if (code >= 71 && code <= 77) return "❄️";
+        if (code >= 80 && code <= 82) return "🌦️";
+        if (code >= 95) return "⛈️";
+        return "☁️";
+    }
+
+    function getWeatherDesc(code) {
+        if (code === 0) return "Ciel dégagé";
+        if (code >= 1 && code <= 3) return "Partiellement nuageux";
+        if (code >= 51 && code <= 67) return "Pluie prévue";
+        if (code >= 80 && code <= 82) return "Averses";
+        if (code >= 95) return "Risque d'orage";
+        return "Nuageux";
+    }
+
+    async function updateMeteo(lat, lon) {
         const container = document.getElementById('meteo-container');
         if (!container) return;
 
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const lat = pos.coords.latitude.toFixed(2);
-                const lon = pos.coords.longitude.toFixed(2);
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
-                
-                const res = await fetch(url);
-                const d = await res.json();
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+            const res = await fetch(url);
+            const d = await res.json();
 
-                container.style.display = 'flex';
-                const temp = Math.round(d.current_weather.temperature);
-                document.getElementById('meteo-temp').innerText = temp + "°C";
-                
-                const txt = document.getElementById('meteo-text');
-                txt.innerText = temp > 25 ? "☀️ Chaleur : Pensez à arroser." : (temp < 5 ? "❄️ Attention au gel." : "Conditions idéales.");
+            container.style.display = 'flex';
+            const current = d.current_weather;
+            
+            document.getElementById('meteo-temp').innerText = Math.round(current.temperature) + "°C";
+            document.getElementById('meteo-text').innerText = getWeatherDesc(current.weathercode);
+            
+            // Lien prévisions
+            const meteoLink = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
+            document.getElementById('meteo-link-box').innerHTML = `<a href="${meteoLink}" target="_blank" class="meteo-link">Prévisions 7 jours →</a>`;
 
-                const forecast = document.getElementById('forecast-container');
-                forecast.innerHTML = "";
-                const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-                
-                for (let i = 1; i <= 3; i++) {
-                    const date = new Date(d.daily.time[i]);
-                    forecast.innerHTML += `
-                        <div style="text-align: center; flex: 1;">
-                            <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
-                            <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
-                        </div>`;
-                }
-            } catch (e) { 
-                console.warn("Météo : Erreur réseau"); 
+            // Forecast 3 jours
+            const forecast = document.getElementById('forecast-container');
+            forecast.innerHTML = "";
+            const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+            
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(d.daily.time[i]);
+                const icon = getWeatherIcon(d.daily.weathercode[i]);
+                forecast.innerHTML += `
+                    <div style="text-align: center; flex: 1;">
+                        <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
+                        <div style="font-size: 1rem; margin: 2px 0;">${icon}</div>
+                        <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
+                    </div>`;
             }
-        }, (err) => {
-            container.style.display = 'none';
-        }, { enableHighAccuracy: false, timeout: 5000 });
+        } catch (e) { console.warn("Météo indisponible"); }
     }
 
     async function load() {
@@ -151,7 +175,6 @@
             });
 
             const plants = await response.json();
-            // Recherche ultra-souple (ID avec ou sans tirets)
             const p = plants.find(item => item.id === plantId || item.id?.replace(/-/g, '') === plantId?.replace(/-/g, ''));
 
             if (!p) {
@@ -159,9 +182,11 @@
                 return;
             }
 
+            plantData = p;
             statusMsg.style.display = 'none';
             detailsCont.style.display = 'block';
 
+            // Remplissage data
             document.getElementById('main-img').src = p["Photo"] || "";
             document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Éonia";
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
@@ -169,26 +194,32 @@
             document.getElementById('famille').innerText = p["Famille"] || "-";
             document.getElementById('exposition').innerText = p["Exposition"] || "-";
             document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
-            
             if(document.getElementById('rusticite')) document.getElementById('rusticite').innerText = p["Rusticité"] || "-";
             if(document.getElementById('taille')) document.getElementById('taille').innerText = p["Taille maturité"] || "-";
-
-            document.getElementById('info-gen').innerText = (p["Type"] || []).join(', ') || "Informations générales.";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Aucun conseil particulier.";
+            document.getElementById('info-gen').innerText = (p["Type"] || []).join(', ') || "Information botanique.";
+            document.getElementById('entretien').innerText = p["Entretien"] || "Conseils standard.";
             document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée.";
-            document.getElementById('compagnons').innerText = p["Campagnonnage / Plantes associees"] || p["Sol et fertilisation"] || "-";
+            document.getElementById('compagnons').innerText = p["Campagnonnage / Plantes associees"] || "-";
 
             if (p.estProprietaire) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
                 document.getElementById('msg-visiteur').style.display = 'none';
                 document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Pas de notes.";
-                const badge = document.getElementById('arrosage-badge');
-                badge.innerText = "JARDIN ACTIF";
-                badge.className = "status-badge status-ok";
+                document.getElementById('arrosage-badge').className = "status-badge status-ok";
+                document.getElementById('arrosage-badge').innerText = "JARDIN ACTIF";
+            }
+
+            // LANCEMENT MÉTÉO (Priorité : Coordonnées fixes de la plante si elles existent, sinon GPS)
+            if (p.Latitude && p.Longitude) {
+                updateMeteo(p.Latitude, p.Longitude);
+            } else {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => updateMeteo(pos.coords.latitude, pos.coords.longitude),
+                    () => { document.getElementById('meteo-container').style.display = 'none'; }
+                );
             }
 
         } catch (error) {
-            console.error(error);
             statusMsg.innerText = "Erreur de chargement.";
         }
     }
