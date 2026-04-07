@@ -97,61 +97,51 @@
         updateMeteo();
     };
 
-    async function updateMeteo() {
-    const meteoCont = document.getElementById('meteo-container');
-    const meteoText = document.getElementById('meteo-text');
+  async function updateMeteo() {
+    const container = document.getElementById('meteo-container');
+    if (!container) return;
 
-    if (!navigator.geolocation) {
-        console.error("Géolocalisation non supportée par ce navigateur.");
-        return;
-    }
-
-    // Option highAccuracy pour forcer une réponse propre
     navigator.geolocation.getCurrentPosition(async (pos) => {
         try {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
+            // Appel direct en HTTPS avec arrondi des coordonnées pour la rapidité
+            const lat = pos.coords.latitude.toFixed(2);
+            const lon = pos.coords.longitude.toFixed(2);
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
             
-            // On s'assure du HTTPS ici
-            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
-            
-            if (!res.ok) throw new Error("Réponse API météo non valide");
-            
+            const res = await fetch(url);
             const d = await res.json();
+
+            // Affichage immédiat
+            container.style.display = 'flex';
+            const temp = Math.round(d.current_weather.temperature);
+            document.getElementById('meteo-temp').innerText = temp + "°C";
             
-            if (meteoCont) {
-                meteoCont.style.display = 'flex';
-                const tCurrent = Math.round(d.current_weather.temperature);
-                document.getElementById('meteo-temp').innerText = tCurrent + "°C";
-                
-                // Petit conseil contextuel
-                let conseil = "Conditions stables.";
-                if (tCurrent > 28) conseil = "⚠️ Chaleur : Arrosage conseillé.";
-                if (tCurrent < 4) conseil = "❄️ Risque de gel : Protégez-la.";
-                meteoText.innerText = conseil;
-                
-                // Prévisions
-                const forecastDiv = document.getElementById('forecast-container');
-                forecastDiv.innerHTML = "";
-                const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-                
-                for (let i = 1; i <= 3; i++) {
-                    const date = new Date(d.daily.time[i]);
-                    forecastDiv.innerHTML += `
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
-                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}° / ${Math.round(d.daily.temperature_2m_min[i])}°</div>
-                        </div>`;
-                }
+            // Texte conseil
+            const txt = document.getElementById('meteo-text');
+            txt.innerText = temp > 25 ? "☀️ Chaleur : Pensez à arroser." : (temp < 5 ? "❄️ Attention au gel." : "Conditions idéales.");
+
+            // Mini prévisions
+            const forecast = document.getElementById('forecast-container');
+            forecast.innerHTML = "";
+            const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+            
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(d.daily.time[i]);
+                forecast.innerHTML += `
+                    <div style="text-align: center; flex: 1;">
+                        <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
+                        <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
+                    </div>`;
             }
-        } catch(e) { 
-            console.error("Erreur API Météo:", e);
-            if(meteoText) meteoText.innerText = "Météo indisponible.";
+        } catch (e) { 
+            console.warn("Météo : Erreur réseau"); 
         }
     }, (err) => {
-        console.warn("Erreur Géolocalisation (" + err.code + "): " + err.message);
-        if(meteoText) meteoText.innerText = "Activez la localisation pour la météo.";
-    }, { timeout: 10000 }); // On attend max 10 secondes
+        // Si l'utilisateur refuse ou que ça bug, on cache proprement le bloc
+        container.style.display = 'none';
+        console.warn("Météo : Localisation refusée");
+    }, { enableHighAccuracy: false, timeout: 5000 }); // "HighAccuracy: false" rend l'appel 10x plus rapide
+}
 }
 
     async function load() {
