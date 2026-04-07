@@ -84,30 +84,39 @@
 
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    async function loadCatalogue() {
+   async function loadCatalogue() {
         const container = document.getElementById('catalogue-grid');
         const statusMsg = document.getElementById('status-msg');
+        
+        // On récupère l'email stocké lors de la connexion
+        const userEmail = localStorage.getItem('user_email');
 
         try {
-            const response = await fetch(API_URL);
-            const plants = await response.json(); // Le Worker envoie déjà la liste directe
+            // Changement ici : on fait un POST pour envoyer l'email au Worker
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail }) 
+            });
+
+            const plants = await response.json();
             
             container.innerHTML = "";
 
-            // On boucle sur les plantes simplifiées par le Worker
             plants.forEach(p => {
+                // IMPORTANT : On vérifie les noms exacts que ton Worker renvoie
                 const name = p["Nom commun"] || "Sans nom";
                 const surnom = p["Surnom de ma plante"] || "";
-                const plaqueNum = p["ID_Plaque"] || p["id"]; // On utilise l'ID si la plaque est vide
+                const plaqueNum = p["ID_Plaque"] || "00";
                 const image = p["Photo"] || "https://via.placeholder.com/400?text=EONIA";
 
                 const card = document.createElement('a');
-                // Redirection vers la fiche avec l'ID unique de la plante
+                // On passe l'ID à la page suivante (jardin.html)
                 card.href = `jardin.html?id=${p.id}`; 
                 card.className = "plant-card";
                 card.innerHTML = `
                     <div class="img-container">
-                        <img src="${image}" class="plant-img">
+                        <img src="${image}" class="plant-img" onerror="this.src='https://via.placeholder.com/400?text=Image+Indisponible'">
                         <div class="plaque-badge">#${plaqueNum}</div>
                     </div>
                     <div class="plant-info">
@@ -119,14 +128,15 @@
             });
 
             if (plants.length === 0) {
-                statusMsg.innerText = "Le catalogue est vide.";
+                statusMsg.innerText = "Aucune plante publiée n'a été trouvée.";
+                statusMsg.style.display = 'block';
             } else {
                 statusMsg.style.display = 'none';
             }
 
         } catch (error) {
             console.error("Erreur détaillée:", error);
-            statusMsg.innerText = "Erreur de connexion au jardin.";
+            statusMsg.innerText = "Erreur de chargement du catalogue.";
         }
     }
     
