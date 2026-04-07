@@ -62,7 +62,7 @@
 
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; /* VERT EONIA */ font-weight: 300; 
-                             text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
+                             text-transform: uppercase letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
         
     </style>
@@ -82,8 +82,9 @@
             </p>
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Créer votre mot de passe" id="pass">
-            <button class="btn-main" id="btn-login" onclick="validerConnexion()">ENTRER</button>
-            <a href="mailto:contact@eonia.com?subject=Mot de passe oublié" class="forgot-pass">Mot de passe oublié ?</a>
+            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
+            <a href="#"
+                class="forgot-pass">Mot de passe oublié ?</a>
         </div>
 
         <div class="bottom-nav">
@@ -102,66 +103,35 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
-<script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-
+        <script>
     // 1. Redirection automatique si déjà connecté
-    if (localStorage.getItem('user_email')) {
-        // window.location.href = "catalogue.html"; // Optionnel : à activer si tu veux sauter le login
+    if (localStorage.getItem('eonia_access')) {
+        window.location.href = "catalogue.html";
     }
 
-    // 2. Fonction pour les CLIENTS (Accès sécurisé via Notion)
-    async function validerConnexion() {
-        const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
-        const passSaisi = document.getElementById('pass').value.trim();
-        const btn = document.getElementById('btn-login');
+    // 2. Fonction pour les CLIENTS (Accès complet)
+    function validerConnexion() {
+        const mailSaisi = document.getElementById('email').value;
+        const passSaisi = document.getElementById('pass').value;
         
-        if (!mailSaisi || !passSaisi) {
+        if (mailSaisi.includes('@') && passSaisi.length > 0) {
+            localStorage.setItem('eonia_access', 'client'); // Statut Client
+            localStorage.setItem('user_email', mailSaisi);
+            window.location.href = "catalogue.html";
+        } else {
             alert("Merci d'entrer votre mail et votre mot de passe.");
-            return;
-        }
-
-        btn.innerText = "VÉRIFICATION...";
-        btn.disabled = true;
-
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-
-            // Recherche de l'utilisateur dans les propriétés Notion
-            const user = data.results.find(p => {
-                const props = p.properties;
-                const n_email = props["Client_Email"]?.email || 
-                                props["Client_Email"]?.rich_text?.[0]?.plain_text || "";
-                const n_pass = props["Password"]?.rich_text?.[0]?.plain_text || 
-                               props["Password"]?.title?.[0]?.plain_text || "";
-                
-                return n_email.toLowerCase().trim() === mailSaisi && n_pass === passSaisi;
-            });
-
-            if (user) {
-                localStorage.setItem('eonia_access', 'client');
-                localStorage.setItem('user_email', mailSaisi);
-                window.location.href = "catalogue.html";
-            } else {
-                alert("Email ou mot de passe incorrect.");
-                btn.innerText = "ENTRER";
-                btn.disabled = false;
-            }
-        } catch (e) {
-            alert("Erreur de connexion au jardin.");
-            btn.innerText = "ENTRER";
-            btn.disabled = false;
         }
     }
 
-    // 3. Fonction pour les INVITÉS
+    // 3. Fonction pour les INVITÉS (Accès limité)
     function accesInvite() {
-        localStorage.setItem('eonia_access', 'guest');
+        localStorage.setItem('eonia_access', 'guest'); // Statut Invité
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
 </script>
+
+
 
 </body>
 </html>
