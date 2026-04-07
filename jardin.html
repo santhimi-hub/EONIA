@@ -231,35 +231,158 @@
 
                 const freq = p["Frequence_Arrosage"]?.number;
                 const badge = document.getElementById('arrosage-badge');
+<script>
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-                if (freq && lastWater) {
-                    const dateL = new Date(lastWater);
-                    const diff = Math.floor((new Date() - dateL) / (1000 * 60 * 60 * 24));
-                    if (diff >= freq) {
-                        badge.innerText = "🚨 Soif ! Arrosage en retard";
-                        badge.className = "status-badge status-alert";
-                    } else {
-                        badge.innerText = "💧 Hydratation OK";
-                        badge.className = "status-badge status-ok";
-                    }
+// --- FONCTION MÉTÉO SÉCURISÉE ---
+async function updateMeteo() {
+    const container = document.getElementById('meteo-container');
+    const meteoText = document.getElementById('meteo-text');
+    const forecastDiv = document.getElementById('forecast-container');
+
+    if (!navigator.geolocation) {
+        if(meteoText) meteoText.innerText = "GPS non supporté";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            
+            // On force l'affichage du bloc dès qu'on a la position
+            container.style.display = 'flex';
+            meteoText.innerText = "Récupération...";
+
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+            const d = await res.json();
+
+            if (!d.current_weather) throw new Error("Données vides");
+
+            // 1. Température Actuelle
+            const tCurrent = Math.round(d.current_weather.temperature);
+            document.getElementById('meteo-temp').innerText = tCurrent + "°C";
+            
+            let msg = "Ciel stable.";
+            if (tCurrent > 28) msg = "⚠️ Chaleur intense.";
+            if (tCurrent < 4) msg = "❄️ Risque de gel.";
+            meteoText.innerText = msg;
+
+            // 2. Prévisions sur 3 jours
+            forecastDiv.innerHTML = ""; 
+            const joursNom = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+            
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(d.daily.time[i]);
+                const jourNom = joursNom[date.getDay()];
+                const max = Math.round(d.daily.temperature_2m_max[i]);
+                const min = Math.round(d.daily.temperature_2m_min[i]);
+                
+                forecastDiv.innerHTML += `
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jourNom}</div>
+                        <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${max}° / ${min}°</div>
+                    </div>
+                `;
+            }
+        } catch(e) { 
+            meteoText.innerText = "Erreur météo";
+            console.error("Détail erreur:", e);
+        }
+    }, (err) => {
+        meteoText.innerText = "Position refusée";
+    }, { timeout: 10000 }); // On attend max 10 sec le GPS
+}
+
+async function load() {
+    const params = new URLSearchParams(window.location.search);
+    const plaqueNum = params.get('plaque'); 
+    
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        const page = data.results.find(p => {
+            const prop = p.properties["ID_Plaque"];
+            const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
+            return val.toString().trim() === plaqueNum?.toString().trim();
+        });
+
+        if (!page) { 
+            document.getElementById('status-msg').innerText = "Plante #" + plaqueNum + " introuvable."; 
+            return; 
+        }
+
+        const p = page.properties;
+        const read = (name) => {
+            const f = p[name];
+            if (!f) return "";
+            if (f.title?.length > 0) return f.title[0].plain_text;
+            if (f.rich_text?.length > 0) return f.rich_text.map(t => t.plain_text).join("");
+            if (f.select) return f.select.name;
+            if (f.date) return f.date.start || "";
+            if (f.number !== undefined) return f.number;
+            if (f.email) return f.email || "";
+            return "";
+        };
+
+        // Remplissage Public
+        document.getElementById('nom-commun').innerText = read("Nom commun") || "Plante Eonia";
+        document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
+        document.getElementById('id-plaque').innerText = plaqueNum;
+        document.getElementById('famille').innerText = read("Famille");
+        document.getElementById('exposition').innerText = read("Exposition");
+        document.getElementById('rusticite').innerText = read("Rusticite");
+        document.getElementById('arrosage').innerText = read("Arrosage");
+        document.getElementById('taille').innerText = read("Taille à maturite");
+        document.getElementById('info-gen').innerText = read("Informations generales");
+        document.getElementById('entretien').innerText = read("Entretien");
+        document.getElementById('sante').innerText = read("Protection et sante");
+        document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées");
+
+        const img = p["Photo"]?.files?.[0];
+        if(img) document.getElementById('main-img').src = img.file?.url || img.external?.url || "";
+
+        // Propriétaire
+        const userEmail = localStorage.getItem('user_email');
+        const ownerEmail = read("Client_Email");
+
+        if (userEmail && ownerEmail && userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
+            document.getElementById('espace-proprietaire').style.display = 'block';
+            if(document.getElementById('msg-visiteur')) document.getElementById('msg-visiteur').style.display = 'none';
+            document.getElementById('notes-suivi').innerText = read("Notes_Suivi");
+            document.getElementById('date-plant').innerText = read("Date_Plantation");
+            const lastWater = read("Dernier_Arrosage");
+            document.getElementById('last-water').innerText = lastWater || "Jamais";
+
+            const freq = p["Frequence_Arrosage"]?.number;
+            const badge = document.getElementById('arrosage-badge');
+            if (freq && lastWater) {
+                const dateL = new Date(lastWater);
+                const diff = Math.floor((new Date() - dateL) / (1000 * 60 * 60 * 24));
+                if (diff >= freq) {
+                    badge.innerText = "🚨 Soif ! Arrosage en retard";
+                    badge.className = "status-badge status-alert";
                 } else {
-                    badge.innerText = "Définissez votre fréquence d'arrosage";
-                    badge.className = "status-badge";
+                    badge.innerText = "💧 Hydratation OK";
+                    badge.className = "status-badge status-ok";
                 }
             }
-
-            document.getElementById('status-msg').style.display = 'none';
-            document.getElementById('plant-details').style.display = 'block';
-            
-            // On lance la météo à la fin
-            updateMeteo();
-
-        } catch (e) { 
-            console.error(e);
-            document.getElementById('status-msg').innerText = "Erreur de chargement."; 
         }
+
+        document.getElementById('status-msg').style.display = 'none';
+        document.getElementById('plant-details').style.display = 'block';
+        
+        // On lance la météo à la toute fin
+        updateMeteo();
+
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('status-msg').innerText = "Erreur de chargement."; 
     }
-    load();
-    </script>
+}
+load();
+</script>
+
 </body>
 </html>
