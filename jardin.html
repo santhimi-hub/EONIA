@@ -98,41 +98,61 @@
     };
 
     async function updateMeteo() {
-        if (!navigator.geolocation) {
-            console.log("Géolocalisation non supportée");
-            return;
-        }
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
-                const d = await res.json();
-                
-                const meteoCont = document.getElementById('meteo-container');
-                if (meteoCont) {
-                    meteoCont.style.display = 'flex';
-                    const tCurrent = Math.round(d.current_weather.temperature);
-                    document.getElementById('meteo-temp').innerText = tCurrent + "°C";
-                    document.getElementById('meteo-text').innerText = tCurrent > 28 ? "⚠️ Chaleur intense." : (tCurrent < 4 ? "❄️ Risque de gel." : "Conditions stables.");
-                    
-                    const forecastDiv = document.getElementById('forecast-container');
-                    forecastDiv.innerHTML = "";
-                    const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-                    for (let i = 1; i <= 3; i++) {
-                        const date = new Date(d.daily.time[i]);
-                        forecastDiv.innerHTML += `
-                            <div style="text-align: center;">
-                                <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
-                                <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
-                            </div>`;
-                    }
-                }
-            } catch(e) { console.warn("Erreur météo API"); }
-        }, (err) => {
-            console.log("L'utilisateur a refusé la géolocalisation");
-        });
+    const meteoCont = document.getElementById('meteo-container');
+    const meteoText = document.getElementById('meteo-text');
+
+    if (!navigator.geolocation) {
+        console.error("Géolocalisation non supportée par ce navigateur.");
+        return;
     }
+
+    // Option highAccuracy pour forcer une réponse propre
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            
+            // On s'assure du HTTPS ici
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+            
+            if (!res.ok) throw new Error("Réponse API météo non valide");
+            
+            const d = await res.json();
+            
+            if (meteoCont) {
+                meteoCont.style.display = 'flex';
+                const tCurrent = Math.round(d.current_weather.temperature);
+                document.getElementById('meteo-temp').innerText = tCurrent + "°C";
+                
+                // Petit conseil contextuel
+                let conseil = "Conditions stables.";
+                if (tCurrent > 28) conseil = "⚠️ Chaleur : Arrosage conseillé.";
+                if (tCurrent < 4) conseil = "❄️ Risque de gel : Protégez-la.";
+                meteoText.innerText = conseil;
+                
+                // Prévisions
+                const forecastDiv = document.getElementById('forecast-container');
+                forecastDiv.innerHTML = "";
+                const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                
+                for (let i = 1; i <= 3; i++) {
+                    const date = new Date(d.daily.time[i]);
+                    forecastDiv.innerHTML += `
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
+                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}° / ${Math.round(d.daily.temperature_2m_min[i])}°</div>
+                        </div>`;
+                }
+            }
+        } catch(e) { 
+            console.error("Erreur API Météo:", e);
+            if(meteoText) meteoText.innerText = "Météo indisponible.";
+        }
+    }, (err) => {
+        console.warn("Erreur Géolocalisation (" + err.code + "): " + err.message);
+        if(meteoText) meteoText.innerText = "Activez la localisation pour la météo.";
+    }, { timeout: 10000 }); // On attend max 10 secondes
+}
 
     async function load() {
         const statusMsg = document.getElementById('status-msg');
