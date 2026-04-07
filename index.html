@@ -18,13 +18,11 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            /* Vérifie que ton image s'appelle bien background.jpg sur GitHub */
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat;
         }
 
         .logo-main { width: 120px; margin-bottom: 25px; }
 
-        /* TON TITRE CORRIGÉ : GRAND ET FIN */
         .brand-title {
             font-family: 'Raleway', sans-serif;
             font-size: 4rem;
@@ -36,7 +34,6 @@
             line-height: 1;
         }
 
-        /* TA PHRASE CORRIGÉE : PETITE ET LISIBLE */
         .tagline {
             font-family: 'Raleway', sans-serif;
             font-style: italic;
@@ -45,26 +42,41 @@
             text-transform: none;
             letter-spacing: 1px;
             color: #ffffff;
-            margin-top: 35px; /* L'espacement que tu voulais */
+            margin-top: 35px;
             margin-bottom: 45px;
         }
 
         /* STYLES FORMULAIRE */
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
-        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; }
-        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase;
-                   letter-spacing: 2px; }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; }
+        
+        .btn-main { 
+            width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; 
+            cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s; /* Pour que l'effet de survol soit fluide */
+        }
 
-        .forgot-pass {font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
+        /* EFFET DE SURVOL DU BOUTON */
+        .btn-main:hover {
+            background: #4ade80; /* Devient vert au survol */
+            color: #000;
+        }
+
+        .forgot-pass { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
-        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; }
-        .bottom-nav a:hover {border-bottom: 1px solid #4ade80; }
+        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
+        .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
 
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
-        .content-section h2 { color: #4ade80; /* VERT EONIA */ font-weight: 300; 
-                             text-transform: uppercase letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
+        .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
-        
+
+        /* ADAPTATION MOBILE (Écrans de moins de 600px) */
+        @media (max-width: 600px) {
+            .brand-title { font-size: 2.5rem; }
+            .hero { padding: 20px; }
+            .tagline { font-size: 0.8rem; margin-top: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -81,15 +93,13 @@
                 Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
             </p>
             <input type="email" placeholder="Votre Email" id="email">
-            <input type="password" placeholder="Créer votre mot de passe" id="pass">
+            <input type="password" placeholder="Votre mot de passe" id="pass">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
-            <a href="#"
-                class="forgot-pass">Mot de passe oublié ?</a>
+            <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
         </div>
 
         <div class="bottom-nav">
             <a href="#" onclick="accesInvite()">Visiter en tant qu'invité</a>
-
             <span>|</span>
             <a href="#concept">Notre Concept</a>
         </div>
@@ -103,7 +113,7 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
-       <script>
+<script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     // 1. Redirection automatique si déjà connecté
@@ -111,7 +121,7 @@
         window.location.href = "catalogue.html";
     }
 
-    // 2. Fonction de connexion CORRIGÉE
+    // 2. Fonction de connexion
     async function validerConnexion() {
         const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
         const passSaisi = document.getElementById('pass').value.trim();
@@ -126,7 +136,6 @@
         btn.disabled = true;
 
         try {
-            // On envoie l'email au Worker via POST pour qu'il vérifie les droits
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -134,15 +143,11 @@
             });
             
             const plants = await response.json();
-
-            // On vérifie si l'utilisateur existe ET si un des objets renvoyé a "estProprietaire" à true
             const isAuthorized = plants.some(p => p.estProprietaire === true || p.Client_Email === mailSaisi);
 
             if (isAuthorized) {
                 localStorage.setItem('eonia_access', 'client');
                 localStorage.setItem('user_email', mailSaisi);
-                // Note : Pour la sécurité, tu devrais aussi vérifier le mot de passe ici 
-                // si tu l'ajoutes dans ton Worker plus tard.
                 window.location.href = "catalogue.html";
             } else {
                 alert("Email non reconnu ou aucun jardin associé.");
@@ -160,13 +165,10 @@
     // 3. Accès Invité
     function accesInvite() {
         localStorage.setItem('eonia_access', 'guest');
-        localStorage.removeItem('user_email'); // Nettoie l'ancien email au cas où
+        localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
 </script>
-
-
-
 
 </body>
 </html>
