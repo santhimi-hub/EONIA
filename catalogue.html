@@ -76,7 +76,7 @@
     <button class="logout-btn" onclick="logout()">Quitter le jardin</button>
 
     <script>
-    // 1. Garde-barrière : Personne n'entre sans au moins un statut
+    // 1. Garde-barrière
     const accessStatus = localStorage.getItem('eonia_access');
     if (!accessStatus) {
         window.location.href = "index.html";
@@ -90,40 +90,43 @@
 
         try {
             const response = await fetch(API_URL);
-            const data = await response.json();
+            const plants = await response.json(); // Le Worker envoie déjà la liste directe
+            
             container.innerHTML = "";
 
-            data.results.forEach(page => {
-                const p = page.properties;
-                const name = p["Nom commun"]?.title?.[0]?.plain_text || "Sans nom";
-                const surnom = p["Surnom de ma plante"]?.rich_text?.[0]?.plain_text || "";
-                const plaqueNum = p["ID_Plaque"]?.rich_text?.[0]?.plain_text || 
-                                 p["ID_Plaque"]?.title?.[0]?.plain_text || "";
-                
-                const imgCol = p["Photo"]?.files?.[0];
-                const image = imgCol?.file?.url || imgCol?.external?.url || "https://via.placeholder.com/400?text=EONIA";
+            // On boucle sur les plantes simplifiées par le Worker
+            plants.forEach(p => {
+                const name = p["Nom commun"] || "Sans nom";
+                const surnom = p["Surnom de ma plante"] || "";
+                const plaqueNum = p["ID_Plaque"] || p["id"]; // On utilise l'ID si la plaque est vide
+                const image = p["Photo"] || "https://via.placeholder.com/400?text=EONIA";
 
-                if (name !== "Sans nom") {
-                    const card = document.createElement('a');
-                    // On envoie vers la fiche avec le numéro de plaque
-                    card.href = `jardin.html?plaque=${plaqueNum}`;
-                    card.className = "plant-card";
-                    card.innerHTML = `
-                        <div class="img-container">
-                            <img src="${image}" class="plant-img">
-                            <div class="plaque-badge">#${plaqueNum}</div>
-                        </div>
-                        <div class="plant-info">
-                            <div class="plant-name">${name}</div>
-                            <div class="plant-surnom">${surnom}</div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
+                const card = document.createElement('a');
+                // Redirection vers la fiche avec l'ID unique de la plante
+                card.href = `jardin.html?id=${p.id}`; 
+                card.className = "plant-card";
+                card.innerHTML = `
+                    <div class="img-container">
+                        <img src="${image}" class="plant-img">
+                        <div class="plaque-badge">#${plaqueNum}</div>
+                    </div>
+                    <div class="plant-info">
+                        <div class="plant-name">${name}</div>
+                        <div class="plant-surnom">${surnom}</div>
+                    </div>
+                `;
+                container.appendChild(card);
             });
-            statusMsg.style.display = 'none';
+
+            if (plants.length === 0) {
+                statusMsg.innerText = "Le catalogue est vide.";
+            } else {
+                statusMsg.style.display = 'none';
+            }
+
         } catch (error) {
-            statusMsg.innerText = "Erreur de chargement du catalogue.";
+            console.error("Erreur détaillée:", error);
+            statusMsg.innerText = "Erreur de connexion au jardin.";
         }
     }
     
@@ -134,6 +137,7 @@
 
     loadCatalogue();
 </script>
+
 
 </body>
 </html>
