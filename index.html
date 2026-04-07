@@ -104,32 +104,66 @@
     </section>
 
         <script>
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+
     // 1. Redirection automatique si déjà connecté
-    if (localStorage.getItem('eonia_access')) {
+    if (localStorage.getItem('user_email') && localStorage.getItem('eonia_access') === 'client') {
         window.location.href = "catalogue.html";
     }
 
-    // 2. Fonction pour les CLIENTS (Accès complet)
-    function validerConnexion() {
-        const mailSaisi = document.getElementById('email').value;
-        const passSaisi = document.getElementById('pass').value;
+    // 2. Ta fonction de connexion mise à jour pour Notion
+    async function validerConnexion() {
+        const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
+        const passSaisi = document.getElementById('pass').value.trim();
+        const btn = document.querySelector('.btn-main'); // Cible ton bouton blanc
         
-        if (mailSaisi.includes('@') && passSaisi.length > 0) {
-            localStorage.setItem('eonia_access', 'client'); // Statut Client
-            localStorage.setItem('user_email', mailSaisi);
-            window.location.href = "catalogue.html";
-        } else {
+        if (!mailSaisi || !passSaisi) {
             alert("Merci d'entrer votre mail et votre mot de passe.");
+            return;
+        }
+
+        btn.innerText = "VÉRIFICATION...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // On vérifie dans ta base Notion
+            const user = data.results.find(p => {
+                const props = p.properties;
+                const n_email = props["Client_Email"]?.email || 
+                                props["Client_Email"]?.rich_text?.[0]?.plain_text || "";
+                const n_pass = props["Password"]?.rich_text?.[0]?.plain_text || 
+                               props["Password"]?.title?.[0]?.plain_text || "";
+                
+                return n_email.toLowerCase().trim() === mailSaisi && n_pass === passSaisi;
+            });
+
+            if (user) {
+                localStorage.setItem('eonia_access', 'client');
+                localStorage.setItem('user_email', mailSaisi);
+                window.location.href = "catalogue.html";
+            } else {
+                alert("Email ou mot de passe incorrect.");
+                btn.innerText = "ENTRER";
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert("Erreur de connexion au jardin.");
+            btn.innerText = "ENTRER";
+            btn.disabled = false;
         }
     }
 
-    // 3. Fonction pour les INVITÉS (Accès limité)
+    // 3. Fonction pour les INVITÉS
     function accesInvite() {
-        localStorage.setItem('eonia_access', 'guest'); // Statut Invité
+        localStorage.setItem('eonia_access', 'guest');
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
 </script>
+
 
 
 
