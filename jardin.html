@@ -91,44 +91,58 @@
    <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // 1. Charger la météo au démarrage
-    updateMeteo();
+    // On lance tout au chargement
+    window.onload = () => {
+        load();
+        updateMeteo();
+    };
 
     async function updateMeteo() {
-        if (!navigator.geolocation) return;
+        if (!navigator.geolocation) {
+            console.log("Géolocalisation non supportée");
+            return;
+        }
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
                 const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
                 const d = await res.json();
-                document.getElementById('meteo-container').style.display = 'flex';
-                const tCurrent = Math.round(d.current_weather.temperature);
-                document.getElementById('meteo-temp').innerText = tCurrent + "°C";
-                document.getElementById('meteo-text').innerText = tCurrent > 28 ? "⚠️ Chaleur intense." : (tCurrent < 4 ? "❄️ Risque de gel." : "Conditions stables.");
-
-                const forecastDiv = document.getElementById('forecast-container');
-                forecastDiv.innerHTML = "";
-                const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-                for (let i = 1; i <= 3; i++) {
-                    const date = new Date(d.daily.time[i]);
-                    forecastDiv.innerHTML += `
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
-                            <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}° / ${Math.round(d.daily.temperature_2m_min[i])}°</div>
-                        </div>`;
+                
+                const meteoCont = document.getElementById('meteo-container');
+                if (meteoCont) {
+                    meteoCont.style.display = 'flex';
+                    const tCurrent = Math.round(d.current_weather.temperature);
+                    document.getElementById('meteo-temp').innerText = tCurrent + "°C";
+                    document.getElementById('meteo-text').innerText = tCurrent > 28 ? "⚠️ Chaleur intense." : (tCurrent < 4 ? "❄️ Risque de gel." : "Conditions stables.");
+                    
+                    const forecastDiv = document.getElementById('forecast-container');
+                    forecastDiv.innerHTML = "";
+                    const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                    for (let i = 1; i <= 3; i++) {
+                        const date = new Date(d.daily.time[i]);
+                        forecastDiv.innerHTML += `
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jours[date.getDay()]}</div>
+                                <div style="font-size: 0.75rem; color: #ddd; margin-top: 5px;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
+                            </div>`;
+                    }
                 }
-            } catch(e) { console.warn("Erreur météo"); }
+            } catch(e) { console.warn("Erreur météo API"); }
+        }, (err) => {
+            console.log("L'utilisateur a refusé la géolocalisation");
         });
     }
 
     async function load() {
-        const params = new URLSearchParams(window.location.search);
-        const plantId = params.get('id');
-        const userEmail = localStorage.getItem('user_email'); // On récupère l'email stocké
+        const statusMsg = document.getElementById('status-msg');
+        const detailsCont = document.getElementById('plant-details');
         
         try {
-            // APPEL CORRIGÉ : On envoie l'email pour débloquer les infos "Propriétaire"
+            const params = new URLSearchParams(window.location.search);
+            const plantId = params.get('id');
+            const userEmail = localStorage.getItem('user_email') || "invite@eonia.com"; // Email par défaut
+
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -138,46 +152,45 @@
             const plants = await response.json();
             const p = plants.find(item => item.id === plantId);
 
-            if (!p) { 
-                document.getElementById('status-msg').innerText = "Plante introuvable."; 
-                return; 
+            if (!p) {
+                statusMsg.innerText = "Plante introuvable.";
+                return;
             }
 
-            // Affichage des éléments
-            document.getElementById('status-msg').style.display = 'none';
-            document.getElementById('plant-details').style.display = 'block';
+            statusMsg.style.display = 'none';
+            detailsCont.style.display = 'block';
 
-            document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x400";
-            document.getElementById('nom-commun').innerText = p["Nom commun"];
+            // --- REMPLISSAGE DES CHAMPS (Vérifie bien les majuscules !) ---
+            document.getElementById('main-img').src = p["Photo"] || "";
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Éonia";
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
             document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "-";
             document.getElementById('famille').innerText = p["Famille"] || "-";
             document.getElementById('exposition').innerText = p["Exposition"] || "-";
             document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
             
-            // Remplissage des détails (Textes)
-            document.getElementById('info-gen').innerText = p["Type"]?.join(', ') || "Informations non renseignées.";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Connectez-vous pour voir les conseils.";
-            document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée de santé.";
-            document.getElementById('compagnons').innerText = p["Sol et fertilisation"] || "Données non disponibles.";
+            // Si tu as ajouté ces colonnes dans Notion, assure-toi qu'elles sont dans le Worker !
+            if(document.getElementById('rusticite')) document.getElementById('rusticite').innerText = p["Rusticité"] || "-";
+            if(document.getElementById('taille')) document.getElementById('taille').innerText = p["Taille maturité"] || "-";
 
-            // ESPACE PROPRIÉTAIRE : On affiche seulement si le Worker confirme qu'on possède la plante
+            // CONTENU DES ONGLETS
+            document.getElementById('info-gen').innerText = (p["Type"] || []).join(', ') || "Informations générales.";
+            document.getElementById('entretien').innerText = p["Entretien"] || "Aucun conseil particulier.";
+            document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée.";
+            document.getElementById('compagnons').innerText = p["Campagnonnage / Plantes associees"] || p["Sol et fertilisation"] || "-";
+
+            // ESPACE PROPRIÉTAIRE
+            const zonePrivate = document.getElementById('espace-proprietaire');
             if (p.estProprietaire) {
-                document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('msg-visiteur').style.display = 'none';
-                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note pour le moment.";
-                
-                // Badge Arrosage (Petit bonus visuel)
+                zonePrivate.style.display = 'block';
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Pas de notes.";
                 const badge = document.getElementById('arrosage-badge');
-                badge.innerText = "À JOUR";
+                badge.innerText = "JARDIN ACTIF";
                 badge.className = "status-badge status-ok";
             }
 
         } catch (error) {
-            console.error(error);
-            document.getElementById('status-msg').innerText = "Erreur de synchronisation.";
+            statusMsg.innerText = "Erreur de chargement.";
         }
     }
-
-    load();
 </script>
