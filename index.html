@@ -3,157 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Accueil</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-
+    <title>ÉONIA — Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
-        /* RESET ET BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; } 
-        body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
-
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            /* Vérifie que ton image s'appelle bien background.jpg sur GitHub */
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat;
-        }
-
-        .logo-main { width: 120px; margin-bottom: 25px; }
-
-        /* TON TITRE CORRIGÉ : GRAND ET FIN */
-        .brand-title {
-            font-family: 'Raleway', sans-serif;
-            font-size: 4rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: #ffffff;
-            margin: 0;
-            line-height: 1;
-        }
-
-        /* TA PHRASE CORRIGÉE : PETITE ET LISIBLE */
-        .tagline {
-            font-family: 'Raleway', sans-serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 0.9rem;
-            text-transform: none;
-            letter-spacing: 1px;
-            color: #ffffff;
-            margin-top: 35px; /* L'espacement que tu voulais */
-            margin-bottom: 45px;
-        }
-
-        /* STYLES FORMULAIRE */
-        .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
-        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; }
-        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase;
-                   letter-spacing: 2px; }
-
-        .forgot-pass {font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
-        .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
-        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; }
-        .bottom-nav a:hover {border-bottom: 1px solid #4ade80; }
-
-        .content-section { padding: 100px 30px; text-align: center; background: #050505; }
-        .content-section h2 { color: #4ade80; /* VERT EONIA */ font-weight: 300; 
-                             text-transform: uppercase letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
-        .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-card { background: #111; padding: 40px; border-radius: 20px; border: 1px solid #222; width: 100%; max-width: 400px; text-align: center; }
+        h1 { font-weight: 200; letter-spacing: 5px; color: #4ade80; margin-bottom: 30px; font-size: 1.5rem; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; outline: none; }
+        input:focus { border-color: #4ade80; }
+        button { width: 100%; padding: 15px; background: #4ade80; color: #000; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #status-msg { margin-top: 15px; font-size: 0.8rem; min-height: 1.2rem; }
+        .error { color: #ef4444; }
+        .success { color: #4ade80; }
+        .links { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        a { color: #666; text-decoration: none; font-size: 0.75rem; transition: 0.3s; }
+        a:hover { color: #4ade80; }
     </style>
 </head>
 <body>
 
-    <div class="hero">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
+    <div class="login-card">
+        <h1>ÉONIA</h1>
+        <input type="email" id="email-input" placeholder="Email" autocomplete="email">
+        <input type="password" id="pass-input" placeholder="Mot de passe">
         
-        <h1 class="brand-title">ÉONIA</h1>
+        <button id="login-btn" onclick="handleLogin()">SE CONNECTER</button>
         
-        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+        <div id="status-msg"></div>
 
-        <div class="auth-container">
-            <p id="welcome-msg" style="font-size: 0.8rem; color: #4ade80; margin-bottom: 10px; display: none;">
-                Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
-            </p>
-            <input type="email" placeholder="Votre Email" id="email">
-            <input type="password" placeholder="Créer votre mot de passe" id="pass">
-            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
-            <a href="#" onclick="forgotPassword()" style="color:#4ade80; font-size:0.8rem;">Mot de passe oublié ?</a>
-        </div>
-
-        <div class="bottom-nav">
-            <a href="#" onclick="accesInvite()">Visiter en tant qu'invité</a>
-
-            <span>|</span>
-            <a href="#concept">Notre Concept</a>
+        <div class="links">
+            <a href="#" onclick="handleForgotPassword()">Mot de passe oublié ?</a>
         </div>
     </div>
 
-    <section class="content-section" id="concept">
-        <h2>Notre Concept</h2>
-        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre. Scanner, Cultiver, Admirer.</p>
-        <div style="height: 80px;"></div>
-        <h2>L'âme d'ÉONIA</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
-    </section>
-
-        <script>
+    <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    async function login() {
-        const email = document.getElementById('email').value.toLowerCase().trim();
-        const pass = document.getElementById('password').value.trim();
-        const btn = document.querySelector('button');
-        const msg = document.getElementById('login-msg'); // Ajoute un <p id="login-msg"></p> dans ton HTML pour les erreurs
+    async function handleLogin() {
+        const email = document.getElementById('email-input').value.toLowerCase().trim();
+        const pass = document.getElementById('pass-input').value.trim();
+        const btn = document.getElementById('login-btn');
+        const status = document.getElementById('status-msg');
 
-        if(!email || !pass) {
-            alert("Veuillez remplir tous les champs.");
+        if (!email || !pass) {
+            status.innerHTML = '<span class="error">Veuillez remplir tous les champs.</span>';
             return;
         }
 
-        btn.innerText = "VÉRIFICATION...";
         btn.disabled = true;
+        btn.innerText = "VÉRIFICATION...";
+        status.innerText = "";
 
         try {
             const response = await fetch(API_URL);
             const data = await response.json();
 
-            // On cherche si un client a cet email ET ce mot de passe dans Notion
+            // On cherche le client dans la base Notion
             const user = data.results.find(p => {
-                const n_email = p.properties["Client_Email"]?.email || "";
-                const n_pass = p.properties["Password"]?.rich_text?.[0]?.plain_text || "";
-                return n_email.toLowerCase() === email && n_pass === pass;
+                const props = p.properties;
+                // On récupère l'email et le password avec sécurité
+                const n_email = props["Client_Email"]?.email || "";
+                const n_pass = props["Password"]?.rich_text?.[0]?.plain_text || 
+                               props["Password"]?.title?.[0]?.plain_text || "";
+                
+                return n_email.toLowerCase().trim() === email && n_pass === pass;
             });
 
             if (user) {
-                // Succès : On stocke l'email et on redirige
+                status.innerHTML = '<span class="success">Connexion réussie ! Redirection...</span>';
                 localStorage.setItem('user_email', email);
-                window.location.href = "catalogue.html";
+                setTimeout(() => {
+                    window.location.href = "catalogue.html";
+                }, 1000);
             } else {
-                alert("Email ou mot de passe incorrect.");
+                status.innerHTML = '<span class="error">Email ou mot de passe incorrect.</span>';
+                btn.disabled = false;
+                btn.innerText = "SE CONNECTER";
             }
+
         } catch (e) {
-            alert("Erreur de connexion au serveur.");
-        } finally {
-            btn.innerText = "SE CONNECTER";
+            console.error(e);
+            status.innerHTML = '<span class="error">Erreur de connexion au serveur.</span>';
             btn.disabled = false;
+            btn.innerText = "SE CONNECTER";
         }
     }
 
-    function forgotPassword() {
-        // Solution simple : ouvre un mail pré-rempli vers toi
-        const emailContact = "ton-email@domaine.com"; // REMPLACE PAR TON MAIL
-        window.location.href = `mailto:${emailContact}?subject=Récupération de mot de passe ÉONIA&body=Bonjour, j'ai oublié mon mot de passe pour l'adresse : `;
+    function handleForgotPassword() {
+        const emailContact = "ton-email@domaine.com"; // REMPLACE PAR TON EMAIL
+        window.location.href = `mailto:${emailContact}?subject=Mot de passe oublié ÉONIA&body=Bonjour, j'ai oublié mon mot de passe pour mon compte ÉONIA.`;
     }
-</script>
 
-
-
-
+    // Permet de valider avec la touche "Entrée"
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+    </script>
 </body>
 </html>
