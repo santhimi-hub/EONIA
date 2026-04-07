@@ -25,7 +25,7 @@
         .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
 
         /* --- BARRE MÉTÉO --- */
-        .meteo-bar { background: #111; padding: 15px; border-radius: 12px; border-left: 3px solid #4ade80; margin-bottom: 25px; display: none; align-items: center; justify-content: space-between; }
+        .meteo-bar { background: #111; padding: 15px; border-radius: 12px; border-left: 3px solid #4ade80; margin-bottom: 25px; display: none; flex-direction: column; }
         .meteo-temp { font-weight: bold; color: #4ade80; font-size: 1.2rem; }
         .meteo-conseil { font-size: 0.75rem; color: #888; font-style: italic; }
 
@@ -62,19 +62,16 @@
             <h1 id="nom-commun">...</h1>
             <div id="surnom-plante" class="surnom"></div>
 
-            <div id="meteo-container" class="meteo-bar" style="display:none; background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div>
-            <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
-            <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
-        </div>
-        <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Analyse du ciel...</div>
-    </div>
-    
-    <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;">
-        </div>
-</div>
-
+            <div id="meteo-container" class="meteo-bar">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <div style="font-size: 0.6rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px;">Météo Locale</div>
+                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200;">--°C</div>
+                    </div>
+                    <div id="meteo-text" style="font-size: 0.75rem; color: #888; text-align: right; max-width: 150px;">Analyse du ciel...</div>
+                </div>
+                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
+            </div>
 
             <div class="grid-info">
                 <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
@@ -92,14 +89,11 @@
 
             <div id="espace-proprietaire" style="display:none;">
                 <h2 style="color:#4ade80; font-size:0.9rem; margin-bottom:10px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
-                
                 <div id="arrosage-badge" class="status-badge">Analyse...</div>
-
                 <div class="grid-info" style="margin-bottom:15px;">
                     <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-- / --</span></div>
                     <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --</span></div>
                 </div>
-
                 <span class="label">Notes de suivi</span>
                 <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
             </div>
@@ -113,22 +107,44 @@
     <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // --- FONCTION MÉTÉO ---
+    // --- FONCTION MÉTÉO AVEC PRÉVISIONS ---
     async function updateMeteo() {
         if (!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(async (pos) => {
             try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                // Appel avec prévisions journalières (daily)
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
                 const d = await res.json();
+                
                 const t = Math.round(d.current_weather.temperature);
                 const container = document.getElementById('meteo-container');
+                
                 if(container) {
                     container.style.display = 'flex';
                     document.getElementById('meteo-temp').innerText = t + "°C";
+                    
                     let msg = "Conditions normales.";
                     if (t > 28) msg = "⚠️ Forte chaleur : Arrosez ce soir !";
                     if (t < 4) msg = "❄️ Risque de gel : Protégez le pied.";
                     document.getElementById('meteo-text').innerText = msg;
+
+                    // Génération des prévisions sur 3 jours
+                    const forecastDiv = document.getElementById('forecast-container');
+                    forecastDiv.innerHTML = ""; 
+                    for (let i = 1; i <= 3; i++) {
+                        const date = new Date(d.daily.time[i]);
+                        const jourNom = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+                        const max = Math.round(d.daily.temperature_2m_max[i]);
+                        const min = Math.round(d.daily.temperature_2m_min[i]);
+                        forecastDiv.innerHTML += `
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.6rem; color: #555; text-transform: uppercase;">${jourNom}</div>
+                                <div style="font-size: 0.8rem; color: #ddd; margin: 4px 0;">${max}° / ${min}°</div>
+                            </div>
+                        `;
+                    }
                 }
             } catch(e) { console.warn("Météo indisponible"); }
         });
@@ -142,7 +158,6 @@
             const response = await fetch(API_URL);
             const data = await response.json();
             
-            // Recherche de la plaque dans Notion
             const page = data.results.find(p => {
                 const prop = p.properties["ID_Plaque"];
                 const val = prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || "";
@@ -156,7 +171,6 @@
 
             const p = page.properties;
 
-            // --- LECTEUR SÉCURISÉ DES DONNÉES ---
             const read = (name) => {
                 const f = p[name];
                 if (!f) return "";
@@ -169,7 +183,6 @@
                 return "";
             };
 
-            // AFFICHAGE PUBLIC
             document.getElementById('nom-commun').innerText = read("Nom commun") || "Plante Eonia";
             document.getElementById('surnom-plante').innerText = read("Surnom de ma plante");
             document.getElementById('id-plaque').innerText = plaqueNum;
@@ -184,15 +197,12 @@
             document.getElementById('sante').innerText = read("Protection et sante") || "Pas d'infos santé.";
             document.getElementById('compagnons').innerText = read("Campagnonnage / Plantes associées") || "Non renseigné.";
 
-            // IMAGE DE COUVERTURE
             const img = p["Photo"]?.files?.[0];
             if(img) document.getElementById('main-img').src = img.file?.url || img.external?.url || "";
 
-            // LOGIQUE PROPRIÉTAIRE & ALERTES
             const userEmail = localStorage.getItem('user_email');
             const ownerEmail = read("Client_Email");
 
-            // On compare les emails pour ouvrir l'espace privé
             if (userEmail && ownerEmail && userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
                 if(document.getElementById('msg-visiteur')) document.getElementById('msg-visiteur').style.display = 'none';
@@ -203,14 +213,12 @@
                 const lastWater = read("Dernier_Arrosage");
                 document.getElementById('last-water').innerText = lastWater || "Jamais";
 
-                // --- CALCUL DU RAPPEL D'ARROSAGE ---
                 const freq = p["Frequence_Arrosage"]?.number;
                 const badge = document.getElementById('arrosage-badge');
 
                 if (freq && lastWater) {
                     const dateL = new Date(lastWater);
                     const diff = Math.floor((new Date() - dateL) / (1000 * 60 * 60 * 24));
-                    
                     if (diff >= freq) {
                         badge.innerText = "🚨 Soif ! Arrosage en retard";
                         badge.className = "status-badge status-alert";
@@ -224,7 +232,6 @@
                 }
             }
 
-            // Affichage de la page une fois chargée
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('plant-details').style.display = 'block';
             updateMeteo();
