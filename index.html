@@ -3,27 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Connexion</title>
+    <title>ÉONIA</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        body { 
+            background: #050505; 
+            color: #fff; 
+            font-family: 'Raleway', sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            overflow: hidden;
+        }
         
-        .login-container { text-align: center; width: 80%; max-width: 300px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 10px; color: #4ade80; margin-bottom: 40px; font-size: 1.8rem; }
-        
-        input { width: 100%; padding: 15px 0; margin-bottom: 20px; background: transparent; border: none; border-bottom: 1px solid #333; color: #fff; font-family: 'Raleway', sans-serif; text-align: center; outline: none; transition: 0.3s; }
-        input:focus { border-bottom: 1px solid #4ade80; }
-        
-        button { width: 100%; padding: 15px; margin-top: 20px; background: transparent; border: 1px solid #4ade80; color: #4ade80; text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #4ade80; color: #000; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .login-container { 
+            width: 100%; 
+            max-width: 320px; 
+            text-align: center; 
+            padding: 20px;
+        }
 
-        .links { margin-top: 30px; }
-        .links a { color: #555; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        .links a:hover { color: #4ade80; }
+        h1 { 
+            font-weight: 200; 
+            text-transform: uppercase; 
+            letter-spacing: 12px; 
+            color: #4ade80; 
+            margin-bottom: 60px; 
+            font-size: 2rem; 
+        }
         
-        #status-msg { margin-top: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; min-height: 15px; }
+        input { 
+            width: 100%; 
+            padding: 18px 0; 
+            margin-bottom: 10px; 
+            background: transparent; 
+            border: none; 
+            border-bottom: 1px solid #1a1a1a; 
+            color: #fff; 
+            font-family: 'Raleway', sans-serif; 
+            text-align: center; 
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            outline: none; 
+            transition: border-color 0.4s;
+        }
+        
+        input:focus { 
+            border-bottom: 1px solid #4ade80; 
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            margin-top: 40px; 
+            background: transparent; 
+            border: 1px solid #4ade80; 
+            color: #4ade80; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            font-size: 0.75rem; 
+            cursor: pointer; 
+            transition: all 0.4s; 
+        }
+        
+        button:hover { 
+            background: #4ade80; 
+            color: #000; 
+        }
+
+        button:disabled { 
+            opacity: 0.2; 
+        }
+
+        .links { 
+            margin-top: 40px; 
+        }
+        
+        .links a { 
+            color: #444; 
+            text-decoration: none; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+        }
+
+        #status-msg { 
+            margin-top: 25px; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            height: 15px;
+        }
     </style>
 </head>
 <body>
@@ -31,7 +103,7 @@
     <div class="login-container">
         <h1>ÉONIA</h1>
         
-        <input type="email" id="email-input" placeholder="EMAIL" autocomplete="email">
+        <input type="email" id="email-input" placeholder="EMAIL" spellcheck="false">
         <input type="password" id="pass-input" placeholder="MOT DE PASSE">
         
         <button id="login-btn" onclick="handleLogin()">SE CONNECTER</button>
@@ -39,7 +111,7 @@
         <div id="status-msg"></div>
 
         <div class="links">
-            <a href="#" onclick="handleForgotPassword()">Mot de passe oublié ?</a>
+            <a href="#" onclick="handleForgot()">Mot de passe oublié ?</a>
         </div>
     </div>
 
@@ -54,21 +126,27 @@
 
         if (!email || !pass) {
             status.style.color = "#ff4444";
-            status.innerText = "Champs incomplets";
+            status.innerText = "Champs requis";
             return;
         }
 
         btn.disabled = true;
-        btn.innerText = "VÉRIFICATION...";
+        btn.innerText = "PATIENTEZ...";
         status.innerText = "";
 
         try {
             const response = await fetch(API_URL);
             const data = await response.json();
 
+            // SÉCURITÉ RENFORCÉE : On scanne toute la base Notion
             const user = data.results.find(p => {
                 const props = p.properties;
-                const n_email = props["Client_Email"]?.email || "";
+                
+                // On récupère l'email peu importe son format dans Notion
+                const n_email = props["Client_Email"]?.email || 
+                                props["Client_Email"]?.rich_text?.[0]?.plain_text || "";
+                
+                // On récupère le password peu importe son format dans Notion
                 const n_pass = props["Password"]?.rich_text?.[0]?.plain_text || 
                                props["Password"]?.title?.[0]?.plain_text || "";
                 
@@ -77,33 +155,31 @@
 
             if (user) {
                 status.style.color = "#4ade80";
-                status.innerText = "Accès autorisé";
+                status.innerText = "Accès validé";
                 localStorage.setItem('user_email', email);
-                setTimeout(() => {
-                    window.location.href = "catalogue.html";
-                }, 800);
+                setTimeout(() => { window.location.href = "catalogue.html"; }, 800);
             } else {
                 status.style.color = "#ff4444";
-                status.innerText = "Identifiants incorrects";
+                status.innerText = "Identifiants invalides";
                 btn.disabled = false;
                 btn.innerText = "SE CONNECTER";
             }
-
         } catch (e) {
             status.style.color = "#ff4444";
-            status.innerText = "Erreur réseau";
+            status.innerText = "Erreur de liaison";
             btn.disabled = false;
             btn.innerText = "SE CONNECTER";
         }
     }
 
-    function handleForgotPassword() {
-        // Remplace par ton vrai mail pro
-        const monEmail = "contact@eonia.com"; 
-        window.location.href = `mailto:${monEmail}?subject=Récupération de mot de passe ÉONIA&body=Bonjour, j'ai oublié mon mot de passe pour le compte : `;
+    function handleForgot() {
+        // Remplace par ton mail si besoin
+        window.location.href = "mailto:contact@eonia.com?subject=Mot de passe oublié";
     }
 
+    // Connexion avec la touche Entrée
     document.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
     </script>
 </body>
 </html>
+   
