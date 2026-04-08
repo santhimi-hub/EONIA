@@ -58,77 +58,46 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
         const plaqueId = params.get('id');
-        const idBotanique = params.get('id_botanique');
-        const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-
-        console.log("Tentative de chargement - Plaque:", plaqueId, "Botanique:", idBotanique);
-
-        if (!plaqueId && !idBotanique) {
-            document.getElementById('status-msg').innerText = "Erreur : Aucun identifiant trouvé dans l'URL.";
+        const idBot = params.get('id_botanique');
+        
+        if(!plaqueId && !idBot) {
+            document.getElementById('status-msg').innerText = "Erreur : ID manquant.";
             return;
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     id: plaqueId, 
-                    id_botanique: idBotanique,
-                    email: userEmail 
+                    id_botanique: idBot, 
+                    email: localStorage.getItem('user_email') || "invite@eonia.com" 
                 })
             });
-
-            const result = await response.json();
+            const data = await res.json();
+            const p = data[0];
             
-            // SI LE WORKER RENVOIE UNE ERREUR
-            if (result.error) {
-                alert("Erreur Worker : " + result.error);
-                document.getElementById('status-msg').innerText = "Erreur : " + result.error;
-                return;
-            }
-
-            const p = result[0];
-
-            // SI LA LISTE EST VIDE
-            if (!p) {
-                alert("Notion n'a renvoyé aucune donnée pour cet ID.");
-                document.getElementById('status-msg').innerText = "Données introuvables dans Notion.";
-                return;
-            }
-
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('plant-details').style.display = 'block';
-
-            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen";
+            
+            document.getElementById('nom-commun').innerText = p["Nom commun"];
             document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "Consultation";
-            document.getElementById('famille').innerText = p["Famille"] || "-";
-            document.getElementById('exposition').innerText = p["Exposition"] || "-";
-            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Non renseigné";
-            document.getElementById('sante').innerText = p["Protection et sante"] || "Non renseigné";
-            document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x600?text=EONIA";
+            document.getElementById('famille').innerText = p["Famille"];
+            document.getElementById('entretien').innerText = p["Entretien"] || "À venir";
+            document.getElementById('main-img').src = p["Photo"];
 
-            if (p.estProprietaire) {
+            if(p.estProprietaire && plaqueId) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note enregistrée.";
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"];
             }
-
-        } catch (error) {
-            alert("Erreur de connexion : " + error.message);
-            document.getElementById('status-msg').innerText = "Problème de connexion au serveur.";
-        }
-    }
-
-    function configurer() {
-        const id = new URLSearchParams(window.location.search).get('id');
-        window.location.href = `catalogue.html?config=${id}`;
-    }
+        } catch(e) { document.getElementById('status-msg').innerText = "Erreur serveur."; }
+    };
 </script>
+
 
 
 </body>
