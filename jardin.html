@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Ma Plante</title>
+    <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,110 +13,120 @@
         .main-img-container { width: 100%; height: 45vh; overflow: hidden; border-bottom: 2px solid #4ade80; background: #111; }
         #main-img { width: 100%; height: 100%; object-fit: cover; }
         .content-padding { padding: 25px 20px; }
-        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 20px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; }
+        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 20px; }
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 10px; }
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; }
-        .value { font-size: 0.8rem; color: #ddd; }
+        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; }
+        .value { font-size: 0.8rem; color: #ddd; font-weight: 500; }
         details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
-        summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; list-style: none; }
+        summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; list-style: none; outline: none; }
         .details-content { padding: 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; white-space: pre-line; }
-        
-        /* METEO & SUIVI */
-        #meteo-container { background: linear-gradient(to right, #0c0c0c, #111); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 3px solid #4ade80; display: none; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74,222,128,0.05); display: none; }
-        .config-btn { margin-top: 15px; width: 100%; padding: 12px; background: none; border: 1px solid #4ade80; color: #4ade80; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
+        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.05); display: none; }
     </style>
 </head>
 <body>
-    <div id="status-msg">Synchronisation ÉONIA...</div>
-    
-    <div id="plant-details">
-        <div class="main-img-container"><img id="main-img" src=""></div>
-        <div class="content-padding">
-            <a href="catalogue.html" class="back-btn">← Retour</a>
-            
-            <div id="meteo-container">
-                <span class="label">Météo locale</span>
-                <span id="meteo-info" class="value">Chargement...</span>
-            </div>
 
+    <div id="status-msg">Chargement des données botaniques...</div>
+
+    <div id="plant-details">
+        <div class="main-img-container"><img id="main-img" src="" alt="Plante"></div>
+        <div class="content-padding">
+            <a href="catalogue.html" class="back-btn">← Retour au Catalogue</a>
+            
             <h1 id="nom-commun">...</h1>
+
             <div class="grid-info">
-                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
+                <div class="info-item"><span class="label">Référence</span><span id="id-plaque" class="value"></span></div>
                 <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
                 <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
                 <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
             </div>
 
-            <details><summary>✂ Entretien</summary><div class="details-content" id="entretien"></div></details>
-            <details><summary>🛡 Santé</summary><div class="details-content" id="sante"></div></details>
+            <details><summary>✂ Conseils d'Entretien</summary><div class="details-content" id="entretien"></div></details>
+            <details><summary>🛡 Santé & Protection</summary><div class="details-content" id="sante"></div></details>
 
             <div id="espace-proprietaire">
-                <h2 style="color:#4ade80; font-size:0.8rem; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
-                <p id="notes-suivi" style="font-size:0.85rem; margin-top:10px; color:#eee; font-style:italic;"></p>
-                <button class="config-btn" onclick="configurer()">Changer de plante</button>
+                <h2 style="color:#4ade80; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase;">Mon Suivi Privé</h2>
+                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic; margin-top:10px;"></p>
+                <button onclick="configurer()" style="margin-top:20px; width:100%; padding:12px; background:none; border:1px solid #4ade80; color:#4ade80; cursor:pointer; text-transform:uppercase; font-size:0.7rem; letter-spacing:1px;">
+                    Changer de variété
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
+<script>
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-        window.onload = async () => {
-            const params = new URLSearchParams(window.location.search);
-            const plaqueId = params.get('id');
-            const idBot = params.get('id_botanique');
-            const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+    window.onload = async () => {
+        const statusMsg = document.getElementById('status-msg');
+        const detailsCont = document.getElementById('plant-details');
+        
+        // On récupère soit l'ID de la plaque (?id=...), soit l'ID de la plante (?id_botanique=...)
+        const params = new URLSearchParams(window.location.search);
+        const plaqueId = params.get('id');
+        const idBotanique = params.get('id_botanique');
+        const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: plaqueId, id_botanique: idBot, email: userEmail })
-                });
-                const data = await res.json();
-                const p = data[0];
-
-                document.getElementById('status-msg').style.display = 'none';
-                document.getElementById('plant-details').style.display = 'block';
-
-                document.getElementById('nom-commun').innerText = p["Nom commun"];
-                document.getElementById('id-plaque').innerText = p["ID_Plaque"];
-                document.getElementById('famille').innerText = p["Famille"];
-                document.getElementById('exposition').innerText = p["Exposition"];
-                document.getElementById('arrosage').innerText = p["Arrosage"];
-                document.getElementById('entretien').innerText = p["Entretien"] || "Non renseigné";
-                document.getElementById('sante').innerText = p["Protection et sante"] || "Non renseigné";
-                document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x600?text=EONIA";
-
-                // --- GESTION PROPRIÉTAIRE ---
-                if (p.estProprietaire) {
-                    document.getElementById('espace-proprietaire').style.display = 'block';
-                    document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note.";
-                    
-                    // Météo si coordonnées présentes
-                    if(p.Latitude && p.Longitude) {
-                        fetchMeteo(p.Latitude, p.Longitude);
-                    }
-                }
-            } catch(e) { document.getElementById('status-msg').innerText = "Erreur de connexion."; }
-        };
-
-        async function fetchMeteo(lat, lon) {
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                const data = await res.json();
-                document.getElementById('meteo-container').style.display = 'block';
-                document.getElementById('meteo-info').innerText = `${data.current_weather.temperature}°C — Vent ${data.current_weather.windspeed}km/h`;
-            } catch(e) { console.log("Météo indisponible"); }
+        if (!plaqueId && !idBotanique) {
+            statusMsg.innerText = "Aucune information à afficher. Veuillez scanner un QR code.";
+            return;
         }
 
-        function configurer() {
-            const id = new URLSearchParams(window.location.search).get('id');
-            window.location.href = `catalogue.html?config=${id}`;
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: plaqueId, 
+                    id_botanique: idBotanique,
+                    email: userEmail 
+                })
+            });
+
+            const result = await response.json();
+            const p = result[0];
+
+            if (!p) {
+                statusMsg.innerText = "Plante ou plaque introuvable.";
+                return;
+            }
+
+            statusMsg.style.display = 'none';
+            detailsCont.style.display = 'block';
+
+            // Remplissage des champs
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen Éonia";
+            document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "Consultation";
+            document.getElementById('famille').innerText = p["Famille"] || "-";
+            document.getElementById('exposition').innerText = p["Exposition"] || "-";
+            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
+            document.getElementById('entretien').innerText = p["Entretien"] || "Données en cours de saisie...";
+            document.getElementById('sante').innerText = p["Protection et sante"] || "Données en cours de saisie...";
+            
+            if (p["Photo"]) {
+                document.getElementById('main-img').src = p["Photo"];
+            } else {
+                document.getElementById('main-img').src = "https://via.placeholder.com/800x600?text=EONIA";
+            }
+
+            // Gestion de l'espace propriétaire
+            if (p.estProprietaire && plaqueId) {
+                document.getElementById('espace-proprietaire').style.display = 'block';
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Vous n'avez pas encore ajouté de notes pour cette plante.";
+            }
+
+        } catch (error) {
+            statusMsg.innerText = "Erreur de connexion au serveur.";
+            console.error(error);
         }
-    </script>
+    }
+
+    function configurer() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        window.location.href = `catalogue.html?config=${id}`;
+    }
+</script>
 </body>
 </html>
