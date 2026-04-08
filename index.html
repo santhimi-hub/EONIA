@@ -8,24 +8,31 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
+        
+        /* HERO SECTION */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
         .logo-main { width: 120px; margin-bottom: 25px; }
         .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
         .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
+        
+        /* AUTHENTIFICATION */
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
         input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; }
         .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
         .btn-main:hover { background: #4ade80; }
-        .forgot-pass { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
+        
+        /* LIENS SECONDAIRES */
+        .link-order { font-size: 0.75rem; color: #4ade80; text-decoration: none; margin-top: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; }
+        .link-order:hover { opacity: 0.8; }
+        
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
         
+        /* CONTENU */
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
-        
-        /* RETOUR AU BLANC POUR LE TEXTE */
         .highlight { color: #fff; font-weight: 500; }
         
         @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
@@ -42,7 +49,8 @@
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Votre mot de passe" id="pass">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
-            <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
+            
+            <a href="commander.html" class="link-order">Pas encore de plaque ? Rejoindre l'aventure</a>
         </div>
 
         <div class="bottom-nav">
@@ -64,16 +72,26 @@
     function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pass = document.getElementById('pass').value.trim();
-        if(!mail || !pass) { alert("Merci d'entrer votre mail et votre mot de passe."); return; }
+        
+        if(!mail || !pass) { 
+            alert("Merci d'entrer votre mail et votre mot de passe."); 
+            return; 
+        }
+
+        // Stockage des informations de session
         localStorage.setItem('user_email', mail);
         localStorage.setItem('eonia_access', 'client');
+        
+        // Redirection vers le catalogue
         window.location.href = "catalogue.html";
     }
+
     function accesInvite() {
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
     }
 </script>
+
 </body>
 </html>
