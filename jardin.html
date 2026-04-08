@@ -17,7 +17,6 @@
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
         .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
-        .meteo-bar { background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px; display: none; flex-direction: column; }
         .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
         .label { font-size: 0.55rem; text-transform: uppercase; color: #555; letter-spacing: 1px; display: block; margin-bottom: 4px; }
@@ -25,19 +24,7 @@
         details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
         summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; list-style: none; outline: none; }
         .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; white-space: pre-line; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
-        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
-        .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
-        
-        /* Styles Configuration & Inputs */
-        #config-plaque { display:none; margin-top: 30px; padding: 20px; border: 1px dashed #4ade80; border-radius: 12px; background: rgba(74, 222, 128, 0.02); }
-        .input-field { width:100%; background:#111; color:#fff; border:1px solid #333; padding:12px; border-radius:8px; margin-bottom:15px; font-family:'Raleway'; font-size:0.8rem; outline:none; transition: 0.3s; }
-        .input-field:focus { border-color: #4ade80; }
-        .btn-save { width:100%; background:#4ade80; color:#000; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-size:0.75rem; transition: 0.3s; }
-        .btn-save:hover { background: #fff; transform: scale(1.02); }
-
-        .meteo-link { color: #4ade80; text-decoration: none; font-size: 0.55rem; border: 1px solid #222; padding: 4px 8px; border-radius: 4px; transition: 0.3s; display: inline-block; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .meteo-link:hover { background: #4ade80; color: #000; }
+        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); display: none; }
     </style>
 </head>
 <body>
@@ -55,64 +42,19 @@
             <h1 id="nom-commun">...</h1>
             <div id="surnom-plante" class="surnom"></div>
 
-            <div id="meteo-container" class="meteo-bar">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <div style="font-size: 0.55rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px; margin-bottom: 5px;">Météo Locale</div>
-                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200; line-height: 1.2;">--°C</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div id="meteo-text" style="font-size: 0.75rem; color: #fff; font-weight: 500;">Chargement...</div>
-                        <div id="meteo-link-box"></div>
-                    </div>
-                </div>
-                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
-            </div>
-
             <div class="grid-info">
                 <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
                 <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
                 <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
-                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
                 <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
-                <div class="info-item"><span class="label">Taille maturité</span><span id="taille" class="value"></span></div>
             </div>
 
-            <details><summary>✿ Informations Générales</summary><div class="details-content" id="info-gen"></div></details>
-            <details><summary>✂ Entretien & Taille</summary><div class="details-content" id="entretien"></div></details>
-            <details><summary>🛡 Protection & Santé</summary><div class="details-content" id="sante"></div></details>
-            <details><summary>🌿 Compagnonnage</summary><div class="details-content" id="compagnons"></div></details>
+            <details><summary>✂ Entretien</summary><div class="details-content" id="entretien"></div></details>
+            <details><summary>🛡 Santé</summary><div class="details-content" id="sante"></div></details>
 
-            <div id="espace-proprietaire" style="display:none;">
-                <h2 style="color:#4ade80; font-size:0.9rem; margin-bottom:10px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
-                <div id="arrosage-badge" class="status-badge">Analyse...</div>
-                <div class="grid-info" style="margin-bottom:15px;">
-                    <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-- / --</span></div>
-                    <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --</span></div>
-                </div>
-                <span class="label">Notes de suivi</span>
-                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
-                
-                <div id="config-plaque">
-                    <h3 style="color:#4ade80; font-size:0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">Configuration de la plaque</h3>
-                    
-                    <label class="label">Associer à une variété :</label>
-                    <select id="select-plante" class="input-field">
-                        <option value="">-- Choisir dans le catalogue --</option>
-                    </select>
-
-                    <label class="label">Surnom personnalisé :</label>
-                    <input type="text" id="input-surnom" class="input-field" placeholder="Ex: Le Cerisier de Léo">
-
-                    <button onclick="sauvegarderConfig()" class="btn-save">
-                        Enregistrer les modifications
-                    </button>
-                    <p style="font-size: 0.5rem; color: #555; text-align: center; margin-top: 10px; text-transform: uppercase;">L'écriture vers Notion sera activée prochainement</p>
-                </div>
-            </div>
-
-            <div id="msg-visiteur" style="text-align:center; opacity:0.3; font-size:0.65rem; margin-top:30px;">
-                Mode consultation publique — ÉONIA
+            <div id="espace-proprietaire">
+                <h2 style="color:#4ade80; font-size:0.8rem; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
+                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic; margin-top:10px;"></p>
             </div>
         </div>
     </div>
@@ -127,16 +69,14 @@
         const detailsCont = document.getElementById('plant-details');
         
         try {
-            // 1. On récupère l'ID (ex: EON001IA) dans l'adresse du navigateur
             const params = new URLSearchParams(window.location.search);
             const plaqueId = params.get('id');
 
             if (!plaqueId) {
-                statusMsg.innerText = "Scanner un QR Code ÉONIA pour voir les détails.";
+                statusMsg.innerText = "Aucun ID de plaque détecté.";
                 return;
             }
 
-            // 2. On appelle ton Worker
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -146,34 +86,39 @@
                 })
             });
 
-            const data = await response.json();
+            const result = await response.json();
             
-            if (data.error || data.length === 0) {
-                statusMsg.innerText = "Plaque introuvable.";
+            if (result.error) {
+                statusMsg.innerText = "Erreur : " + result.error;
                 return;
             }
 
-            const p = data[0]; // On prend les infos de la plaque trouvée
-
-            // 3. On affiche les infos dans la page
+            const p = result[0];
             statusMsg.style.display = 'none';
             detailsCont.style.display = 'block';
 
-            document.getElementById('nom-commun').innerText = p["Nom commun"];
+            // Remplissage des données
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen";
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
-            document.getElementById('id-plaque').innerText = p["ID_Plaque"];
-            document.getElementById('famille').innerText = p["Famille"];
-            document.getElementById('exposition').innerText = p["Exposition"];
-            document.getElementById('arrosage').innerText = p["Arrosage"];
-            document.getElementById('main-img').src = p["Photo"] || "";
+            document.getElementById('id-plaque').innerText = p["ID_Plaque"] || plaqueId;
+            document.getElementById('famille').innerText = p["Famille"] || "-";
+            document.getElementById('exposition').innerText = p["Exposition"] || "-";
+            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
+            document.getElementById('entretien').innerText = p["Entretien"] || "Non renseigné";
+            document.getElementById('sante').innerText = p["Protection et sante"] || "Non renseigné";
+            
+            if (p["Photo"]) {
+                document.getElementById('main-img').src = p["Photo"];
+            }
 
-            // 4. Météo (si les coordonnées sont dans Notion)
-            if (p.Latitude && p.Longitude && typeof updateMeteo === "function") {
-                updateMeteo(p.Latitude, p.Longitude);
+            // Si propriétaire
+            if (p.estProprietaire) {
+                document.getElementById('espace-proprietaire').style.display = 'block';
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note.";
             }
 
         } catch (error) {
-            statusMsg.innerText = "Erreur de synchronisation.";
+            statusMsg.innerText = "Erreur de connexion au serveur.";
             console.error(error);
         }
     }
