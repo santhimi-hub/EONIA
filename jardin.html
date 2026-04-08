@@ -15,58 +15,73 @@
         .content-padding { padding: 25px 20px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 20px; }
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; }
-        .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
         .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; }
         .value { font-size: 0.8rem; color: #ddd; }
         details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
         summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; list-style: none; }
         .details-content { padding: 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; white-space: pre-line; }
+        
+        /* METEO & SUIVI */
+        #meteo-container { background: linear-gradient(to right, #0c0c0c, #111); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 3px solid #4ade80; display: none; }
         #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74,222,128,0.05); display: none; }
         .config-btn { margin-top: 15px; width: 100%; padding: 12px; background: none; border: 1px solid #4ade80; color: #4ade80; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-    <div id="status-msg">Synchronisation...</div>
+    <div id="status-msg">Synchronisation ÉONIA...</div>
+    
     <div id="plant-details">
         <div class="main-img-container"><img id="main-img" src=""></div>
         <div class="content-padding">
-            <a href="catalogue.html" class="back-btn">← Catalogue</a>
+            <a href="catalogue.html" class="back-btn">← Retour</a>
+            
+            <div id="meteo-container">
+                <span class="label">Météo locale</span>
+                <span id="meteo-info" class="value">Chargement...</span>
+            </div>
+
             <h1 id="nom-commun">...</h1>
-            <div id="surnom-plante" class="surnom"></div>
             <div class="grid-info">
                 <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
                 <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
                 <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
                 <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
             </div>
+
             <details><summary>✂ Entretien</summary><div class="details-content" id="entretien"></div></details>
             <details><summary>🛡 Santé</summary><div class="details-content" id="sante"></div></details>
+
             <div id="espace-proprietaire">
-                <h2 style="color:#4ade80; font-size:0.8rem;">VOTRE SUIVI PRIVÉ</h2>
-                <p id="notes-suivi" style="font-size:0.85rem; margin-top:10px;"></p>
+                <h2 style="color:#4ade80; font-size:0.8rem; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
+                <p id="notes-suivi" style="font-size:0.85rem; margin-top:10px; color:#eee; font-style:italic;"></p>
                 <button class="config-btn" onclick="configurer()">Changer de plante</button>
             </div>
         </div>
     </div>
+
     <script>
         const API_URL = "https://eonia-api.santhimi.workers.dev";
+
         window.onload = async () => {
             const params = new URLSearchParams(window.location.search);
             const plaqueId = params.get('id');
             const idBot = params.get('id_botanique');
-            if(!plaqueId && !idBot) { document.getElementById('status-msg').innerText = "Rien à afficher."; return; }
+            const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+
             try {
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: plaqueId, id_botanique: idBot, email: localStorage.getItem('user_email') || "invite@eonia.com" })
+                    body: JSON.stringify({ id: plaqueId, id_botanique: idBot, email: userEmail })
                 });
                 const data = await res.json();
                 const p = data[0];
+
                 document.getElementById('status-msg').style.display = 'none';
                 document.getElementById('plant-details').style.display = 'block';
+
                 document.getElementById('nom-commun').innerText = p["Nom commun"];
                 document.getElementById('id-plaque').innerText = p["ID_Plaque"];
                 document.getElementById('famille').innerText = p["Famille"];
@@ -75,12 +90,29 @@
                 document.getElementById('entretien').innerText = p["Entretien"] || "Non renseigné";
                 document.getElementById('sante').innerText = p["Protection et sante"] || "Non renseigné";
                 document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x600?text=EONIA";
-                if(p.estProprietaire) {
+
+                // --- GESTION PROPRIÉTAIRE ---
+                if (p.estProprietaire) {
                     document.getElementById('espace-proprietaire').style.display = 'block';
                     document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note.";
+                    
+                    // Météo si coordonnées présentes
+                    if(p.Latitude && p.Longitude) {
+                        fetchMeteo(p.Latitude, p.Longitude);
+                    }
                 }
-            } catch(e) { document.getElementById('status-msg').innerText = "Erreur de chargement."; }
+            } catch(e) { document.getElementById('status-msg').innerText = "Erreur de connexion."; }
         };
+
+        async function fetchMeteo(lat, lon) {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const data = await res.json();
+                document.getElementById('meteo-container').style.display = 'block';
+                document.getElementById('meteo-info').innerText = `${data.current_weather.temperature}°C — Vent ${data.current_weather.windspeed}km/h`;
+            } catch(e) { console.log("Météo indisponible"); }
+        }
+
         function configurer() {
             const id = new URLSearchParams(window.location.search).get('id');
             window.location.href = `catalogue.html?config=${id}`;
