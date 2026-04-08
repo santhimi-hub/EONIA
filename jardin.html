@@ -60,17 +60,15 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     window.onload = async () => {
-        const statusMsg = document.getElementById('status-msg');
-        const detailsCont = document.getElementById('plant-details');
-        
-        // On récupère soit l'ID de la plaque (?id=...), soit l'ID de la plante (?id_botanique=...)
         const params = new URLSearchParams(window.location.search);
         const plaqueId = params.get('id');
         const idBotanique = params.get('id_botanique');
         const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
+        console.log("Tentative de chargement - Plaque:", plaqueId, "Botanique:", idBotanique);
+
         if (!plaqueId && !idBotanique) {
-            statusMsg.innerText = "Aucune information à afficher. Veuillez scanner un QR code.";
+            document.getElementById('status-msg').innerText = "Erreur : Aucun identifiant trouvé dans l'URL.";
             return;
         }
 
@@ -86,40 +84,43 @@
             });
 
             const result = await response.json();
-            const p = result[0];
-
-            if (!p) {
-                statusMsg.innerText = "Plante ou plaque introuvable.";
+            
+            // SI LE WORKER RENVOIE UNE ERREUR
+            if (result.error) {
+                alert("Erreur Worker : " + result.error);
+                document.getElementById('status-msg').innerText = "Erreur : " + result.error;
                 return;
             }
 
-            statusMsg.style.display = 'none';
-            detailsCont.style.display = 'block';
+            const p = result[0];
 
-            // Remplissage des champs
-            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen Éonia";
+            // SI LA LISTE EST VIDE
+            if (!p) {
+                alert("Notion n'a renvoyé aucune donnée pour cet ID.");
+                document.getElementById('status-msg').innerText = "Données introuvables dans Notion.";
+                return;
+            }
+
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('plant-details').style.display = 'block';
+
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen";
             document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "Consultation";
             document.getElementById('famille').innerText = p["Famille"] || "-";
             document.getElementById('exposition').innerText = p["Exposition"] || "-";
             document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Données en cours de saisie...";
-            document.getElementById('sante').innerText = p["Protection et sante"] || "Données en cours de saisie...";
-            
-            if (p["Photo"]) {
-                document.getElementById('main-img').src = p["Photo"];
-            } else {
-                document.getElementById('main-img').src = "https://via.placeholder.com/800x600?text=EONIA";
-            }
+            document.getElementById('entretien').innerText = p["Entretien"] || "Non renseigné";
+            document.getElementById('sante').innerText = p["Protection et sante"] || "Non renseigné";
+            document.getElementById('main-img').src = p["Photo"] || "https://via.placeholder.com/800x600?text=EONIA";
 
-            // Gestion de l'espace propriétaire
-            if (p.estProprietaire && plaqueId) {
+            if (p.estProprietaire) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Vous n'avez pas encore ajouté de notes pour cette plante.";
+                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Aucune note enregistrée.";
             }
 
         } catch (error) {
-            statusMsg.innerText = "Erreur de connexion au serveur.";
-            console.error(error);
+            alert("Erreur de connexion : " + error.message);
+            document.getElementById('status-msg').innerText = "Problème de connexion au serveur.";
         }
     }
 
@@ -128,5 +129,6 @@
         window.location.href = `catalogue.html?config=${id}`;
     }
 </script>
+
 </body>
 </html>
