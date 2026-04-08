@@ -77,77 +77,99 @@
     <button class="logout-btn" onclick="logout()">Quitter la session</button>
 
     <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    async function loadCatalogue() {
-        const container = document.getElementById('catalogue-grid');
-        const statusMsg = document.getElementById('status-msg');
-        const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-
-        try {
-            // Appel au Worker (sans ID pour avoir toute la liste)
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail }) 
-            });
-
-            let plants = await response.json();
-            
-            if (!Array.isArray(plants)) {
-                statusMsg.innerText = "Erreur de format des données.";
-                return;
-            }
-
-            // Tri Alphabétique
-            plants.sort((a, b) => {
-                const nomA = (a["Nom commun"] || "").toLowerCase();
-                const nomB = (b["Nom commun"] || "").toLowerCase();
-                return nomA.localeCompare(nomB);
-            });
-
-            container.innerHTML = "";
-
-            plants.forEach(p => {
-                const name = p["Nom commun"] || "Spécimen";
-                const famille = p["Famille"] || "";
-                const image = p["Photo"] || "https://via.placeholder.com/400?text=EONIA";
-                
-                // On utilise p.id pour le lien vers la fiche
-                const card = document.createElement('a');
-                card.href = `jardin.html?id=${p.id}`; 
-                card.className = "plant-card";
-                card.innerHTML = `
-                    <div class="img-container">
-                        <img src="${image}" class="plant-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Image+Indisponible'">
-                    </div>
-                    <div class="plant-info">
-                        <div class="plant-name">${name}</div>
-                        <div class="plant-famille">${famille}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            if (plants.length === 0) {
-                statusMsg.innerText = "Le catalogue est vide.";
-            } else {
-                statusMsg.style.display = 'none';
-            }
-
-        } catch (error) {
-            console.error("Erreur:", error);
-            statusMsg.innerText = "Connexion impossible.";
-        }
-    }
+async function loadCatalogue() {
+    const container = document.getElementById('catalogue-grid');
+    const statusMsg = document.getElementById('status-msg');
+    const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
     
-    function logout() {
-        localStorage.clear();
-        window.location.href = "index.html";
-    }
+    // On vérifie si on est en mode "Configuration de plaque"
+    const params = new URLSearchParams(window.location.search);
+    const configPlaqueId = params.get('config'); 
 
-    loadCatalogue();
-    </script>
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail }) 
+        });
+
+        let plants = await response.json();
+        container.innerHTML = "";
+
+        plants.forEach(p => {
+            const name = p["Nom commun"] || "Spécimen";
+            const image = p["Photo"] || "https://via.placeholder.com/400?text=EONIA";
+            
+            const card = document.createElement('div');
+            card.className = "plant-card";
+            
+            // HTML de la carte
+            let cardHTML = `
+                <div class="img-container">
+                    <img src="${image}" class="plant-img" loading="lazy">
+                </div>
+                <div class="plant-info">
+                    <div class="plant-name">${name}</div>
+                </div>
+            `;
+
+            // SI MODE CONFIG : On ajoute le bouton d'installation
+            if (configPlaqueId) {
+                cardHTML += `
+                    <button onclick="installerPlante('${p.id}', '${configPlaqueId}')" 
+                            style="width:100%; padding:10px; background:#4ade80; border:none; color:#000; font-weight:bold; cursor:pointer; text-transform:uppercase; font-size:0.7rem;">
+                        Installer sur ma plaque
+                    </button>`;
+            } else {
+                // MODE VITRINE : Lien normal vers la fiche
+                card.style.cursor = "pointer";
+                card.onclick = () => { window.location.href = `jardin.html?id_botanique=${p.id}`; };
+            }
+
+            card.innerHTML = cardHTML;
+            container.appendChild(card);
+        });
+
+        statusMsg.style.display = 'none';
+
+    } catch (error) {
+        statusMsg.innerText = "Erreur de chargement.";
+    }
+}
+
+// FONCTION POUR LIER LA PLANTE À LA PLAQUE DANS NOTION
+async function installerPlante(plantePageId, plaqueId) {
+    const userEmail = localStorage.getItem('user_email');
+    if (!confirm("Confirmer l'installation de cette variété sur votre plaque ?")) return;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: "associer_plante",
+                id: plaqueId,
+                plantePageId: plantePageId,
+                email: userEmail
+            })
+        });
+
+        const res = await response.json();
+        if (res.success) {
+            alert("Plaque configurée avec succès !");
+            window.location.href = `jardin.html?id=${plaqueId}`;
+        } else {
+            alert("Erreur lors de l'association.");
+        }
+    } catch (e) {
+        alert("Erreur réseau.");
+    }
+}
+
+loadCatalogue();
+</script>
 
 </body>
 </html>
