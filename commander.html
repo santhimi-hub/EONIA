@@ -15,56 +15,74 @@
         .subtitle { color: #4ade80; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
 
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-
         .section { margin-bottom: 40px; }
         h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; color: #888; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
+        /* APERÇU DYNAMIQUE */
+        .preview-container { 
+            width: 100%; height: 180px; background: #111; border-radius: 12px; margin-bottom: 25px; 
+            display: flex; justify-content: center; align-items: center; border: 1px dashed #333;
+        }
+        #plaque-surface {
+            width: 240px; height: 110px; border-radius: 4px; display: flex; justify-content: center; 
+            align-items: center; padding: 15px; transition: 0.5s; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .mat-ardoise { background-color: #2c2c2c; border: 1px solid #444; }
+        .mat-bois { background-color: #5d4037; border: 1px solid #4e342e; }
+        .mat-acrylique { background-color: #050505; border: 1px solid #333; }
+
+        #text-render {
+            font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;
+            text-align: center; color: rgba(255,255,255,0.8); font-weight: 400;
+        }
+
         /* CHOIX MATIÈRE */
-        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .option-card { background: #0c0c0c; border: 1px solid #222; padding: 20px 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .option-card:hover { border-color: #4ade80; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .option-card { background: #0c0c0c; border: 1px solid #222; padding: 15px 5px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; }
         .option-card.selected { border-color: #4ade80; background: rgba(74, 222, 128, 0.05); }
-        .option-card span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
-        .icon { font-size: 1.5rem; margin-bottom: 5px; }
+        .option-card span { display: block; font-size: 0.65rem; text-transform: uppercase; margin-top: 8px; }
+        .price { display: block; font-size: 0.8rem; color: #4ade80; margin-top: 5px; font-weight: bold; }
 
-        /* PERSONNALISATION */
+        /* CHAMPS */
         .input-group { margin-top: 20px; }
-        label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase; }
-        input[type="text"], select { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Raleway', sans-serif; outline: none; }
-        input:focus { border-color: #4ade80; }
-
-        /* PIQUET 3D */
-        .info-box { background: #0c0c0c; padding: 15px; border-radius: 8px; font-size: 0.8rem; color: #bbb; border-left: 3px solid #4ade80; }
-
-        .btn-order { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 30px; transition: 0.3s; }
-        .btn-order:hover { background: #4ade80; transform: scale(1.02); }
+        label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+        input[type="text"] { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; text-align: center; font-family: 'Raleway'; }
         
-        .back-link { display: block; text-align: center; margin-top: 20px; font-size: 0.7rem; color: #555; text-decoration: none; text-transform: uppercase; }
+        .info-box { background: #0c0c0c; padding: 15px; border-radius: 8px; font-size: 0.8rem; color: #bbb; border-left: 3px solid #4ade80; }
+        .btn-order { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; margin-top: 30px; }
+        .back-link { display: block; text-align: center; margin-top: 20px; font-size: 0.7rem; color: #555; text-decoration: none; }
     </style>
 </head>
 <body>
-
     <header>
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
         <h1>ÉONIA</h1>
         <p class="subtitle">Configuration de votre plaque</p>
     </header>
-
     <div class="container">
+        <div class="preview-container">
+            <div id="plaque-surface" class="mat-ardoise">
+                <div id="text-render">NOM DE VOTRE PLANTE</div>
+            </div>
+        </div>
+
         <div class="section">
-            <h2>1. Choisir le support</h2>
+            <h2>1. Choisir la matière</h2>
             <div class="options-grid">
-                <div class="option-card" onclick="selectMat(this, 'Ardoise')">
-                    <div class="icon">🪨</div>
+                <div class="option-card selected" onclick="selectMat(this, 'Ardoise', 25)">
+                    <div style="font-size:1.5rem">🪨</div>
                     <span>Ardoise</span>
+                    <div class="price">25€</div>
                 </div>
-                <div class="option-card" onclick="selectMat(this, 'Bois')">
-                    <div class="icon">🪵</div>
+                <div class="option-card" onclick="selectMat(this, 'Bois', 30)">
+                    <div style="font-size:1.5rem">🪵</div>
                     <span>Bois</span>
+                    <div class="price">30€</div>
                 </div>
-                <div class="option-card" onclick="selectMat(this, 'Acrylique')">
-                    <div class="icon">💎</div>
+                <div class="option-card" onclick="selectMat(this, 'Acrylique', 20)">
+                    <div style="font-size:1.5rem">💎</div>
                     <span>Acrylique</span>
+                    <div class="price">20€</div>
                 </div>
             </div>
         </div>
@@ -72,47 +90,50 @@
         <div class="section">
             <h2>2. Personnalisation</h2>
             <div class="input-group">
-                <label>Texte à graver (Laissez vide pour une plaque vierge)</label>
-                <input type="text" id="gravure" placeholder="Ex: Olivier de mon grand-père...">
+                <label>Texte à graver <span id="char-count" style="color:#4ade80">0/18</span></label>
+                <input type="text" id="gravure" maxlength="18" placeholder="Ex: MON OLIVIER" oninput="updatePreview()">
             </div>
             <p style="font-size: 0.65rem; color: #555; margin-top: 10px;">
-                * Si vous ne personnalisez pas la plaque, vous pourrez choisir la plante manuellement lors de votre premier scan.
+                * Limité à 18 caractères pour une lisibilité optimale.
             </p>
         </div>
 
         <div class="section">
             <h2>3. Support technique</h2>
             <div class="info-box">
-                <strong>Piquet Éonia (Inclus) :</strong> Système unique imprimé en 3D, ajustable en hauteur par vissage pour accompagner la croissance de votre plante.
+                <strong>Piquet Éonia (Inclus) :</strong> Système ajustable imprimé en 3D pour accompagner la croissance de votre plante.
             </div>
         </div>
 
-        <button class="btn-order" onclick="passerCommande()">Commander ma plaque</button>
-        <a href="index.html" class="back-link">Retour à l'accueil</a>
+        <button class="btn-order" onclick="passerCommande()">Commander - <span id="total-price">25€</span></button>
+        <a href="index.html" class="back-link">RETOUR À L'ACCUEIL</a>
     </div>
 
     <script>
-        let matiereSelectionnee = "";
+        let matiereSelectionnee = "Ardoise";
+        let prixSelectionne = 25;
 
-        function selectMat(element, mat) {
+        function selectMat(element, mat, prix) {
             document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
             element.classList.add('selected');
             matiereSelectionnee = mat;
+            prixSelectionne = prix;
+            document.getElementById('total-price').innerText = prix + "€";
+            
+            const surface = document.getElementById('plaque-surface');
+            surface.className = 'mat-' + mat.toLowerCase();
+        }
+
+        function updatePreview() {
+            const val = document.getElementById('gravure').value;
+            document.getElementById('text-render').innerText = val || "NOM DE VOTRE PLANTE";
+            document.getElementById('char-count').innerText = val.length + "/18";
         }
 
         function passerCommande() {
             const gravure = document.getElementById('gravure').value;
-            if(!matiereSelectionnee) {
-                alert("Veuillez choisir une matière.");
-                return;
-            }
-            
-            // Ici, tu peux rediriger vers un formulaire de contact pré-rempli ou un panier
-            const message = `Bonjour, je souhaite commander une plaque en ${matiereSelectionnee} ${gravure ? 'avec la gravure : ' + gravure : '(Vierge)'}`;
-            alert("Redirection vers la finalisation de commande...\n\nChoix : " + message);
-            
-            // Exemple de lien Mailto pour tester :
-            // window.location.href = `mailto:ton@email.com?subject=Commande EONIA&body=${message}`;
+            const message = `Bonjour, je commande une plaque ÉONIA en ${matiereSelectionnee} (${prixSelectionne}€). Gravure : ${gravure || 'Vierge'}`;
+            window.location.href = `mailto:contact@eonia.com?subject=Commande EONIA&body=${encodeURIComponent(message)}`;
         }
     </script>
 </body>
