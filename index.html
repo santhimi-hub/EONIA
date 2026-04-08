@@ -18,10 +18,24 @@
         /* AUTHENTIFICATION */
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
         input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; text-align: center; }
-        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        
+        /* Cache les flèches du champ number */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .helper-text { 
+            font-size: 0.65rem; 
+            color: rgba(255,255,255,0.7); 
+            margin-top: -2px; 
+            margin-bottom: 5px;
+            line-height: 1.4; 
+            font-style: italic;
+        }
+
+        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 5px; }
         .btn-main:hover { background: #4ade80; }
         
-        /* LIEN COMMANDE SOBRE */
+        /* LIENS SECONDAIRES */
         .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; }
         .link-order:hover { color: #fff; }
         
@@ -48,13 +62,15 @@
         <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
             <input type="number" pattern="[0-9]*" inputmode="numeric" placeholder="Code PIN" id="pin">
-<p style="font-size: 0.6rem; color: #555; margin-top: 5px;">
-    * Première connexion ? Choisissez un code à 4 chiffres pour sécuriser votre plaque.
-</p>
+            
+            <p class="helper-text">
+                Première connexion ? Choisissez un code à 4 chiffres pour sécuriser votre plaque.
+            </p>
 
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
             
             <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
+            <a href="mailto:contact@eonia.com?subject=Code PIN oublié" class="link-order" style="text-transform: none; font-size: 0.6rem; opacity: 0.4; margin-top: 5px;">Code PIN oublié ?</a>
         </div>
 
         <div class="bottom-nav">
@@ -71,9 +87,8 @@
         <h2 style="margin-top: 60px;">L'âme d'Éonia</h2>
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
-
 <script>
-    // On récupère l'ID de la plaque si le client vient d'un scan QR/NFC
+    // Récupération de l'ID de la plaque via l'URL (scan)
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
 
@@ -86,12 +101,12 @@
             return; 
         }
 
-        // Mémorisation pour le Worker et la session
+        // Mémorisation locale pour la session et le Worker
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         localStorage.setItem('eonia_access', 'client');
         
-        // Redirection intelligente
+        // Redirection vers la plaque scannée ou le catalogue par défaut
         if (plaqueEnAttente) {
             window.location.href = `jardin.html?id=${plaqueEnAttente}`;
         } else {
