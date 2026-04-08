@@ -5,93 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-
     <style>
-        /* RESET ET BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
-
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat;
-        }
-
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
         .logo-main { width: 120px; margin-bottom: 25px; }
-
-        .brand-title {
-            font-family: 'Raleway', sans-serif;
-            font-size: 4rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: #ffffff;
-            margin: 0;
-            line-height: 1;
-        }
-
-        .tagline {
-            font-family: 'Raleway', sans-serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 0.9rem;
-            text-transform: none;
-            letter-spacing: 1px;
-            color: #ffffff;
-            margin-top: 35px;
-            margin-bottom: 45px;
-        }
-
-        /* STYLES FORMULAIRE */
+        .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
+        .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
         input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; }
-        
-        .btn-main { 
-            width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; 
-            cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-            transition: 0.3s; /* Pour que l'effet de survol soit fluide */
-        }
-
-        /* EFFET DE SURVOL DU BOUTON */
-        .btn-main:hover {
-            background: #4ade80; /* Devient vert au survol */
-            color: #000;
-        }
-
+        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .btn-main:hover { background: #4ade80; }
         .forgot-pass { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-decoration: none; margin-top: 5px; }
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
-
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
-
-        /* ADAPTATION MOBILE (Écrans de moins de 600px) */
-        @media (max-width: 600px) {
-            .brand-title { font-size: 2.5rem; }
-            .hero { padding: 20px; }
-            .tagline { font-size: 0.8rem; margin-top: 20px; }
-        }
+        @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
     </style>
 </head>
 <body>
 
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
-        
         <h1 class="brand-title">ÉONIA</h1>
-        
         <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
 
         <div class="auth-container">
-            <p id="welcome-msg" style="font-size: 0.8rem; color: #4ade80; margin-bottom: 10px; display: none;">
-                Nouvelle plaque détectée ! <br> Choisissez votre mot de passe pour l'activer.
-            </p>
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Votre mot de passe" id="pass">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
@@ -107,21 +49,12 @@
 
     <section class="content-section" id="concept">
         <h2>Notre Concept</h2>
-        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre. Scanner, Cultiver, Admirer.</p>
-        <div style="height: 80px;"></div>
-        <h2>L'âme d'ÉONIA</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
+        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre.</p>
     </section>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    // 1. Redirection automatique si déjà connecté
-    if (localStorage.getItem('user_email') && localStorage.getItem('eonia_access') === 'client') {
-        window.location.href = "catalogue.html";
-    }
-
-    // 2. Fonction de connexion
     async function validerConnexion() {
         const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
         const passSaisi = document.getElementById('pass').value.trim();
@@ -136,39 +69,34 @@
         btn.disabled = true;
 
         try {
+            // On vérifie juste si l'email existe ou est valide via le worker
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: mailSaisi })
             });
             
-            const plants = await response.json();
-            const isAuthorized = plants.some(p => p.estProprietaire === true || p.Client_Email === mailSaisi);
-
-            if (isAuthorized) {
-                localStorage.setItem('eonia_access', 'client');
+            if (response.ok) {
                 localStorage.setItem('user_email', mailSaisi);
+                localStorage.setItem('eonia_access', 'client');
                 window.location.href = "catalogue.html";
             } else {
-                alert("Email non reconnu ou aucun jardin associé.");
+                alert("Erreur d'authentification.");
                 btn.innerText = "ENTRER";
                 btn.disabled = false;
             }
         } catch (e) {
-            console.error(e);
-            alert("Erreur de connexion au serveur.");
+            alert("Erreur de connexion.");
             btn.innerText = "ENTRER";
             btn.disabled = false;
         }
     }
 
-    // 3. Accès Invité
     function accesInvite() {
-        localStorage.setItem('eonia_access', 'guest');
         localStorage.setItem('user_email', 'invite@eonia.com');
+        localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
     }
 </script>
-
 </body>
 </html>
