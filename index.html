@@ -21,11 +21,13 @@
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
         
-        /* SECTIONS TEXTES */
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
-        .highlight { color: #4ade80; font-weight: 500; }
+        
+        /* RETOUR AU BLANC POUR LE TEXTE */
+        .highlight { color: #fff; font-weight: 500; }
+        
         @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
     </style>
 </head>
@@ -62,17 +64,11 @@
     function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pass = document.getElementById('pass').value.trim();
-        
-        if(!mail || !pass) { 
-            alert("Merci d'entrer votre mail et votre mot de passe."); 
-            return; 
-        }
-        
+        if(!mail || !pass) { alert("Merci d'entrer votre mail et votre mot de passe."); return; }
         localStorage.setItem('user_email', mail);
         localStorage.setItem('eonia_access', 'client');
         window.location.href = "catalogue.html";
     }
-
     function accesInvite() {
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('eonia_access', 'guest');
