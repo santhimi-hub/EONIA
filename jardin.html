@@ -1,262 +1,96 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Ma Plante</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
-        #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-        .main-img-container { width: 100%; height: 45vh; overflow: hidden; position: relative; border-bottom: 2px solid #4ade80; }
-        #main-img { width: 100%; height: 100%; object-fit: cover; }
-        .content-padding { padding: 25px 20px; }
-        header { margin-bottom: 15px; }
-        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 5px; }
-        .surnom { opacity: 0.6; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; color: #4ade80; }
-        .meteo-bar { background: #0c0c0c; padding: 20px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 25px; display: none; flex-direction: column; }
-        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; letter-spacing: 1px; display: block; margin-bottom: 4px; }
-        .value { font-size: 0.8rem; font-weight: 500; color: #ddd; }
-        details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
-        summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; list-style: none; outline: none; }
-        .details-content { padding: 0 12px 12px 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; padding-top: 8px; white-space: pre-line; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 25px; background: rgba(74, 222, 128, 0.03); }
-        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
-        .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
-        
-        /* Styles Configuration & Inputs */
-        #config-plaque { display:none; margin-top: 30px; padding: 20px; border: 1px dashed #4ade80; border-radius: 12px; background: rgba(74, 222, 128, 0.02); }
-        .input-field { width:100%; background:#111; color:#fff; border:1px solid #333; padding:12px; border-radius:8px; margin-bottom:15px; font-family:'Raleway'; font-size:0.8rem; outline:none; transition: 0.3s; }
-        .input-field:focus { border-color: #4ade80; }
-        .btn-save { width:100%; background:#4ade80; color:#000; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-size:0.75rem; transition: 0.3s; }
-        .btn-save:hover { background: #fff; transform: scale(1.02); }
-
-        .meteo-link { color: #4ade80; text-decoration: none; font-size: 0.55rem; border: 1px solid #222; padding: 4px 8px; border-radius: 4px; transition: 0.3s; display: inline-block; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .meteo-link:hover { background: #4ade80; color: #000; }
-    </style>
-</head>
-<body>
-
-    <div id="status-msg">Synchronisation avec le jardin...</div>
-
-    <div id="plant-details">
-        <div class="main-img-container">
-            <img id="main-img" src="" alt="Plante">
-        </div>
-
-        <div class="content-padding">
-            <header><a href="catalogue.html" class="back-btn">← Retour au Jardin</a></header>
-
-            <h1 id="nom-commun">...</h1>
-            <div id="surnom-plante" class="surnom"></div>
-
-            <div id="meteo-container" class="meteo-bar">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <div style="font-size: 0.55rem; text-transform: uppercase; color: #4ade80; letter-spacing: 2px; margin-bottom: 5px;">Météo Locale</div>
-                        <div id="meteo-temp" style="font-size: 1.8rem; font-weight: 200; line-height: 1.2;">--°C</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div id="meteo-text" style="font-size: 0.75rem; color: #fff; font-weight: 500;">Chargement...</div>
-                        <div id="meteo-link-box"></div>
-                    </div>
-                </div>
-                <div id="forecast-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px;"></div>
-            </div>
-
-            <div class="grid-info">
-                <div class="info-item"><span class="label">ID Plaque</span><span id="id-plaque" class="value"></span></div>
-                <div class="info-item"><span class="label">Famille</span><span id="famille" class="value"></span></div>
-                <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value"></span></div>
-                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value"></span></div>
-                <div class="info-item"><span class="label">Arrosage</span><span id="arrosage" class="value"></span></div>
-                <div class="info-item"><span class="label">Taille maturité</span><span id="taille" class="value"></span></div>
-            </div>
-
-            <details><summary>✿ Informations Générales</summary><div class="details-content" id="info-gen"></div></details>
-            <details><summary>✂ Entretien & Taille</summary><div class="details-content" id="entretien"></div></details>
-            <details><summary>🛡 Protection & Santé</summary><div class="details-content" id="sante"></div></details>
-            <details><summary>🌿 Compagnonnage</summary><div class="details-content" id="compagnons"></div></details>
-
-            <div id="espace-proprietaire" style="display:none;">
-                <h2 style="color:#4ade80; font-size:0.9rem; margin-bottom:10px; letter-spacing:2px;">VOTRE SUIVI PRIVÉ</h2>
-                <div id="arrosage-badge" class="status-badge">Analyse...</div>
-                <div class="grid-info" style="margin-bottom:15px;">
-                    <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-- / --</span></div>
-                    <div class="info-item"><span class="label">Dernier Arrosage</span><span id="last-water" class="value">-- / --</span></div>
-                </div>
-                <span class="label">Notes de suivi</span>
-                <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
-                
-                <div id="config-plaque">
-                    <h3 style="color:#4ade80; font-size:0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">Configuration de la plaque</h3>
-                    
-                    <label class="label">Associer à une variété :</label>
-                    <select id="select-plante" class="input-field">
-                        <option value="">-- Choisir dans le catalogue --</option>
-                    </select>
-
-                    <label class="label">Surnom personnalisé :</label>
-                    <input type="text" id="input-surnom" class="input-field" placeholder="Ex: Le Cerisier de Léo">
-
-                    <button onclick="sauvegarderConfig()" class="btn-save">
-                        Enregistrer les modifications
-                    </button>
-                    <p style="font-size: 0.5rem; color: #555; text-align: center; margin-top: 10px; text-transform: uppercase;">L'écriture vers Notion sera activée prochainement</p>
-                </div>
-            </div>
-
-            <div id="msg-visiteur" style="text-align:center; opacity:0.3; font-size:0.65rem; margin-top:30px;">
-                Mode consultation publique — ÉONIA
-            </div>
-        </div>
-    </div>
-
-<script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-    let plantData = null;
-
-    window.onload = () => {
-        load();
+export default {
+  async fetch(request, env) {
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, Notion-Version",
     };
 
-    function getWeatherIcon(code) {
-        if (code === 0) return "☀️";
-        if (code >= 1 && code <= 3) return "⛅";
-        if (code >= 45 && code <= 48) return "🌫️";
-        if (code >= 51 && code <= 67) return "🌧️";
-        if (code >= 71 && code <= 77) return "❄️";
-        if (code >= 80 && code <= 82) return "🌦️";
-        if (code >= 95) return "⛈️";
-        return "☁️";
+    if (request.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+    const TOKEN = env.NOTION_KEY; 
+    const DB_PLAQUES_ID = env.NOTION_DB_PLAQUES_ID; 
+
+    try {
+      let emailClient = null;
+      let plaqueIdRecherche = null;
+
+      if (request.method === "POST") {
+        const reqBody = await request.json().catch(() => ({}));
+        emailClient = reqBody.email ? reqBody.email.toLowerCase().trim() : null;
+        const url = new URL(request.url);
+        plaqueIdRecherche = reqBody.id || url.searchParams.get("id");
+      }
+
+      if (!plaqueIdRecherche) return new Response(JSON.stringify({ error: "Pas d'ID" }), { status: 400, headers: corsHeaders });
+
+      // 1. RECHERCHE DE LA PLAQUE (On utilise "title" par sécurité car c'est la colonne principale)
+      const plaqueResponse = await fetch(`https://api.notion.com/v1/databases/${DB_PLAQUES_ID}/query`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${TOKEN}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filter: { property: "title", title: { equals: plaqueIdRecherche.trim() } }
+        }),
+      });
+
+      const dataPlaque = await plaqueResponse.json();
+      const plaquePage = dataPlaque.results?.[0];
+
+      if (!plaquePage) return new Response(JSON.stringify({ error: "Plaque introuvable" }), { status: 404, headers: corsHeaders });
+
+      const p = plaquePage.properties;
+      const rowEmail = p["Propriétaire"]?.email?.toLowerCase().trim();
+      const isOwner = emailClient && rowEmail === emailClient;
+
+      // 2. RÉCUPÉRATION DU CATALOGUE (Lien_Plante)
+      let bot = {};
+      const relation = p["Lien_Plante"]?.relation;
+      if (relation && relation.length > 0) {
+        const botanicResponse = await fetch(`https://api.notion.com/v1/pages/${relation[0].id}`, {
+          headers: { "Authorization": `Bearer ${TOKEN}`, "Notion-Version": "2022-06-28" }
+        });
+        const botData = await botanicResponse.json();
+        bot = botData.properties || {};
+      }
+
+      const getText = (prop) => {
+        if (!prop) return "";
+        const array = prop.title || prop.rich_text || [];
+        return array.length > 0 ? array[0].plain_text : "";
+      };
+
+      // 3. RÉPONSE (On garde tes clés d'origine)
+      const result = {
+        "pageId": plaquePage.id,
+        "ID_Plaque": plaqueIdRecherche,
+        "Surnom de ma plante": getText(p["Surnom_Perso"]),
+        "Notes_Suivi": getText(p["Note_Privee"]),
+        "Latitude": p["Lat"]?.number || null,
+        "Longitude": p["Long"]?.number || null,
+        "estProprietaire": isOwner,
+        
+        // Retour aux noms qui fonctionnaient
+        "Nom commun": getText(bot["Nom commun"]) || "Spécimen Éonia",
+        "Famille": bot["Famille"]?.select?.name || "",
+        "Exposition": bot["Exposition"]?.select?.name || "",
+        "Arrosage": bot["Arrosage"]?.select?.name || "",
+        "Rusticité": getText(bot["Rusticité"]),
+        "Taille maturité": getText(bot["Taille maturité"]),
+        "Photo": bot["Photo"]?.files?.[0]?.file?.url || bot["Photo"]?.files?.[0]?.external?.url || "",
+        "Type": bot["Type"]?.multi_select?.map(s => s.name) || [],
+        "Entretien": getText(bot["Entretien"]),
+        "Protection et sante": getText(bot["Protection et sante"]),
+        "Campagnonnage / Plantes associees": getText(bot["Campagnonnage / Plantes associees"])
+      };
+
+      return new Response(JSON.stringify([result]), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
     }
-
-    function getWeatherDesc(code) {
-        if (code === 0) return "Ciel dégagé";
-        if (code >= 1 && code <= 3) return "Partiellement nuageux";
-        if (code >= 51 && code <= 67) return "Pluie prévue";
-        if (code >= 80 && code <= 82) return "Averses";
-        if (code >= 95) return "Risque d'orage";
-        return "Nuageux";
-    }
-
-    async function updateMeteo(lat, lon) {
-        const container = document.getElementById('meteo-container');
-        if (!container) return;
-        try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
-            const res = await fetch(url);
-            const d = await res.json();
-            container.style.display = 'flex';
-            const current = d.current_weather;
-            document.getElementById('meteo-temp').innerText = Math.round(current.temperature) + "°C";
-            document.getElementById('meteo-text').innerText = getWeatherDesc(current.weathercode);
-            const meteoLink = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
-            document.getElementById('meteo-link-box').innerHTML = `<a href="${meteoLink}" target="_blank" class="meteo-link">Prévisions 7 jours →</a>`;
-            const forecast = document.getElementById('forecast-container');
-            forecast.innerHTML = "";
-            const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-            for (let i = 1; i <= 3; i++) {
-                const date = new Date(d.daily.time[i]);
-                const icon = getWeatherIcon(d.daily.weathercode[i]);
-                forecast.innerHTML += `<div style="text-align: center; flex: 1;">
-                    <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
-                    <div style="font-size: 1rem; margin: 2px 0;">${icon}</div>
-                    <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
-                </div>`;
-            }
-        } catch (e) { console.warn("Météo indisponible"); }
-    }
-
-    async function chargerListePlantes() {
-        const select = document.getElementById('select-plante');
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "get_all_species" }) // On demandera au worker toutes les espèces
-            });
-            const plantes = await response.json();
-            plantes.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p["Nom commun"] || "Sans nom";
-                select.appendChild(opt);
-            });
-        } catch (e) { console.error("Erreur chargement catalogue pour selection"); }
-    }
-
-    function sauvegarderConfig() {
-        alert("Action enregistrée ! L'association sera effective dès l'activation de l'écriture sur votre API Notion.");
-    }
-
-    async function load() {
-        const statusMsg = document.getElementById('status-msg');
-        const detailsCont = document.getElementById('plant-details');
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const plantId = params.get('id');
-            const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail })
-            });
-
-            const plants = await response.json();
-            const p = plants.find(item => item.id === plantId || item.id?.replace(/-/g, '') === plantId?.replace(/-/g, ''));
-
-            if (!p) {
-                statusMsg.innerText = "Spécimen introuvable.";
-                return;
-            }
-
-            plantData = p;
-            statusMsg.style.display = 'none';
-            detailsCont.style.display = 'block';
-
-            document.getElementById('main-img').src = p["Photo"] || "";
-            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Éonia";
-            document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
-            document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "-";
-            document.getElementById('famille').innerText = p["Famille"] || "-";
-            document.getElementById('exposition').innerText = p["Exposition"] || "-";
-            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
-            if(document.getElementById('rusticite')) document.getElementById('rusticite').innerText = p["Rusticité"] || "-";
-            if(document.getElementById('taille')) document.getElementById('taille').innerText = p["Taille maturité"] || "-";
-            document.getElementById('info-gen').innerText = (p["Type"] || []).join(', ') || "Information botanique.";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Conseils standard.";
-            document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée.";
-            document.getElementById('compagnons').innerText = p["Campagnonnage / Plantes associees"] || "-";
-
-            if (p.estProprietaire) {
-                document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('msg-visiteur').style.display = 'none';
-                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Pas de notes.";
-                document.getElementById('arrosage-badge').className = "status-badge status-ok";
-                document.getElementById('arrosage-badge').innerText = "VOTRE COLLECTION";
-                
-                // On affiche la config et on charge la liste
-                document.getElementById('config-plaque').style.display = 'block';
-                chargerListePlantes();
-            }
-
-            if (p.Latitude && p.Longitude) {
-                updateMeteo(p.Latitude, p.Longitude);
-            } else {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => updateMeteo(pos.coords.latitude, pos.coords.longitude),
-                    () => { document.getElementById('meteo-container').style.display = 'none'; }
-                );
-            }
-        } catch (error) { statusMsg.innerText = "Erreur de chargement."; }
-    }
-</script>
-</body>
-</html>
+  }
+};
