@@ -88,9 +88,15 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 <script>
-    // Récupération de l'ID de la plaque via l'URL (scan)
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
+
+    // Gestion de la touche "Entrée" pour valider
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            validerConnexion();
+        }
+    });
 
     function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
@@ -101,21 +107,24 @@
             return; 
         }
 
-        // Mémorisation locale pour la session et le Worker
+        // Sauvegarde des identifiants
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         localStorage.setItem('eonia_access', 'client');
         
-        // Redirection vers la plaque scannée ou le catalogue par défaut
+        // Redirection
         if (plaqueEnAttente) {
+            // Si le client scanne une plaque, on l'envoie direct dessus
             window.location.href = `jardin.html?id=${plaqueEnAttente}`;
         } else {
+            // Sinon, direction le catalogue (vue propriétaire)
             window.location.href = "catalogue.html";
         }
     }
 
     function accesInvite() {
         localStorage.setItem('user_email', 'invite@eonia.com');
+        localStorage.setItem('user_pin', '0000'); // PIN fictif pour invité
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
     }
