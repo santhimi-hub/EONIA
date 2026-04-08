@@ -29,7 +29,13 @@
         .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #333; color: #666; }
         .status-ok { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
         
-        /* Lien météo */
+        /* Styles Configuration & Inputs */
+        #config-plaque { display:none; margin-top: 30px; padding: 20px; border: 1px dashed #4ade80; border-radius: 12px; background: rgba(74, 222, 128, 0.02); }
+        .input-field { width:100%; background:#111; color:#fff; border:1px solid #333; padding:12px; border-radius:8px; margin-bottom:15px; font-family:'Raleway'; font-size:0.8rem; outline:none; transition: 0.3s; }
+        .input-field:focus { border-color: #4ade80; }
+        .btn-save { width:100%; background:#4ade80; color:#000; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px; font-size:0.75rem; transition: 0.3s; }
+        .btn-save:hover { background: #fff; transform: scale(1.02); }
+
         .meteo-link { color: #4ade80; text-decoration: none; font-size: 0.55rem; border: 1px solid #222; padding: 4px 8px; border-radius: 4px; transition: 0.3s; display: inline-block; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
         .meteo-link:hover { background: #4ade80; color: #000; }
     </style>
@@ -86,6 +92,23 @@
                 </div>
                 <span class="label">Notes de suivi</span>
                 <p id="notes-suivi" style="font-size:0.85rem; color:#eee; font-style:italic;"></p>
+                
+                <div id="config-plaque">
+                    <h3 style="color:#4ade80; font-size:0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">Configuration de la plaque</h3>
+                    
+                    <label class="label">Associer à une variété :</label>
+                    <select id="select-plante" class="input-field">
+                        <option value="">-- Choisir dans le catalogue --</option>
+                    </select>
+
+                    <label class="label">Surnom personnalisé :</label>
+                    <input type="text" id="input-surnom" class="input-field" placeholder="Ex: Le Cerisier de Léo">
+
+                    <button onclick="sauvegarderConfig()" class="btn-save">
+                        Enregistrer les modifications
+                    </button>
+                    <p style="font-size: 0.5rem; color: #555; text-align: center; margin-top: 10px; text-transform: uppercase;">L'écriture vers Notion sera activée prochainement</p>
+                </div>
             </div>
 
             <div id="msg-visiteur" style="text-align:center; opacity:0.3; font-size:0.65rem; margin-top:30px;">
@@ -125,44 +148,56 @@
     async function updateMeteo(lat, lon) {
         const container = document.getElementById('meteo-container');
         if (!container) return;
-
         try {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
             const res = await fetch(url);
             const d = await res.json();
-
             container.style.display = 'flex';
             const current = d.current_weather;
-            
             document.getElementById('meteo-temp').innerText = Math.round(current.temperature) + "°C";
             document.getElementById('meteo-text').innerText = getWeatherDesc(current.weathercode);
-            
-            // Lien prévisions
             const meteoLink = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
             document.getElementById('meteo-link-box').innerHTML = `<a href="${meteoLink}" target="_blank" class="meteo-link">Prévisions 7 jours →</a>`;
-
-            // Forecast 3 jours
             const forecast = document.getElementById('forecast-container');
             forecast.innerHTML = "";
             const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-            
             for (let i = 1; i <= 3; i++) {
                 const date = new Date(d.daily.time[i]);
                 const icon = getWeatherIcon(d.daily.weathercode[i]);
-                forecast.innerHTML += `
-                    <div style="text-align: center; flex: 1;">
-                        <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
-                        <div style="font-size: 1rem; margin: 2px 0;">${icon}</div>
-                        <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
-                    </div>`;
+                forecast.innerHTML += `<div style="text-align: center; flex: 1;">
+                    <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
+                    <div style="font-size: 1rem; margin: 2px 0;">${icon}</div>
+                    <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
+                </div>`;
             }
         } catch (e) { console.warn("Météo indisponible"); }
+    }
+
+    async function chargerListePlantes() {
+        const select = document.getElementById('select-plante');
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: "get_all_species" }) // On demandera au worker toutes les espèces
+            });
+            const plantes = await response.json();
+            plantes.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p["Nom commun"] || "Sans nom";
+                select.appendChild(opt);
+            });
+        } catch (e) { console.error("Erreur chargement catalogue pour selection"); }
+    }
+
+    function sauvegarderConfig() {
+        alert("Action enregistrée ! L'association sera effective dès l'activation de l'écriture sur votre API Notion.");
     }
 
     async function load() {
         const statusMsg = document.getElementById('status-msg');
         const detailsCont = document.getElementById('plant-details');
-        
         try {
             const params = new URLSearchParams(window.location.search);
             const plantId = params.get('id');
@@ -178,7 +213,7 @@
             const p = plants.find(item => item.id === plantId || item.id?.replace(/-/g, '') === plantId?.replace(/-/g, ''));
 
             if (!p) {
-                statusMsg.innerText = "Plante introuvable.";
+                statusMsg.innerText = "Spécimen introuvable.";
                 return;
             }
 
@@ -186,7 +221,6 @@
             statusMsg.style.display = 'none';
             detailsCont.style.display = 'block';
 
-            // Remplissage data
             document.getElementById('main-img').src = p["Photo"] || "";
             document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Éonia";
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
@@ -206,10 +240,13 @@
                 document.getElementById('msg-visiteur').style.display = 'none';
                 document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Pas de notes.";
                 document.getElementById('arrosage-badge').className = "status-badge status-ok";
-                document.getElementById('arrosage-badge').innerText = "JARDIN ACTIF";
+                document.getElementById('arrosage-badge').innerText = "VOTRE COLLECTION";
+                
+                // On affiche la config et on charge la liste
+                document.getElementById('config-plaque').style.display = 'block';
+                chargerListePlantes();
             }
 
-            // LANCEMENT MÉTÉO (Priorité : Coordonnées fixes de la plante si elles existent, sinon GPS)
             if (p.Latitude && p.Longitude) {
                 updateMeteo(p.Latitude, p.Longitude);
             } else {
@@ -218,10 +255,7 @@
                     () => { document.getElementById('meteo-container').style.display = 'none'; }
                 );
             }
-
-        } catch (error) {
-            statusMsg.innerText = "Erreur de chargement.";
-        }
+        } catch (error) { statusMsg.innerText = "Erreur de chargement."; }
     }
 </script>
 </body>
