@@ -3,116 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Catalogue</title>
+    <title>ÉONIA — Collection</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        /* TES STYLES STRICTEMENT CONSERVÉS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; padding: 20px; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 20px; }
-        .logo-small { width: 50px; }
-        .btn-logout { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        .brand-header { text-align: center; margin-bottom: 40px; }
-        .logo-main { width: 100px; margin-bottom: 20px; }
-        .brand-header h1 { font-size: 3rem; font-weight: 300; letter-spacing: 6px; text-transform: uppercase; color: #ffffff; margin: 0; }
+        header { text-align: center; padding: 50px 20px 30px 20px; }
+        .logo-main { width: 90px; margin-bottom: 20px; opacity: 0.9; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.2rem; margin: 0; }
         
-        /* CORRECTION : VOTRE COLLECTION EN VERT */
-        .brand-header p { font-size: 1rem; color: #4ade80; margin-top: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+        /* Titre dynamique : Notre Collection ou Mon Jardin */
+        #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
 
-        #catalogue-container { 
+        /* NAVIGATION CLIENT DISCRÈTE */
+        .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway', sans-serif; }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+
+        .catalog-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 25px; 
             max-width: 1000px; 
-            margin: 40px auto; 
+            margin: 0 auto; 
+            padding: 20px;
         }
 
         .plant-card { 
             background: #0c0c0c; 
-            border-radius: 12px; 
+            border-radius: 15px; 
             overflow: hidden; 
             border: 1px solid #1a1a1a; 
             transition: 0.3s;
             cursor: pointer;
+            text-decoration: none;
         }
-        .plant-card:hover { border-color: #4ade80; }
-        .plant-card img { width: 100%; height: 160px; object-fit: cover; }
+        .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
+        .img-container { width: 100%; height: 180px; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; }
         .plant-info { padding: 15px; text-align: center; }
-        .plant-info h3 { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: #ddd; }
+        .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
 
-        #loading { text-align: center; color: #4ade80; margin-top: 50px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <header>
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-small">
-        <button class="btn-logout" onclick="logout()">Quitter</button>
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA Logo" class="logo-main">
+        <h1 class="brand-title">ÉONIA</h1>
+        <p id="page-title">Notre Collection</p>
     </header>
 
-    <div class="brand-header">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
-        <h1>ÉONIA</h1>
-        <p>Votre Collection</p>
+    <div id="client-menu" class="client-nav">
+        <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+        <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
     </div>
 
-    <div id="loading">Recherche des spécimens...</div>
-    <div id="catalogue-container"></div>
+    <div id="status-msg">Synchronisation...</div>
+    <div id="catalogue-grid" class="catalog-container"></div>
 
-    <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
+    <button class="logout-btn" onclick="logout()">Quitter</button>
 
-        window.onload = async () => {
-            const userEmail = localStorage.getItem('user_email');
-            if (!userEmail) { window.location.href = "index.html"; return; }
+<script>
+    const userEmail = localStorage.getItem('user_email');
+    let currentView = 'catalogue'; 
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: userEmail })
-                });
-                
-                const plants = await response.json();
-                document.getElementById('loading').style.display = 'none';
-                renderCatalogue(plants);
-            } catch (e) {
-                document.getElementById('loading').innerText = "Erreur de connexion.";
-            }
-        };
+    if (!userEmail) { window.location.href = "index.html"; }
 
-        function renderCatalogue(plants) {
-            const container = document.getElementById('catalogue-container');
-            container.innerHTML = "";
+    // Affichage du menu si ce n'est pas un invité
+    if (userEmail !== 'invite@eonia.com') {
+        document.getElementById('client-menu').style.display = 'flex';
+    }
+
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+    async function loadData() {
+        const container = document.getElementById('catalogue-grid');
+        const statusMsg = document.getElementById('status-msg');
+        const pageTitle = document.getElementById('page-title');
+        
+        container.innerHTML = "";
+        statusMsg.style.display = 'block';
+        statusMsg.innerText = "Chargement...";
+
+        const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+        pageTitle.innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailToSend }) 
+            });
+
+            const plants = await response.json();
 
             if (!plants || plants.length === 0) {
-                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; opacity:0.5;'>Aucune plante disponible.</p>";
+                statusMsg.innerText = (currentView === 'catalogue') ? "La collection est vide." : "Votre jardin est vide.";
                 return;
             }
 
+            statusMsg.style.display = 'none';
+
             plants.forEach(p => {
                 const card = document.createElement('div');
-                card.className = 'plant-card';
+                card.className = "plant-card";
+                
                 card.onclick = () => {
-                    // Cette ligne assure que jardin.html reçoit l'ID et n'affiche pas "Rien à afficher"
-                    window.location.href = `jardin.html?id_botanique=${p.id}`;
+                    const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
+                    window.location.href = `jardin.html?${param}`;
                 };
 
                 card.innerHTML = `
-                    <img src="${p.Photo || 'https://via.placeholder.com/300x300?text=EONIA'}" alt="${p["Nom commun"]}">
+                    <div class="img-container">
+                        <img src="${p.Photo}" class="plant-img" onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
+                    </div>
                     <div class="plant-info">
-                        <h3>${p["Nom commun"] || "Spécimen"}</h3>
+                        <div class="plant-name">${p["Nom commun"] || "Spécimen"}</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
-        }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
+        } catch (error) {
+            statusMsg.innerText = "Erreur de connexion.";
         }
-    </script>
+    }
+
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+        loadData();
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = "index.html";
+    }
+
+    loadData();
+</script>
 </body>
 </html>
