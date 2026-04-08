@@ -23,14 +23,25 @@
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
+        .auth-footer { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 4px; margin-top: -4px; }
+        
         .helper-text { 
-            font-size: 0.65rem; 
+            font-size: 0.6rem; 
             color: rgba(255,255,255,0.7); 
-            margin-top: -2px; 
-            margin-bottom: 5px;
-            line-height: 1.4; 
+            line-height: 1.3; 
             font-style: italic;
+            text-align: left;
+            max-width: 180px;
         }
+
+        .pin-forgot {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .pin-forgot:hover { color: #fff; }
 
         .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 5px; }
         .btn-main:hover { background: #4ade80; }
@@ -63,14 +74,14 @@
             <input type="email" placeholder="Votre Email" id="email">
             <input type="number" pattern="[0-9]*" inputmode="numeric" placeholder="Code PIN" id="pin">
             
-            <p class="helper-text">
-                Première connexion ? Choisissez un code à 4 chiffres pour sécuriser votre plaque.
-            </p>
+            <div class="auth-footer">
+                <p class="helper-text">Première connexion ? Choisissez 4 chiffres pour activer votre plaque.</p>
+                <a href="mailto:contact@eonia.com?subject=Code PIN oublié" class="pin-forgot">PIN oublié ?</a>
+            </div>
 
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
             
             <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
-            <a href="mailto:contact@eonia.com?subject=Code PIN oublié" class="link-order" style="text-transform: none; font-size: 0.6rem; opacity: 0.4; margin-top: 5px;">Code PIN oublié ?</a>
         </div>
 
         <div class="bottom-nav">
@@ -87,11 +98,12 @@
         <h2 style="margin-top: 60px;">L'âme d'Éonia</h2>
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
+
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
 
-    // Gestion de la touche "Entrée" pour valider
+    // Gestion de la touche "Entrée"
     document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             validerConnexion();
@@ -107,24 +119,20 @@
             return; 
         }
 
-        // Sauvegarde des identifiants
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         localStorage.setItem('eonia_access', 'client');
         
-        // Redirection
         if (plaqueEnAttente) {
-            // Si le client scanne une plaque, on l'envoie direct dessus
             window.location.href = `jardin.html?id=${plaqueEnAttente}`;
         } else {
-            // Sinon, direction le catalogue (vue propriétaire)
             window.location.href = "catalogue.html";
         }
     }
 
     function accesInvite() {
         localStorage.setItem('user_email', 'invite@eonia.com');
-        localStorage.setItem('user_pin', '0000'); // PIN fictif pour invité
+        localStorage.setItem('user_pin', '0000');
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
     }
