@@ -4,26 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Catalogue</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; padding: 20px; }
         
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 20px; }
-        .logo-small { width: 40px; }
-        .btn-logout { background: none; border: 1px solid rgba(74, 222, 128, 0.5); color: #4ade80; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
+        .logo-small { width: 50px; }
+        .btn-logout { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* TITRE ÉONIA RÉTABLI */
+        /* RÉTABLISSEMENT DE TON IDENTITÉ */
         .brand-header { text-align: center; margin-bottom: 40px; }
-        .brand-header h1 { font-size: 2.5rem; font-weight: 200; letter-spacing: 8px; text-transform: uppercase; color: #fff; margin-bottom: 5px; }
-        .brand-header p { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #4ade80; opacity: 0.8; }
+        .logo-main { width: 100px; margin-bottom: 20px; }
+        .brand-header h1 { font-size: 3rem; font-weight: 300; letter-spacing: 6px; text-transform: uppercase; color: #ffffff; margin: 0; }
+        .brand-header p { font-size: 0.9rem; font-style: italic; color: #ffffff; margin-top: 10px; letter-spacing: 1px; }
 
         #catalogue-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
             gap: 20px; 
             max-width: 1000px; 
-            margin: 0 auto; 
+            margin: 40px auto; 
         }
 
         .plant-card { 
@@ -50,8 +51,9 @@
     </header>
 
     <div class="brand-header">
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
         <h1>ÉONIA</h1>
-        <p>Le Catalogue</p>
+        <p>Bienvenue dans l'âme d'Éonia.</p>
     </div>
 
     <div id="loading">Recherche des spécimens...</div>
@@ -84,12 +86,32 @@
             container.innerHTML = "";
 
             if (!plants || plants.length === 0) {
-                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; opacity:0.5; font-size:0.8rem;'>Aucune plante disponible.</p>";
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; opacity:0.5;'>Aucune plante disponible.</p>";
                 return;
             }
 
             plants.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'plant-card';
-                // Envoi de l'ID à jardin.html pour éviter le "Rien à afficher"
-                card.onclick
+                card.onclick = () => {
+                    // C'est cette ligne qui permet à l'invité de voir la plante sans erreur
+                    window.location.href = `jardin.html?id_botanique=${p.id}`;
+                };
+
+                card.innerHTML = `
+                    <img src="${p.Photo || 'https://via.placeholder.com/300x300?text=EONIA'}" alt="${p["Nom commun"]}">
+                    <div class="plant-info">
+                        <h3>${p["Nom commun"] || "Spécimen"}</h3>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
