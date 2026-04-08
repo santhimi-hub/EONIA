@@ -6,6 +6,7 @@
     <title>ÉONIA — Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        /* TON DESIGN RESTE INTACT */
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
@@ -36,7 +37,7 @@
         <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Votre mot de passe" id="pass">
-            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
+            <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
             <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
         </div>
 
@@ -53,43 +54,33 @@
     </section>
 
 <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    // ON VERIFIE SI L'UTILISATEUR EST DEJA CONNECTE AU CHARGEMENT
+    window.onload = () => {
+        const user = localStorage.getItem('user_email');
+        if (user && user !== 'invite@eonia.com') {
+            window.location.href = "catalogue.html";
+        }
+    }
 
-    async function validerConnexion() {
+    function validerConnexion() {
         const mailSaisi = document.getElementById('email').value.toLowerCase().trim();
         const passSaisi = document.getElementById('pass').value.trim();
-        const btn = document.querySelector('.btn-main');
+        const btn = document.getElementById('btn-entrer');
         
         if (!mailSaisi || !passSaisi) {
             alert("Merci d'entrer votre mail et votre mot de passe.");
             return;
         }
 
-        btn.innerText = "VÉRIFICATION...";
-        btn.disabled = true;
-
-        try {
-            // On vérifie juste si l'email existe ou est valide via le worker
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: mailSaisi })
-            });
-            
-            if (response.ok) {
-                localStorage.setItem('user_email', mailSaisi);
-                localStorage.setItem('eonia_access', 'client');
-                window.location.href = "catalogue.html";
-            } else {
-                alert("Erreur d'authentification.");
-                btn.innerText = "ENTRER";
-                btn.disabled = false;
-            }
-        } catch (e) {
-            alert("Erreur de connexion.");
-            btn.innerText = "ENTRER";
-            btn.disabled = false;
-        }
+        // CONNEXION SIMPLIFIEE : On enregistre et on laisse passer
+        // La vérification réelle se fait dans le catalogue/jardin via le Worker
+        localStorage.setItem('user_email', mailSaisi);
+        localStorage.setItem('eonia_access', 'client');
+        
+        btn.innerText = "CONNEXION...";
+        setTimeout(() => {
+            window.location.href = "catalogue.html";
+        }, 500);
     }
 
     function accesInvite() {
