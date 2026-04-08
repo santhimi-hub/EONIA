@@ -9,13 +9,15 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; padding: 20px; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 30px; }
-        .logo-small { width: 50px; }
-        .btn-logout { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 20px; }
+        .logo-small { width: 40px; }
+        .btn-logout { background: none; border: 1px solid rgba(74, 222, 128, 0.5); color: #4ade80; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        h2 { font-weight: 200; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; color: #4ade80; }
+        /* TITRE ÉONIA RÉTABLI */
+        .brand-header { text-align: center; margin-bottom: 40px; }
+        .brand-header h1 { font-size: 2.5rem; font-weight: 200; letter-spacing: 8px; text-transform: uppercase; color: #fff; margin-bottom: 5px; }
+        .brand-header p { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #4ade80; opacity: 0.8; }
 
-        /* GRILLE DU CATALOGUE */
         #catalogue-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
@@ -32,12 +34,12 @@
             transition: 0.3s;
             cursor: pointer;
         }
-        .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
-        .plant-card img { width: 100%; height: 150px; object-fit: cover; }
-        .plant-info { padding: 12px; text-align: center; }
-        .plant-info h3 { font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .plant-card:hover { border-color: #4ade80; }
+        .plant-card img { width: 100%; height: 160px; object-fit: cover; }
+        .plant-info { padding: 15px; text-align: center; }
+        .plant-info h3 { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: #ddd; }
 
-        #loading { text-align: center; color: #4ade80; margin-top: 50px; letter-spacing: 2px; }
+        #loading { text-align: center; color: #4ade80; margin-top: 50px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -47,7 +49,10 @@
         <button class="btn-logout" onclick="logout()">Quitter</button>
     </header>
 
-    <h2>Catalogue Végétal</h2>
+    <div class="brand-header">
+        <h1>ÉONIA</h1>
+        <p>Le Catalogue</p>
+    </div>
 
     <div id="loading">Recherche des spécimens...</div>
     <div id="catalogue-container"></div>
@@ -57,8 +62,6 @@
 
         window.onload = async () => {
             const userEmail = localStorage.getItem('user_email');
-            
-            // Si pas d'email, on renvoie à l'accueil
             if (!userEmail) { window.location.href = "index.html"; return; }
 
             try {
@@ -69,12 +72,10 @@
                 });
                 
                 const plants = await response.json();
-                
                 document.getElementById('loading').style.display = 'none';
                 renderCatalogue(plants);
             } catch (e) {
-                document.getElementById('loading').innerText = "Erreur de connexion au catalogue.";
-                console.error(e);
+                document.getElementById('loading').innerText = "Erreur de connexion.";
             }
         };
 
@@ -83,33 +84,12 @@
             container.innerHTML = "";
 
             if (!plants || plants.length === 0) {
-                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; opacity:0.5;'>Aucune plante trouvée.</p>";
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; opacity:0.5; font-size:0.8rem;'>Aucune plante disponible.</p>";
                 return;
             }
 
             plants.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'plant-card';
-                
-                // CRUCIAL : On passe l'ID Notion de la plante pour la page jardin
-                card.onclick = () => {
-                    window.location.href = `jardin.html?id_botanique=${p.id}`;
-                };
-
-                card.innerHTML = `
-                    <img src="${p.Photo || 'https://via.placeholder.com/300x300?text=EONIA'}" alt="${p["Nom commun"]}">
-                    <div class="plant-info">
-                        <h3>${p["Nom commun"] || "Spécimen"}</h3>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
-    </script>
-</body>
-</html>
+                // Envoi de l'ID à jardin.html pour éviter le "Rien à afficher"
+                card.onclick
