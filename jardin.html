@@ -119,143 +119,63 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    let plantData = null;
 
-    window.onload = () => {
-        load();
-    };
-
-    function getWeatherIcon(code) {
-        if (code === 0) return "☀️";
-        if (code >= 1 && code <= 3) return "⛅";
-        if (code >= 45 && code <= 48) return "🌫️";
-        if (code >= 51 && code <= 67) return "🌧️";
-        if (code >= 71 && code <= 77) return "❄️";
-        if (code >= 80 && code <= 82) return "🌦️";
-        if (code >= 95) return "⛈️";
-        return "☁️";
-    }
-
-    function getWeatherDesc(code) {
-        if (code === 0) return "Ciel dégagé";
-        if (code >= 1 && code <= 3) return "Partiellement nuageux";
-        if (code >= 51 && code <= 67) return "Pluie prévue";
-        if (code >= 80 && code <= 82) return "Averses";
-        if (code >= 95) return "Risque d'orage";
-        return "Nuageux";
-    }
-
-    async function updateMeteo(lat, lon) {
-        const container = document.getElementById('meteo-container');
-        if (!container) return;
-        try {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
-            const res = await fetch(url);
-            const d = await res.json();
-            container.style.display = 'flex';
-            const current = d.current_weather;
-            document.getElementById('meteo-temp').innerText = Math.round(current.temperature) + "°C";
-            document.getElementById('meteo-text').innerText = getWeatherDesc(current.weathercode);
-            const meteoLink = `https://www.meteoblue.com/fr/meteo/semaine/${lat}N${lon}E`;
-            document.getElementById('meteo-link-box').innerHTML = `<a href="${meteoLink}" target="_blank" class="meteo-link">Prévisions 7 jours →</a>`;
-            const forecast = document.getElementById('forecast-container');
-            forecast.innerHTML = "";
-            const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-            for (let i = 1; i <= 3; i++) {
-                const date = new Date(d.daily.time[i]);
-                const icon = getWeatherIcon(d.daily.weathercode[i]);
-                forecast.innerHTML += `<div style="text-align: center; flex: 1;">
-                    <div style="font-size: 0.55rem; color: #555;">${jours[date.getDay()]}</div>
-                    <div style="font-size: 1rem; margin: 2px 0;">${icon}</div>
-                    <div style="font-size: 0.7rem; color: #ddd;">${Math.round(d.daily.temperature_2m_max[i])}°</div>
-                </div>`;
-            }
-        } catch (e) { console.warn("Météo indisponible"); }
-    }
-
-    async function chargerListePlantes() {
-        const select = document.getElementById('select-plante');
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "get_all_species" }) // On demandera au worker toutes les espèces
-            });
-            const plantes = await response.json();
-            plantes.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p["Nom commun"] || "Sans nom";
-                select.appendChild(opt);
-            });
-        } catch (e) { console.error("Erreur chargement catalogue pour selection"); }
-    }
-
-    function sauvegarderConfig() {
-        alert("Action enregistrée ! L'association sera effective dès l'activation de l'écriture sur votre API Notion.");
-    }
+    window.onload = () => { load(); };
 
     async function load() {
         const statusMsg = document.getElementById('status-msg');
         const detailsCont = document.getElementById('plant-details');
+        
         try {
+            // 1. On récupère l'ID (ex: EON001IA) dans l'adresse du navigateur
             const params = new URLSearchParams(window.location.search);
-            const plantId = params.get('id');
-            const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+            const plaqueId = params.get('id');
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail })
-            });
-
-            const plants = await response.json();
-            const p = plants.find(item => item.id === plantId || item.id?.replace(/-/g, '') === plantId?.replace(/-/g, ''));
-
-            if (!p) {
-                statusMsg.innerText = "Spécimen introuvable.";
+            if (!plaqueId) {
+                statusMsg.innerText = "Scanner un QR Code ÉONIA pour voir les détails.";
                 return;
             }
 
-            plantData = p;
+            // 2. On appelle ton Worker
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: plaqueId,
+                    email: localStorage.getItem('user_email') || "invite@eonia.com"
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.error || data.length === 0) {
+                statusMsg.innerText = "Plaque introuvable.";
+                return;
+            }
+
+            const p = data[0]; // On prend les infos de la plaque trouvée
+
+            // 3. On affiche les infos dans la page
             statusMsg.style.display = 'none';
             detailsCont.style.display = 'block';
 
-            document.getElementById('main-img').src = p["Photo"] || "";
-            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Plante Éonia";
+            document.getElementById('nom-commun').innerText = p["Nom commun"];
             document.getElementById('surnom-plante').innerText = p["Surnom de ma plante"] || "";
-            document.getElementById('id-plaque').innerText = p["ID_Plaque"] || "-";
-            document.getElementById('famille').innerText = p["Famille"] || "-";
-            document.getElementById('exposition').innerText = p["Exposition"] || "-";
-            document.getElementById('arrosage').innerText = p["Arrosage"] || "-";
-            if(document.getElementById('rusticite')) document.getElementById('rusticite').innerText = p["Rusticité"] || "-";
-            if(document.getElementById('taille')) document.getElementById('taille').innerText = p["Taille maturité"] || "-";
-            document.getElementById('info-gen').innerText = (p["Type"] || []).join(', ') || "Information botanique.";
-            document.getElementById('entretien').innerText = p["Entretien"] || "Conseils standard.";
-            document.getElementById('sante').innerText = p["Protection et sante"] || "Aucune donnée.";
-            document.getElementById('compagnons').innerText = p["Campagnonnage / Plantes associees"] || "-";
+            document.getElementById('id-plaque').innerText = p["ID_Plaque"];
+            document.getElementById('famille').innerText = p["Famille"];
+            document.getElementById('exposition').innerText = p["Exposition"];
+            document.getElementById('arrosage').innerText = p["Arrosage"];
+            document.getElementById('main-img').src = p["Photo"] || "";
 
-            if (p.estProprietaire) {
-                document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('msg-visiteur').style.display = 'none';
-                document.getElementById('notes-suivi').innerText = p["Notes_Suivi"] || "Pas de notes.";
-                document.getElementById('arrosage-badge').className = "status-badge status-ok";
-                document.getElementById('arrosage-badge').innerText = "VOTRE COLLECTION";
-                
-                // On affiche la config et on charge la liste
-                document.getElementById('config-plaque').style.display = 'block';
-                chargerListePlantes();
-            }
-
-            if (p.Latitude && p.Longitude) {
+            // 4. Météo (si les coordonnées sont dans Notion)
+            if (p.Latitude && p.Longitude && typeof updateMeteo === "function") {
                 updateMeteo(p.Latitude, p.Longitude);
-            } else {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => updateMeteo(pos.coords.latitude, pos.coords.longitude),
-                    () => { document.getElementById('meteo-container').style.display = 'none'; }
-                );
             }
-        } catch (error) { statusMsg.innerText = "Erreur de chargement."; }
+
+        } catch (error) {
+            statusMsg.innerText = "Erreur de synchronisation.";
+            console.error(error);
+        }
     }
 </script>
 </body>
