@@ -6,7 +6,6 @@
     <title>ÉONIA — Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        /* TES STYLES CONSERVÉS */
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
@@ -28,39 +27,46 @@
     </style>
 </head>
 <body>
+
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
-        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
-        <div class="auth-container">
+        <p class="tagline">Bienvenue dans l'âme d'Éonia.</p> <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Votre mot de passe" id="pass">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
-            <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
-        </div>
+            <a href="#" class="forgot-pass">Mot de passe oublié ?</a> </div>
+
         <div class="bottom-nav">
             <a href="#" onclick="accesInvite()">Visiter en tant qu'invité</a>
             <span>|</span>
             <a href="#concept">Notre Concept</a>
         </div>
     </div>
+
     <section class="content-section" id="concept">
         <h2>Notre Concept</h2>
-        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique.</p>
+        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre.</p>
     </section>
 
 <script>
     function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pass = document.getElementById('pass').value.trim();
-        if(!mail || !pass) { alert("Identifiants requis"); return; }
         
+        if(!mail || !pass) { 
+            alert("Merci d'entrer votre mail et votre mot de passe."); 
+            return; 
+        }
+        
+        // On enregistre l'email et on redirige vers le catalogue
         localStorage.setItem('user_email', mail);
         localStorage.setItem('eonia_access', 'client');
         window.location.href = "catalogue.html";
     }
 
     function accesInvite() {
+        // L'invité est identifié pour que le catalogue sache quoi lui montrer
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
