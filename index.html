@@ -20,9 +20,12 @@
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
+        
+        /* SECTIONS TEXTES */
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
-        .content-section p { max-width: 600px; margin: 0 auto; line-height: 1.8; color: #bbb; }
+        .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
+        .highlight { color: #4ade80; font-weight: 500; }
         @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
     </style>
 </head>
@@ -31,11 +34,14 @@
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
-        <p class="tagline">Bienvenue dans l'âme d'Éonia.</p> <div class="auth-container">
+        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+
+        <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
             <input type="password" placeholder="Votre mot de passe" id="pass">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
-            <a href="#" class="forgot-pass">Mot de passe oublié ?</a> </div>
+            <a href="#" class="forgot-pass">Mot de passe oublié ?</a>
+        </div>
 
         <div class="bottom-nav">
             <a href="#" onclick="accesInvite()">Visiter en tant qu'invité</a>
@@ -46,7 +52,10 @@
 
     <section class="content-section" id="concept">
         <h2>Notre Concept</h2>
-        <p>ÉONIA fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. Racontez la vôtre.</p>
+        <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <span class="highlight">Scanner, Cultiver, Raconter.</span></p>
+        
+        <h2 style="margin-top: 60px;">L'âme d'Éonia</h2>
+        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
 <script>
@@ -59,14 +68,12 @@
             return; 
         }
         
-        // On enregistre l'email et on redirige vers le catalogue
         localStorage.setItem('user_email', mail);
         localStorage.setItem('eonia_access', 'client');
         window.location.href = "catalogue.html";
     }
 
     function accesInvite() {
-        // L'invité est identifié pour que le catalogue sache quoi lui montrer
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
