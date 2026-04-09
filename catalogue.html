@@ -6,7 +6,7 @@
     <title>ÉONIA — Collection</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        /* TES STYLES STRICTEMENT CONSERVÉS */
+        /* TES STYLES DE BASE CONSERVÉS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
         
@@ -14,13 +14,33 @@
         .logo-main { width: 90px; margin-bottom: 20px; opacity: 0.9; }
         .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.2rem; margin: 0; }
         
-        /* Titre dynamique : Notre Collection ou Mon Jardin */
         #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
 
-        /* NAVIGATION CLIENT DISCRÈTE */
         .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
         .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway', sans-serif; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+
+        /* NOUVEAUX STYLES : RECHERCHE ET FILTRES */
+        .controls-area { max-width: 1000px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center; }
+        .search-input { 
+            width: 100%; max-width: 400px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
+            border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; 
+            text-align: center; margin-bottom: 20px; transition: 0.3s;
+        }
+        .search-input:focus { border-color: #4ade80; }
+        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .f-btn { 
+            background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; 
+            border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s;
+        }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
+
+        /* INDEX ALPHABÉTIQUE */
+        .letter-divider { 
+            grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; 
+            border-bottom: 1px solid #111; margin: 30px 0 10px 0; 
+            padding-bottom: 5px; font-weight: 200; letter-spacing: 5px;
+        }
 
         .catalog-container { 
             display: grid; 
@@ -31,18 +51,23 @@
             padding: 20px;
         }
 
+        /* EFFET ILLUMINATION AU SURVOL */
         .plant-card { 
-            background: #0c0c0c; 
-            border-radius: 15px; 
-            overflow: hidden; 
-            border: 1px solid #1a1a1a; 
-            transition: 0.3s;
-            cursor: pointer;
-            text-decoration: none;
+            background: #0c0c0c; border-radius: 15px; overflow: hidden; 
+            border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; text-decoration: none;
         }
         .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
-        .img-container { width: 100%; height: 180px; }
-        .plant-img { width: 100%; height: 100%; object-fit: cover; }
+        .img-container { width: 100%; height: 180px; overflow: hidden; }
+        .plant-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            filter: grayscale(0.4) brightness(0.7); /* Effet sombre */
+            transition: 0.5s ease;
+        }
+        .plant-card:hover .plant-img { 
+            filter: grayscale(0) brightness(1.1); /* S'illumine */
+            transform: scale(1.08); 
+        }
+        
         .plant-info { padding: 15px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -63,18 +88,28 @@
         <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
     </div>
 
+    <div class="controls-area">
+        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
+        <div id="filter-container" class="filter-nav">
+            <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+            <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+            <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+            <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        </div>
+    </div>
+
     <div id="status-msg">Synchronisation...</div>
     <div id="catalogue-grid" class="catalog-container"></div>
 
     <button class="logout-btn" onclick="logout()">Quitter</button>
-
 <script>
     const userEmail = localStorage.getItem('user_email');
     let currentView = 'catalogue'; 
+    let allPlants = []; // Stockage global des données reçues
+    let activeFilter = 'all';
 
     if (!userEmail) { window.location.href = "index.html"; }
 
-    // Affichage du menu si ce n'est pas un invité
     if (userEmail !== 'invite@eonia.com') {
         document.getElementById('client-menu').style.display = 'flex';
     }
@@ -82,16 +117,15 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function loadData() {
-        const container = document.getElementById('catalogue-grid');
         const statusMsg = document.getElementById('status-msg');
-        const pageTitle = document.getElementById('page-title');
+        const container = document.getElementById('catalogue-grid');
         
         container.innerHTML = "";
         statusMsg.style.display = 'block';
         statusMsg.innerText = "Chargement...";
 
         const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
-        pageTitle.innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+        document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
         try {
             const response = await fetch(API_URL, {
@@ -100,44 +134,92 @@
                 body: JSON.stringify({ email: emailToSend }) 
             });
 
-            const plants = await response.json();
-
-            if (!plants || plants.length === 0) {
-                statusMsg.innerText = (currentView === 'catalogue') ? "La collection est vide." : "Votre jardin est vide.";
-                return;
-            }
-
-            statusMsg.style.display = 'none';
-
-            plants.forEach(p => {
-                const card = document.createElement('div');
-                card.className = "plant-card";
-                
-                card.onclick = () => {
-                    const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
-                    window.location.href = `jardin.html?${param}`;
-                };
-
-                card.innerHTML = `
-                    <div class="img-container">
-                        <img src="${p.Photo}" class="plant-img" onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
-                    </div>
-                    <div class="plant-info">
-                        <div class="plant-name">${p["Nom commun"] || "Spécimen"}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            allPlants = await response.json();
+            renderGrid(); // Appel de la fonction d'affichage
 
         } catch (error) {
             statusMsg.innerText = "Erreur de connexion.";
         }
     }
 
+    function renderGrid() {
+        const container = document.getElementById('catalogue-grid');
+        const statusMsg = document.getElementById('status-msg');
+        const searchVal = document.getElementById('searchBox').value.toLowerCase();
+        
+        container.innerHTML = "";
+
+        // 1. Filtrage (Recherche + Catégorie)
+        let filtered = allPlants.filter(p => {
+            const nom = (p["Nom commun"] || "").toLowerCase();
+            const matchSearch = nom.includes(searchVal);
+            const matchType = (activeFilter === 'all' || p.Type === activeFilter);
+            return matchSearch && matchType;
+        });
+
+        // 2. Tri par ordre alphabétique
+        filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
+
+        if (filtered.length === 0) {
+            statusMsg.style.display = 'block';
+            statusMsg.innerText = "Aucun résultat trouvé.";
+            return;
+        }
+
+        statusMsg.style.display = 'none';
+
+        // 3. Affichage avec Indexation Alphabétique (Lettres A-Z)
+        let lastLetter = "";
+
+        filtered.forEach(p => {
+            const nom = p["Nom commun"] || "Spécimen";
+            const currentLetter = nom[0].toUpperCase();
+
+            // Affichage de la lettre si elle change (uniquement en mode collection)
+            if (currentView === 'catalogue' && currentLetter !== lastLetter) {
+                const divider = document.createElement('div');
+                divider.className = "letter-divider";
+                divider.innerText = currentLetter;
+                container.appendChild(divider);
+                lastLetter = currentLetter;
+            }
+
+            const card = document.createElement('div');
+            card.className = "plant-card";
+            
+            card.onclick = () => {
+                const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
+                window.location.href = `jardin.html?${param}`;
+            };
+
+            card.innerHTML = `
+                <div class="img-container">
+                    <img src="${p.Photo}" class="plant-img" onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
+                </div>
+                <div class="plant-info">
+                    <div class="plant-name">${nom}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Gestion des filtres (Tout, Fruitiers, etc.)
+    function setFilter(type, btn) {
+        activeFilter = type;
+        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGrid();
+    }
+
     function switchView(view) {
         currentView = view;
         document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
         document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+        
+        // Cache les filtres en mode "Mon Jardin" pour plus de clarté si tu veux
+        document.getElementById('filter-container').style.opacity = (view === 'catalogue') ? "1" : "0.3";
+        
         loadData();
     }
 
