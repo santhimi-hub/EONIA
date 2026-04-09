@@ -42,6 +42,8 @@
             padding-bottom: 5px; font-weight: 200; letter-spacing: 5px;
         }
 
+ /* --- BLOC À REMPLACER POUR L'EFFET MOBILE --- */
+
         .catalog-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
@@ -51,25 +53,52 @@
             padding: 20px;
         }
 
-        /* EFFET ILLUMINATION AU SURVOL */
         .plant-card { 
-            background: #0c0c0c; border-radius: 15px; overflow: hidden; 
-            border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; text-decoration: none;
+            background: #0c0c0c; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            border: 1px solid #1a1a1a; 
+            transition: 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            /* Empêche le flash bleu du navigateur sur mobile lors du clic */
+            -webkit-tap-highlight-color: transparent; 
         }
-        .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
-        .img-container { width: 100%; height: 180px; overflow: hidden; }
+
+        /* L'éclat qui s'illumine au survol ou au toucher */
+        .plant-card:hover, .plant-card:active { 
+            border-color: #4ade80; 
+            transform: translateY(-5px); 
+        }
+
+        .img-container { 
+            width: 100%; 
+            height: 180px; 
+            overflow: hidden; 
+            background: #000;
+        }
+
         .plant-img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            filter: grayscale(0.4) brightness(0.7); /* Effet sombre */
-            transition: 0.5s ease;
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            /* On commence un peu sombre pour l'effet de révélation */
+            filter: grayscale(0.3) brightness(0.8); 
+            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), filter 0.6s ease;
         }
-        .plant-card:hover .plant-img { 
-            filter: grayscale(0) brightness(1.1); /* S'illumine */
-            transform: scale(1.08); 
+
+        /* Effet illumination au survol (PC) et au toucher (Mobile) */
+        .plant-card:hover .plant-img, 
+        .plant-card:active .plant-img { 
+            filter: grayscale(0) brightness(1.2) contrast(1.1); 
+            transform: scale(1.1); 
         }
-        
+
         .plant-info { padding: 15px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- FIN DU BLOC --- */
 
         #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
         .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
