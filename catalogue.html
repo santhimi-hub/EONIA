@@ -6,7 +6,6 @@
     <title>ÉONIA — Collection</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        /* TES STYLES DE BASE CONSERVÉS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
         
@@ -17,107 +16,53 @@
         #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
 
         .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway', sans-serif; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        /* NOUVEAUX STYLES : RECHERCHE ET FILTRES */
         .controls-area { max-width: 1000px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center; }
         .search-input { 
             width: 100%; max-width: 400px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
-            border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; 
-            text-align: center; margin-bottom: 20px; transition: 0.3s;
+            border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; text-align: center; margin-bottom: 20px; 
         }
         .search-input:focus { border-color: #4ade80; }
+
         .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .f-btn { 
-            background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; 
-            border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s;
-        }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s; }
         .f-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
 
-        /* INDEX ALPHABÉTIQUE */
-        .letter-divider { 
-            grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; 
-            border-bottom: 1px solid #111; margin: 30px 0 10px 0; 
-            padding-bottom: 5px; font-weight: 200; letter-spacing: 5px;
-        }
+        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; border-bottom: 1px solid #111; margin: 30px 0 10px 0; padding-bottom: 5px; font-weight: 200; letter-spacing: 5px; }
 
- /* --- BLOC À REMPLACER POUR L'EFFET MOBILE --- */
-
-        .catalog-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 25px; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            padding: 20px;
-        }
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto; padding: 20px; }
 
         .plant-card { 
-            background: #0c0c0c; 
-            border-radius: 15px; 
-            overflow: hidden; 
-            border: 1px solid #1a1a1a; 
-            transition: 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            position: relative;
-            /* Empêche le flash bleu du navigateur sur mobile lors du clic */
-            -webkit-tap-highlight-color: transparent; 
+            background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; 
+            transition: 0.3s; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
         }
+        
+        /* Animation au clic/survol */
+        .plant-card:hover, .plant-card.active-touch { border-color: #4ade80; transform: translateY(-5px); }
 
-        /* L'éclat qui s'illumine au survol ou au toucher */
-        .plant-card:hover, .plant-card:active { 
-            border-color: #4ade80; 
-            transform: translateY(-5px); 
-        }
-
-        .img-container { 
-            width: 100%; 
-            height: 180px; 
-            overflow: hidden; 
-            background: #000;
-        }
+        .img-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
 
         .plant-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            /* On commence un peu sombre pour l'effet de révélation */
+            width: 100%; height: 100%; object-fit: cover; opacity: 0;
             filter: grayscale(0.3) brightness(0.8); 
-            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), filter 0.6s ease;
+            transition: transform 0.4s ease-out, filter 0.4s ease-out, opacity 0.5s ease-in;
         }
 
-        /* Effet illumination au survol (PC) et au toucher (Mobile) */
-        .plant-card:hover .plant-img, 
-        .plant-card:active .plant-img { 
-            filter: grayscale(0) brightness(1.2) contrast(1.1); 
-            transform: scale(1.1); 
+        /* Illumination */
+        .plant-card:hover .plant-img, .plant-card.active-touch .plant-img { 
+            filter: grayscale(0) brightness(1.3) contrast(1.1) !important; 
+            transform: scale(1.1) !important; 
         }
+        
+        .plant-img.loaded { opacity: 1; }
 
         .plant-info { padding: 15px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- FIN DU BLOC --- */
-
         #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
         .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
-   /* Effet au survol (Souris) ET au toucher (Mobile) */
-.plant-card:hover .plant-img, 
-.plant-card:active .plant-img { 
-    filter: grayscale(0) brightness(1.2) contrast(1.1) !important; 
-    transform: scale(1.1) !important; 
-}
-
-/* On rend la transition plus nerveuse pour qu'elle soit vue même sur un clic rapide */
-.plant-img {
-    transition: transform 0.3s ease-out, filter 0.3s ease-out !important;
-}
-
-/* Supprime le délai de clic sur mobile pour plus de réactivité */
-.plant-card {
-    touch-action: manipulation;
-}
     </style>
 </head>
 <body>
@@ -147,24 +92,21 @@
     <div id="catalogue-grid" class="catalog-container"></div>
 
     <button class="logout-btn" onclick="logout()">Quitter</button>
+
 <script>
     const userEmail = localStorage.getItem('user_email');
     let currentView = 'catalogue'; 
-    let allPlants = []; // Stockage global des données reçues
+    let allPlants = [];
     let activeFilter = 'all';
 
     if (!userEmail) { window.location.href = "index.html"; }
-
-    if (userEmail !== 'invite@eonia.com') {
-        document.getElementById('client-menu').style.display = 'flex';
-    }
+    if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
 
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function loadData() {
         const statusMsg = document.getElementById('status-msg');
         const container = document.getElementById('catalogue-grid');
-        
         container.innerHTML = "";
         statusMsg.style.display = 'block';
         statusMsg.innerText = "Chargement...";
@@ -178,10 +120,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailToSend }) 
             });
-
             allPlants = await response.json();
-            renderGrid(); // Appel de la fonction d'affichage
-
+            renderGrid();
         } catch (error) {
             statusMsg.innerText = "Erreur de connexion.";
         }
@@ -191,18 +131,13 @@
         const container = document.getElementById('catalogue-grid');
         const statusMsg = document.getElementById('status-msg');
         const searchVal = document.getElementById('searchBox').value.toLowerCase();
-        
         container.innerHTML = "";
 
-        // 1. Filtrage (Recherche + Catégorie)
         let filtered = allPlants.filter(p => {
             const nom = (p["Nom commun"] || "").toLowerCase();
-            const matchSearch = nom.includes(searchVal);
-            const matchType = (activeFilter === 'all' || p.Type === activeFilter);
-            return matchSearch && matchType;
+            return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
         });
 
-        // 2. Tri par ordre alphabétique
         filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
 
         if (filtered.length === 0) {
@@ -212,15 +147,12 @@
         }
 
         statusMsg.style.display = 'none';
-
-        // 3. Affichage avec Indexation Alphabétique (Lettres A-Z)
         let lastLetter = "";
 
         filtered.forEach(p => {
             const nom = p["Nom commun"] || "Spécimen";
             const currentLetter = nom[0].toUpperCase();
 
-            // Affichage de la lettre si elle change (uniquement en mode collection)
             if (currentView === 'catalogue' && currentLetter !== lastLetter) {
                 const divider = document.createElement('div');
                 divider.className = "letter-divider";
@@ -232,14 +164,20 @@
             const card = document.createElement('div');
             card.className = "plant-card";
             
-            card.onclick = () => {
+            // Logique de clic optimisée pour Mobile (Délai pour voir l'illumination)
+            card.onclick = (e) => {
+                card.classList.add('active-touch');
                 const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
-                window.location.href = `jardin.html?${param}`;
+                setTimeout(() => { window.location.href = `jardin.html?${param}`; }, 150);
             };
 
+            // HTML avec Lazy Loading
             card.innerHTML = `
                 <div class="img-container">
-                    <img src="${p.Photo}" class="plant-img" onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
+                    <img data-src="${p.Photo}" 
+                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                         class="plant-img lazy" 
+                         onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
                 </div>
                 <div class="plant-info">
                     <div class="plant-name">${nom}</div>
@@ -247,9 +185,25 @@
             `;
             container.appendChild(card);
         });
+        
+        handleLazyLoad(); // Active le chargement des images visibles
     }
 
-    // Gestion des filtres (Tout, Fruitiers, etc.)
+    function handleLazyLoad() {
+        const images = document.querySelectorAll('.plant-img.lazy');
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.add('loaded');
+                    obs.unobserve(img);
+                }
+            });
+        });
+        images.forEach(img => observer.observe(img));
+    }
+
     function setFilter(type, btn) {
         activeFilter = type;
         document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
@@ -261,17 +215,11 @@
         currentView = view;
         document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
         document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-        
-        // Cache les filtres en mode "Mon Jardin" pour plus de clarté si tu veux
         document.getElementById('filter-container').style.opacity = (view === 'catalogue') ? "1" : "0.3";
-        
         loadData();
     }
 
-    function logout() {
-        localStorage.clear();
-        window.location.href = "index.html";
-    }
+    function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
     loadData();
 </script>
