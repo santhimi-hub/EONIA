@@ -16,8 +16,12 @@
         .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 15px 0; color: #4ade80; border-bottom: 1px solid #222; padding-bottom: 8px; }
 
         /* APERÇU RÉEL AVEC LOGO ET QR */
-        .preview-container { width: 100%; height: 240px; background: #080808; border-radius: 15px; display: flex; justify-content: center; align-items: center; perspective: 1000px; border: 1px solid #111; margin-bottom: 25px; }
-        #plaque-surface { width: 280px; height: 140px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 15px; transition: 0.5s; box-shadow: 0 20px 40px rgba(0,0,0,0.8); transform: rotateX(8deg); }
+        .preview-container { width: 100%; height: 280px; background: #080808; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; perspective: 1000px; border: 1px solid #111; margin-bottom: 25px; padding: 20px; }
+        #plaque-surface { width: 240px; height: 168px; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; transition: 0.5s; box-shadow: 0 20px 40px rgba(0,0,0,0.8); transform: rotateX(8deg); position: relative; }
+        
+        /* FIXATION VISUELLE */
+        #fixation-visual { width: 12px; height: 60px; background: #1a1a1a; margin-top: -10px; border-radius: 0 0 4px 4px; transition: 0.3s; border: 1px solid #333; }
+
         .mat-ardoise { background: url('https://www.transparenttextures.com/patterns/dark-matter.png'), #222; border: 1px solid #333; }
         .mat-bois { background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), #5d4037; border: 1px solid #4e342e; }
         .mat-acrylique { background: linear-gradient(135deg, #111 0%, #000 100%); border: 1px solid #333; }
@@ -28,7 +32,7 @@
         #text-render { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 3px; text-align: center; font-weight: 200; color: #fff; margin-top: 5px; }
         .plaque-footer { font-size: 0.4rem; letter-spacing: 2px; opacity: 0.4; text-transform: uppercase; }
 
-        /* GRILLE DE CHOIX (MATIÈRES ET PACKS) */
+        /* GRILLE DE CHOIX */
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .option-card { background: #0c0c0c; border: 1px solid #222; padding: 20px 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; position: relative; }
         .option-card.selected { border-color: #4ade80; background: rgba(74, 222, 128, 0.05); }
@@ -55,7 +59,7 @@
 
     <div class="container">
         
-        <h2 class="section-title">1. Votre Plaque Personnalisée</h2>
+        <h2 class="section-title">1. Votre Bijou Végétal (10x7cm)</h2>
         <div class="preview-container">
             <div id="plaque-surface" class="mat-ardoise">
                 <div class="plaque-header">
@@ -67,38 +71,51 @@
                 <div id="text-render">NOM DE VOTRE PLANTE</div>
                 <div class="plaque-footer">ÉONIA — MÉMOIRE VÉGÉTALE</div>
             </div>
+            <div id="fixation-visual"></div>
         </div>
 
         <h2 class="section-title">2. Choisissez votre offre</h2>
         <div class="options-grid">
             <div class="option-card selected" onclick="selectOffer(this, 'Ardoise', 25, 'Solo')">
-                <h3>Ardoise Solo</h3>
+                <h3>Ardoise Naturelle</h3>
                 <div class="price-tag">25€</div>
-                <div class="desc">1 Plaque + 1 Piquet</div>
+                <div class="desc">1 Plaque + Support Universel</div>
             </div>
             <div class="option-card" onclick="selectOffer(this, 'Bois', 30, 'Solo')">
-                <h3>Chêne Solo</h3>
+                <h3>Chêne du Périgord</h3>
                 <div class="price-tag">30€</div>
-                <div class="desc">1 Plaque + 1 Piquet</div>
+                <div class="desc">1 Plaque + Support Universel</div>
             </div>
             <div class="option-card" onclick="selectOffer(this, 'Acrylique', 20, 'Solo')">
-                <h3>Acrylique Solo</h3>
+                <h3>Acrylique Givré</h3>
                 <div class="price-tag">20€</div>
-                <div class="desc">1 Plaque + 1 Piquet</div>
+                <div class="desc">1 Plaque + Support Universel</div>
             </div>
             <div class="option-card" onclick="selectOffer(this, 'Ardoise', 65, 'Pack Trio')">
                 <div class="badge-promo">-10€</div>
                 <h3>Pack Trio Ardoise</h3>
                 <div class="price-tag">65€</div>
-                <div class="desc">3 Plaques + 3 Piquets</div>
+                <div class="desc">3 Plaques + 3 Supports</div>
             </div>
         </div>
 
-        <h2 class="section-title">3. Personnalisation</h2>
+        <h2 class="section-title">3. Type de fixation</h2>
+        <div class="options-grid">
+            <div id="opt-piquet" class="option-card selected" onclick="selectFixation('piquet', 0)">
+                <h3>Piquet de sol</h3>
+                <div class="desc">Tige PETG 18mm</div>
+            </div>
+            <div id="opt-medaille" class="option-card" onclick="selectFixation('medaille', 5)">
+                <h3>Médaille d'arbre</h3>
+                <div class="desc">Ressort Inox (+5€)</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">4. Personnalisation</h2>
         <div class="input-box">
             <input type="text" id="gravure" maxlength="18" placeholder="EX: MON OLIVIER" oninput="updatePreview()">
             <p class="info-txt">
-                * Si laissé vide, la plaque sera <strong>vierge</strong> (-5€ sur le prix final).
+                * Les plaques sont au format standard 10x7cm. Si laissé vide, la plaque sera <strong>vierge</strong> (-5€).
             </p>
         </div>
 
@@ -112,19 +129,42 @@
     <script>
         let selectedMat = "Ardoise";
         let currentPrice = 25;
+        let fixationPrice = 0;
+        let selectedFixationType = "piquet";
         let offerName = "Ardoise Solo";
 
         function selectOffer(el, mat, price, name) {
-            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.options-grid:nth-of-type(2) .option-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
             selectedMat = mat;
             currentPrice = price;
             offerName = name;
             
-            // Update texture plaque
             const surface = document.getElementById('plaque-surface');
             surface.className = 'mat-' + mat.toLowerCase();
+            updateFinalPrice();
+        }
+
+        function selectFixation(type, price) {
+            document.getElementById('opt-piquet').classList.remove('selected');
+            document.getElementById('opt-medaille').classList.remove('selected');
+            document.getElementById('opt-' + type).classList.add('selected');
             
+            selectedFixationType = type;
+            fixationPrice = price;
+            
+            const piquetVis = document.getElementById('fixation-visual');
+            if(type === 'medaille') {
+                piquetVis.style.width = "260px";
+                piquetVis.style.height = "10px";
+                piquetVis.style.borderRadius = "10px";
+                piquetVis.style.marginTop = "-85px";
+            } else {
+                piquetVis.style.width = "12px";
+                piquetVis.style.height = "60px";
+                piquetVis.style.borderRadius = "0 0 4px 4px";
+                piquetVis.style.marginTop = "-10px";
+            }
             updateFinalPrice();
         }
 
@@ -136,7 +176,7 @@
 
         function updateFinalPrice() {
             const isVierge = document.getElementById('gravure').value === "";
-            let total = currentPrice;
+            let total = currentPrice + fixationPrice;
             if (isVierge) total -= 5;
             document.getElementById('final-price').innerText = total + "€";
         }
@@ -144,7 +184,7 @@
         function commander() {
             const txt = document.getElementById('gravure').value || "Vierge";
             const total = document.getElementById('final-price').innerText;
-            alert("RÉCAPITULATIF :\nOffre : " + offerName + "\nTexte : " + txt + "\nTotal : " + total + "\n\nRedirection Stripe...");
+            alert("RÉCAPITULATIF ÉONIA :\nOffre : " + offerName + "\nFixation : " + selectedFixationType + "\nTexte : " + txt + "\nTotal : " + total + "\n\nRedirection vers le paiement sécurisé...");
         }
     </script>
 </body>
