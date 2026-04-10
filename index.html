@@ -75,11 +75,11 @@
             <input type="number" pattern="[0-9]*" inputmode="numeric" placeholder="Code PIN" id="pin">
             
             <div class="auth-footer">
-                <p class="helper-text">Première connexion ? Choisissez 4 chiffres pour activer votre plaque.</p>
+                <p class="helper-text" id="help-text">Première connexion ? Choisissez 4 chiffres pour activer votre plaque.</p>
                 <a href="mailto:contact@eonia.com?subject=Code PIN oublié" class="pin-forgot">PIN oublié ?</a>
             </div>
 
-            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
+            <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
             
             <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
         </div>
@@ -103,6 +103,15 @@
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
 
+    // Optimisation visuelle si scan de plaque
+    window.onload = () => {
+        if (plaqueEnAttente) {
+            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+            document.getElementById('help-text').style.color = "#4ade80";
+            document.getElementById('help-text').innerHTML = "<strong>Nouvelle plaque détectée :</strong> Entrez un mail et créez votre PIN.";
+        }
+    };
+
     // Gestion de la touche "Entrée"
     document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
@@ -119,10 +128,12 @@
             return; 
         }
 
+        // Sauvegarde des identifiants pour le Worker
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         localStorage.setItem('eonia_access', 'client');
         
+        // Redirection vers la plaque ou le catalogue
         if (plaqueEnAttente) {
             window.location.href = `jardin.html?id=${plaqueEnAttente}`;
         } else {
