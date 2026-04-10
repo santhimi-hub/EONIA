@@ -62,24 +62,29 @@
         #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
         .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
 
-        /* --- STYLES BOUTON IA ÉONIA --- */
+        /* --- STYLES BOUTON IA ÉONIA (CORRIGÉS) --- */
         #eonia-ai-trigger { 
             position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
             cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
         }
         .ai-icon-circle { 
-            width: 50px; height: 50px; background: #fff; border-radius: 50%; 
+            width: 50px; height: 50px; background: #4ade80; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 1px solid #4ade80; transition: 0.3s;
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 2px solid #fff; transition: 0.3s;
         }
         .ai-tooltip { 
-            background: #111; color: #4ade80; padding: 7px 14px; border-radius: 20px; 
-            font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; 
-            margin-right: 10px; border: 1px solid #1a1a1a; opacity: 0; 
-            transition: 0.4s; pointer-events: none; font-weight: 700; white-space: nowrap;
+            background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; 
+            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; 
+            margin-right: 10px; opacity: 1; /* Visible par défaut sur PC */
+            transition: 0.4s; pointer-events: none; font-weight: 800; white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(-5px); }
-        #eonia-ai-trigger:hover .ai-icon-circle { transform: scale(1.1); }
+
+        /* --- ADAPTATION MOBILE --- */
+        @media (max-width: 600px) {
+            #eonia-ai-trigger { bottom: 20px; right: 20px; transform: scale(0.9); }
+            .ai-tooltip { display: none; } /* On cache le texte sur mobile pour ne pas gêner */
+        }
     </style>
 </head>
 <body>
@@ -111,9 +116,9 @@
     <button class="logout-btn" onclick="logout()">Quitter</button>
 
     <div id="eonia-ai-trigger" onclick="handleAIClick()">
-        <span id="ai-label" class="ai-tooltip">Expert Éonia</span>
+        <span id="ai-label" class="ai-tooltip">Une question ?</span>
         <div class="ai-icon-circle">
-            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 22px; filter: invert(1);" alt="IA Expert">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 24px;" alt="IA Expert">
         </div>
     </div>
 
@@ -244,7 +249,6 @@
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
-    // --- LOGIQUE IA ÉONIA ---
     function handleAIClick() {
         const urlParams = new URLSearchParams(window.location.search);
         const isOnSpecificPlant = urlParams.get('id') || urlParams.get('id_botanique');
@@ -261,9 +265,9 @@
         const label = document.getElementById('ai-label');
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('id') || urlParams.get('id_botanique')) {
-            label.innerText = "Aide sur cette plante ?";
+            label.innerText = "Soin spécifique ?";
         } else {
-            label.innerText = "Expert Éonia";
+            label.innerText = "Une question ?";
         }
     }
 
