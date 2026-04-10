@@ -131,14 +131,15 @@
         const plaqueId = params.get('id');
         const idBot = params.get('id_botanique');
         
-        // RÉCUPÉRATION DE LA SESSION (Email + PIN)
+        // RÉCUPÉRATION DE LA SESSION
         const userEmail = localStorage.getItem('user_email');
         const userPin = localStorage.getItem('user_pin');
         
         currentPlaqueId = plaqueId;
 
-        // Redirection vers login si accès direct à une plaque sans être connecté
-        if (!userEmail && plaqueId) {
+        // --- SÉCURITÉ : REDIRECTION AVANT TOUT ---
+        // Si on scanne une plaque mais qu'on n'est pas logué (Email ou PIN manquant)
+        if (plaqueId && (!userEmail || !userPin)) {
             window.location.href = "index.html?id=" + plaqueId;
             return;
         }
@@ -151,14 +152,14 @@
                     id: plaqueId, 
                     id_botanique: idBot,
                     email: userEmail || "invite@eonia.com",
-                    pin: userPin || "" // Transmission du PIN pour débloquer le dashboard
+                    pin: userPin || "" 
                 })
             });
             
             const data = await res.json();
             const p = data[0];
 
-            // 1. CAS PLAQUE VIDE (Prête à être configurée)
+            // 1. CAS PLAQUE VIDE
             if (plaqueId && p && !p.aUnePlante) {
                 document.getElementById('status-msg').style.display = 'none';
                 document.getElementById('display-plaque-id').innerText = plaqueId;
@@ -166,17 +167,16 @@
                 return;
             }
 
-            // 2. CAS FICHE NON DISPONIBLE
+            // 2. CAS BROUILLON
             if(!p || p["Statut"] === "Brouillon") {
                 document.getElementById('status-msg').innerText = "Cette fiche est en cours de préparation...";
                 return;
             }
 
-            // 3. AFFICHAGE DES INFOS BOTANIQUES
+            // 3. AFFICHAGE DES INFOS
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('plant-details').style.display = 'block';
 
-            // Si un Surnom existe, on l'affiche en priorité ou en complément
             const nomAffichage = p["Surnom"] ? `${p["Nom commun"]} (${p["Surnom"]})` : (p["Nom commun"] || "Spécimen ÉONIA");
             
             document.getElementById('nom-commun').innerText = nomAffichage;
@@ -191,12 +191,10 @@
             document.getElementById('floraison').innerText = p["Floraison"] || "-";
             document.getElementById('main-img').src = p["Photo"] || "";
 
-            // 4. LOGIQUE PROPRIÉTAIRE (Tableau de bord)
+            // 4. LOGIQUE PROPRIÉTAIRE
             if(p.estProprietaire && plaqueId) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
                 document.getElementById('meteo-display').style.display = 'flex';
-                
-                // Données réservées au propriétaire
                 document.getElementById('vip-entretien').innerText = p["Entretien"] || "À venir...";
                 document.getElementById('vip-sante').innerText = p["Protection et sante"] || "À venir...";
                 document.getElementById('vip-compagnon').innerText = p["Campagnonnage"] || "À venir...";
@@ -212,7 +210,6 @@
     };
 
     function allerAuCatalogue() {
-        // Mémorise la plaque pour faire le lien après le choix de la plante
         localStorage.setItem('plaque_en_cours_de_liaison', currentPlaqueId);
         window.location.href = "catalogue.html";
     }
@@ -249,7 +246,6 @@
     }
 
     async function checkMeteo(rusticite) {
-        // Simulation température (remplacer par une API météo réelle plus tard)
         const tempSimulee = 5; 
         const rust = parseInt(rusticite) || 0;
         if(tempSimulee < rust) {
