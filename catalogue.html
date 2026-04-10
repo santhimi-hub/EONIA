@@ -62,7 +62,6 @@
         #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
         .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
 
-        /* --- STYLES BOUTON IA ÉONIA (CORRIGÉS) --- */
         #eonia-ai-trigger { 
             position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
             cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
@@ -75,15 +74,12 @@
         .ai-tooltip { 
             background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; 
             font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; 
-            margin-right: 10px; opacity: 1; /* Visible par défaut sur PC */
-            transition: 0.4s; pointer-events: none; font-weight: 800; white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-right: 10px; opacity: 1; font-weight: 800; white-space: nowrap;
         }
 
-        /* --- ADAPTATION MOBILE --- */
         @media (max-width: 600px) {
             #eonia-ai-trigger { bottom: 20px; right: 20px; transform: scale(0.9); }
-            .ai-tooltip { display: none; } /* On cache le texte sur mobile pour ne pas gêner */
+            .ai-tooltip { display: none; }
         }
     </style>
 </head>
@@ -124,6 +120,9 @@
 
 <script>
     const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    
     let currentView = 'catalogue'; 
     let allPlants = [];
     let activeFilter = 'all';
@@ -131,23 +130,31 @@
     if (!userEmail) { window.location.href = "index.html"; }
     if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
 
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-
     async function loadData() {
         const statusMsg = document.getElementById('status-msg');
         const container = document.getElementById('catalogue-grid');
+        const plaqueEnAttente = localStorage.getItem('plaque_en_cours_de_liaison');
+        
         container.innerHTML = "";
         statusMsg.style.display = 'block';
         statusMsg.innerText = "Chargement...";
 
+        // Mise à jour du titre si on est en train de lier une plaque
+        if (plaqueEnAttente && currentView === 'catalogue') {
+            document.getElementById('page-title').innerText = "Lier à la plaque " + plaqueEnAttente;
+            document.getElementById('page-title').style.color = "#4ade80";
+        } else {
+            document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+            document.getElementById('page-title').style.color = "#fff";
+        }
+
         const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
-        document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailToSend }) 
+                body: JSON.stringify({ email: emailToSend, pin: userPin }) 
             });
             allPlants = await response.json();
             renderGrid();
@@ -193,10 +200,40 @@
             const card = document.createElement('div');
             card.className = "plant-card";
             
-            card.onclick = (e) => {
+            card.onclick = async (e) => {
                 card.classList.add('active-touch');
-                const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
-                setTimeout(() => { window.location.href = `jardin.html?${param}`; }, 150);
+                const plaqueEnAttente = localStorage.getItem('plaque_en_cours_de_liaison');
+
+                // LOGIQUE DE LIAISON
+                if (currentView === 'catalogue' && plaqueEnAttente) {
+                    const confirmer = confirm(`Associer "${nom}" à votre plaque ${plaqueEnAttente} ?`);
+                    if (confirmer) {
+                        statusMsg.innerText = "Liaison en cours...";
+                        statusMsg.style.display = 'block';
+                        try {
+                            const res = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    id: plaqueEnAttente,
+                                    email: userEmail,
+                                    pin: userPin,
+                                    nouvelle_plante_id: p.id
+                                })
+                            });
+                            if (res.ok) {
+                                localStorage.removeItem('plaque_en_cours_de_liaison');
+                                window.location.href = `jardin.html?id=${plaqueEnAttente}`;
+                            } else {
+                                alert("Erreur lors de l'enregistrement.");
+                            }
+                        } catch (err) { alert("Erreur réseau."); }
+                    }
+                } else {
+                    // CONSULTATION NORMALE
+                    const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
+                    setTimeout(() => { window.location.href = `jardin.html?${param}`; }, 150);
+                }
             };
 
             card.innerHTML = `
@@ -243,36 +280,17 @@
         document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
         document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
         document.getElementById('filter-container').style.opacity = (view === 'catalogue') ? "1" : "0.3";
-        updateAITooltip();
         loadData();
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
     function handleAIClick() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const isOnSpecificPlant = urlParams.get('id') || urlParams.get('id_botanique');
-        
-        if (isOnSpecificPlant) {
-            alert("L'Expert ÉONIA : Je me connecte à la mémoire de cette essence spécifique pour vous conseiller.");
-        } else {
-            const context = (currentView === 'catalogue') ? "la collection globale" : "votre jardin personnel";
-            alert("L'Expert ÉONIA : Je suis prêt à vous guider dans " + context + ".");
-        }
+        const context = (currentView === 'catalogue') ? "la collection" : "votre jardin";
+        alert("L'Expert ÉONIA : Je suis prêt à vous guider dans " + context + ".");
     }
 
-    function updateAITooltip() {
-        const label = document.getElementById('ai-label');
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('id') || urlParams.get('id_botanique')) {
-            label.innerText = "Soin spécifique ?";
-        } else {
-            label.innerText = "Une question ?";
-        }
-    }
-
-    window.onload = updateAITooltip;
-    loadData();
+    window.onload = loadData;
 </script>
 </body>
 </html>
