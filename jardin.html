@@ -9,38 +9,41 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
+        
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
-        #config-plaque { display: none; text-align: center; padding: 100px 20px; }
-        #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
+        
+        /* Interfaces */
+        #config-plaque, #plant-details { display: none; }
+        
         .main-img-container { width: 100%; height: 45vh; overflow: hidden; border-bottom: 2px solid #4ade80; background: #111; position: relative; }
         #main-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .content-padding { padding: 25px 20px; }
-        .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 20px; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; }
-        .sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 20px; display: block; }
+        
+        .content-padding { padding: 25px 20px; max-width: 800px; margin: 0 auto; }
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 10px; }
+        
         .grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; letter-spacing: 1px; }
+        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; }
         .value { font-size: 0.8rem; color: #ddd; }
-        details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
-        summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.7rem; text-transform: uppercase; list-style: none; outline: none; }
-        .details-content { padding: 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; white-space: pre-line; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 25px; border-radius: 12px; margin-top: 30px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.08) 0%, rgba(0,0,0,0) 100%); display: none; }
-        .vip-title { color: #4ade80; font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(74, 222, 128, 0.2); padding-bottom: 10px; }
-        .btn-action { margin-top: 15px; width: 100%; padding: 14px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; border-radius: 50px; }
-        .btn-secondary { background: none; border: 1px solid #4ade80; color: #4ade80; margin-top: 10px; }
-        .chart-container { margin: 20px 0; background: #111; padding: 15px; border-radius: 8px; height: 200px; }
+        
+        #espace-proprietaire { border: 1px solid #4ade80; padding: 20px; border-radius: 12px; margin-top: 30px; background: rgba(74, 222, 128, 0.05); }
+        .vip-title { color: #4ade80; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        
+        .btn-action { width: 100%; padding: 15px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; border-radius: 50px; margin-top: 10px; }
+        .btn-logout { background: none; border: 1px solid #ff4d4d; color: #ff4d4d; margin-top: 30px; }
+        
+        .chart-container { height: 180px; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-    <div id="status-msg">Chargement de votre espace ÉONIA...</div>
+    <div id="status-msg">Analyse de la plaque...</div>
 
-    <div id="config-plaque">
-        <h1 style="color:#fff; margin-bottom:20px;">Plaque Neuve</h1>
-        <p style="color:#bbb; margin-bottom:40px;">Identifié en tant que : <br><strong id="user-session-mail" style="color:#4ade80;"></strong></p>
-        <button onclick="allerAuCatalogue()" class="btn-action">Associer un spécimen</button>
-        <button onclick="deconnexion()" class="btn-action btn-secondary">Utiliser un autre compte</button>
+    <div id="config-plaque" class="content-padding" style="text-align: center; padding-top: 100px;">
+        <h1>Nouvelle Plaque</h1>
+        <p style="color:#bbb; margin-bottom:30px;">Bonjour, cette plaque n'est pas encore associée à votre jardin.</p>
+        <button onclick="allerAuCatalogue()" class="btn-action">Choisir une plante pour cette plaque</button>
+        <button onclick="deconnexion()" class="btn-logout btn-action">Se déconnecter</button>
     </div>
 
     <div id="plant-details">
@@ -50,43 +53,41 @@
 
         <div class="content-padding">
             <h1 id="nom-commun">...</h1>
-            <span id="nom-scientifique" class="sci-name">...</span>
+            <p id="nom-scientifique" style="font-style:italic; color:#666; margin-bottom:20px;"></p>
 
             <div class="grid-info">
                 <div class="info-item"><span class="label">Famille</span><span id="famille" class="value">-</span></div>
-                <div class="info-item"><span class="label">Rusticité</span><span id="rusticite" class="value">-</span></div>
+                <div class="info-item"><span class="label">Exposition</span><span id="exposition" class="value">-</span></div>
             </div>
-
-            <details><summary>📄 Description</summary><div class="details-content" id="description"></div></details>
 
             <div id="espace-proprietaire">
-                <h2 class="vip-title">Tableau de Bord</h2>
-                <div class="grid-info">
+                <h2 class="vip-title">Mon Tableau de Bord</h2>
+                <div class="grid-info" style="margin-top:0;">
                     <div class="info-item"><span class="label">Plantée le</span><span id="date-plant" class="value">-</span></div>
-                    <div class="info-item"><span class="label">Propriétaire</span><span id="proprio-mail" class="value">-</span></div>
+                    <div class="info-item"><span class="label">ID Plaque</span><span id="plaque-id-display" class="value">-</span></div>
                 </div>
                 <div class="chart-container"><canvas id="arrosageChart"></canvas></div>
-                <button onclick="deconnexion()" class="btn-action btn-secondary">Déconnexion</button>
+                <button onclick="alert('Soin enregistré !')" class="btn-action">Valider un arrosage</button>
             </div>
+
+            <button onclick="deconnexion()" class="btn-logout btn-action">Déconnexion</button>
         </div>
     </div>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     let currentPlaqueId = "";
-    
+
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
-        const plaqueId = params.get('id');
-        const idBot = params.get('id_botanique');
+        currentPlaqueId = params.get('id');
         
         const userEmail = localStorage.getItem('user_email');
         const userPin = localStorage.getItem('user_pin');
-        currentPlaqueId = plaqueId;
 
-        // 1. Si pas de session -> Login
-        if (plaqueId && (!userEmail || !userPin)) {
-            window.location.href = "index.html?id=" + plaqueId;
+        // 1. SI PAS DE SESSION -> LOGIN DIRECT
+        if (!userEmail || !userPin) {
+            window.location.href = "index.html" + (currentPlaqueId ? "?id=" + currentPlaqueId : "");
             return;
         }
 
@@ -95,59 +96,51 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    id: plaqueId, 
-                    id_botanique: idBot,
+                    id: currentPlaqueId, 
                     email: userEmail,
                     pin: userPin
                 })
             });
-            
             const data = await res.json();
             const p = data[0];
 
-            // 2. Si plaque neuve -> Interface d'association
-            if (plaqueId && p && !p.aUnePlante) {
+            // 2. CAS PLAQUE NEUVE
+            if (currentPlaqueId && p && !p.aUnePlante) {
                 document.getElementById('status-msg').style.display = 'none';
-                document.getElementById('user-session-mail').innerText = userEmail;
                 document.getElementById('config-plaque').style.display = 'block';
                 return;
             }
 
-            // 3. Si plaque occupée mais Worker dit "Pas proprio" -> On force le changement de mail
-            if (plaqueId && p && p.aUnePlante && !p.estProprietaire) {
-                alert("Session expirée ou compte non autorisé pour cette plaque.");
-                deconnexion();
-                return;
-            }
-
-            // 4. Affichage des détails
-            document.getElementById('status-msg').style.display = 'none';
-            document.getElementById('plant-details').style.display = 'block';
-
-            document.getElementById('nom-commun').innerText = p["Surnom"] ? `${p["Nom commun"]} (${p["Surnom"]})` : p["Nom commun"];
-            document.getElementById('nom-scientifique').innerText = p["Nom scientifique"] || "";
-            document.getElementById('famille').innerText = p["Famille"] || "-";
-            document.getElementById('rusticite').innerText = p["Rusticite"] || "-";
-            document.getElementById('description').innerText = p["Informations générales"] || "...";
-            document.getElementById('main-img').src = p["Photo"] || "";
-
-            // 5. Affichage Dashboard
-            if(p.estProprietaire) {
-                document.getElementById('espace-proprietaire').style.display = 'block';
-                document.getElementById('date-plant').innerText = p["Date de plantation"] || "-";
-                document.getElementById('proprio-mail').innerText = userEmail;
+            // 3. CAS ACCÈS AUTORISÉ (Propriétaire)
+            if (p && p.estProprietaire) {
+                document.getElementById('status-msg').style.display = 'none';
+                document.getElementById('plant-details').style.display = 'block';
+                
+                document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen";
+                document.getElementById('nom-scientifique').innerText = p["Nom scientifique"] || "";
+                document.getElementById('famille').innerText = p["Famille"] || "-";
+                document.getElementById('exposition').innerText = p["Exposition"] || "-";
+                document.getElementById('date-plant').innerText = p["Date de plantation"] || "Non renseignée";
+                document.getElementById('plaque-id-display').innerText = currentPlaqueId;
+                document.getElementById('main-img').src = p["Photo"] || "";
+                
                 initChart();
+            } else {
+                // Si la plaque appartient à quelqu'un d'autre
+                document.getElementById('status-msg').innerText = "Accès refusé : cette plaque ne vous appartient pas.";
             }
 
-        } catch(e) { 
-            document.getElementById('status-msg').innerText = "Erreur de connexion."; 
+        } catch (e) {
+            document.getElementById('status-msg').innerText = "Erreur de connexion aux serveurs ÉONIA.";
         }
     };
 
     function deconnexion() {
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_pin');
-        window.location.href = "index.html?id=" + currentPlaqueId;
+        if(confirm("Voulez-vous vous déconnecter ?")) {
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('user_pin');
+            window.location.href = "index.html";
+        }
     }
 
     function allerAuCatalogue() {
@@ -162,13 +155,20 @@
             data: {
                 labels: ['S1', 'S2', 'S3', 'S4'],
                 datasets: [{
-                    data: [1, 2, 1, 3],
+                    label: 'Humidité',
+                    data: [60, 45, 70, 50],
                     borderColor: '#4ade80',
-                    tension: 0.4,
-                    fill: false
+                    backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                    fill: true,
+                    tension: 0.4
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { display: false }, x: { grid: { display: false } } }
+            }
         });
     }
 </script>
