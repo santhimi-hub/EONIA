@@ -6,20 +6,18 @@
     <title>ÉONIA — Accueil</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        /* [Tes styles existants sont conservés ici] */
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
         
-        /* HERO SECTION */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
         .logo-main { width: 120px; margin-bottom: 25px; }
         .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
         .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
         
-        /* AUTHENTIFICATION */
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
         input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; text-align: center; }
         
-        /* Cache les flèches du champ number */
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
@@ -46,7 +44,6 @@
         .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 5px; }
         .btn-main:hover { background: #4ade80; }
         
-        /* LIENS SECONDAIRES */
         .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; }
         .link-order:hover { color: #fff; }
         
@@ -54,13 +51,19 @@
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
         
-        /* CONTENU */
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
         .highlight { color: #fff; font-weight: 500; }
         
         @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
+
+        /* NOUVEAUX STYLES BOUTON IA */
+        #eonia-ai-trigger { position: fixed; bottom: 30px; right: 30px; z-index: 1000; cursor: pointer; display: flex; align-items: center; transition: 0.3s; }
+        .ai-icon-circle { width: 55px; height: 55px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(74, 222, 128, 0.2); border: 2px solid #4ade80; transition: 0.3s; }
+        .ai-tooltip { background: #111; color: #4ade80; padding: 8px 15px; border-radius: 20px; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 12px; border: 1px solid #222; opacity: 0; transition: 0.5s; pointer-events: none; font-weight: 700; white-space: nowrap; }
+        #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(-5px); }
+        #eonia-ai-trigger:hover .ai-icon-circle { transform: scale(1.05); box-shadow: 0 15px 40px rgba(74, 222, 128, 0.4); }
     </style>
 </head>
 <body>
@@ -99,11 +102,17 @@
         <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
     </section>
 
+    <div id="eonia-ai-trigger" onclick="toggleAIChat()">
+        <span class="ai-tooltip">Besoin d'un conseil ?</span>
+        <div class="ai-icon-circle">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 25px; filter: invert(1);">
+        </div>
+    </div>
+
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
 
-    // Gestion de la touche "Entrée"
     document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             validerConnexion();
@@ -135,6 +144,11 @@
         localStorage.setItem('user_pin', '0000');
         localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
+    }
+
+    // FONCTION IA
+    function toggleAIChat() {
+        alert("L'Expert ÉONIA : Je suis en cours de préparation pour devenir votre conseiller botanique personnel.");
     }
 </script>
 
