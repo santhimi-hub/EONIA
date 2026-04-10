@@ -4,36 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Expertise Botanique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* TOUT TON STYLE EST CONSERVÉ À 100% */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
         #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
+        
+        /* HEADER IMAGE */
         .main-img-container { width: 100%; height: 45vh; overflow: hidden; border-bottom: 2px solid #4ade80; background: #111; position: relative; }
         #main-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .meteo-badge { position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; border: 1px solid #4ade80; font-size: 0.7rem; display: flex; align-items: center; gap: 8px; display: none; } /* Caché par défaut */
+        .meteo-badge { position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; border: 1px solid #4ade80; font-size: 0.7rem; display: flex; align-items: center; gap: 8px; display: none; }
+        
         .content-padding { padding: 25px 20px; }
         .back-btn { color: #4ade80; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 20px; }
+        
         h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; margin-bottom: 2px; }
         .sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 20px; display: block; }
+        
+        /* GRID INFO */
         .grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
         .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
         .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; letter-spacing: 1px; }
         .value { font-size: 0.8rem; color: #ddd; font-weight: 500; }
+        
+        /* ACCORDEONS */
         details { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
         summary { padding: 12px; cursor: pointer; color: #4ade80; font-size: 0.7rem; text-transform: uppercase; list-style: none; outline: none; letter-spacing: 1px; }
         .details-content { padding: 12px; font-size: 0.85rem; color: #bbb; border-top: 1px solid #1a1a1a; white-space: pre-line; }
-        #espace-proprietaire { border: 1px solid #4ade80; padding: 25px; border-radius: 12px; margin-top: 30px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.08) 0%, rgba(0,0,0,0) 100%); display: none; } /* Caché par défaut */
+        
+        /* ESPACE PROPRIETAIRE */
+        #espace-proprietaire { border: 1px solid #4ade80; padding: 25px; border-radius: 12px; margin-top: 30px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.08) 0%, rgba(0,0,0,0) 100%); display: none; }
         .vip-title { color: #4ade80; font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(74, 222, 128, 0.2); padding-bottom: 10px; }
         .alert-banner { background: #ff4d4d; color: #fff; padding: 10px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
         .btn-action { margin-top: 15px; width: 100%; padding: 12px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; font-weight: bold; border-radius: 4px; }
         .btn-secondary { background: none; border: 1px solid #4ade80; color: #4ade80; margin-top: 10px; }
+        
         .chart-container { margin: 20px 0; background: #111; padding: 15px; border-radius: 8px; height: 200px; }
-        #galerie-evolution { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .thumb-evo { width: 100%; aspect-ratio: 1/1; background: #222; border-radius: 4px; object-fit: cover; }
+
+        /* IA BULLE STYLE */
+        #eonia-ai-trigger { 
+            position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
+            cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
+        }
+        .ai-icon-circle { 
+            width: 50px; height: 50px; background: #4ade80; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 2px solid #fff;
+        }
+        .ai-tooltip { 
+            background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; 
+            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; 
+            margin-right: 10px; font-weight: 800; white-space: nowrap;
+        }
+        @media (max-width: 600px) {
+            #eonia-ai-trigger { bottom: 20px; right: 20px; transform: scale(0.9); }
+            .ai-tooltip { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -47,7 +75,7 @@
         </div>
 
         <div class="content-padding">
-            <a href="catalogue.html" class="back-btn">← Catalogue</a>
+            <a href="catalogue.html" class="back-btn">← Retour</a>
             <h1 id="nom-commun">...</h1>
             <span id="nom-scientifique" class="sci-name">...</span>
 
@@ -73,12 +101,7 @@
                 </div>
                 <div class="chart-container"><canvas id="arrosageChart"></canvas></div>
                 <button onclick="validerArrosage()" class="btn-action">J'ai arrosé aujourd'hui</button>
-                <div style="margin-top:25px;">
-                    <span class="label">Album Évolution</span>
-                    <div id="galerie-evolution">
-                        <div class="thumb-evo" style="display:flex; align-items:center; justify-content:center; border:1px dashed #4ade80; color:#4ade80; font-size:1.5rem;">+</div>
-                    </div>
-                </div>
+                
                 <details style="margin-top:20px; border-color: rgba(74, 222, 128, 0.4);">
                     <summary>💎 Conseils Experts (VIP)</summary>
                     <div class="details-content">
@@ -87,10 +110,18 @@
                         <p><strong>Compagnonnage :</strong> <span id="vip-compagnon"></span></p>
                     </div>
                 </details>
+                
                 <span class="label" style="margin-top:20px;">Notes personnelles</span>
-                <textarea id="notes-client" style="width:100%; background:#000; border:1px solid #1a1a1a; color:#eee; padding:10px; font-family:'Raleway'; font-size:0.8rem; border-radius:4px; margin-top:5px;"></textarea>
+                <textarea id="notes-client" style="width:100%; background:#000; border:1px solid #1a1a1a; color:#eee; padding:10px; font-family:'Raleway'; font-size:0.8rem; border-radius:4px; margin-top:5px; min-height:80px;"></textarea>
                 <button onclick="saveNotes()" class="btn-action btn-secondary">Enregistrer mes notes</button>
             </div>
+        </div>
+    </div>
+
+    <div id="eonia-ai-trigger" onclick="handleAIClick()">
+        <span class="ai-tooltip">Une question ?</span>
+        <div class="ai-icon-circle">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 24px;" alt="IA Expert">
         </div>
     </div>
 
@@ -101,6 +132,13 @@
         const params = new URLSearchParams(window.location.search);
         const plaqueId = params.get('id');
         const idBot = params.get('id_botanique');
+        const userEmail = localStorage.getItem('user_email');
+
+        // FORCE LA CONNEXION SI SCAN SANS SESSION
+        if (!userEmail && plaqueId) {
+            window.location.href = "index.html?id=" + plaqueId;
+            return;
+        }
 
         try {
             const res = await fetch(API_URL, {
@@ -109,15 +147,15 @@
                 body: JSON.stringify({ 
                     id: plaqueId, 
                     id_botanique: idBot,
-                    email: localStorage.getItem('user_email') || "invite@eonia.com",
-                    pin: localStorage.getItem('user_pin') || "" // AJOUT DU PIN POUR LA VÉRIFICATION
+                    email: userEmail || "invite@eonia.com",
+                    pin: localStorage.getItem('user_pin') || ""
                 })
             });
             
             const data = await res.json();
             const p = data[0];
 
-            if(p["Statut"] === "Brouillon") {
+            if(!p || p["Statut"] === "Brouillon") {
                 document.getElementById('status-msg').innerText = "Cette fiche est en cours de préparation...";
                 return;
             }
@@ -126,44 +164,41 @@
             document.getElementById('plant-details').style.display = 'block';
 
             // REMPLISSAGE PUBLIC
-            document.getElementById('nom-commun').innerText = p["Nom commun"];
-            document.getElementById('nom-scientifique').innerText = p["Nom scientifique"];
-            document.getElementById('famille').innerText = p["Famille"];
-            document.getElementById('type').innerText = p["Type"];
-            document.getElementById('exposition').innerText = p["Exposition"];
-            document.getElementById('rusticite').innerText = p["Rusticite"];
-            document.getElementById('persistance').innerText = p["Persistance"];
-            document.getElementById('sol').innerText = p["Type de sol"];
-            document.getElementById('description').innerText = p["Informations générales"];
-            document.getElementById('floraison').innerText = p["Floraison"];
-            document.getElementById('main-img').src = p["Photo"];
+            document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen ÉONIA";
+            document.getElementById('nom-scientifique').innerText = p["Nom scientifique"] || "";
+            document.getElementById('famille').innerText = p["Famille"] || "-";
+            document.getElementById('type').innerText = p["Type"] || "-";
+            document.getElementById('exposition').innerText = p["Exposition"] || "-";
+            document.getElementById('rusticite').innerText = p["Rusticite"] || "-";
+            document.getElementById('persistance').innerText = p["Persistance"] || "-";
+            document.getElementById('sol').innerText = p["Type de sol"] || "-";
+            document.getElementById('description').innerText = p["Informations générales"] || "En cours de rédaction...";
+            document.getElementById('floraison').innerText = p["Floraison"] || "-";
+            document.getElementById('main-img').src = p["Photo"] || "";
 
-            // --- LOGIQUE DE SÉCURITÉ ---
+            // LOGIQUE PROPRIÉTAIRE
             if(p.estProprietaire && plaqueId) {
-                // Montrer les éléments VIP
                 document.getElementById('espace-proprietaire').style.display = 'block';
                 document.getElementById('meteo-display').style.display = 'flex';
                 
-                // Remplir les données VIP
-                document.getElementById('vip-entretien').innerText = p["Entretien"];
-                document.getElementById('vip-sante').innerText = p["Protection et sante"];
-                document.getElementById('vip-compagnon').innerText = p["Campagnonnage"];
+                document.getElementById('vip-entretien').innerText = p["Entretien"] || "À venir...";
+                document.getElementById('vip-sante').innerText = p["Protection et sante"] || "À venir...";
+                document.getElementById('vip-compagnon').innerText = p["Campagnonnage"] || "À venir...";
                 document.getElementById('notes-client').value = p["Notes personnelles"] || "";
-                document.getElementById('date-plant').innerText = p["Date de plantation"] || "Non renseignée";
+                document.getElementById('date-plant').innerText = p["Date de plantation"] || "-";
                 
                 initChart();
                 checkMeteo(p["Rusticite"]);
-            } else {
-                // Cacher explicitement pour les invités
-                document.getElementById('espace-proprietaire').style.display = 'none';
-                document.getElementById('meteo-display').style.display = 'none';
             }
         } catch(e) { 
             document.getElementById('status-msg').innerText = "Erreur de connexion aux jardins d'ÉONIA."; 
         }
     };
 
-    // TOUTES TES FONCTIONS EXISTANTES SONT ICI
+    function handleAIClick() {
+        alert("L'Expert ÉONIA : Je me connecte aux données de cette essence pour vous guider. (Module de chat en cours de déploiement)");
+    }
+
     function initChart() {
         const ctx = document.getElementById('arrosageChart').getContext('2d');
         new Chart(ctx, {
@@ -171,7 +206,7 @@
             data: {
                 labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
                 datasets: [{
-                    label: 'Fréquence Arrosage',
+                    label: 'Fréquence',
                     data: [2, 3, 2, 4],
                     borderColor: '#4ade80',
                     tension: 0.4,
@@ -189,15 +224,15 @@
     }
 
     async function checkMeteo(rusticite) {
-        const tempSimulee = -8; 
+        const tempSimulee = 5; // À remplacer par une vraie API météo plus tard
         const rust = parseInt(rusticite) || 0;
         if(tempSimulee < rust) {
             document.getElementById('alert-meteo').style.display = 'block';
         }
     }
 
-    function validerArrosage() { alert("Soin enregistré. Votre historique d'arrosage a été mis à jour."); }
-    function saveNotes() { alert("Notes personnelles sauvegardées dans votre coffre-fort ÉONIA."); }
+    function validerArrosage() { alert("Soin enregistré."); }
+    function saveNotes() { alert("Notes sauvegardées."); }
 </script>
 
 </body>
