@@ -9,7 +9,11 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
+        
+        /* Message d'état et Configuration */
         #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; }
+        #config-plaque { display: none; text-align: center; padding: 100px 20px; }
+        
         #plant-details { display: none; max-width: 1000px; margin: 0 auto; padding-bottom: 50px; }
         
         /* HEADER IMAGE */
@@ -38,35 +42,28 @@
         #espace-proprietaire { border: 1px solid #4ade80; padding: 25px; border-radius: 12px; margin-top: 30px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.08) 0%, rgba(0,0,0,0) 100%); display: none; }
         .vip-title { color: #4ade80; font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid rgba(74, 222, 128, 0.2); padding-bottom: 10px; }
         .alert-banner { background: #ff4d4d; color: #fff; padding: 10px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
-        .btn-action { margin-top: 15px; width: 100%; padding: 12px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; font-weight: bold; border-radius: 4px; }
+        
+        .btn-action { margin-top: 15px; width: 100%; padding: 14px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; border-radius: 50px; transition: 0.3s; }
+        .btn-action:hover { background: #fff; }
         .btn-secondary { background: none; border: 1px solid #4ade80; color: #4ade80; margin-top: 10px; }
         
         .chart-container { margin: 20px 0; background: #111; padding: 15px; border-radius: 8px; height: 200px; }
 
         /* IA BULLE STYLE */
-        #eonia-ai-trigger { 
-            position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
-            cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
-        }
-        .ai-icon-circle { 
-            width: 50px; height: 50px; background: #4ade80; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 2px solid #fff;
-        }
-        .ai-tooltip { 
-            background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; 
-            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; 
-            margin-right: 10px; font-weight: 800; white-space: nowrap;
-        }
-        @media (max-width: 600px) {
-            #eonia-ai-trigger { bottom: 20px; right: 20px; transform: scale(0.9); }
-            .ai-tooltip { display: none; }
-        }
+        #eonia-ai-trigger { position: fixed; bottom: 25px; right: 25px; z-index: 2000; cursor: pointer; display: flex; align-items: center; transition: 0.3s; }
+        .ai-icon-circle { width: 50px; height: 50px; background: #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 2px solid #fff; }
+        .ai-tooltip { background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 10px; font-weight: 800; white-space: nowrap; }
     </style>
 </head>
 <body>
 
     <div id="status-msg">Initialisation de l'interface ÉONIA...</div>
+
+    <div id="config-plaque">
+        <h1 style="color:#fff; margin-bottom:20px;">Plaque Activée !</h1>
+        <p style="color:#bbb; margin-bottom:40px;">Votre plaque <strong><span id="display-plaque-id"></span></strong> est prête.<br>Choisissez maintenant le spécimen qu'elle va accompagner.</p>
+        <button onclick="allerAuCatalogue()" class="btn-action" style="max-width:300px;">Choisir une plante</button>
+    </div>
 
     <div id="plant-details">
         <div class="main-img-container">
@@ -127,14 +124,15 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
+    let currentPlaqueId = "";
     
     window.onload = async () => {
         const params = new URLSearchParams(window.location.search);
         const plaqueId = params.get('id');
         const idBot = params.get('id_botanique');
         const userEmail = localStorage.getItem('user_email');
+        currentPlaqueId = plaqueId;
 
-        // FORCE LA CONNEXION SI SCAN SANS SESSION
         if (!userEmail && plaqueId) {
             window.location.href = "index.html?id=" + plaqueId;
             return;
@@ -154,6 +152,14 @@
             
             const data = await res.json();
             const p = data[0];
+
+            // SI LA PLAQUE EST VIDE (Pas de plante liée)
+            if (plaqueId && p && !p.aUnePlante) {
+                document.getElementById('status-msg').style.display = 'none';
+                document.getElementById('display-plaque-id').innerText = plaqueId;
+                document.getElementById('config-plaque').style.display = 'block';
+                return;
+            }
 
             if(!p || p["Statut"] === "Brouillon") {
                 document.getElementById('status-msg').innerText = "Cette fiche est en cours de préparation...";
@@ -180,13 +186,11 @@
             if(p.estProprietaire && plaqueId) {
                 document.getElementById('espace-proprietaire').style.display = 'block';
                 document.getElementById('meteo-display').style.display = 'flex';
-                
                 document.getElementById('vip-entretien').innerText = p["Entretien"] || "À venir...";
                 document.getElementById('vip-sante').innerText = p["Protection et sante"] || "À venir...";
                 document.getElementById('vip-compagnon').innerText = p["Campagnonnage"] || "À venir...";
                 document.getElementById('notes-client').value = p["Notes personnelles"] || "";
                 document.getElementById('date-plant').innerText = p["Date de plantation"] || "-";
-                
                 initChart();
                 checkMeteo(p["Rusticite"]);
             }
@@ -195,8 +199,14 @@
         }
     };
 
+    function allerAuCatalogue() {
+        // On mémorise la plaque qu'on veut configurer
+        localStorage.setItem('plaque_en_cours_de_liaison', currentPlaqueId);
+        window.location.href = "catalogue.html";
+    }
+
     function handleAIClick() {
-        alert("L'Expert ÉONIA : Je me connecte aux données de cette essence pour vous guider. (Module de chat en cours de déploiement)");
+        alert("L'Expert ÉONIA : Je me connecte aux données de cette essence pour vous guider.");
     }
 
     function initChart() {
@@ -224,7 +234,7 @@
     }
 
     async function checkMeteo(rusticite) {
-        const tempSimulee = 5; // À remplacer par une vraie API météo plus tard
+        const tempSimulee = 5; 
         const rust = parseInt(rusticite) || 0;
         if(tempSimulee < rust) {
             document.getElementById('alert-meteo').style.display = 'block';
