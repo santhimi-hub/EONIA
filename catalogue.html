@@ -3,294 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Collection</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
+    <title>ÉONIA — Catalogue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
+        .container { padding: 40px 20px; max-width: 1000px; margin: auto; }
         
-        header { text-align: center; padding: 50px 20px 30px 20px; }
-        .logo-main { width: 90px; margin-bottom: 20px; opacity: 0.9; }
-        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.2rem; margin: 0; }
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; text-align: center; margin-bottom: 40px; }
         
-        #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
-
-        .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; }
-        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
-
-        .controls-area { max-width: 1000px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center; }
-        .search-input { 
-            width: 100%; max-width: 400px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
-            border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; text-align: center; margin-bottom: 20px; 
-        }
-        .search-input:focus { border-color: #4ade80; }
-
-        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .f-btn { background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s; }
-        .f-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
-
-        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; border-bottom: 1px solid #111; margin: 30px 0 10px 0; padding-bottom: 5px; font-weight: 200; letter-spacing: 5px; }
-
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto; padding: 20px; }
-
-        .plant-card { 
-            background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; 
-            transition: 0.3s; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-        }
+        /* Grille de plantes */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
         
-        .plant-card:hover, .plant-card.active-touch { border-color: #4ade80; transform: translateY(-5px); }
-
-        .img-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
-
-        .plant-img { 
-            width: 100%; height: 100%; object-fit: cover; opacity: 0;
-            filter: grayscale(0.3) brightness(0.8); 
-            transition: transform 0.4s ease-out, filter 0.4s ease-out, opacity 0.5s ease-in;
+        .card { 
+            background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; 
+            transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit;
         }
+        .card:hover { border-color: #4ade80; transform: translateY(-5px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; opacity: 0.8; }
+        .card-info { padding: 15px; }
+        .card-name { display: block; font-size: 1rem; text-transform: uppercase; color: #4ade80; }
+        .card-sci { font-size: 0.8rem; font-style: italic; color: #666; }
 
-        .plant-card:hover .plant-img, .plant-card.active-touch .plant-img { 
-            filter: grayscale(0) brightness(1.3) contrast(1.1) !important; 
-            transform: scale(1.1) !important; 
-        }
-        
-        .plant-img.loaded { opacity: 1; }
-
-        .plant-info { padding: 15px; text-align: center; }
-        .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-
-        #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
-        .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
-
-        #eonia-ai-trigger { 
-            position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
-            cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
-        }
-        .ai-icon-circle { 
-            width: 50px; height: 50px; background: #4ade80; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 2px solid #fff; transition: 0.3s;
-        }
-        .ai-tooltip { 
-            background: #4ade80; color: #000; padding: 7px 14px; border-radius: 20px; 
-            font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; 
-            margin-right: 10px; opacity: 1; font-weight: 800; white-space: nowrap;
-        }
-
-        @media (max-width: 600px) {
-            #eonia-ai-trigger { bottom: 20px; right: 20px; transform: scale(0.9); }
-            .ai-tooltip { display: none; }
-        }
+        #loader { text-align: center; color: #4ade80; padding: 50px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA Logo" class="logo-main">
-        <h1 class="brand-title">ÉONIA</h1>
-        <p id="page-title">Notre Collection</p>
-    </header>
-
-    <div id="client-menu" class="client-nav">
-        <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
-        <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
-    </div>
-
-    <div class="controls-area">
-        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
-        <div id="filter-container" class="filter-nav">
-            <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-            <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-            <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-            <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-        </div>
-    </div>
-
-    <div id="status-msg">Synchronisation...</div>
-    <div id="catalogue-grid" class="catalog-container"></div>
-
-    <button class="logout-btn" onclick="logout()">Quitter</button>
-
-    <div id="eonia-ai-trigger" onclick="handleAIClick()">
-        <span id="ai-label" class="ai-tooltip">Une question ?</span>
-        <div class="ai-icon-circle">
-            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 24px;" alt="IA Expert">
-        </div>
+    <div class="container">
+        <h1>Catalogue ÉONIA</h1>
+        <div id="loader">Chargement de la collection...</div>
+        <div id="catalogue-grid" class="grid"></div>
     </div>
 
 <script>
-    const userEmail = localStorage.getItem('user_email');
-    const userPin = localStorage.getItem('user_pin');
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    
-    let currentView = 'catalogue'; 
-    let allPlants = [];
-    let activeFilter = 'all';
 
-    if (!userEmail) { window.location.href = "index.html"; }
-    if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
-
-    async function loadData() {
-        const statusMsg = document.getElementById('status-msg');
-        const container = document.getElementById('catalogue-grid');
-        const plaqueEnAttente = localStorage.getItem('plaque_en_cours_de_liaison');
-        
-        container.innerHTML = "";
-        statusMsg.style.display = 'block';
-        statusMsg.innerText = "Chargement...";
-
-        // Mise à jour du titre si on est en train de lier une plaque
-        if (plaqueEnAttente && currentView === 'catalogue') {
-            document.getElementById('page-title').innerText = "Lier à la plaque " + plaqueEnAttente;
-            document.getElementById('page-title').style.color = "#4ade80";
-        } else {
-            document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
-            document.getElementById('page-title').style.color = "#fff";
-        }
-
-        const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+    window.onload = async () => {
+        const role = localStorage.getItem('user_role') || 'public';
+        const email = localStorage.getItem('user_email') || '';
 
         try {
-            const response = await fetch(API_URL, {
+            const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailToSend, pin: userPin }) 
+                // On envoie le rôle pour que le Worker sache quoi filtrer
+                body: JSON.stringify({ 
+                    action: "get_catalogue", 
+                    role: role,
+                    email: email 
+                })
             });
-            allPlants = await response.json();
-            renderGrid();
-        } catch (error) {
-            statusMsg.innerText = "Erreur de connexion.";
-        }
-    }
 
-    function renderGrid() {
-        const container = document.getElementById('catalogue-grid');
-        const statusMsg = document.getElementById('status-msg');
-        const searchVal = document.getElementById('searchBox').value.toLowerCase();
-        container.innerHTML = "";
+            const plantes = await res.json();
+            document.getElementById('loader').style.display = 'none';
 
-        let filtered = allPlants.filter(p => {
-            const nom = (p["Nom commun"] || "").toLowerCase();
-            return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
-        });
-
-        filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-
-        if (filtered.length === 0) {
-            statusMsg.style.display = 'block';
-            statusMsg.innerText = "Aucun résultat trouvé.";
-            return;
-        }
-
-        statusMsg.style.display = 'none';
-        let lastLetter = "";
-
-        filtered.forEach(p => {
-            const nom = p["Nom commun"] || "Spécimen";
-            const currentLetter = nom[0].toUpperCase();
-
-            if (currentView === 'catalogue' && currentLetter !== lastLetter) {
-                const divider = document.createElement('div');
-                divider.className = "letter-divider";
-                divider.innerText = currentLetter;
-                container.appendChild(divider);
-                lastLetter = currentLetter;
+            if (!plantes || plantes.length === 0) {
+                document.getElementById('loader').innerHTML = "Aucune plante disponible dans cette section.";
+                document.getElementById('loader').style.display = 'block';
+                return;
             }
 
-            const card = document.createElement('div');
-            card.className = "plant-card";
-            
-            card.onclick = async (e) => {
-                card.classList.add('active-touch');
-                const plaqueEnAttente = localStorage.getItem('plaque_en_cours_de_liaison');
-
-                // LOGIQUE DE LIAISON
-                if (currentView === 'catalogue' && plaqueEnAttente) {
-                    const confirmer = confirm(`Associer "${nom}" à votre plaque ${plaqueEnAttente} ?`);
-                    if (confirmer) {
-                        statusMsg.innerText = "Liaison en cours...";
-                        statusMsg.style.display = 'block';
-                        try {
-                            const res = await fetch(API_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    id: plaqueEnAttente,
-                                    email: userEmail,
-                                    pin: userPin,
-                                    nouvelle_plante_id: p.id
-                                })
-                            });
-                            if (res.ok) {
-                                localStorage.removeItem('plaque_en_cours_de_liaison');
-                                window.location.href = `jardin.html?id=${plaqueEnAttente}`;
-                            } else {
-                                alert("Erreur lors de l'enregistrement.");
-                            }
-                        } catch (err) { alert("Erreur réseau."); }
-                    }
-                } else {
-                    // CONSULTATION NORMALE
-                    const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
-                    setTimeout(() => { window.location.href = `jardin.html?${param}`; }, 150);
-                }
-            };
-
-            card.innerHTML = `
-                <div class="img-container">
-                    <img data-src="${p.Photo}" 
-                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-                         class="plant-img lazy" 
-                         onerror="this.src='https://via.placeholder.com/400?text=Indisponible'">
-                </div>
-                <div class="plant-info">
-                    <div class="plant-name">${nom}</div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-        
-        handleLazyLoad();
-    }
-
-    function handleLazyLoad() {
-        const images = document.querySelectorAll('.plant-img.lazy');
-        const observer = new IntersectionObserver((entries, obs) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.onload = () => img.classList.add('loaded');
-                    obs.unobserve(img);
-                }
+            const grid = document.getElementById('catalogue-grid');
+            plantes.forEach(p => {
+                const card = document.createElement('a');
+                card.className = 'card';
+                // On redirige vers la fiche avec l'ID (ou l'ID de référence catalogue)
+                card.href = `jardin.html?id=${p.id}`; 
+                
+                card.innerHTML = `
+                    <img src="${p.Photo || 'placeholder.jpg'}">
+                    <div class="card-info">
+                        <span class="card-name">${p["Nom commun"]}</span>
+                        <span class="card-sci">${p["Nom scientifique"] || ''}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
-        });
-        images.forEach(img => observer.observe(img));
-    }
 
-    function setFilter(type, btn) {
-        activeFilter = type;
-        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGrid();
-    }
-
-    function switchView(view) {
-        currentView = view;
-        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-        document.getElementById('filter-container').style.opacity = (view === 'catalogue') ? "1" : "0.3";
-        loadData();
-    }
-
-    function logout() { localStorage.clear(); window.location.href = "index.html"; }
-
-    function handleAIClick() {
-        const context = (currentView === 'catalogue') ? "la collection" : "votre jardin";
-        alert("L'Expert ÉONIA : Je suis prêt à vous guider dans " + context + ".");
-    }
-
-    window.onload = loadData;
+        } catch (e) {
+            document.getElementById('loader').innerText = "Erreur : Impossible de charger le catalogue.";
+        }
+    };
 </script>
 </body>
 </html>
