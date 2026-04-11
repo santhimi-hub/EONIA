@@ -8,55 +8,38 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway', sans-serif; background: #000; color: #fff; }
-        
         .hero { 
-            height: 100vh; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; 
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; 
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('background.jpg') center/cover no-repeat; 
         }
-
         .logo-main { width: 120px; margin-bottom: 25px; }
-        .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin: 0; }
-        .tagline { font-style: italic; font-size: 0.9rem; margin: 35px 0 45px 0; }
-        
+        .brand-title { font-size: 3.5rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin: 0; }
+        .tagline { font-style: italic; font-size: 0.9rem; margin: 20px 0 40px 0; }
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
-        input { 
-            width: 100%; padding: 14px; border-radius: 8px; border: none; 
-            background: rgba(255,255,255,0.15); color: white; text-align: center; font-family: 'Raleway', sans-serif; 
-        }
-        
-        .btn-main { 
-            width: 100%; padding: 14px; background: #fff; color: #000; border: none; 
-            border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; 
-            letter-spacing: 2px; transition: 0.3s; margin-top: 5px; 
-        }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; text-align: center; font-family: 'Raleway', sans-serif; }
+        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
         .btn-main:hover { background: #4ade80; }
-        
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
         .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; transition: 0.3s; }
         .bottom-nav a:hover { color: #4ade80; }
     </style>
 </head>
 <body>
-
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
         <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
-
         <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
             <input type="number" placeholder="Code PIN" id="pin">
             <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
         </div>
-
         <div class="bottom-nav">
-            <a href="#" onclick="accesInvite()">Espace Invité</a>
+            <a href="#" onclick="accesInvite()">Accès Invité</a>
             <span>|</span>
             <a href="catalogue.html">Catalogue Public</a>
         </div>
     </div>
-
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueId = urlParams.get('id');
@@ -65,23 +48,17 @@
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
         if(!mail || !pin) { alert("Email et PIN requis"); return; }
-
         localStorage.setItem('user_role', 'client');
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
-        
-        if (plaqueId) {
-            window.location.href = "jardin.html?id=" + plaqueId;
-        } else {
-            window.location.href = "catalogue.html";
-        }
+        if (plaqueId) { window.location.href = "jardin.html?id=" + plaqueId; } 
+        else { window.location.href = "catalogue.html"; }
     }
 
     function accesInvite() {
+        localStorage.clear();
         localStorage.setItem('user_role', 'invite');
-        // On nettoie les anciennes sessions clients
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_pin');
+        localStorage.setItem('user_email', 'visiteur');
         window.location.href = "catalogue.html";
     }
 </script>
