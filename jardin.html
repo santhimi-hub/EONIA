@@ -3,191 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Expertise Botanique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ÉONIA — Catalogue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
     <style>
-        /* TA PRÉSENTATION EST CONSERVÉE */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; line-height: 1.6; }
-        
-        #status-msg { text-align: center; padding: 50px; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
-        
-        #config-plaque, #plant-details { display: none; }
-        
-        .main-img-container { width: 100%; height: 45vh; overflow: hidden; border-bottom: 2px solid #4ade80; background: #111; }
-        #main-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        
-        .content-padding { padding: 25px 20px; max-width: 800px; margin: 0 auto; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 4px; color: #4ade80; font-size: 1.6rem; }
-        .sci-name { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 20px; display: block; }
-        
-        .grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
-        .info-item { background: #0c0c0c; padding: 12px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .label { font-size: 0.55rem; text-transform: uppercase; color: #555; display: block; margin-bottom: 4px; }
-        .value { font-size: 0.8rem; color: #ddd; }
-
-        #espace-proprietaire { display: none; border: 1px solid #4ade80; padding: 25px; border-radius: 12px; margin-top: 30px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, rgba(0,0,0,0) 100%); }
-        .vip-badge { background: #4ade80; color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; vertical-align: middle; margin-left: 10px; }
-        
-        .btn-action { width: 100%; padding: 15px; background: #4ade80; border: none; color: #000; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; border-radius: 50px; margin-top: 15px; }
-        .btn-secondary { background: none; border: 1px solid #4ade80; color: #4ade80; }
-        .btn-logout { background: none; color: #ff4d4d; border: none; font-size: 0.7rem; text-transform: uppercase; margin-top: 40px; cursor: pointer; width: 100%; opacity: 0.6; }
-        
-        .chart-container { height: 180px; margin: 20px 0; background: #111; padding: 10px; border-radius: 8px; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
+        .container { padding: 40px 20px; max-width: 1000px; margin: auto; }
+        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; text-align: center; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        .card { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+        .card:hover { border-color: #4ade80; }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .card-name { display: block; font-size: 1rem; text-transform: uppercase; color: #4ade80; }
+        #loader { text-align: center; color: #4ade80; padding: 50px; }
     </style>
 </head>
 <body>
-
-    <div id="status-msg">Initialisation de votre espace...</div>
-
-    <div id="config-plaque" class="content-padding" style="text-align: center; padding-top: 80px;">
-        <h1>Activation Plaque</h1>
-        <p id="welcome-user" style="color:#bbb; margin-bottom:30px;">Bonjour, cette plaque est prête à être activée.</p>
-        <button onclick="checkAuthBeforeLink()" class="btn-action">Associer à mon compte ÉONIA</button>
-        <button onclick="deconnexion()" id="btn-change-account" style="display:none;" class="btn-logout">Utiliser un autre compte</button>
-    </div>
-
-    <div id="plant-details">
-        <div class="main-img-container"><img id="main-img" src=""></div>
-        <div class="content-padding">
-            <h1 id="nom-commun">...</h1>
-            <span id="nom-scientifique" class="sci-name">...</span>
-
-            <div class="grid-info">
-                <div class="info-item"><span class="label">Famille</span><span id="famille" class="value">-</span></div>
-                <div class="info-item"><span class="label">Référence Plaque</span><span id="plaque-ref" class="value">-</span></div>
-            </div>
-
-            <button id="btn-login-needed" onclick="redirectToLogin()" class="btn-action btn-secondary" style="display:none;">Accéder au suivi de ce spécimen</button>
-
-            <div id="espace-proprietaire">
-                <h2 style="color:#4ade80; font-size:0.8rem; text-transform:uppercase; margin-bottom:20px;">Suivi Personnalisé <span class="vip-badge">MON JARDIN</span></h2>
-                
-                <div class="grid-info" style="margin-top:0;">
-                    <div class="info-item"><span class="label">Connecté en tant que</span><span id="proprio-mail" class="value">-</span></div>
-                    <div class="info-item"><span class="label">Date de mise en terre</span><span id="date-plant" class="value">-</span></div>
-                </div>
-                
-                <div class="chart-container"><canvas id="arrosageChart"></canvas></div>
-                
-                <div style="background:#000; padding:15px; border-radius:8px; border:1px solid #1a1a1a; margin-top:15px;">
-                    <span class="label">Notes pour ce spécimen</span>
-                    <p id="notes-privees" style="font-size:0.85rem; color:#bbb;">-</p>
-                </div>
-
-                <button onclick="deconnexion()" class="btn-logout">Se déconnecter</button>
-            </div>
-            
-            <a href="catalogue.html" style="display:block; text-align:center; color:#4ade80; text-decoration:none; font-size:0.7rem; margin-top:30px; text-transform:uppercase;">Catalogue Global</a>
-        </div>
+    <div class="container">
+        <h1>La Collection</h1>
+        <div id="loader">Chargement...</div>
+        <div id="grid" class="grid"></div>
     </div>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    let currentPlaqueId = "";
 
     window.onload = async () => {
-        const params = new URLSearchParams(window.location.search);
-        currentPlaqueId = params.get('id');
-        
-        const userEmail = localStorage.getItem('user_email');
-        const userPin = localStorage.getItem('user_pin');
-
-        // On affiche l'ID de la plaque dans l'interface
-        document.getElementById('plaque-ref').innerText = currentPlaqueId || "Inconnue";
-
         try {
+            // On demande le catalogue. On envoie le rôle si besoin de filtrer côté Worker
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    id: currentPlaqueId, 
-                    email: userEmail || "visiteur",
-                    pin: userPin || ""
-                })
+                body: JSON.stringify({ action: "get_catalogue", role: localStorage.getItem('user_role') || 'public' })
             });
-            const data = await res.json();
-            const p = data[0];
+            const plantes = await res.json();
+            document.getElementById('loader').style.display = 'none';
 
-            document.getElementById('status-msg').style.display = 'none';
-
-            // 1. GESTION PLAQUE NEUVE
-            if (currentPlaqueId && p && !p.aUnePlante) {
-                document.getElementById('config-plaque').style.display = 'block';
-                if(userEmail) {
-                    document.getElementById('welcome-user').innerText = "Bonjour " + userEmail + ", associez cette nouvelle plaque à votre jardin.";
-                    document.getElementById('btn-change-account').style.display = 'block';
-                }
-                return;
-            }
-
-            // 2. GESTION FICHE PUBLIQUE + PRIVÉE
-            if (p) {
-                document.getElementById('plant-details').style.display = 'block';
-                document.getElementById('nom-commun').innerText = p["Nom commun"] || "Spécimen";
-                document.getElementById('nom-scientifique').innerText = p["Nom scientifique"] || "";
-                document.getElementById('famille').innerText = p["Famille"] || "-";
-                document.getElementById('main-img').src = p["Photo"] || "";
-
-                // Vérification du propriétaire (même mail + même PIN)
-                if (p.estProprietaire) {
-                    document.getElementById('btn-login-needed').style.display = 'none';
-                    document.getElementById('espace-proprietaire').style.display = 'block';
-                    document.getElementById('proprio-mail').innerText = userEmail;
-                    document.getElementById('date-plant').innerText = p["Date de plantation"] || "Récemment";
-                    document.getElementById('notes-privees').innerText = p["Notes personnelles"] || "Aucune note spécifique.";
-                    initChart();
-                } else {
-                    // Si la plaque appartient à quelqu'un ou si l'utilisateur n'est pas logué
-                    document.getElementById('btn-login-needed').style.display = 'block';
-                }
-            }
+            const grid = document.getElementById('grid');
+            plantes.forEach(p => {
+                grid.innerHTML += `
+                    <a href="jardin.html?id=${p.id}" class="card">
+                        <img src="${p.Photo || ''}">
+                        <div class="card-info">
+                            <span class="card-name">${p["Nom commun"]}</span>
+                        </div>
+                    </a>`;
+            });
         } catch (e) {
-            document.getElementById('status-msg').innerText = "Connexion impossible.";
+            document.getElementById('loader').innerText = "Erreur de chargement.";
         }
     };
-
-    function checkAuthBeforeLink() {
-        const userEmail = localStorage.getItem('user_email');
-        if (!userEmail) {
-            // Premier achat ou nouvelle session : demande mail/pin
-            window.location.href = "index.html?id=" + currentPlaqueId;
-        } else {
-            // Déjà client : on utilise le mail existant pour lier la nouvelle plaque
-            localStorage.setItem('plaque_en_cours_de_liaison', currentPlaqueId);
-            window.location.href = "catalogue.html";
-        }
-    }
-
-    function redirectToLogin() {
-        window.location.href = "index.html?id=" + currentPlaqueId;
-    }
-
-    function deconnexion() {
-        if(confirm("Se déconnecter changera l'accès à votre jardin perso. Continuer ?")) {
-            localStorage.removeItem('user_email');
-            localStorage.removeItem('user_pin');
-            window.location.reload();
-        }
-    }
-
-    function initChart() {
-        const ctx = document.getElementById('arrosageChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['S1', 'S2', 'S3', 'S4'],
-                datasets: [{
-                    data: [1, 3, 2, 4],
-                    borderColor: '#4ade80',
-                    tension: 0.4,
-                    fill: false
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-    }
 </script>
 </body>
 </html>
