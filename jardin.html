@@ -3,57 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Catalogue</title>
+    <title>ÉONIA — Expertise Botanique</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
-        .container { padding: 40px 20px; max-width: 1000px; margin: auto; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; text-align: center; margin-bottom: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
-        .card { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
-        .card:hover { border-color: #4ade80; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-info { padding: 15px; }
-        .card-name { display: block; font-size: 1rem; text-transform: uppercase; color: #4ade80; }
-        #loader { text-align: center; color: #4ade80; padding: 50px; }
+        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; }
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        
+        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 2px solid #4ade80; }
+        h1 { font-weight: 200; text-transform: uppercase; color: #4ade80; letter-spacing: 3px; margin-top: 20px; }
+        
+        /* ACCORDÉONS / MENUS DÉROULANTS (Visible par Invité & Client) */
+        .details-section { margin-top: 20px; border-top: 1px solid #1a1a1a; }
+        details { padding: 15px 0; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
+        details summary { color: #4ade80; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; list-style: none; display: flex; justify-content: space-between; }
+        details summary::after { content: "+"; }
+        details[open] summary::after { content: "-"; }
+        .details-content { padding-top: 10px; color: #bbb; font-size: 0.9rem; line-height: 1.6; }
+
+        /* TABLEAU DE BORD (Visible Client UNIQUEMENT) */
+        #espace-client { display: none; margin-top: 30px; padding: 20px; border: 1px solid #4ade80; border-radius: 15px; background: rgba(74, 222, 128, 0.05); }
+        
+        .btn { width: 100%; padding: 15px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 20px; }
+        .btn-back { background: #222; color: #fff; text-decoration: none; display: block; text-align: center; }
     </style>
 </head>
 <body>
+
+    <img id="p-img" src="" class="hero-img">
+    
     <div class="container">
-        <h1>La Collection</h1>
-        <div id="loader">Chargement...</div>
-        <div id="grid" class="grid"></div>
+        <h1 id="p-nom">Chargement...</h1>
+        <p id="p-sci" style="font-style:italic; color:#666;"></p>
+
+        <div class="details-section">
+            <details>
+                <summary>Conseils d'Entretien</summary>
+                <div class="details-content" id="p-entretien">Informations à venir...</div>
+            </details>
+            <details>
+                <summary>Sol & Exposition</summary>
+                <div class="details-content" id="p-sol">Informations à venir...</div>
+            </details>
+            <details>
+                <summary>Histoire & Origine</summary>
+                <div class="details-content" id="p-histoire">Informations à venir...</div>
+            </details>
+        </div>
+
+        <div id="espace-client">
+            <h2 style="font-size:0.8rem; color:#4ade80; margin-bottom:15px; letter-spacing:2px;">MON JARDIN PRIVÉ</h2>
+            <p style="font-size:0.7rem; color:#555; text-transform:uppercase;">Ma dernière activité</p>
+            <div style="height:150px; margin: 15px 0;"><canvas id="chart"></canvas></div>
+            <p id="p-notes" style="font-size:0.85rem; color:#ddd; background:#000; padding:10px; border-radius:5px;"></p>
+        </div>
+
+        <a href="catalogue.html" class="btn btn-back">Retour au Catalogue</a>
     </div>
 
 <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const API = "https://eonia-api.santhimi.workers.dev";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
 
     window.onload = async () => {
-        try {
-            // On demande le catalogue. On envoie le rôle si besoin de filtrer côté Worker
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: "get_catalogue", role: localStorage.getItem('user_role') || 'public' })
-            });
-            const plantes = await res.json();
-            document.getElementById('loader').style.display = 'none';
+        const email = localStorage.getItem('user_email') || "visiteur";
+        const pin = localStorage.getItem('user_pin') || "";
 
-            const grid = document.getElementById('grid');
-            plantes.forEach(p => {
-                grid.innerHTML += `
-                    <a href="jardin.html?id=${p.id}" class="card">
-                        <img src="${p.Photo || ''}">
-                        <div class="card-info">
-                            <span class="card-name">${p["Nom commun"]}</span>
-                        </div>
-                    </a>`;
+        try {
+            const res = await fetch(API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: id, email: email, pin: pin })
             });
+            const data = await res.json();
+            const p = data[0];
+
+            if (p) {
+                // Remplissage des infos (visibles par tous)
+                document.getElementById('p-nom').innerText = p["Nom commun"];
+                document.getElementById('p-sci').innerText = p["Nom scientifique"];
+                document.getElementById('p-img').src = p["Photo"];
+                
+                // Menus déroulants (Infos que tu acceptes de donner)
+                document.getElementById('p-entretien').innerText = p["Entretien"] || "Non renseigné";
+                document.getElementById('p-sol').innerText = p["Sol"] || "Non renseigné";
+                document.getElementById('p-histoire').innerText = p["Histoire"] || "Non renseigné";
+
+                // Si c'est le propriétaire, on montre le tableau de bord
+                if (p.estProprietaire) {
+                    document.getElementById('espace-client').style.display = 'block';
+                    document.getElementById('p-notes').innerText = "Notes : " + (p["Notes personnelles"] || "Aucune note.");
+                    initChart();
+                }
+            }
         } catch (e) {
-            document.getElementById('loader').innerText = "Erreur de chargement.";
+            console.log("Erreur de chargement");
         }
     };
+
+    function initChart() {
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: ['Lun', 'Mar', 'Mer', 'Jeu'], datasets: [{ data: [1, 2, 1, 4], borderColor: '#4ade80', tension: 0.4 }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+    }
 </script>
 </body>
 </html>
