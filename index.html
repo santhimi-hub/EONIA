@@ -7,99 +7,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; } 
-        body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
+        body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: #000; }
         .logo-main { width: 120px; margin-bottom: 25px; }
-        .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
-        .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
+        .brand-title { font-size: 3rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #fff; margin: 0; }
+        .tagline { font-style: italic; font-size: 0.9rem; color: #fff; margin: 20px 0 40px 0; }
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
-        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; text-align: center; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .auth-footer { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 4px; margin-top: -4px; }
-        .helper-text { font-size: 0.6rem; color: rgba(255,255,255,0.7); line-height: 1.3; font-style: italic; text-align: left; max-width: 180px; }
-        .pin-forgot { font-size: 0.6rem; color: rgba(255,255,255,0.5); text-decoration: none; transition: 0.3s; white-space: nowrap; }
-        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 5px; }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; text-align: center; font-family: 'Raleway', sans-serif; }
+        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; margin-top: 10px; }
         .btn-main:hover { background: #4ade80; }
-        .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; }
-        .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
-        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
-        .content-section { padding: 100px 30px; text-align: center; background: #050505; }
-        .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
-        .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
-        .highlight { color: #fff; font-weight: 500; }
-        @media (max-width: 600px) { .brand-title { font-size: 2.5rem; } }
+        .helper-text { font-size: 0.65rem; color: #4ade80; margin-top: 5px; font-style: italic; }
     </style>
 </head>
 <body>
-
     <div class="hero">
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
-        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+        <p class="tagline">Mémoire Végétale</p>
 
         <div class="auth-container">
             <input type="email" placeholder="Votre Email" id="email">
-            <input type="number" pattern="[0-9]*" inputmode="numeric" placeholder="Code PIN" id="pin">
-            
-            <div class="auth-footer">
-                <p class="helper-text" id="help-text">Première connexion ? Choisissez 4 chiffres pour activer votre plaque.</p>
-                <a href="mailto:contact@eonia.com?subject=Code PIN oublié" class="pin-forgot">PIN oublié ?</a>
-            </div>
-
-            <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
-            <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
-        </div>
-
-        <div class="bottom-nav">
-            <a href="#" onclick="accesInvite()">Visiter en tant qu'invité</a>
-            <span>|</span>
-            <a href="#concept">Notre Concept</a>
+            <input type="number" placeholder="Code PIN (4 chiffres)" id="pin">
+            <p id="help-text" class="helper-text"></p>
+            <button class="btn-main" onclick="validerConnexion()">ENTRER</button>
+            <a href="catalogue.html" style="color:#666; font-size:0.7rem; text-decoration:none; margin-top:10px;">Accès Catalogue Public</a>
         </div>
     </div>
 
-    <section class="content-section" id="concept">
-        <h2>Notre Concept</h2>
-        <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <span class="highlight">Scanner, Cultiver, Raconter.</span></p>
-    </section>
-
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const plaqueEnAttente = urlParams.get('id');
+    const plaqueId = urlParams.get('id');
 
-    window.onload = () => {
-        if (plaqueEnAttente) {
-            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-            document.getElementById('help-text').style.color = "#4ade80";
-            document.getElementById('help-text').innerHTML = "<strong>Nouvelle plaque détectée :</strong> Entrez un mail et créez votre PIN.";
-        }
-    };
+    if (plaqueId) {
+        document.getElementById('help-text').innerText = "Plaque détectée. Connectez-vous pour l'activer.";
+    }
 
-    async function validerConnexion() {
+    function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
         
-        if(!mail || !pin) { 
-            alert("Merci d'entrer votre email et votre code PIN."); 
-            return; 
-        }
+        if(!mail || !pin) { alert("Email et PIN requis"); return; }
 
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         
-        setTimeout(() => {
-            if (plaqueEnAttente) {
-                window.location.href = "jardin.html?id=" + plaqueEnAttente;
-            } else {
-                window.location.href = "catalogue.html";
-            }
-        }, 100);
-    }
-
-    function accesInvite() {
-        localStorage.setItem('user_email', 'invite@eonia.com');
-        localStorage.setItem('user_pin', '0000');
-        window.location.href = "catalogue.html";
+        // Redirection vers jardin avec l'ID de la plaque s'il existe
+        if (plaqueId) {
+            window.location.href = "jardin.html?id=" + plaqueId;
+        } else {
+            window.location.href = "catalogue.html";
+        }
     }
 </script>
 </body>
