@@ -52,7 +52,7 @@ padding:30px 20px;
 .brand-title{font-weight:300;letter-spacing:8px;text-transform:uppercase;}
 #page-title{font-size:0.7rem;color:#4ade80;margin-top:5px;}
 
-/* MENU */
+/* MENU CLIENT */
 .client-nav{
 display:none;
 justify-content:center;
@@ -75,6 +75,23 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
+/* SEARCH */
+.controls-area{
+text-align:center;
+padding:0 15px;
+}
+
+.search-input{
+width:100%;
+max-width:350px;
+padding:10px;
+border-radius:50px;
+border:1px solid #1a1a1a;
+background:#0c0c0c;
+color:#fff;
+text-align:center;
+}
+
 /* GRID */
 .catalog-container{
 display:grid;
@@ -85,6 +102,16 @@ max-width:1000px;
 margin:auto;
 }
 
+/* ALPHABET */
+.letter-divider{
+grid-column:1/-1;
+color:#4ade80;
+margin:20px 0 10px;
+letter-spacing:6px;
+font-size:0.9rem;
+}
+
+/* CARD */
 .plant-card{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
@@ -155,6 +182,10 @@ filter:brightness(0) invert(1);
 <button class="nav-btn">Mon Jardin</button>
 </div>
 
+<div class="controls-area">
+<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+</div>
+
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <script>
@@ -163,10 +194,19 @@ const API_URL="https://eonia-api.santhimi.workers.dev";
 
 let allPlants=[];
 
-/* ✅ CATALOGUE = GLOBAL (IMPORTANT) */
+/* ===================== USER ===================== */
+const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+const userPin = localStorage.getItem('user_pin') || "0000";
+
+/* menu visible si connecté */
+if(userEmail !== "invite@eonia.com"){
+document.getElementById("client-menu").style.display="flex";
+}
+
+/* ===================== LOAD CATALOGUE (GLOBAL UNIQUEMENT) ===================== */
 async function loadData(){
 
-const res=await fetch(API_URL,{
+const res = await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -174,18 +214,44 @@ action:"get_catalogue"
 })
 });
 
-allPlants=await res.json();
+allPlants = await res.json();
 renderGrid();
 }
 
+/* ===================== RENDER AVEC ALPHABET ===================== */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
+const search=document.getElementById("searchBox").value.toLowerCase();
+
 container.innerHTML="";
 
-allPlants.forEach(p=>{
+let filtered = allPlants.filter(p =>
+(p["Nom commun"] || "").toLowerCase().includes(search)
+);
 
-const id=p["ID_Plaque"] || p.id;
+filtered.sort((a,b)=>
+(a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
+);
+
+let lastLetter = "";
+
+filtered.forEach(p=>{
+
+const name = p["Nom commun"] || "Plante";
+const letter = name[0].toUpperCase();
+
+/* ALPHABET */
+if(letter !== lastLetter){
+const div=document.createElement("div");
+div.className="letter-divider";
+div.textContent = letter;
+container.appendChild(div);
+lastLetter = letter;
+}
+
+/* CARD */
+const id = p["ID_Plaque"] || p.id;
 
 const card=document.createElement("div");
 card.className="plant-card";
@@ -197,7 +263,8 @@ window.location.href="jardin.html?id="+id;
 card.innerHTML=`
 <div class="img-container">
 <img class="plant-img" src="${p.Photo || ''}">
-</div>`;
+</div>
+`;
 
 container.appendChild(card);
 
