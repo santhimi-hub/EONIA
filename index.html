@@ -33,8 +33,9 @@
         .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; text-align: center; }
         .link-order:hover { color: #fff; }
         
+        /* NAVIGATION SIMPLIFIÉE */
         .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
-        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 10px; border-bottom: 1px solid transparent; transition: 0.3s; }
+        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 15px; border-bottom: 1px solid transparent; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
         
         /* CONTENU */
@@ -69,7 +70,6 @@
         <div class="bottom-nav">
             <a href="#" onclick="accesInvite()">Accès Invité</a>
             <a href="#concept">Notre Concept</a>
-            <a href="catalogue.html">Catalogue</a>
         </div>
     </div>
 
@@ -91,11 +91,12 @@
         }
     };
 
-    document.addEventListener('keypress', function (e) {
+    // Gestion du bouton "Entrer" au clavier
+    document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') { validerConnexion(); }
     });
 
-    async function validerConnexion() {
+    function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
 
@@ -104,10 +105,12 @@
             return; 
         }
 
+        // Sauvegarde immédiate
         localStorage.setItem('user_email', mail);
         localStorage.setItem('user_pin', pin);
         localStorage.setItem('eonia_access', 'client');
 
+        // Redirection forcée
         if (plaqueEnAttente) {
             window.location.href = "jardin.html?id=" + plaqueEnAttente;
         } else {
@@ -116,6 +119,7 @@
     }
 
     function accesInvite() {
+        localStorage.clear(); // On vide pour être sûr de ne pas avoir de vieux comptes
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('user_pin', '0000');
         localStorage.setItem('eonia_access', 'guest');
