@@ -8,8 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
 
 <style>
-
-/* BASE */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -67,6 +65,29 @@ color:#4ade80;
 margin-top:5px;
 }
 
+/* NAV */
+.client-nav{
+display:none;
+justify-content:center;
+gap:10px;
+margin:15px 0;
+}
+
+.nav-btn{
+background:none;
+border:1px solid #222;
+color:#fff;
+padding:6px 14px;
+border-radius:20px;
+font-size:0.6rem;
+cursor:pointer;
+}
+
+.nav-btn.active{
+border-color:#4ade80;
+color:#4ade80;
+}
+
 /* SEARCH */
 .controls-area{
 text-align:center;
@@ -94,15 +115,6 @@ max-width:1000px;
 margin:auto;
 }
 
-/* ALPHABET */
-.letter-divider{
-grid-column:1/-1;
-color:#4ade80;
-margin:20px 0 10px;
-letter-spacing:6px;
-}
-
-/* CARD */
 .plant-card{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
@@ -168,48 +180,6 @@ z-index:3000;
 flex-direction:column;
 overflow:hidden;
 }
-
-.chat-header{
-padding:10px;
-background:#111;
-display:flex;
-justify-content:space-between;
-color:#4ade80;
-font-size:0.7rem;
-}
-
-.chat-body{
-flex:1;
-padding:10px;
-overflow-y:auto;
-font-size:0.8rem;
-}
-
-.chat-input{
-display:flex;
-padding:10px;
-gap:8px;
-background:#000;
-}
-
-.chat-input input{
-flex:1;
-padding:8px;
-border-radius:20px;
-border:1px solid #333;
-background:#111;
-color:#fff;
-}
-
-.chat-input button{
-width:36px;
-height:36px;
-border-radius:50%;
-background:#4ade80;
-border:none;
-cursor:pointer;
-}
-
 </style>
 </head>
 
@@ -225,55 +195,52 @@ cursor:pointer;
 <p id="page-title">Catalogue</p>
 </header>
 
+<!-- MENU CLIENT -->
+<div id="client-menu" class="client-nav">
+<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
+<button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+</div>
+
 <div class="controls-area">
 <input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
-<!-- IA -->
-<div id="ai-chat-window">
-<div class="chat-header">
-<span>Assistant ÉONIA</span>
-<span onclick="toggleChat()">✕</span>
-</div>
-
-<div id="chat-body" class="chat-body">Bonjour 🌿</div>
-
-<div class="chat-input">
-<input id="chat-input" placeholder="Votre question...">
-<button onclick="sendAI()">➤</button>
-</div>
-</div>
-
-<div id="eonia-ai-trigger" onclick="toggleChat()">
-<div class="ai-icon-circle">
-<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
-</div>
-</div>
-
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
 
 let allPlants=[];
+let currentView="catalogue";
 
-/* LOAD */
+const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+const userPin = localStorage.getItem('user_pin') || "0000";
+
+/* AFFICHAGE MENU CLIENT */
+if(userEmail !== "invite@eonia.com"){
+document.getElementById("client-menu").style.display="flex";
+}
+
 async function loadData(){
 
-const res=await fetch(API_URL,{
+document.getElementById("page-title").innerText =
+currentView === "catalogue" ? "Catalogue" : "Mon Jardin";
+
+const res = await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-email:"invite@eonia.com"
+email:userEmail,
+pin:userPin,
+view:currentView
 })
 });
 
-allPlants=await res.json();
+allPlants = await res.json();
 renderGrid();
 }
 
-/* GRID */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
@@ -281,48 +248,29 @@ const search=document.getElementById("searchBox").value.toLowerCase();
 
 container.innerHTML="";
 
-let filtered=allPlants.filter(p=>
-(p["Nom commun"]||"").toLowerCase().includes(search)
+let filtered = allPlants.filter(p =>
+(p["Nom commun"] || "").toLowerCase().includes(search)
 );
 
 filtered.sort((a,b)=>
-(a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
+(a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
 );
-
-let last="";
 
 filtered.forEach(p=>{
 
-let name=p["Nom commun"]||"Plante";
-let letter=name[0].toUpperCase();
+const id = p["ID_Plaque"] || p.id;
 
-if(letter!==last){
-let div=document.createElement("div");
-div.className="letter-divider";
-div.innerText=letter;
-container.appendChild(div);
-last=letter;
-}
-
-/* ✅ FIX IMPORTANT : sécurisation ID */
-let id = p["ID_Plaque"] || p.id || p.id_botanique;
-
-if(!id){
-console.warn("ID manquant :", p);
-return;
-}
-
-let card=document.createElement("div");
+const card=document.createElement("div");
 card.className="plant-card";
 
-/* ✅ FIX IMPORTANT : encodage URL */
+/* IMPORTANT: redirection vers fiche plante */
 card.onclick=()=>{
-window.location.href=`jardin.html?id=${encodeURIComponent(id)}`;
+window.location.href="jardin.html?id="+id;
 };
 
 card.innerHTML=`
 <div class="img-container">
-<img class="plant-img" src="${p.Photo||''}">
+<img class="plant-img" src="${p.Photo || ''}">
 </div>
 `;
 
@@ -332,27 +280,13 @@ container.appendChild(card);
 
 }
 
-/* IA */
-function toggleChat(){
-let chat=document.getElementById("ai-chat-window");
-chat.style.display=(chat.style.display==="flex")?"none":"flex";
+function switchView(view){
+currentView=view;
+document.getElementById("btn-col").classList.toggle("active",view==="catalogue");
+document.getElementById("btn-jar").classList.toggle("active",view==="jardin");
+loadData();
 }
 
-function sendAI(){
-let input=document.getElementById("chat-input");
-let body=document.getElementById("chat-body");
-
-if(!input.value.trim())return;
-
-body.innerHTML+=`<div>🧑 ${input.value}</div>`;
-input.value="";
-
-setTimeout(()=>{
-body.innerHTML+=`<div>🌿 Je vous guide vers la bonne plante.</div>`;
-},500);
-}
-
-/* LOGOUT */
 function logout(){
 localStorage.clear();
 window.location.href="index.html";
