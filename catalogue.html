@@ -9,255 +9,239 @@
 <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
-
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-background:#000;
-color:#fff;
-font-family:'Raleway',sans-serif;
-min-height:100vh;
-padding-top:60px;
--webkit-font-smoothing:antialiased;
+background: #000;
+color: #fff;
+font-family: 'Raleway', sans-serif;
+-webkit-font-smoothing: antialiased;
+min-height: 100vh;
+padding-top: 60px;
 }
 
 /* TOP BAR */
-
 .top-bar {
-position:fixed;
-top:0; left:0;
-width:100%; height:60px;
-background:rgba(0,0,0,0.85);
-backdrop-filter:blur(15px);
-display:flex;
-justify-content:flex-end;
-align-items:center;
-padding:0 20px;
-z-index:3000;
-border-bottom:1px solid rgba(255,255,255,0.05);
+position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+background: rgba(0,0,0,0.85);
+backdrop-filter: blur(15px);
+display: flex; justify-content: flex-end; align-items: center;
+padding: 0 20px;
+z-index: 3000;
+border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .logout-header-btn {
-background:none;
-border:1px solid #4ade80;
-color:#4ade80;
-padding:6px 16px;
-border-radius:20px;
-font-size:0.6rem;
-text-transform:uppercase;
-cursor:pointer;
-transition:0.3s;
+background: none;
+border: 1px solid #4ade80;
+color: #4ade80;
+padding: 6px 16px;
+border-radius: 20px;
+font-size: 0.6rem;
+text-transform: uppercase;
+cursor: pointer;
+transition: 0.3s;
 }
 
 .logout-header-btn:hover {
-background:#4ade80;
-color:#000;
+background: #4ade80;
+color: #000;
 }
 
 /* HEADER */
-
 header {
-text-align:center;
-padding:30px 20px 20px;
+text-align: center;
+padding: 30px 20px 20px 20px;
 }
 
 .logo-main {
-width:70px;
-margin-bottom:15px;
-opacity:0.9;
+width: 70px;
+margin-bottom: 15px;
 }
 
 .brand-title {
-font-weight:300;
-text-transform:uppercase;
-letter-spacing:8px;
-font-size:2rem;
+font-weight: 300;
+text-transform: uppercase;
+letter-spacing: 8px;
+font-size: 2.1rem;
 }
 
 #page-title {
-font-size:0.7rem;
-color:#4ade80;
-margin-top:8px;
-letter-spacing:3px;
+font-size: 0.7rem;
+color: #4ade80;
+margin-top: 8px;
+letter-spacing: 3px;
 }
 
 /* NAV */
-
 .client-nav {
-display:none;
-justify-content:center;
-gap:12px;
-margin:15px 0 25px;
+display: none;
+justify-content: center;
+gap: 12px;
+margin: 15px 0 25px;
 }
 
 .nav-btn {
-background:none;
-border:1px solid #1a1a1a;
-color:#aaa;
-padding:7px 15px;
-border-radius:20px;
-font-size:0.6rem;
-text-transform:uppercase;
-cursor:pointer;
-transition:0.3s;
+background: none;
+border: 1px solid #1a1a1a;
+color: #fff;
+padding: 7px 15px;
+border-radius: 20px;
+font-size: 0.6rem;
+cursor: pointer;
 }
 
 .nav-btn.active {
-border-color:#4ade80;
-color:#4ade80;
+border-color: #4ade80;
+color: #4ade80;
 }
 
 /* SEARCH */
-
 .controls-area {
-max-width:900px;
-margin:auto;
-padding:0 15px;
-text-align:center;
+max-width: 1000px;
+margin: 0 auto 20px auto;
+padding: 0 15px;
+text-align: center;
 }
 
 .search-input {
-width:100%;
-max-width:350px;
-padding:12px;
-background:#0c0c0c;
-border:1px solid #1a1a1a;
-border-radius:50px;
-color:#fff;
-text-align:center;
-font-size:0.8rem;
-margin-bottom:15px;
+width: 100%;
+max-width: 350px;
+padding: 12px;
+background: #0c0c0c;
+border: 1px solid #1a1a1a;
+border-radius: 50px;
+color: #fff;
+text-align: center;
+font-size: 0.8rem;
+margin-bottom: 15px;
 }
 
 .search-input:focus {
-border-color:#4ade80;
-outline:none;
+border-color: #4ade80;
+outline: none;
 }
 
 /* FILTER */
-
 .filter-nav {
-display:flex;
-justify-content:center;
-gap:6px;
-flex-wrap:wrap;
+display: flex;
+justify-content: center;
+gap: 6px;
+flex-wrap: wrap;
 }
 
 .f-btn {
-background:none;
-border:1px solid #1a1a1a;
-color:#555;
-padding:5px 12px;
-border-radius:20px;
-font-size:0.5rem;
-text-transform:uppercase;
-cursor:pointer;
+background: none;
+border: 1px solid #1a1a1a;
+color: #555;
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 0.5rem;
+cursor: pointer;
+text-transform: uppercase;
 }
 
 .f-btn.active {
-border-color:#4ade80;
-color:#4ade80;
+border-color: #4ade80;
+color: #4ade80;
 }
 
 /* GRID */
-
 .catalog-container {
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
-gap:20px;
-max-width:1000px;
-margin:auto;
-padding:20px;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+gap: 20px;
+max-width: 1000px;
+margin: 0 auto;
+padding: 20px;
 }
 
+/* LETTER */
+.letter-divider {
+grid-column: 1 / -1;
+font-size: 1.2rem;
+color: #4ade80;
+margin: 20px 0 10px 5px;
+font-weight: 200;
+letter-spacing: 6px;
+}
+
+/* CARD */
 .plant-card {
-background:#0c0c0c;
-border-radius:12px;
-overflow:hidden;
-border:1px solid #1a1a1a;
-cursor:pointer;
-transition:0.3s;
+background: #0c0c0c;
+border-radius: 12px;
+overflow: hidden;
+border: 1px solid #1a1a1a;
+cursor: pointer;
+transition: 0.3s;
 }
 
 .plant-card:hover {
-border-color:#4ade80;
-transform:translateY(-5px);
+border-color: #4ade80;
+transform: translateY(-5px);
 }
 
 .img-container {
-height:145px;
-background:#000;
-overflow:hidden;
+height: 145px;
+overflow: hidden;
+background: #000;
 }
 
 .plant-img {
-width:100%;
-height:100%;
-object-fit:cover;
-filter:brightness(0.7);
-transition:0.4s;
-}
-
-.plant-card:hover .plant-img {
-filter:brightness(1);
-transform:scale(1.1);
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: 0.4s;
 }
 
 .plant-info {
-padding:10px;
-text-align:center;
+padding: 12px;
+text-align: center;
 }
 
 .plant-name {
-font-size:0.65rem;
-text-transform:uppercase;
-color:#bbb;
+font-size: 0.65rem;
+text-transform: uppercase;
+color: #bbb;
 }
 
-/* AI BUTTON */
-
+/* AI */
 #eonia-ai-trigger {
-position:fixed;
-bottom:30px;
-right:25px;
-display:flex;
-align-items:center;
-cursor:pointer;
+position: fixed;
+bottom: 30px;
+right: 25px;
+cursor: pointer;
 }
 
 .ai-icon-circle {
-width:50px;
-height:50px;
-background:#fff;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-border:1px solid #4ade80;
+width: 50px;
+height: 50px;
+background: #fff;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 1px solid #4ade80;
 }
 
 /* CHAT */
-
 #ai-chat-window {
-display:none;
-position:fixed;
-bottom:95px;
-right:25px;
-width:320px;
-height:450px;
-background:#0c0c0c;
-border:1px solid #4ade80;
-border-radius:15px;
-flex-direction:column;
-z-index:3000;
-overflow:hidden;
+display: none;
+position: fixed;
+bottom: 95px;
+right: 25px;
+width: 320px;
+height: 450px;
+background: #0c0c0c;
+border: 1px solid #4ade80;
+border-radius: 15px;
+z-index: 3000;
 }
 
-/* MOBILE */
-
-@media(max-width:450px){
-.catalog-container{grid-template-columns:repeat(2,1fr);}
-#ai-chat-window{width:90%;right:5%;}
+@media (max-width: 450px) {
+.catalog-container {
+grid-template-columns: repeat(2, 1fr);
+}
 }
 
 </style>
@@ -276,174 +260,4 @@ overflow:hidden;
 </header>
 
 <div id="client-menu" class="client-nav">
-<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
-<button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
-</div>
-
-<div class="controls-area">
-<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
-
-<div class="filter-nav">
-<button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-<button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-<button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-<button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-</div>
-</div>
-
-<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">Chargement...</div>
-
-<div id="catalogue-grid" class="catalog-container"></div>
-
-<script>
-
-/* ---------------- RÔLE ---------------- */
-
-const userEmail = localStorage.getItem('user_email');
-const userPin = localStorage.getItem('user_pin');
-const access = localStorage.getItem('eonia_access') || 'guest';
-
-let currentView = 'catalogue';
-let allPlants = [];
-let activeFilter = 'all';
-
-if (!userEmail) logout();
-
-if (access !== 'guest') {
-document.getElementById('client-menu').style.display = 'flex';
-}
-
-/* ---------------- API ---------------- */
-
-const API_URL = "https://eonia-api.santhimi.workers.dev";
-
-/* ---------------- LOAD ---------------- */
-
-async function loadData(){
-
-const status = document.getElementById('status-msg');
-status.innerText = "Synchronisation...";
-
-let emailToSend = 'invite@eonia.com';
-
-if (access === 'client' || access === 'admin') {
-if (currentView === 'jardin') {
-emailToSend = userEmail;
-}
-}
-
-document.getElementById('page-title').innerText =
-(currentView === 'catalogue') ? "Collection" : "Mon Jardin";
-
-try {
-
-const res = await fetch(API_URL,{
-method:'POST',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-email: emailToSend,
-pin: userPin,
-access: access,
-view: currentView
-})
-});
-
-const data = await res.json();
-
-allPlants = Array.isArray(data) ? data : [];
-
-renderGrid();
-
-} catch(e){
-status.innerText = "Erreur API";
-console.error(e);
-}
-
-}
-
-/* ---------------- GRID ---------------- */
-
-function renderGrid(){
-
-const container = document.getElementById('catalogue-grid');
-const search = document.getElementById('searchBox').value.toLowerCase();
-
-container.innerHTML = "";
-
-let filtered = allPlants.filter(p=>{
-const name = (p["Nom commun"]||"").toLowerCase();
-const type = (activeFilter === 'all' || p.Type === activeFilter);
-return name.includes(search) && type;
-});
-
-if(filtered.length === 0){
-document.getElementById('status-msg').innerText = "Aucun résultat";
-return;
-}
-
-document.getElementById('status-msg').style.display="none";
-
-filtered.forEach(p=>{
-
-const id = p.id || p.ID || p.id_botanique;
-
-const card = document.createElement('div');
-card.className="plant-card";
-
-card.onclick=()=>{
-
-if(currentView === 'catalogue'){
-window.location.href = `jardin.html?id_botanique=${id}`;
-}else{
-window.location.href = `jardin.html?id=${p["ID_Plaque"]}`;
-}
-
-};
-
-card.innerHTML=`
-<div class="img-container">
-<img class="plant-img" src="${p.Photo || ''}">
-</div>
-<div class="plant-info">
-<div class="plant-name">${p["Nom commun"]||""}</div>
-</div>`;
-
-container.appendChild(card);
-
-});
-
-}
-
-/* ---------------- SWITCH VIEW ---------------- */
-
-function switchView(v){
-currentView=v;
-document.getElementById('btn-col').classList.toggle('active',v==='catalogue');
-document.getElementById('btn-jar').classList.toggle('active',v==='jardin');
-loadData();
-}
-
-/* ---------------- FILTER ---------------- */
-
-function setFilter(t,btn){
-activeFilter=t;
-document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-renderGrid();
-}
-
-/* ---------------- LOGOUT ---------------- */
-
-function logout(){
-localStorage.clear();
-window.location.href="index.html";
-}
-
-/* ---------------- INIT ---------------- */
-
-loadData();
-
-</script>
-
-</body>
-</html>
+<button id
