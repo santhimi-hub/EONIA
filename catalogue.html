@@ -17,6 +17,7 @@ color:#fff;
 font-family:'Raleway',sans-serif;
 }
 
+/* HEADER */
 header{
 text-align:center;
 padding:50px 20px 30px 20px;
@@ -43,6 +44,7 @@ letter-spacing:3px;
 text-transform:uppercase;
 }
 
+/* NAV */
 .client-nav{
 display:none;
 justify-content:center;
@@ -66,6 +68,7 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
+/* SEARCH */
 .controls-area{
 max-width:1000px;
 margin:0 auto 30px auto;
@@ -85,6 +88,7 @@ text-align:center;
 margin-bottom:20px;
 }
 
+/* GRID */
 .catalog-container{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
@@ -102,6 +106,7 @@ margin:30px 0 10px 0;
 letter-spacing:5px;
 }
 
+/* CARD */
 .plant-card{
 background:#0c0c0c;
 border-radius:15px;
@@ -137,14 +142,16 @@ font-size:0.75rem;
 text-transform:uppercase;
 }
 
+/* STATUS */
 #status-msg{
 text-align:center;
 color:#4ade80;
 margin-top:40px;
 }
 
-/* IA BULLE */
+/* ================= IA ================= */
 
+/* Bulle */
 #ai-bubble{
 position:fixed;
 bottom:25px;
@@ -169,6 +176,7 @@ animation:breath 3s infinite;
 100%{transform:scale(1)}
 }
 
+/* Notification IA */
 #ai-notif{
 position:fixed;
 bottom:100px;
@@ -200,19 +208,12 @@ max-width:200px;
 </div>
 
 <div class="controls-area">
-
-<input type="text"
-id="searchBox"
-class="search-input"
-placeholder="RECHERCHER UNE ESSENCE..."
-oninput="renderGrid()">
-
+<input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
 </div>
 
 <div id="status-msg">Synchronisation...</div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
-
 
 <!-- IA -->
 <div id="ai-notif"></div>
@@ -220,41 +221,36 @@ oninput="renderGrid()">
 
 <script>
 
-const userEmail=localStorage.getItem('user_email');
-const userPin=localStorage.getItem('user_pin')||"0000";
+const userEmail = localStorage.getItem('user_email');
+const userPin = localStorage.getItem('user_pin') || "0000";
 
-let currentView='catalogue';
-let allPlants=[];
+let currentView = "catalogue";
+let allPlants = [];
 
-if(!userEmail)window.location.href="index.html";
+if (!userEmail) window.location.href = "index.html";
 
-if(userEmail!=='invite@eonia.com'){
-document.getElementById('client-menu').style.display="flex";
+if (userEmail !== "invite@eonia.com") {
+document.getElementById("client-menu").style.display = "flex";
 }
 
-const API_URL="https://eonia-api.santhimi.workers.dev";
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
+/* ================= LOAD ================= */
 async function loadData(){
 
-const status=document.getElementById('status-msg');
-const container=document.getElementById('catalogue-grid');
+document.getElementById('status-msg').innerText = "Chargement...";
 
-container.innerHTML="";
-status.innerText="Chargement...";
+const emailToSend =
+(currentView === "catalogue")
+? "invite@eonia.com"
+: userEmail;
 
-const emailToSend=
-(currentView==='catalogue')
-?'invite@eonia.com'
-:userEmail;
+document.getElementById('page-title').innerText =
+(currentView === "catalogue")
+? "Notre Collection"
+: "Mon Jardin";
 
-document.getElementById('page-title').innerText=
-(currentView==='catalogue')
-?"Notre Collection"
-:"Mon Jardin";
-
-try{
-
-const response=await fetch(API_URL,{
+const res = await fetch(API_URL,{
 method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
@@ -263,65 +259,61 @@ pin:userPin
 })
 });
 
-const data=await response.json();
+const data = await res.json();
 
-allPlants=Array.isArray(data)?data:[];
+allPlants = Array.isArray(data) ? data : [];
 
-if(currentView==="catalogue"){
-allPlants=allPlants.filter(p=>
-(p.Statut||"").toLowerCase()==="publié"
+if(currentView === "catalogue"){
+allPlants = allPlants.filter(p =>
+(p.Statut || "").toLowerCase() === "publié"
 );
 }
 
 renderGrid();
 showAIMessage();
-
-}catch(e){
-status.innerText="Erreur connexion";
 }
 
-}
-
+/* ================= GRID ================= */
 function renderGrid(){
 
-const container=document.getElementById('catalogue-grid');
-const search=document.getElementById('searchBox').value.toLowerCase();
+const container = document.getElementById("catalogue-grid");
+const search = document.getElementById("searchBox").value.toLowerCase();
 
-container.innerHTML="";
+container.innerHTML = "";
 
-let filtered=allPlants.filter(p=>{
-return (p["Nom commun"]||"").toLowerCase().includes(search);
-});
+let filtered = allPlants.filter(p =>
+(p["Nom commun"] || "").toLowerCase().includes(search)
+);
 
 filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-let lastLetter="";
+let lastLetter = "";
 
 filtered.forEach(p=>{
 
-const nom=p["Nom commun"]||"Plante";
-const letter=nom.charAt(0).toUpperCase();
+const nom = p["Nom commun"] || "Plante";
+const letter = nom.charAt(0).toUpperCase();
 
-if(letter!==lastLetter){
-const div=document.createElement('div');
-div.className="letter-divider";
-div.innerText=letter;
+if(letter !== lastLetter){
+const div = document.createElement("div");
+div.className = "letter-divider";
+div.innerText = letter;
 container.appendChild(div);
-lastLetter=letter;
+lastLetter = letter;
 }
 
-const card=document.createElement('div');
-card.className="plant-card";
+const card = document.createElement("div");
+card.className = "plant-card";
 
-card.onclick=()=>{
-window.location.href="jardin.html?id="+(p["ID_Plaque"]||p.id);
+card.onclick = () => {
+window.location.href = "jardin.html?id=" + (p["ID_Plaque"] || p.id);
 };
 
-card.innerHTML=`
+card.innerHTML = `
 <div class="img-container">
-<img src="${p.Photo||''}" class="plant-img">
+<img src="${p.Photo || ''}" class="plant-img">
 </div>
 <div class="plant-info">
 <div class="plant-name">${nom}</div>
@@ -334,46 +326,47 @@ container.appendChild(card);
 
 }
 
-/* IA INTELLIGENTE */
+/* ================= IA ORIGINALE ================= */
 
 function showAIMessage(){
 
-const notif=document.getElementById('ai-notif');
+const notif = document.getElementById("ai-notif");
 
-const messages=[
+const messages = [
 "🌱 Besoin de conseils pour vos plantes ?",
 "💧 Pensez à vérifier l'arrosage",
 "🌿 Découvrez votre jardin personnel",
 "☀️ Certaines plantes aiment le soleil"
 ];
 
-const random=messages[Math.floor(Math.random()*messages.length)];
+const random = messages[Math.floor(Math.random() * messages.length)];
 
-notif.innerText=random;
-notif.style.display="block";
+notif.innerText = random;
+notif.style.display = "block";
 
 setTimeout(()=>{
-notif.style.display="none";
+notif.style.display = "none";
 },5000);
 
 }
 
 function openAI(){
-window.location.href="assistant.html";
+window.location.href = "assistant.html";
 }
+
+/* ================= SWITCH ================= */
 
 function switchView(view){
 
-currentView=view;
+currentView = view;
 
-document.getElementById('btn-col')
-.classList.toggle('active',view==='catalogue');
+document.getElementById("btn-col")
+.classList.toggle("active", view === "catalogue");
 
-document.getElementById('btn-jar')
-.classList.toggle('active',view==='jardin');
+document.getElementById("btn-jar")
+.classList.toggle("active", view === "jardin");
 
 loadData();
-
 }
 
 loadData();
