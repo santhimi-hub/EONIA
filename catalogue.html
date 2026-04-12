@@ -3,18 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Collection & Conseil</title>
+    <title>ÉONIA — Collection & Jardin</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        /* BASE & TYPO */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #000; color: #fff; 
-            font-family: 'Raleway', sans-serif; 
-            -webkit-font-smoothing: antialiased; 
-            min-height: 100vh;
-            padding-top: 60px;
-        }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
         
         /* BARRE HAUTE FIXE */
         .top-bar {
@@ -38,12 +31,12 @@
         .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.1rem; margin: 0; }
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
 
-        /* NAV CLIENT */
+        /* NAVIGATION CLIENT */
         .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; margin-top: 15px; }
         .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 1px; transition: 0.3s; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
 
-        /* CONTROLES */
+        /* RECHERCHE ET FILTRES */
         .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
         .search-input { 
             width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
@@ -57,17 +50,8 @@
         .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
         /* GRILLE */
-        .catalog-container { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); 
-            gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; 
-        }
-
-        .letter-divider { 
-            grid-column: 1 / -1; font-size: 1.25rem; color: #4ade80; 
-            border-bottom: 1px solid rgba(74, 222, 128, 0.15); margin: 30px 0 15px 5px; 
-            padding-bottom: 5px; font-weight: 200; letter-spacing: 6px; text-align: left;
-        }
-
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .letter-divider { grid-column: 1 / -1; font-size: 1.25rem; color: #4ade80; border-bottom: 1px solid rgba(74, 222, 128, 0.15); margin: 30px 0 15px 5px; padding-bottom: 5px; font-weight: 200; letter-spacing: 6px; text-align: left; }
         .plant-card { background: #0c0c0c; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.3s ease; cursor: pointer; }
         .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(74, 222, 128, 0.1); }
         .img-container { width: 100%; height: 145px; overflow: hidden; background: #000; }
@@ -81,11 +65,11 @@
         .ai-icon-circle { width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #4ade80; }
         .ai-tooltip { background: #111; color: #4ade80; padding: 8px 16px; border-radius: 20px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 12px; opacity: 0; transition: 0.4s; pointer-events: none; }
         #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(0); }
+        #ai-chat-window { display: none; position: fixed; bottom: 95px; right: 25px; width: 320px; height: 450px; background: #0c0c0c; border: 1px solid #4ade80; border-radius: 15px; flex-direction: column; z-index: 3000; box-shadow: 0 15px 50px rgba(0,0,0,0.9); overflow: hidden; }
 
-        #ai-chat-window {
-            display: none; position: fixed; bottom: 95px; right: 25px; width: 320px; height: 450px;
-            background: #0c0c0c; border: 1px solid #4ade80; border-radius: 15px; flex-direction: column;
-            z-index: 3000; box-shadow: 0 15px 50px rgba(0,0,0,0.9); overflow: hidden;
+        @media (max-width: 450px) {
+            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+            #ai-chat-window { width: 90%; right: 5%; bottom: 90px; }
         }
     </style>
 </head>
@@ -98,7 +82,7 @@
     <header>
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA Logo" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
-        <p id="page-title">Notre Collection</p>
+        <p id="page-title">Chargement...</p>
     </header>
 
     <div id="client-menu" class="client-nav">
@@ -107,7 +91,7 @@
     </div>
 
     <div class="controls-area">
-        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
+        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
         <div id="filter-container" class="filter-nav">
             <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
             <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
@@ -126,11 +110,11 @@
         </div>
         <div id="chat-messages" style="flex:1; padding:15px; overflow-y:auto; font-size:0.8rem; color:#ddd; display:flex; flex-direction:column; gap:12px;">
             <div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">
-                Bonjour. Je suis là pour vous conseiller. Que recherchez-vous comme plante idéale ?
+                Bonjour. Je suis là pour vous conseiller. Que recherchez-vous ?
             </div>
         </div>
-        <div style="padding:15px; border-top:1px solid #1a1a1a; display:flex; gap:10px; background:#080808;">
-            <input type="text" id="chat-input" placeholder="Posez votre question..." style="flex:1; background:#000; border:1px solid #333; border-radius:20px; padding:10px 15px; color:#fff; font-family:'Raleway'; font-size:0.75rem; outline:none;">
+        <div style="padding:15px; border-top:1px solid #1a1a1a; display:flex; gap:10px;">
+            <input type="text" id="chat-input" placeholder="Votre question..." style="flex:1; background:#000; border:1px solid #333; border-radius:20px; padding:10px 15px; color:#fff; font-size:0.75rem; outline:none;">
             <button onclick="envoyerQuestion()" style="background:#4ade80; border:none; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="black"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
@@ -150,25 +134,39 @@
     let currentView = 'catalogue'; 
     let allPlants = []; 
     let activeFilter = 'all';
-    let conversationHistory = []; // MÉMOIRE DE LA SESSION
+    let conversationHistory = [];
 
-    if (!userEmail) { window.location.href = "index.html"; }
-    if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
+    if (!userEmail) logout();
+    if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
 
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function loadData() {
         const statusMsg = document.getElementById('status-msg');
-        statusMsg.style.display = 'block';
+        statusMsg.innerText = "Synchronisation...";
+        
+        // On demande toujours les données liées à l'email stocké
         const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
         document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailToSend, pin: userPin }) 
             });
-            allPlants = await response.json();
+
+            const data = await response.json();
+
+            // LOGIQUE DE SÉCURITÉ CLIENT : 
+            // Si on cherche le jardin d'un client et que la liste est vide => ce n'est pas un client Éonia.
+            if (currentView === 'jardin' && data.length === 0 && userEmail !== 'invite@eonia.com') {
+                alert("Accès restreint aux clients ÉONIA possédant une plaque.");
+                logout();
+                return;
+            }
+
+            allPlants = data;
             renderGrid();
         } catch (error) { statusMsg.innerText = "Erreur de connexion."; }
     }
@@ -177,12 +175,15 @@
         const container = document.getElementById('catalogue-grid');
         const searchVal = document.getElementById('searchBox').value.toLowerCase();
         container.innerHTML = "";
+        
         let filtered = allPlants.filter(p => {
             const nom = (p["Nom commun"] || "").toLowerCase();
             return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
         });
+
         filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
         document.getElementById('status-msg').style.display = (filtered.length === 0) ? 'block' : 'none';
+        if (filtered.length === 0) { document.getElementById('status-msg').innerText = "Aucun résultat."; return; }
 
         let lastLetter = "";
         filtered.forEach(p => {
@@ -190,20 +191,31 @@
             const currentLetter = nom[0].toUpperCase();
             if (currentView === 'catalogue' && currentLetter !== lastLetter) {
                 const divider = document.createElement('div');
-                divider.className = "letter-divider";
-                divider.innerText = currentLetter;
-                container.appendChild(divider);
-                lastLetter = currentLetter;
+                divider.className = "letter-divider"; divider.innerText = currentLetter;
+                container.appendChild(divider); lastLetter = currentLetter;
             }
             const card = document.createElement('div');
             card.className = "plant-card";
             card.onclick = () => {
-                const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
-                window.location.href = `jardin.html?${param}`;
+                const url = (currentView === 'jardin') ? `jardin.html?id=${p["ID_Plaque"]}` : `jardin.html?id_botanique=${p.id}`;
+                window.location.href = url;
             };
             card.innerHTML = `<div class="img-container"><img src="${p.Photo}" class="plant-img"></div><div class="plant-info"><div class="plant-name">${nom}</div></div>`;
             container.appendChild(card);
         });
+    }
+
+    function setFilter(type, btn) {
+        activeFilter = type;
+        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active'); renderGrid();
+    }
+
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+        loadData();
     }
 
     function toggleChat() {
@@ -214,35 +226,16 @@
     function envoyerQuestion() {
         const input = document.getElementById('chat-input');
         const box = document.getElementById('chat-messages');
-        const texte = input.value.trim();
-        if (!texte) return;
-
-        box.innerHTML += `<div style="background:#4ade80; color:#000; padding:10px; border-radius:12px; border-bottom-right-radius:0; align-self:flex-end;">${texte}</div>`;
-        conversationHistory.push({ role: "user", content: texte });
-        input.value = "";
-        box.scrollTop = box.scrollHeight;
-
+        if (!input.value.trim()) return;
+        box.innerHTML += `<div style="background:#4ade80; color:#000; padding:10px; border-radius:12px; border-bottom-right-radius:0; align-self:flex-end;">${input.value}</div>`;
+        conversationHistory.push({ role: "user", content: input.value });
+        input.value = ""; box.scrollTop = box.scrollHeight;
         setTimeout(() => {
-            let rep = "Je recherche l'essence idéale dans notre catalogue de 500 espèces...";
-            if (conversationHistory.length > 2) rep = "Je prends en compte vos précisions pour affiner mes conseils botaniques.";
+            const rep = "Je recherche dans nos 500 espèces pour vous répondre...";
             box.innerHTML += `<div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">${rep}</div>`;
             conversationHistory.push({ role: "assistant", content: rep });
             box.scrollTop = box.scrollHeight;
         }, 1000);
-    }
-
-    function setFilter(type, btn) {
-        activeFilter = type;
-        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGrid();
-    }
-
-    function switchView(view) {
-        currentView = view;
-        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-        loadData();
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
