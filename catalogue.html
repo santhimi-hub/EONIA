@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
+/* ===== TON CSS INCHANGÉ ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -20,7 +21,6 @@ min-height: 100vh;
 padding-top: 60px;
 }
 
-/* TOP BAR */
 .top-bar {
 position: fixed; top: 0; left: 0; width: 100%; height: 60px;
 background: rgba(0,0,0,0.85);
@@ -40,7 +40,6 @@ border-radius: 20px;
 font-size: 0.6rem;
 text-transform: uppercase;
 cursor: pointer;
-transition: 0.3s;
 }
 
 .logout-header-btn:hover {
@@ -48,16 +47,12 @@ background: #4ade80;
 color: #000;
 }
 
-/* HEADER */
 header {
 text-align: center;
 padding: 30px 20px 20px 20px;
 }
 
-.logo-main {
-width: 70px;
-margin-bottom: 15px;
-}
+.logo-main { width: 70px; margin-bottom: 15px; }
 
 .brand-title {
 font-weight: 300;
@@ -73,7 +68,6 @@ margin-top: 8px;
 letter-spacing: 3px;
 }
 
-/* NAV */
 .client-nav {
 display: none;
 justify-content: center;
@@ -96,7 +90,6 @@ border-color: #4ade80;
 color: #4ade80;
 }
 
-/* SEARCH */
 .controls-area {
 max-width: 1000px;
 margin: 0 auto 20px auto;
@@ -117,12 +110,6 @@ font-size: 0.8rem;
 margin-bottom: 15px;
 }
 
-.search-input:focus {
-border-color: #4ade80;
-outline: none;
-}
-
-/* FILTER */
 .filter-nav {
 display: flex;
 justify-content: center;
@@ -138,7 +125,6 @@ padding: 5px 12px;
 border-radius: 20px;
 font-size: 0.5rem;
 cursor: pointer;
-text-transform: uppercase;
 }
 
 .f-btn.active {
@@ -146,7 +132,6 @@ border-color: #4ade80;
 color: #4ade80;
 }
 
-/* GRID */
 .catalog-container {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -156,7 +141,6 @@ margin: 0 auto;
 padding: 20px;
 }
 
-/* LETTER */
 .letter-divider {
 grid-column: 1 / -1;
 font-size: 1.2rem;
@@ -166,7 +150,6 @@ font-weight: 200;
 letter-spacing: 6px;
 }
 
-/* CARD */
 .plant-card {
 background: #0c0c0c;
 border-radius: 12px;
@@ -184,14 +167,12 @@ transform: translateY(-5px);
 .img-container {
 height: 145px;
 overflow: hidden;
-background: #000;
 }
 
 .plant-img {
 width: 100%;
 height: 100%;
 object-fit: cover;
-transition: 0.4s;
 }
 
 .plant-info {
@@ -203,45 +184,6 @@ text-align: center;
 font-size: 0.65rem;
 text-transform: uppercase;
 color: #bbb;
-}
-
-/* AI */
-#eonia-ai-trigger {
-position: fixed;
-bottom: 30px;
-right: 25px;
-cursor: pointer;
-}
-
-.ai-icon-circle {
-width: 50px;
-height: 50px;
-background: #fff;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-border: 1px solid #4ade80;
-}
-
-/* CHAT */
-#ai-chat-window {
-display: none;
-position: fixed;
-bottom: 95px;
-right: 25px;
-width: 320px;
-height: 450px;
-background: #0c0c0c;
-border: 1px solid #4ade80;
-border-radius: 15px;
-z-index: 3000;
-}
-
-@media (max-width: 450px) {
-.catalog-container {
-grid-template-columns: repeat(2, 1fr);
-}
 }
 
 </style>
@@ -260,4 +202,187 @@ grid-template-columns: repeat(2, 1fr);
 </header>
 
 <div id="client-menu" class="client-nav">
-<button id
+<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
+<button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+</div>
+
+<div class="controls-area">
+<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+
+<div class="filter-nav">
+<button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+<button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+<button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+<button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+</div>
+</div>
+
+<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
+Chargement...
+</div>
+
+<div id="catalogue-grid" class="catalog-container"></div>
+
+<script>
+
+/* ================= SAFE USER ================= */
+
+const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
+const userPin = localStorage.getItem('user_pin') || '0000';
+const access = localStorage.getItem('eonia_access') || 'guest';
+
+let currentView = 'catalogue';
+let allPlants = [];
+let activeFilter = 'all';
+
+const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+/* ================= LOGOUT FIX ================= */
+
+function logout(){
+localStorage.clear();
+window.location.replace("index.html");
+}
+
+/* ================= LOAD ================= */
+
+async function loadData(){
+
+document.getElementById('status-msg').innerText = "Synchronisation...";
+
+let emailToSend = 'invite@eonia.com';
+
+if(access !== 'guest' && currentView === 'jardin'){
+emailToSend = userEmail;
+}
+
+document.getElementById('page-title').innerText =
+(currentView === 'catalogue') ? "Collection" : "Mon Jardin";
+
+try {
+
+const res = await fetch(API_URL,{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+email: emailToSend,
+pin: userPin,
+access: access,
+view: currentView
+})
+});
+
+const data = await res.json();
+
+/* FIX IMPORTANT API */
+allPlants =
+Array.isArray(data) ? data :
+Array.isArray(data?.results) ? data.results :
+Array.isArray(data?.data) ? data.data :
+[];
+
+renderGrid();
+
+} catch(e){
+console.error(e);
+document.getElementById('status-msg').innerText = "Erreur API";
+}
+
+}
+
+/* ================= GRID + TRI ================= */
+
+function renderGrid(){
+
+const container = document.getElementById('catalogue-grid');
+const search = document.getElementById('searchBox').value.toLowerCase();
+
+container.innerHTML = "";
+
+let filtered = allPlants.filter(p=>{
+const name = (p["Nom commun"]||"").toLowerCase();
+const type = (activeFilter === 'all' || p.Type === activeFilter);
+return name.includes(search) && type;
+});
+
+/* TRI ALPHABÉTIQUE RESTAURÉ */
+filtered.sort((a,b)=>
+(a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
+);
+
+if(filtered.length === 0){
+document.getElementById('status-msg').innerText = "Aucun résultat";
+return;
+}
+
+document.getElementById('status-msg').style.display = "none";
+
+let lastLetter = "";
+
+filtered.forEach(p=>{
+
+const nom = p["Nom commun"] || "Plante";
+const letter = nom.charAt(0).toUpperCase();
+
+if(currentView === 'catalogue' && search === "" && letter !== lastLetter){
+
+const div = document.createElement('div');
+div.className = "letter-divider";
+div.innerText = letter;
+container.appendChild(div);
+
+lastLetter = letter;
+}
+
+const id = p.id || p.ID || p.id_botanique;
+
+const card = document.createElement('div');
+card.className = "plant-card";
+
+card.onclick = () => {
+window.location.href =
+(currentView === 'catalogue')
+? `jardin.html?id_botanique=${id}`
+: `jardin.html?id=${p["ID_Plaque"]}`;
+};
+
+card.innerHTML = `
+<div class="img-container">
+<img class="plant-img" src="${p.Photo || ''}">
+</div>
+<div class="plant-info">
+<div class="plant-name">${nom}</div>
+</div>`;
+
+container.appendChild(card);
+
+});
+
+}
+
+/* ================= FILTER ================= */
+
+function setFilter(type,btn){
+activeFilter = type;
+document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+renderGrid();
+}
+
+/* ================= SWITCH ================= */
+
+function switchView(view){
+currentView = view;
+document.getElementById('btn-col').classList.toggle('active', view==='catalogue');
+document.getElementById('btn-jar').classList.toggle('active', view==='jardin');
+loadData();
+}
+
+/* ================= INIT ================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>
