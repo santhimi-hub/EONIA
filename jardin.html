@@ -208,26 +208,41 @@ body:JSON.stringify(bodyRequest)
 const data = await res.json();
 const p = Array.isArray(data) ? data[0] : data;
 
-/* ---------------- BLOQUER BROUILLON ---------------- */
-if (p.Statut !== "Publié" && access === "guest") {
+/* ================= SAFE STOP ================= */
+if(!p){
+document.getElementById('p-nom').innerText = "Plante introuvable";
+return;
+}
+
+/* ================= STATUT SAFE ================= */
+const statut = (p.Statut || "").toLowerCase();
+
+if (statut !== "publié" && access === "guest") {
 document.getElementById('p-nom').innerText = "Fiche en cours de création";
 return;
 }
 
-/* ---------------- IMAGE NOTION ---------------- */
-document.getElementById('p-img').src =
-p["Photo"]?.[0]?.url ||
-"https://via.placeholder.com/600x400/000000/4ade80?text=EONIA";
+/* ================= IMAGE SAFE NOTION ================= */
+let img = "";
 
-/* ---------------- BASE ---------------- */
-document.getElementById('p-nom').innerText = p["Nom commun"] || "";
+if (Array.isArray(p.Photo)) {
+img = p.Photo[0]?.url || "";
+} else if (typeof p.Photo === "string") {
+img = p.Photo;
+}
+
+document.getElementById('p-img').src =
+img || "https://via.placeholder.com/600x400/000000/4ade80?text=EONIA";
+
+/* ================= BASE ================= */
+document.getElementById('p-nom').innerText = p["Nom commun"] || "Sans nom";
 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
-/* ---------------- INFOS ---------------- */
+/* ================= INFOS ================= */
 document.getElementById('p-info').innerText =
-p["Informations générales"] || "Aucune information.";
+p["Informations générales"] || "Aucune information disponible.";
 
-/* ---------------- CARACTÉRISTIQUES ---------------- */
+/* ================= CARACTÉRISTIQUES ================= */
 document.getElementById('p-caracteristiques').innerText =
 `Famille : ${p["Famille"] || "-"}
 Origine : ${p["Origine"] || "-"}
@@ -235,16 +250,16 @@ Style jardin : ${p["Style jardin"] || "-"}
 Persistance : ${p["Persistance"] || "-"}
 Type : ${p["Type"] || "-"}`;
 
-/* ---------------- CULTURE ---------------- */
+/* ================= CULTURE ================= */
 document.getElementById('p-culture').innerText =
 `Exposition : ${p["Exposition"] || "-"}
 Difficulté : ${p["Difficulte"] || "-"}
 Rusticité : ${p["Rusticite"] || "-"}
 Arrosage : ${p["Arrosage"] || "-"}
-Sol : ${p["Type de sol"] || "-"}
+Type de sol : ${p["Type de sol"] || "-"}
 Taille à maturité : ${p["Taille à maturite"] || "-"}`;
 
-/* ---------------- CLIENT ---------------- */
+/* ================= CLIENT ================= */
 if (p.estProprietaire === true) {
 
 document.getElementById('espace-client').style.display = "block";
@@ -264,15 +279,13 @@ document.getElementById('p-nom').innerText = "Erreur de chargement";
 
 };
 
-/* ---------------- CHART ---------------- */
+/* ================= CHART ================= */
 function initChart() {
 
 const ctx = document.getElementById('chart').getContext('2d');
 
 new Chart(ctx, {
-
 type:'line',
-
 data:{
 labels:['Jan','Fév','Mar','Avr','Mai'],
 datasets:[{
@@ -284,7 +297,6 @@ tension:0.4,
 pointRadius:0
 }]
 },
-
 options:{
 responsive:true,
 maintainAspectRatio:false,
@@ -294,12 +306,11 @@ y:{display:false},
 x:{grid:{display:false},ticks:{color:'#444',font:{size:9}}}
 }
 }
-
 });
 
 }
 
-</script>
+  </script>
 
 </body>
 </html>
