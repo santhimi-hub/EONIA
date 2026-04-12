@@ -258,7 +258,7 @@ const API_URL="https://eonia-api.santhimi.workers.dev";
 
 let allPlants=[];
 
-/* CATALOGUE = IDENTIQUE POUR TOUS */
+/* LOAD */
 async function loadData(){
 
 const res=await fetch(API_URL,{
@@ -273,6 +273,7 @@ allPlants=await res.json();
 renderGrid();
 }
 
+/* GRID */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
@@ -303,13 +304,20 @@ container.appendChild(div);
 last=letter;
 }
 
-let id=p["ID_Plaque"];
+/* ✅ FIX IMPORTANT : sécurisation ID */
+let id = p["ID_Plaque"] || p.id || p.id_botanique;
+
+if(!id){
+console.warn("ID manquant :", p);
+return;
+}
 
 let card=document.createElement("div");
 card.className="plant-card";
 
+/* ✅ FIX IMPORTANT : encodage URL */
 card.onclick=()=>{
-window.location.href="jardin.html?id="+id;
+window.location.href=`jardin.html?id=${encodeURIComponent(id)}`;
 };
 
 card.innerHTML=`
