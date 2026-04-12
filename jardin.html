@@ -3,374 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA — Catalogue</title>
+<title>ÉONIA — Plante</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
 
 <style>
-
-/* RESET */
-*{margin:0;padding:0;box-sizing:border-box;}
-
 body{
+margin:0;
 background:#000;
 color:#fff;
 font-family:'Raleway',sans-serif;
-padding-top:60px;
 }
 
-/* TOP BAR */
-.top-bar{
-position:fixed;
-top:0;left:0;
-width:100%;
-height:60px;
-background:rgba(0,0,0,0.85);
-backdrop-filter:blur(15px);
-display:flex;
-justify-content:flex-end;
-align-items:center;
-padding:0 20px;
-z-index:3000;
-}
-
-.logout-header-btn{
-background:none;
-border:1px solid #4ade80;
-color:#4ade80;
-padding:6px 14px;
-border-radius:20px;
-font-size:0.6rem;
-cursor:pointer;
-}
-
-/* HEADER */
-header{
-text-align:center;
+.container{
+max-width:800px;
+margin:auto;
 padding:30px 20px;
 }
 
-.logo-main{
-width:70px;
-margin-bottom:10px;
-}
-
-.brand-title{
-font-weight:300;
-letter-spacing:8px;
+h1{
+color:#4ade80;
 text-transform:uppercase;
-}
-
-#page-title{
-font-size:0.7rem;
-color:#4ade80;
-margin-top:5px;
-}
-
-/* NAV */
-.client-nav{
-display:none;
-justify-content:center;
-gap:10px;
-margin:15px 0;
-}
-
-.nav-btn{
-background:none;
-border:1px solid #222;
-color:#fff;
-padding:6px 14px;
-border-radius:20px;
-font-size:0.6rem;
-cursor:pointer;
-}
-
-.nav-btn.active{
-border-color:#4ade80;
-color:#4ade80;
-}
-
-/* SEARCH */
-.controls-area{
+font-weight:200;
+letter-spacing:4px;
 text-align:center;
-padding:0 15px;
+margin-bottom:20px;
 }
 
-.search-input{
+img{
 width:100%;
-max-width:350px;
-padding:10px;
-border-radius:50px;
-border:1px solid #1a1a1a;
-background:#0c0c0c;
-color:#fff;
-text-align:center;
+height:300px;
+object-fit:cover;
+border-radius:12px;
+margin-bottom:20px;
 }
 
-/* GRID */
-.catalog-container{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
-gap:15px;
-padding:20px;
-max-width:1000px;
-margin:auto;
-}
-
-.plant-card{
+.box{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
 border-radius:12px;
-cursor:pointer;
-transition:0.3s;
-overflow:hidden;
+padding:15px;
+margin-bottom:15px;
 }
 
-.plant-card:hover{
-border-color:#4ade80;
-transform:translateY(-5px);
-}
-
-.img-container{
-height:140px;
-overflow:hidden;
-}
-
-.plant-img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-.plant-info{
-padding:10px;
-text-align:center;
-}
-
-.plant-name{
-font-size:0.65rem;
-text-transform:uppercase;
-color:#bbb;
-}
-
-/* IA BUBBLE */
-#eonia-ai-trigger{
-position:fixed;
-bottom:25px;
-right:25px;
-z-index:9999;
-cursor:pointer;
-}
-
-.ai-icon-circle{
-width:55px;
-height:55px;
-background:#4ade80;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 0 20px rgba(74,222,128,0.5);
-}
-
-.ai-icon-circle img{
-width:28px;
-filter:brightness(0) invert(1);
-}
-
-/* CHAT */
-#ai-chat-window{
-display:none;
-position:fixed;
-bottom:95px;
-right:25px;
-width:320px;
-height:420px;
-background:#0c0c0c;
-border:1px solid #4ade80;
-border-radius:15px;
-z-index:3000;
-flex-direction:column;
-overflow:hidden;
-}
-
-.chat-header{
-padding:10px;
-background:#111;
-display:flex;
-justify-content:space-between;
+.label{
 color:#4ade80;
 font-size:0.7rem;
+text-transform:uppercase;
+letter-spacing:2px;
+margin-bottom:5px;
 }
 
-.chat-body{
-flex:1;
-padding:10px;
-overflow-y:auto;
-font-size:0.8rem;
+.back{
+display:block;
+text-align:center;
+margin-top:30px;
+color:#4ade80;
+text-decoration:none;
 }
-
-.chat-input{
-display:flex;
-padding:10px;
-gap:8px;
-background:#000;
-}
-
-.chat-input input{
-flex:1;
-padding:8px;
-border-radius:20px;
-border:1px solid #333;
-background:#111;
-color:#fff;
-}
-
-.chat-input button{
-width:36px;
-height:36px;
-border-radius:50%;
-background:#4ade80;
-border:none;
-cursor:pointer;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="top-bar">
-<button class="logout-header-btn" onclick="logout()">Quitter</button>
+<div class="container">
+<h1 id="name">Chargement...</h1>
+
+<img id="img">
+
+<div class="box">
+<div class="label">Informations</div>
+<div id="info"></div>
 </div>
 
-<header>
-<img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
-<h1 class="brand-title">ÉONIA</h1>
-<p id="page-title">Catalogue</p>
-</header>
-
-<div class="controls-area">
-<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+<div class="box">
+<div class="label">Culture</div>
+<div id="culture"></div>
 </div>
 
-<div id="catalogue-grid" class="catalog-container"></div>
-
-<!-- IA -->
-<div id="ai-chat-window">
-<div class="chat-header">
-<span>Assistant ÉONIA</span>
-<span onclick="toggleChat()" style="cursor:pointer;">✕</span>
-</div>
-
-<div id="chat-body" class="chat-body">
-Bonjour 🌿 comment puis-je vous aider ?
-</div>
-
-<div class="chat-input">
-<input id="chat-input" placeholder="Votre question...">
-<button onclick="sendAI()">➤</button>
-</div>
-</div>
-
-<div id="eonia-ai-trigger" onclick="toggleChat()">
-<div class="ai-icon-circle">
-<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
-</div>
+<a class="back" href="catalogue.html">← Retour au catalogue</a>
 </div>
 
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
+const params=new URLSearchParams(window.location.search);
 
-let userEmail=localStorage.getItem('user_email')||"invite@eonia.com";
-let userPin=localStorage.getItem('user_pin')||"0000";
+/* ✅ IMPORTANT : récupération ID */
+const id = params.get("id") || params.get("id_botanique");
 
-let allPlants=[];
+if(!id){
+document.getElementById("name").innerText="Plante introuvable";
+throw new Error("ID manquant");
+}
 
-/* LOAD = TOUJOURS IDENTIQUE (IMPORTANT) */
-async function loadData(){
+window.onload = async () => {
+
+try{
 
 const res=await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-email:"invite@eonia.com",
-pin:"0000"
+action:"get_plante",
+id:id
 })
 });
 
-allPlants=await res.json();
-renderGrid();
+const data=await res.json();
+
+/* 🔴 sécurité : on prend UN SEUL objet */
+const p = Array.isArray(data) ? data[0] : data;
+
+if(!p){
+document.getElementById("name").innerText="Plante introuvable";
+return;
 }
 
-function renderGrid(){
+/* IMAGE */
+document.getElementById("img").src = p.Photo || "";
 
-const container=document.getElementById("catalogue-grid");
-const search=document.getElementById("searchBox").value.toLowerCase();
+/* NOM */
+document.getElementById("name").innerText = p["Nom commun"] || "Sans nom";
 
-container.innerHTML="";
+/* INFOS */
+document.getElementById("info").innerText =
+p["Informations générales"] || "Aucune information";
 
-let filtered=allPlants.filter(p=>
-(p["Nom commun"]||"").toLowerCase().includes(search)
-);
+/* CULTURE */
+document.getElementById("culture").innerText =
+`Exposition: ${p.Exposition || "-"}
+Arrosage: ${p.Arrosage || "-"}
+Rusticité: ${p.Rusticite || "-"}
+Sol: ${p["Type de sol"] || "-"}`;
 
-filtered.sort((a,b)=>
-(a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
-);
+}catch(e){
+document.getElementById("name").innerText="Erreur de chargement";
+console.error(e);
+}
 
-filtered.forEach(p=>{
-
-const name=p["Nom commun"]||"Plante";
-
-const card=document.createElement("div");
-card.className="plant-card";
-
-card.onclick=()=>{
-window.location.href="jardin.html?id="+(p["ID_Plaque"]||p.id);
 };
-
-card.innerHTML=`
-<div class="img-container">
-<img class="plant-img" src="${p.Photo||''}">
-</div>
-<div class="plant-info">
-<div class="plant-name">${name}</div>
-</div>`;
-
-container.appendChild(card);
-
-});
-
-}
-
-/* IA */
-function toggleChat(){
-const chat=document.getElementById("ai-chat-window");
-chat.style.display=(chat.style.display==="flex")?"none":"flex";
-}
-
-function sendAI(){
-const input=document.getElementById("chat-input");
-const body=document.getElementById("chat-body");
-
-if(!input.value.trim())return;
-
-body.innerHTML+=`<div>🧑 ${input.value}</div>`;
-input.value="";
-
-setTimeout(()=>{
-body.innerHTML+=`<div>🌿 Analyse en cours...</div>`;
-},500);
-}
-
-/* LOGOUT */
-function logout(){
-localStorage.clear();
-window.location.href="index.html";
-}
-
-loadData();
 
 </script>
 
