@@ -7,65 +7,88 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
-        header { text-align: center; padding: 50px 20px 30px 20px; }
-        .logo-main { width: 90px; margin-bottom: 20px; opacity: 0.9; }
-        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.2rem; margin: 0; }
-        #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
+        
+        header { text-align: center; padding: 40px 20px 20px 20px; }
+        .logo-main { width: 80px; margin-bottom: 15px; opacity: 0.9; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2rem; margin: 0; }
+        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
 
-        .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway', sans-serif; }
-        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+        .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway'; }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
 
-        .controls-area { max-width: 1000px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center; }
+        .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
         .search-input { 
-            width: 100%; max-width: 400px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
+            width: 100%; max-width: 350px; padding: 10px; background: #0c0c0c; border: 1px solid #1a1a1a; 
             border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; 
-            text-align: center; margin-bottom: 20px; transition: 0.3s;
+            text-align: center; margin-bottom: 15px; font-size: 0.8rem;
         }
-        .search-input:focus { border-color: #4ade80; }
 
-        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .f-btn { 
-            background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; 
-            border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s;
-        }
-        .f-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
+        .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; transition: 0.3s; }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
         .letter-divider { 
-            grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; 
-            border-bottom: 1px solid #111; margin: 30px 0 10px 0; 
-            padding-bottom: 5px; font-weight: 200; letter-spacing: 5px; text-align: left;
+            grid-column: 1 / -1; font-size: 1.2rem; color: #4ade80; 
+            border-bottom: 1px solid rgba(74, 222, 128, 0.15); margin: 25px 0 10px 5px; 
+            padding-bottom: 5px; font-weight: 200; letter-spacing: 6px; text-align: left;
         }
 
         .catalog-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 25px; max-width: 1000px; margin: 0 auto; padding: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 15px; max-width: 1000px; margin: 0 auto; padding: 15px; 
         }
 
+        /* --- CORRECTION ICI : Structure de la carte --- */
         .plant-card { 
-            background: #0c0c0c; border-radius: 15px; overflow: hidden; 
-            border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; text-decoration: none;
+            background: #0c0c0c; border-radius: 12px; overflow: hidden; 
+            /* Bordure par défaut discrète */
+            border: 1px solid #1a1a1a; 
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+            cursor: pointer;
+            display: block; /* Pour que le hover fonctionne bien */
         }
-        .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
 
-        .img-container { width: 100%; height: 180px; overflow: hidden; }
+        /* --- CORRECTION ICI : Encadrement vert au survol --- */
+        .plant-card:hover { 
+            border-color: #4ade80; /* Vert ÉONIA */
+            transform: translateY(-4px); /* Soulèvement léger */
+            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.15); /* Ombre portée verte */
+        }
+
+        .img-container { width: 100%; height: 130px; overflow: hidden; background: #000; }
+
+        /* --- CORRECTION ICI : Effet "fade" par défaut sur la photo --- */
         .plant-img { 
             width: 100%; height: 100%; object-fit: cover; 
-            filter: grayscale(0.4) brightness(0.7); 
-            transition: 0.5s ease;
+            /* Fade : Un peu sombre et désaturé */
+            filter: grayscale(0.5) brightness(0.7); 
+            transition: filter 0.5s ease, transform 0.5s ease;
         }
+
+        /* --- CORRECTION ICI : Illumination au survol --- */
         .plant-card:hover .plant-img { 
+            /* Illumination : Couleurs d'origine et luminosité augmentée */
             filter: grayscale(0) brightness(1.1); 
-            transform: scale(1.08); 
+            transform: scale(1.08); /* Zoom léger */
         }
 
-        .plant-info { padding: 15px; text-align: center; }
-        .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .plant-info { padding: 10px 5px; text-align: center; }
+        .plant-name { font-size: 0.65rem; color: #eee; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; transition: color 0.3s ease; }
 
-        #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
-        .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
+        /* Le nom de la plante s'éclaire aussi au hover */
+        .plant-card:hover .plant-name { color: #fff; }
+
+        #status-msg { text-align: center; color: #4ade80; margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
+        .logout-btn { display: block; margin: 30px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #444; padding: 6px 15px; border-radius: 30px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s; }
+        .logout-btn:hover { border-color: rgba(255,255,255,0.3); color: #888; }
+
+        @media (max-width: 400px) {
+            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .img-container { height: 110px; }
+        }
     </style>
 </head>
 <body>
@@ -82,7 +105,7 @@
     </div>
 
     <div class="controls-area">
-        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
+        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
         <div id="filter-container" class="filter-nav">
             <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
             <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
@@ -104,10 +127,7 @@
     let activeFilter = 'all';
 
     if (!userEmail) { window.location.href = "index.html"; }
-
-    if (userEmail !== 'invite@eonia.com') {
-        document.getElementById('client-menu').style.display = 'flex';
-    }
+    if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
 
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
@@ -116,7 +136,7 @@
         const statusMsg = document.getElementById('status-msg');
         container.innerHTML = "";
         statusMsg.style.display = 'block';
-        statusMsg.innerText = "Chargement...";
+        statusMsg.innerText = "Synchronisation...";
 
         const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
         document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
@@ -142,16 +162,14 @@
 
         let filtered = allPlants.filter(p => {
             const nom = (p["Nom commun"] || "").toLowerCase();
-            const matchSearch = nom.includes(searchVal);
-            const matchType = (activeFilter === 'all' || p.Type === activeFilter);
-            return matchSearch && matchType;
+            return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
         });
 
         filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
 
         if (filtered.length === 0) {
             statusMsg.style.display = 'block';
-            statusMsg.innerText = "Aucun résultat trouvé.";
+            statusMsg.innerText = "Aucun résultat.";
             return;
         }
 
@@ -199,7 +217,6 @@
         currentView = view;
         document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
         document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-        document.getElementById('filter-container').style.opacity = (view === 'catalogue') ? "1" : "0.3";
         loadData();
     }
 
