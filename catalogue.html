@@ -7,99 +7,132 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
         
-        header { text-align: center; padding: 40px 20px 20px 20px; }
+        /* HEADER AVEC BOUTON QUITTER DISCRET */
+        header { position: relative; text-align: center; padding: 50px 20px 20px 20px; }
+        
+        .logout-header-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #555;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .logout-header-btn:hover { border-color: #ff4f4f; color: #ff4f4f; background: rgba(255, 79, 79, 0.05); }
+
         .logo-main { width: 80px; margin-bottom: 15px; opacity: 0.9; }
-        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2rem; margin: 0; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.1rem; margin: 0; }
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
 
-        .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        /* NAVIGATION CLIENT */
+        .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; margin-top: 10px; }
         .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway'; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
 
+        /* RECHERCHE ET FILTRES */
         .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
         .search-input { 
-            width: 100%; max-width: 350px; padding: 10px; background: #0c0c0c; border: 1px solid #1a1a1a; 
+            width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
             border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; 
-            text-align: center; margin-bottom: 15px; font-size: 0.8rem;
+            text-align: center; margin-bottom: 15px; font-size: 0.8rem; transition: 0.3s;
         }
+        .search-input:focus { border-color: #4ade80; }
 
         .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
-        .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; transition: 0.3s; }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; transition: 0.3s; }
         .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
+        /* SÉPARATEURS ALPHABÉTIQUES VERTS */
         .letter-divider { 
-            grid-column: 1 / -1; font-size: 1.2rem; color: #4ade80; 
-            border-bottom: 1px solid rgba(74, 222, 128, 0.15); margin: 25px 0 10px 5px; 
+            grid-column: 1 / -1; font-size: 1.25rem; color: #4ade80; 
+            border-bottom: 1px solid rgba(74, 222, 128, 0.15); margin: 30px 0 15px 5px; 
             padding-bottom: 5px; font-weight: 200; letter-spacing: 6px; text-align: left;
         }
 
+        /* GRILLE ET CARTES */
         .catalog-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-            gap: 15px; max-width: 1000px; margin: 0 auto; padding: 15px; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; 
         }
 
         .plant-card { 
             background: #0c0c0c; border-radius: 12px; overflow: hidden; 
             border: 1px solid #1a1a1a; 
-            transition: transform 0.3s ease, border-color 0.3s ease; 
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
             cursor: pointer;
         }
-        .plant-card:hover { border-color: #4ade80; transform: translateY(-4px); }
 
-        .img-container { width: 100%; height: 130px; overflow: hidden; background: #000; }
+        /* Effet encadré vert au survol */
+        .plant-card:hover { 
+            border-color: #4ade80; 
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.1);
+        }
+
+        .img-container { width: 100%; height: 140px; overflow: hidden; background: #000; }
+
+        /* Effet fade par défaut */
         .plant-img { 
             width: 100%; height: 100%; object-fit: cover; 
-            filter: grayscale(0.5) brightness(0.7); 
-            transition: filter 0.5s ease, transform 0.5s ease;
+            filter: grayscale(0.6) brightness(0.7); 
+            transition: 0.6s ease;
         }
-        .plant-card:hover .plant-img { filter: grayscale(0) brightness(1.1); transform: scale(1.08); }
 
-        .plant-info { padding: 10px 5px; text-align: center; }
-        .plant-name { font-size: 0.65rem; color: #eee; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; }
-
-        /* BOUTON QUITTER VISIBLE */
-        .logout-btn { 
-            display: block; margin: 50px auto 80px auto; background: none; 
-            border: 1px solid rgba(255,255,255,0.2); color: #888; 
-            padding: 10px 25px; border-radius: 30px; cursor: pointer; 
-            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px;
-            transition: 0.3s;
+        /* Illumination au survol */
+        .plant-card:hover .plant-img { 
+            filter: grayscale(0) brightness(1.1); 
+            transform: scale(1.1); 
         }
-        .logout-btn:hover { border-color: #ff4f4f; color: #ff4f4f; }
 
-        /* BULL IA ÉONIA */
+        .plant-info { padding: 12px 5px; text-align: center; }
+        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; transition: 0.3s; }
+        .plant-card:hover .plant-name { color: #fff; }
+
+        #status-msg { text-align: center; color: #4ade80; margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* BULLE IA : UNE QUESTION ? */
         #eonia-ai-trigger { 
-            position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
+            position: fixed; bottom: 30px; right: 25px; z-index: 2000; 
             cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
         }
         .ai-icon-circle { 
             width: 50px; height: 50px; background: #fff; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 1px solid #4ade80; transition: 0.3s;
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.2); border: 1px solid #4ade80;
         }
         .ai-tooltip { 
-            background: #111; color: #4ade80; padding: 7px 14px; border-radius: 20px; 
+            background: #111; color: #4ade80; padding: 8px 16px; border-radius: 20px; 
             font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; 
-            margin-right: 10px; border: 1px solid #1a1a1a; opacity: 0; 
+            margin-right: 12px; border: 1px solid #1a1a1a; opacity: 0; 
             transition: 0.4s; pointer-events: none; font-weight: 700; white-space: nowrap;
             transform: translateX(10px);
         }
         #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(0); }
         #eonia-ai-trigger:hover .ai-icon-circle { transform: scale(1.1); }
 
-        @media (max-width: 400px) {
-            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .img-container { height: 110px; }
-            #eonia-ai-trigger { bottom: 20px; right: 20px; }
+        /* MOBILE OPTIMISATION */
+        @media (max-width: 450px) {
+            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+            .img-container { height: 120px; }
+            .brand-title { font-size: 1.7rem; }
+            .logout-header-btn { top: 15px; right: 15px; padding: 4px 10px; }
         }
     </style>
 </head>
 <body>
 
     <header>
+        <button class="logout-header-btn" onclick="logout()">Quitter</button>
         <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA Logo" class="logo-main">
         <h1 class="brand-title">ÉONIA</h1>
         <p id="page-title">Notre Collection</p>
@@ -123,10 +156,8 @@
     <div id="status-msg">Synchronisation...</div>
     <div id="catalogue-grid" class="catalog-container"></div>
 
-    <button class="logout-btn" onclick="logout()">Quitter la session</button>
-
     <div id="eonia-ai-trigger" onclick="ouvrirChatIA()">
-        <span class="ai-tooltip">Expert Éonia</span>
+        <span class="ai-tooltip">Une question ?</span>
         <div class="ai-icon-circle">
             <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 22px; filter: invert(1);" alt="IA">
         </div>
@@ -180,7 +211,7 @@
 
         if (filtered.length === 0) {
             statusMsg.style.display = 'block';
-            statusMsg.innerText = "Aucun résultat.";
+            statusMsg.innerText = "Aucun résultat trouvé.";
             return;
         }
 
@@ -232,7 +263,7 @@
     }
 
     function ouvrirChatIA() {
-        alert("L'Expert ÉONIA : Je suis à votre écoute pour toute question botanique générale sur la collection.");
+        alert("Une question ? Je suis là pour vous conseiller sur les essences de notre collection et leur entretien.");
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
