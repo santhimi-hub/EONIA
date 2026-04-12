@@ -6,17 +6,21 @@
     <title>ÉONIA</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        /* RESET & BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; } 
         body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
         
+        /* HERO SECTION */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
         .logo-main { width: 120px; margin-bottom: 25px; }
         .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
         .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
         
+        /* AUTHENTICATION */
         .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
         input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; text-align: center; }
         
+        /* Suppression flèches input number */
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
@@ -41,18 +45,24 @@
         .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; text-align: center; }
         .link-order:hover { color: #fff; }
         
+        /* BOTTOM NAVIGATION (Mis à jour en vert) */
         .bottom-nav { margin-top: 35px; }
         .bottom-nav a { 
-            color: #ccc; 
+            color: #4ade80; /* Couleur verte demandée */
             text-decoration: none; 
             margin: 0 15px; 
             font-size: 0.65rem; 
             text-transform: uppercase; 
             letter-spacing: 2.5px; 
             transition: 0.3s; 
+            font-weight: 500;
         }
-        .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
+        .bottom-nav a:hover { 
+            color: #fff; 
+            border-bottom: 1px solid #4ade80; 
+        }
         
+        /* CONTENT SECTION */
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
