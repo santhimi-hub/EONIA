@@ -1,161 +1,305 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Expertise Botanique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #050505; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
-        .container { padding: 20px; max-width: 600px; margin: auto; padding-bottom: 50px; }
-        
-        .hero-img { width: 100%; height: 35vh; object-fit: cover; border-bottom: 2px solid #4ade80; background: #111; }
-        h1 { font-weight: 200; text-transform: uppercase; color: #4ade80; letter-spacing: 3px; margin-top: 20px; font-size: 1.8rem; }
-        
-        /* ACCORDÉONS */
-        .details-section { margin-top: 20px; border-top: 1px solid #1a1a1a; }
-        details { padding: 18px 0; border-bottom: 1px solid #1a1a1a; cursor: pointer; outline: none; }
-        details summary { color: #4ade80; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; list-style: none; display: flex; justify-content: space-between; font-weight: 500; }
-        details summary::after { content: "+"; transition: 0.3s; }
-        details[open] summary::after { content: "-"; transform: rotate(180deg); }
-        .details-content { padding-top: 15px; color: #bbb; font-size: 0.85rem; line-height: 1.8; font-weight: 400; text-align: justify; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        /* TABLEAU DE BORD CLIENT */
-        #espace-client { display: none; margin-top: 30px; padding: 25px; border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 15px; background: rgba(74, 222, 128, 0.03); backdrop-filter: blur(5px); }
-        
-        .btn-back { 
-            width: 100%; padding: 15px; border-radius: 50px; border: 1px solid #333; 
-            font-weight: 500; cursor: pointer; text-transform: uppercase; margin-top: 30px; 
-            background: none; color: #888; text-decoration: none; display: block; 
-            text-align: center; font-size: 0.7rem; letter-spacing: 2px; transition: 0.3s;
-        }
-        .btn-back:hover { border-color: #4ade80; color: #4ade80; }
-    </style>
+<title>ÉONIA — Expertise Botanique</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+* {
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body {
+background:#050505;
+color:#fff;
+font-family:'Raleway',sans-serif;
+-webkit-font-smoothing:antialiased;
+}
+
+.hero-img {
+width:100%;
+height:38vh;
+object-fit:cover;
+border-bottom:2px solid #4ade80;
+background:#111;
+}
+
+.container {
+padding:22px;
+max-width:600px;
+margin:auto;
+padding-bottom:60px;
+}
+
+h1 {
+font-weight:200;
+text-transform:uppercase;
+color:#4ade80;
+letter-spacing:3px;
+margin-top:20px;
+font-size:1.8rem;
+}
+
+#p-sci {
+font-style:italic;
+color:#666;
+font-size:0.9rem;
+margin-top:5px;
+}
+
+/* ACCORDÉONS */
+
+details {
+padding:18px 0;
+border-bottom:1px solid #1a1a1a;
+cursor:pointer;
+}
+
+details summary {
+color:#4ade80;
+text-transform:uppercase;
+font-size:0.75rem;
+letter-spacing:2px;
+display:flex;
+justify-content:space-between;
+font-weight:500;
+}
+
+details summary::after {
+content:"+";
+}
+
+details[open] summary::after {
+content:"–";
+}
+
+.details-content {
+padding-top:15px;
+color:#bbb;
+font-size:0.85rem;
+line-height:1.8;
+white-space:pre-line;
+}
+
+/* CLIENT */
+
+#espace-client {
+display:none;
+margin-top:30px;
+padding:25px;
+border:1px solid rgba(74,222,128,0.3);
+border-radius:15px;
+background:rgba(74,222,128,0.03);
+backdrop-filter:blur(5px);
+}
+
+/* BUTTON */
+
+.btn-back {
+width:100%;
+padding:15px;
+border-radius:50px;
+border:1px solid #333;
+margin-top:35px;
+background:none;
+color:#888;
+text-align:center;
+text-transform:uppercase;
+font-size:0.7rem;
+letter-spacing:2px;
+display:block;
+text-decoration:none;
+}
+
+.btn-back:hover {
+border-color:#4ade80;
+color:#4ade80;
+}
+
+</style>
 </head>
+
 <body>
 
-    <img id="p-img" src="" class="hero-img" alt="Chargement...">
-    
-    <div class="container">
-        <h1 id="p-nom">Chargement...</h1>
-        <p id="p-sci" style="font-style:italic; color:#666; font-size: 0.9rem; margin-top: 5px;"></p>
+<img id="p-img" class="hero-img">
 
-        <div class="details-section">
-            <details open>
-                <summary>Conseils d'Entretien</summary>
-                <div class="details-content" id="p-entretien">Recherche des données horticoles...</div>
-            </details>
-            <details>
-                <summary>Sol & Exposition</summary>
-                <div class="details-content" id="p-sol">Recherche des données environnementales...</div>
-            </details>
-            <details>
-                <summary>Histoire & Origine</summary>
-                <div class="details-content" id="p-histoire">Exploration des archives botaniques...</div>
-            </details>
-        </div>
+<div class="container">
 
-        <div id="espace-client">
-            <h2 style="font-size:0.7rem; color:#4ade80; margin-bottom:15px; letter-spacing:3px; text-transform: uppercase;">Mon Jardin Privé</h2>
-            <p style="font-size:0.6rem; color:#555; text-transform:uppercase; margin-bottom: 10px;">Suivi de croissance & Vitalité</p>
-            <div style="height:150px; margin: 15px 0;"><canvas id="chart"></canvas></div>
-            <div style="background: #000; padding: 15px; border-radius: 10px; border: 1px solid #1a1a1a;">
-                <p style="font-size: 0.6rem; color: #4ade80; text-transform: uppercase; margin-bottom: 5px;">Notes personnelles</p>
-                <p id="p-notes" style="font-size:0.85rem; color:#ddd;"></p>
-            </div>
-        </div>
+<h1 id="p-nom">Chargement...</h1>
+<p id="p-sci"></p>
 
-        <a href="catalogue.html" class="btn-back">Retour au Catalogue</a>
-    </div>
+<!-- INFORMATIONS -->
+<details open>
+<summary>Informations Générales</summary>
+<div class="details-content" id="p-info"></div>
+</details>
+
+<!-- CARACTÉRISTIQUES -->
+<details>
+<summary>Caractéristiques</summary>
+<div class="details-content" id="p-caracteristiques"></div>
+</details>
+
+<!-- CULTURE -->
+<details>
+<summary>Culture & Conditions</summary>
+<div class="details-content" id="p-culture"></div>
+</details>
+
+<!-- CLIENT -->
+<div id="espace-client">
+
+<h2 style="color:#4ade80; font-size:0.7rem; text-transform:uppercase; letter-spacing:3px;">
+Mon Jardin Privé
+</h2>
+
+<div style="height:150px;margin:15px 0;">
+<canvas id="chart"></canvas>
+</div>
+
+<div style="background:#000;padding:15px;border-radius:10px;border:1px solid #1a1a1a;">
+<p style="color:#4ade80;font-size:0.6rem;text-transform:uppercase;margin-bottom:5px;">
+Notes personnelles
+</p>
+<p id="p-notes"></p>
+</div>
+
+</div>
+
+<a href="catalogue.html" class="btn-back">Retour au Catalogue</a>
+
+</div>
 
 <script>
-    const API = "https://eonia-api.santhimi.workers.dev";
-    const params = new URLSearchParams(window.location.search);
-    
-    // Récupère soit l'ID de la plaque (client), soit l'ID botanique (catalogue/invité)
-    const id_plaque = params.get('id');
-    const id_botanique = params.get('id_botanique');
 
-    window.onload = async () => {
-        const email = localStorage.getItem('user_email') || "invite@eonia.com";
-        const pin = localStorage.getItem('user_pin') || "0000";
+const API = "https://eonia-api.santhimi.workers.dev";
+const params = new URLSearchParams(window.location.search);
 
-        // On prépare l'objet à envoyer à l'API
-        // Si id_botanique existe, on force le mode consultation catalogue
-        const bodyRequest = {
-            email: email,
-            pin: pin
-        };
+const id_plaque = params.get('id');
+const id_botanique = params.get('id_botanique');
 
-        if (id_plaque) bodyRequest.id = id_plaque;
-        if (id_botanique) bodyRequest.id_botanique = id_botanique;
+window.onload = async () => {
 
-        try {
-            const res = await fetch(API, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(bodyRequest)
-            });
-            
-            const data = await res.json();
-            // L'API renvoie souvent un tableau
-            const p = Array.isArray(data) ? data[0] : data;
+const email = localStorage.getItem('user_email') || "invite@eonia.com";
+const pin = localStorage.getItem('user_pin') || "0000";
+const access = localStorage.getItem('eonia_access') || "guest";
 
-            if (p) {
-                // Remplissage des infos générales
-                document.getElementById('p-nom').innerText = p["Nom commun"] || "Spécimen Éonia";
-                document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-                document.getElementById('p-img').src = p["Photo"] || "https://via.placeholder.com/600x400/000000/4ade80?text=EONIA";
-                document.getElementById('p-img').alt = p["Nom commun"];
-                
-                document.getElementById('p-entretien').innerText = p["Entretien"] || "Les conseils d'entretien spécifiques arrivent bientôt.";
-                document.getElementById('p-sol').innerText = p["Sol"] || "Données sur le sol et l'exposition en cours de rédaction.";
-                document.getElementById('p-histoire').innerText = p["Histoire"] || "L'origine historique de ce spécimen est en cours d'archivage.";
+const bodyRequest = { email, pin };
 
-                // Affichage du tableau de bord si l'utilisateur est reconnu comme propriétaire
-                if (p.estProprietaire === true) {
-                    document.getElementById('espace-client').style.display = 'block';
-                    document.getElementById('p-notes').innerText = p["Notes personnelles"] || "Aucune note pour le moment. Utilisez votre interface de gestion pour ajouter des souvenirs.";
-                    initChart();
-                }
-            } else {
-                document.getElementById('p-nom').innerText = "Plante introuvable";
-            }
-        } catch (e) {
-            console.error("Erreur technique :", e);
-            document.getElementById('p-nom').innerText = "Erreur de chargement";
-        }
-    };
+if(id_plaque) bodyRequest.id = id_plaque;
+if(id_botanique) bodyRequest.id_botanique = id_botanique;
 
-    function initChart() {
-        const ctx = document.getElementById('chart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: { 
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai'], 
-                datasets: [{ 
-                    label: 'Vitalité',
-                    data: [60, 65, 80, 75, 90], 
-                    borderColor: '#4ade80', 
-                    backgroundColor: 'rgba(74, 222, 128, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                }] 
-            },
-            options: { 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { grid: { display: false }, ticks: { color: '#444', font: { size: 9 } } }
-                }
-            }
-        });
-    }
+try {
+
+const res = await fetch(API, {
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(bodyRequest)
+});
+
+const data = await res.json();
+const p = Array.isArray(data) ? data[0] : data;
+
+/* ---------------- BLOQUER BROUILLON ---------------- */
+if (p.Statut !== "Publié" && access === "guest") {
+document.getElementById('p-nom').innerText = "Fiche en cours de création";
+return;
+}
+
+/* ---------------- IMAGE NOTION ---------------- */
+document.getElementById('p-img').src =
+p["Photo"]?.[0]?.url ||
+"https://via.placeholder.com/600x400/000000/4ade80?text=EONIA";
+
+/* ---------------- BASE ---------------- */
+document.getElementById('p-nom').innerText = p["Nom commun"] || "";
+document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+
+/* ---------------- INFOS ---------------- */
+document.getElementById('p-info').innerText =
+p["Informations générales"] || "Aucune information.";
+
+/* ---------------- CARACTÉRISTIQUES ---------------- */
+document.getElementById('p-caracteristiques').innerText =
+`Famille : ${p["Famille"] || "-"}
+Origine : ${p["Origine"] || "-"}
+Style jardin : ${p["Style jardin"] || "-"}
+Persistance : ${p["Persistance"] || "-"}
+Type : ${p["Type"] || "-"}`;
+
+/* ---------------- CULTURE ---------------- */
+document.getElementById('p-culture').innerText =
+`Exposition : ${p["Exposition"] || "-"}
+Difficulté : ${p["Difficulte"] || "-"}
+Rusticité : ${p["Rusticite"] || "-"}
+Arrosage : ${p["Arrosage"] || "-"}
+Sol : ${p["Type de sol"] || "-"}
+Taille à maturité : ${p["Taille à maturite"] || "-"}`;
+
+/* ---------------- CLIENT ---------------- */
+if (p.estProprietaire === true) {
+
+document.getElementById('espace-client').style.display = "block";
+document.getElementById('p-notes').innerText =
+p["Notes personnelles"] || "Aucune note.";
+
+initChart();
+
+}
+
+} catch (e) {
+
+console.error(e);
+document.getElementById('p-nom').innerText = "Erreur de chargement";
+
+}
+
+};
+
+/* ---------------- CHART ---------------- */
+function initChart() {
+
+const ctx = document.getElementById('chart').getContext('2d');
+
+new Chart(ctx, {
+
+type:'line',
+
+data:{
+labels:['Jan','Fév','Mar','Avr','Mai'],
+datasets:[{
+data:[60,65,80,75,90],
+borderColor:'#4ade80',
+backgroundColor:'rgba(74,222,128,0.05)',
+fill:true,
+tension:0.4,
+pointRadius:0
+}]
+},
+
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{legend:{display:false}},
+scales:{
+y:{display:false},
+x:{grid:{display:false},ticks:{color:'#444',font:{size:9}}}
+}
+}
+
+});
+
+}
+
 </script>
+
 </body>
 </html>
