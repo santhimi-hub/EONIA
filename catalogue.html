@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
 
 <style>
+
+/* BASE */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -48,31 +50,21 @@ text-align:center;
 padding:30px 20px;
 }
 
-.logo-main{width:70px;margin-bottom:10px;}
-.brand-title{font-weight:300;letter-spacing:8px;text-transform:uppercase;}
-#page-title{font-size:0.7rem;color:#4ade80;margin-top:5px;}
-
-/* MENU CLIENT */
-.client-nav{
-display:none;
-justify-content:center;
-gap:10px;
-margin:15px 0;
+.logo-main{
+width:70px;
+margin-bottom:10px;
 }
 
-.nav-btn{
-background:none;
-border:1px solid #222;
-color:#fff;
-padding:6px 14px;
-border-radius:20px;
-font-size:0.6rem;
-cursor:pointer;
+.brand-title{
+font-weight:300;
+letter-spacing:8px;
+text-transform:uppercase;
 }
 
-.nav-btn.active{
-border-color:#4ade80;
+#page-title{
+font-size:0.7rem;
 color:#4ade80;
+margin-top:5px;
 }
 
 /* SEARCH */
@@ -108,7 +100,6 @@ grid-column:1/-1;
 color:#4ade80;
 margin:20px 0 10px;
 letter-spacing:6px;
-font-size:0.9rem;
 }
 
 /* CARD */
@@ -161,6 +152,64 @@ box-shadow:0 0 20px rgba(74,222,128,0.5);
 width:28px;
 filter:brightness(0) invert(1);
 }
+
+/* CHAT */
+#ai-chat-window{
+display:none;
+position:fixed;
+bottom:95px;
+right:25px;
+width:320px;
+height:420px;
+background:#0c0c0c;
+border:1px solid #4ade80;
+border-radius:15px;
+z-index:3000;
+flex-direction:column;
+overflow:hidden;
+}
+
+.chat-header{
+padding:10px;
+background:#111;
+display:flex;
+justify-content:space-between;
+color:#4ade80;
+font-size:0.7rem;
+}
+
+.chat-body{
+flex:1;
+padding:10px;
+overflow-y:auto;
+font-size:0.8rem;
+}
+
+.chat-input{
+display:flex;
+padding:10px;
+gap:8px;
+background:#000;
+}
+
+.chat-input input{
+flex:1;
+padding:8px;
+border-radius:20px;
+border:1px solid #333;
+background:#111;
+color:#fff;
+}
+
+.chat-input button{
+width:36px;
+height:36px;
+border-radius:50%;
+background:#4ade80;
+border:none;
+cursor:pointer;
+}
+
 </style>
 </head>
 
@@ -176,17 +225,32 @@ filter:brightness(0) invert(1);
 <p id="page-title">Catalogue</p>
 </header>
 
-<!-- MENU CLIENT -->
-<div id="client-menu" class="client-nav">
-<button class="nav-btn active">Collection</button>
-<button class="nav-btn">Mon Jardin</button>
-</div>
-
 <div class="controls-area">
 <input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
+
+<!-- IA -->
+<div id="ai-chat-window">
+<div class="chat-header">
+<span>Assistant ÉONIA</span>
+<span onclick="toggleChat()">✕</span>
+</div>
+
+<div id="chat-body" class="chat-body">Bonjour 🌿</div>
+
+<div class="chat-input">
+<input id="chat-input" placeholder="Votre question...">
+<button onclick="sendAI()">➤</button>
+</div>
+</div>
+
+<div id="eonia-ai-trigger" onclick="toggleChat()">
+<div class="ai-icon-circle">
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+</div>
+</div>
 
 <script>
 
@@ -194,31 +258,22 @@ const API_URL="https://eonia-api.santhimi.workers.dev";
 
 let allPlants=[];
 
-/* ===================== USER ===================== */
-const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-const userPin = localStorage.getItem('user_pin') || "0000";
-
-/* menu visible si connecté */
-if(userEmail !== "invite@eonia.com"){
-document.getElementById("client-menu").style.display="flex";
-}
-
-/* ===================== LOAD CATALOGUE (GLOBAL UNIQUEMENT) ===================== */
+/* LOAD */
 async function loadData(){
 
-const res = await fetch(API_URL,{
+const res=await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-action:"get_catalogue"
+email:"invite@eonia.com"
 })
 });
 
-allPlants = await res.json();
+allPlants=await res.json();
 renderGrid();
 }
 
-/* ===================== RENDER AVEC ALPHABET ===================== */
+/* GRID */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
@@ -226,43 +281,48 @@ const search=document.getElementById("searchBox").value.toLowerCase();
 
 container.innerHTML="";
 
-let filtered = allPlants.filter(p =>
-(p["Nom commun"] || "").toLowerCase().includes(search)
+let filtered=allPlants.filter(p=>
+(p["Nom commun"]||"").toLowerCase().includes(search)
 );
 
 filtered.sort((a,b)=>
-(a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
+(a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-let lastLetter = "";
+let last="";
 
 filtered.forEach(p=>{
 
-const name = p["Nom commun"] || "Plante";
-const letter = name[0].toUpperCase();
+let name=p["Nom commun"]||"Plante";
+let letter=name[0].toUpperCase();
 
-/* ALPHABET */
-if(letter !== lastLetter){
-const div=document.createElement("div");
+if(letter!==last){
+let div=document.createElement("div");
 div.className="letter-divider";
-div.textContent = letter;
+div.innerText=letter;
 container.appendChild(div);
-lastLetter = letter;
+last=letter;
 }
 
-/* CARD */
-const id = p["ID_Plaque"] || p.id;
+/* ✅ FIX IMPORTANT : sécurisation ID */
+let id = p["ID_Plaque"] || p.id || p.id_botanique;
 
-const card=document.createElement("div");
+if(!id){
+console.warn("ID manquant :", p);
+return;
+}
+
+let card=document.createElement("div");
 card.className="plant-card";
 
+/* ✅ FIX IMPORTANT : encodage URL */
 card.onclick=()=>{
-window.location.href="jardin.html?id="+id;
+window.location.href=`jardin.html?id=${encodeURIComponent(id)}`;
 };
 
 card.innerHTML=`
 <div class="img-container">
-<img class="plant-img" src="${p.Photo || ''}">
+<img class="plant-img" src="${p.Photo||''}">
 </div>
 `;
 
@@ -272,6 +332,27 @@ container.appendChild(card);
 
 }
 
+/* IA */
+function toggleChat(){
+let chat=document.getElementById("ai-chat-window");
+chat.style.display=(chat.style.display==="flex")?"none":"flex";
+}
+
+function sendAI(){
+let input=document.getElementById("chat-input");
+let body=document.getElementById("chat-body");
+
+if(!input.value.trim())return;
+
+body.innerHTML+=`<div>🧑 ${input.value}</div>`;
+input.value="";
+
+setTimeout(()=>{
+body.innerHTML+=`<div>🌿 Je vous guide vers la bonne plante.</div>`;
+},500);
+}
+
+/* LOGOUT */
 function logout(){
 localStorage.clear();
 window.location.href="index.html";
