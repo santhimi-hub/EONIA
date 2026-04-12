@@ -3,125 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>ÉONIA — Expertise Botanique</title>
+<title>ÉONIA — Catalogue</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-* {
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+/* BASE */
+*{margin:0;padding:0;box-sizing:border-box;}
 
-body {
-background:#050505;
+body{
+background:#000;
 color:#fff;
 font-family:'Raleway',sans-serif;
--webkit-font-smoothing:antialiased;
+padding-top:60px;
 }
 
-.hero-img {
+/* TOP BAR */
+.top-bar{
+position:fixed;
+top:0;left:0;
 width:100%;
-height:38vh;
-object-fit:cover;
-border-bottom:2px solid #4ade80;
-background:#111;
+height:60px;
+background:rgba(0,0,0,0.85);
+backdrop-filter:blur(15px);
+display:flex;
+justify-content:flex-end;
+align-items:center;
+padding:0 20px;
+z-index:3000;
 }
 
-.container {
-padding:22px;
-max-width:600px;
-margin:auto;
-padding-bottom:60px;
-}
-
-h1 {
-font-weight:200;
-text-transform:uppercase;
+.logout-header-btn{
+background:none;
+border:1px solid #4ade80;
 color:#4ade80;
-letter-spacing:3px;
-margin-top:20px;
-font-size:1.8rem;
-}
-
-#p-sci {
-font-style:italic;
-color:#666;
-font-size:0.9rem;
-margin-top:5px;
-}
-
-/* ACCORDÉONS */
-
-details {
-padding:18px 0;
-border-bottom:1px solid #1a1a1a;
+padding:6px 14px;
+border-radius:20px;
+font-size:0.6rem;
 cursor:pointer;
 }
 
-details summary {
-color:#4ade80;
+/* HEADER */
+header{
+text-align:center;
+padding:30px 20px;
+}
+
+.logo-main{
+width:70px;
+margin-bottom:10px;
+}
+
+.brand-title{
+font-weight:300;
+letter-spacing:8px;
 text-transform:uppercase;
-font-size:0.75rem;
-letter-spacing:2px;
+}
+
+#page-title{
+font-size:0.7rem;
+color:#4ade80;
+margin-top:5px;
+}
+
+/* SEARCH */
+.controls-area{
+text-align:center;
+padding:0 15px;
+}
+
+.search-input{
+width:100%;
+max-width:350px;
+padding:10px;
+border-radius:50px;
+border:1px solid #1a1a1a;
+background:#0c0c0c;
+color:#fff;
+text-align:center;
+}
+
+/* GRID */
+.catalog-container{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
+gap:15px;
+padding:20px;
+max-width:1000px;
+margin:auto;
+}
+
+/* ALPHABET */
+.letter-divider{
+grid-column:1/-1;
+color:#4ade80;
+margin:20px 0 10px;
+letter-spacing:6px;
+}
+
+/* CARD */
+.plant-card{
+background:#0c0c0c;
+border:1px solid #1a1a1a;
+border-radius:12px;
+cursor:pointer;
+transition:0.3s;
+overflow:hidden;
+}
+
+.plant-card:hover{
+border-color:#4ade80;
+transform:translateY(-5px);
+}
+
+.img-container{
+height:140px;
+overflow:hidden;
+}
+
+.plant-img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* IA */
+#eonia-ai-trigger{
+position:fixed;
+bottom:25px;
+right:25px;
+z-index:9999;
+cursor:pointer;
+}
+
+.ai-icon-circle{
+width:55px;
+height:55px;
+background:#4ade80;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 0 20px rgba(74,222,128,0.5);
+}
+
+.ai-icon-circle img{
+width:28px;
+filter:brightness(0) invert(1);
+}
+
+/* CHAT */
+#ai-chat-window{
+display:none;
+position:fixed;
+bottom:95px;
+right:25px;
+width:320px;
+height:420px;
+background:#0c0c0c;
+border:1px solid #4ade80;
+border-radius:15px;
+z-index:3000;
+flex-direction:column;
+overflow:hidden;
+}
+
+.chat-header{
+padding:10px;
+background:#111;
 display:flex;
 justify-content:space-between;
-font-weight:500;
-}
-
-details summary::after {
-content:"+";
-}
-
-details[open] summary::after {
-content:"–";
-}
-
-.details-content {
-padding-top:15px;
-color:#bbb;
-font-size:0.85rem;
-line-height:1.8;
-white-space:pre-line;
-}
-
-/* CLIENT */
-
-#espace-client {
-display:none;
-margin-top:30px;
-padding:25px;
-border:1px solid rgba(74,222,128,0.3);
-border-radius:15px;
-background:rgba(74,222,128,0.03);
-backdrop-filter:blur(5px);
-}
-
-/* BUTTON */
-
-.btn-back {
-width:100%;
-padding:15px;
-border-radius:50px;
-border:1px solid #333;
-margin-top:35px;
-background:none;
-color:#888;
-text-align:center;
-text-transform:uppercase;
-font-size:0.7rem;
-letter-spacing:2px;
-display:block;
-text-decoration:none;
-}
-
-.btn-back:hover {
-border-color:#4ade80;
 color:#4ade80;
+font-size:0.7rem;
+}
+
+.chat-body{
+flex:1;
+padding:10px;
+overflow-y:auto;
+font-size:0.8rem;
+}
+
+.chat-input{
+display:flex;
+padding:10px;
+gap:8px;
+background:#000;
+}
+
+.chat-input input{
+flex:1;
+padding:8px;
+border-radius:20px;
+border:1px solid #333;
+background:#111;
+color:#fff;
+}
+
+.chat-input button{
+width:36px;
+height:36px;
+border-radius:50%;
+background:#4ade80;
+border:none;
+cursor:pointer;
 }
 
 </style>
@@ -129,188 +215,144 @@ color:#4ade80;
 
 <body>
 
-<img id="p-img" class="hero-img">
-
-<div class="container">
-
-<h1 id="p-nom">Chargement...</h1>
-<p id="p-sci"></p>
-
-<!-- INFORMATIONS -->
-<details open>
-<summary>Informations Générales</summary>
-<div class="details-content" id="p-info"></div>
-</details>
-
-<!-- CARACTÉRISTIQUES -->
-<details>
-<summary>Caractéristiques</summary>
-<div class="details-content" id="p-caracteristiques"></div>
-</details>
-
-<!-- CULTURE -->
-<details>
-<summary>Culture & Conditions</summary>
-<div class="details-content" id="p-culture"></div>
-</details>
-
-<!-- CLIENT -->
-<div id="espace-client">
-
-<h2 style="color:#4ade80; font-size:0.7rem; text-transform:uppercase; letter-spacing:3px;">
-Mon Jardin Privé
-</h2>
-
-<div style="height:150px;margin:15px 0;">
-<canvas id="chart"></canvas>
+<div class="top-bar">
+<button class="logout-header-btn" onclick="logout()">Quitter</button>
 </div>
 
-<div style="background:#000;padding:15px;border-radius:10px;border:1px solid #1a1a1a;">
-<p style="color:#4ade80;font-size:0.6rem;text-transform:uppercase;margin-bottom:5px;">
-Notes personnelles
-</p>
-<p id="p-notes"></p>
+<header>
+<img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+<h1 class="brand-title">ÉONIA</h1>
+<p id="page-title">Catalogue</p>
+</header>
+
+<div class="controls-area">
+<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 </div>
 
+<div id="catalogue-grid" class="catalog-container"></div>
+
+<!-- IA -->
+<div id="ai-chat-window">
+<div class="chat-header">
+<span>Assistant ÉONIA</span>
+<span onclick="toggleChat()">✕</span>
 </div>
 
-<a href="catalogue.html" class="btn-back">Retour au Catalogue</a>
+<div id="chat-body" class="chat-body">Bonjour 🌿</div>
 
+<div class="chat-input">
+<input id="chat-input" placeholder="Votre question...">
+<button onclick="sendAI()">➤</button>
+</div>
+</div>
+
+<div id="eonia-ai-trigger" onclick="toggleChat()">
+<div class="ai-icon-circle">
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+</div>
 </div>
 
 <script>
 
-const API = "https://eonia-api.santhimi.workers.dev";
-const params = new URLSearchParams(window.location.search);
+const API_URL="https://eonia-api.santhimi.workers.dev";
 
-const id_plaque = params.get('id');
-const id_botanique = params.get('id_botanique');
+let allPlants=[];
 
-window.onload = async () => {
+/* CATALOGUE = IDENTIQUE POUR TOUS */
+async function loadData(){
 
-const email = localStorage.getItem('user_email') || "invite@eonia.com";
-const pin = localStorage.getItem('user_pin') || "0000";
-const access = localStorage.getItem('eonia_access') || "guest";
-
-const bodyRequest = { email, pin };
-
-if(id_plaque) bodyRequest.id = id_plaque;
-if(id_botanique) bodyRequest.id_botanique = id_botanique;
-
-try {
-
-const res = await fetch(API, {
-method:'POST',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(bodyRequest)
+const res=await fetch(API_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+email:"invite@eonia.com"
+})
 });
 
-const data = await res.json();
-const p = Array.isArray(data) ? data[0] : data;
-
-/* ================= SAFE STOP ================= */
-if(!p){
-document.getElementById('p-nom').innerText = "Plante introuvable";
-return;
+allPlants=await res.json();
+renderGrid();
 }
 
-/* ================= STATUT SAFE ================= */
-const statut = (p.Statut || "").toLowerCase();
+function renderGrid(){
 
-if (statut !== "publié" && access === "guest") {
-document.getElementById('p-nom').innerText = "Fiche en cours de création";
-return;
+const container=document.getElementById("catalogue-grid");
+const search=document.getElementById("searchBox").value.toLowerCase();
+
+container.innerHTML="";
+
+let filtered=allPlants.filter(p=>
+(p["Nom commun"]||"").toLowerCase().includes(search)
+);
+
+filtered.sort((a,b)=>
+(a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
+);
+
+let last="";
+
+filtered.forEach(p=>{
+
+let name=p["Nom commun"]||"Plante";
+let letter=name[0].toUpperCase();
+
+if(letter!==last){
+let div=document.createElement("div");
+div.className="letter-divider";
+div.innerText=letter;
+container.appendChild(div);
+last=letter;
 }
 
-/* ================= IMAGE SAFE NOTION ================= */
-let img = "";
+let id=p["ID_Plaque"];
 
-if (Array.isArray(p.Photo)) {
-img = p.Photo[0]?.url || "";
-} else if (typeof p.Photo === "string") {
-img = p.Photo;
-}
+let card=document.createElement("div");
+card.className="plant-card";
 
-document.getElementById('p-img').src =
-img || "https://via.placeholder.com/600x400/000000/4ade80?text=EONIA";
-
-/* ================= BASE ================= */
-document.getElementById('p-nom').innerText = p["Nom commun"] || "Sans nom";
-document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-
-/* ================= INFOS ================= */
-document.getElementById('p-info').innerText =
-p["Informations générales"] || "Aucune information disponible.";
-
-/* ================= CARACTÉRISTIQUES ================= */
-document.getElementById('p-caracteristiques').innerText =
-`Famille : ${p["Famille"] || "-"}
-Origine : ${p["Origine"] || "-"}
-Style jardin : ${p["Style jardin"] || "-"}
-Persistance : ${p["Persistance"] || "-"}
-Type : ${p["Type"] || "-"}`;
-
-/* ================= CULTURE ================= */
-document.getElementById('p-culture').innerText =
-`Exposition : ${p["Exposition"] || "-"}
-Difficulté : ${p["Difficulte"] || "-"}
-Rusticité : ${p["Rusticite"] || "-"}
-Arrosage : ${p["Arrosage"] || "-"}
-Type de sol : ${p["Type de sol"] || "-"}
-Taille à maturité : ${p["Taille à maturite"] || "-"}`;
-
-/* ================= CLIENT ================= */
-if (p.estProprietaire === true) {
-
-document.getElementById('espace-client').style.display = "block";
-document.getElementById('p-notes').innerText =
-p["Notes personnelles"] || "Aucune note.";
-
-initChart();
-
-}
-
-} catch (e) {
-
-console.error(e);
-document.getElementById('p-nom').innerText = "Erreur de chargement";
-
-}
-
+card.onclick=()=>{
+window.location.href="jardin.html?id="+id;
 };
 
-/* ================= CHART ================= */
-function initChart() {
+card.innerHTML=`
+<div class="img-container">
+<img class="plant-img" src="${p.Photo||''}">
+</div>
+`;
 
-const ctx = document.getElementById('chart').getContext('2d');
+container.appendChild(card);
 
-new Chart(ctx, {
-type:'line',
-data:{
-labels:['Jan','Fév','Mar','Avr','Mai'],
-datasets:[{
-data:[60,65,80,75,90],
-borderColor:'#4ade80',
-backgroundColor:'rgba(74,222,128,0.05)',
-fill:true,
-tension:0.4,
-pointRadius:0
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{display:false}},
-scales:{
-y:{display:false},
-x:{grid:{display:false},ticks:{color:'#444',font:{size:9}}}
-}
-}
 });
 
 }
 
-  </script>
+/* IA */
+function toggleChat(){
+let chat=document.getElementById("ai-chat-window");
+chat.style.display=(chat.style.display==="flex")?"none":"flex";
+}
+
+function sendAI(){
+let input=document.getElementById("chat-input");
+let body=document.getElementById("chat-body");
+
+if(!input.value.trim())return;
+
+body.innerHTML+=`<div>🧑 ${input.value}</div>`;
+input.value="";
+
+setTimeout(()=>{
+body.innerHTML+=`<div>🌿 Je vous guide vers la bonne plante.</div>`;
+},500);
+}
+
+/* LOGOUT */
+function logout(){
+localStorage.clear();
+window.location.href="index.html";
+}
+
+loadData();
+
+</script>
 
 </body>
 </html>
