@@ -9,7 +9,7 @@
 
 <style>
 
-/* BASE */
+/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -67,6 +67,29 @@ color:#4ade80;
 margin-top:5px;
 }
 
+/* NAV */
+.client-nav{
+display:none;
+justify-content:center;
+gap:10px;
+margin:15px 0;
+}
+
+.nav-btn{
+background:none;
+border:1px solid #222;
+color:#fff;
+padding:6px 14px;
+border-radius:20px;
+font-size:0.6rem;
+cursor:pointer;
+}
+
+.nav-btn.active{
+border-color:#4ade80;
+color:#4ade80;
+}
+
 /* SEARCH */
 .controls-area{
 text-align:center;
@@ -94,15 +117,6 @@ max-width:1000px;
 margin:auto;
 }
 
-/* ALPHABET */
-.letter-divider{
-grid-column:1/-1;
-color:#4ade80;
-margin:20px 0 10px;
-letter-spacing:6px;
-}
-
-/* CARD */
 .plant-card{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
@@ -128,7 +142,18 @@ height:100%;
 object-fit:cover;
 }
 
-/* IA */
+.plant-info{
+padding:10px;
+text-align:center;
+}
+
+.plant-name{
+font-size:0.65rem;
+text-transform:uppercase;
+color:#bbb;
+}
+
+/* IA BUBBLE */
 #eonia-ai-trigger{
 position:fixed;
 bottom:25px;
@@ -235,10 +260,12 @@ cursor:pointer;
 <div id="ai-chat-window">
 <div class="chat-header">
 <span>Assistant ÉONIA</span>
-<span onclick="toggleChat()">✕</span>
+<span onclick="toggleChat()" style="cursor:pointer;">✕</span>
 </div>
 
-<div id="chat-body" class="chat-body">Bonjour 🌿</div>
+<div id="chat-body" class="chat-body">
+Bonjour 🌿 comment puis-je vous aider ?
+</div>
 
 <div class="chat-input">
 <input id="chat-input" placeholder="Votre question...">
@@ -256,16 +283,20 @@ cursor:pointer;
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
 
+let userEmail=localStorage.getItem('user_email')||"invite@eonia.com";
+let userPin=localStorage.getItem('user_pin')||"0000";
+
 let allPlants=[];
 
-/* CATALOGUE = IDENTIQUE POUR TOUS */
+/* LOAD = TOUJOURS IDENTIQUE (IMPORTANT) */
 async function loadData(){
 
 const res=await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-email:"invite@eonia.com"
+email:"invite@eonia.com",
+pin:"0000"
 })
 });
 
@@ -288,35 +319,24 @@ filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-let last="";
-
 filtered.forEach(p=>{
 
-let name=p["Nom commun"]||"Plante";
-let letter=name[0].toUpperCase();
+const name=p["Nom commun"]||"Plante";
 
-if(letter!==last){
-let div=document.createElement("div");
-div.className="letter-divider";
-div.innerText=letter;
-container.appendChild(div);
-last=letter;
-}
-
-let id=p["ID_Plaque"];
-
-let card=document.createElement("div");
+const card=document.createElement("div");
 card.className="plant-card";
 
 card.onclick=()=>{
-window.location.href="jardin.html?id="+id;
+window.location.href="jardin.html?id="+(p["ID_Plaque"]||p.id);
 };
 
 card.innerHTML=`
 <div class="img-container">
 <img class="plant-img" src="${p.Photo||''}">
 </div>
-`;
+<div class="plant-info">
+<div class="plant-name">${name}</div>
+</div>`;
 
 container.appendChild(card);
 
@@ -326,13 +346,13 @@ container.appendChild(card);
 
 /* IA */
 function toggleChat(){
-let chat=document.getElementById("ai-chat-window");
+const chat=document.getElementById("ai-chat-window");
 chat.style.display=(chat.style.display==="flex")?"none":"flex";
 }
 
 function sendAI(){
-let input=document.getElementById("chat-input");
-let body=document.getElementById("chat-body");
+const input=document.getElementById("chat-input");
+const body=document.getElementById("chat-body");
 
 if(!input.value.trim())return;
 
@@ -340,7 +360,7 @@ body.innerHTML+=`<div>🧑 ${input.value}</div>`;
 input.value="";
 
 setTimeout(()=>{
-body.innerHTML+=`<div>🌿 Je vous guide vers la bonne plante.</div>`;
+body.innerHTML+=`<div>🌿 Analyse en cours...</div>`;
 },500);
 }
 
