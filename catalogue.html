@@ -3,93 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>ÉONIA — Collection & Jardin</title>
+<title>ÉONIA — Collection</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
+
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
 background:#000;
 color:#fff;
 font-family:'Raleway',sans-serif;
--webkit-font-smoothing:antialiased;
-min-height:100vh;
-padding-top:60px;
 }
 
-/* TOP BAR */
-.top-bar {
-position:fixed;
-top:0; left:0;
-width:100%; height:60px;
-background:rgba(0,0,0,0.85);
-backdrop-filter:blur(15px);
-display:flex;
-justify-content:flex-end;
-align-items:center;
-padding:0 20px;
-z-index:3000;
-border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
-.logout-header-btn {
-background:none;
-border:1px solid #4ade80;
-color:#4ade80;
-padding:6px 16px;
-border-radius:20px;
-font-size:0.6rem;
-text-transform:uppercase;
-cursor:pointer;
-transition:0.3s;
-}
-
-.logout-header-btn:hover {
-background:#4ade80;
-color:#000;
-}
-
-/* HEADER */
 header {
 text-align:center;
-padding:30px 20px;
+padding:50px 20px 30px 20px;
 }
 
-.logo-main { width:70px; margin-bottom:15px; }
+.logo-main {
+width:90px;
+margin-bottom:20px;
+opacity:0.9;
+}
 
 .brand-title {
 font-weight:300;
 text-transform:uppercase;
 letter-spacing:8px;
-font-size:2.1rem;
+font-size:2.2rem;
 }
 
 #page-title {
-font-size:0.7rem;
+font-size:0.8rem;
 color:#4ade80;
-margin-top:8px;
+margin-top:10px;
 letter-spacing:3px;
+text-transform:uppercase;
 }
 
-/* NAV */
 .client-nav {
 display:none;
 justify-content:center;
-gap:12px;
-margin:15px 0 25px;
+gap:15px;
+margin-bottom:30px;
 }
 
 .nav-btn {
 background:none;
-border:1px solid #1a1a1a;
+border:1px solid rgba(255,255,255,0.2);
 color:#fff;
-padding:7px 15px;
+padding:8px 18px;
 border-radius:20px;
-font-size:0.6rem;
 cursor:pointer;
+font-size:0.65rem;
+text-transform:uppercase;
 }
 
 .nav-btn.active {
@@ -97,43 +66,40 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
-/* SEARCH */
 .controls-area {
 max-width:1000px;
-margin:auto;
-padding:0 15px;
+margin:0 auto 30px auto;
+padding:0 20px;
 text-align:center;
 }
 
 .search-input {
 width:100%;
-max-width:350px;
+max-width:400px;
 padding:12px;
 background:#0c0c0c;
 border:1px solid #1a1a1a;
 border-radius:50px;
 color:#fff;
 text-align:center;
-font-size:0.8rem;
-margin-bottom:15px;
+margin-bottom:20px;
 }
 
 .filter-nav {
 display:flex;
 justify-content:center;
-gap:6px;
+gap:8px;
 flex-wrap:wrap;
 }
 
 .f-btn {
 background:none;
 border:1px solid #1a1a1a;
-color:#555;
+color:#666;
 padding:5px 12px;
 border-radius:20px;
-font-size:0.5rem;
-text-transform:uppercase;
 cursor:pointer;
+font-size:0.55rem;
 }
 
 .f-btn.active {
@@ -141,30 +107,26 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
-/* GRID */
 .catalog-container {
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
-gap:20px;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:25px;
 max-width:1000px;
-margin:auto;
+margin:0 auto;
 padding:20px;
 }
 
-/* LETTER */
 .letter-divider {
 grid-column:1/-1;
-font-size:1.2rem;
+font-size:1.5rem;
 color:#4ade80;
-margin:20px 0 10px 5px;
-font-weight:200;
-letter-spacing:6px;
+margin:30px 0 10px 0;
+letter-spacing:5px;
 }
 
-/* CARD */
 .plant-card {
 background:#0c0c0c;
-border-radius:12px;
+border-radius:15px;
 overflow:hidden;
 border:1px solid #1a1a1a;
 cursor:pointer;
@@ -177,209 +139,189 @@ transform:translateY(-5px);
 }
 
 .img-container {
-height:145px;
+height:180px;
 overflow:hidden;
-background:#000;
 }
 
 .plant-img {
 width:100%;
 height:100%;
 object-fit:cover;
+transition:0.4s;
+}
+
+.plant-card:hover .plant-img {
+transform:scale(1.08);
 }
 
 .plant-info {
-padding:12px;
+padding:15px;
 text-align:center;
 }
 
 .plant-name {
-font-size:0.65rem;
+font-size:0.75rem;
 text-transform:uppercase;
-color:#bbb;
 }
 
-/* AI */
-#eonia-ai-trigger {
-position:fixed;
-bottom:30px;
-right:25px;
+#status-msg {
+text-align:center;
+color:#4ade80;
+margin-top:40px;
+}
+
+.logout-btn {
+display:block;
+margin:40px auto;
+background:none;
+border:1px solid #333;
+color:#666;
+padding:8px 20px;
+border-radius:30px;
 cursor:pointer;
 }
 
-.ai-icon-circle {
-width:50px;
-height:50px;
-background:#fff;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-border:1px solid #4ade80;
-}
-
-/* CHAT */
-#ai-chat-window {
-display:none;
-position:fixed;
-bottom:95px;
-right:25px;
-width:320px;
-height:450px;
-background:#0c0c0c;
-border:1px solid #4ade80;
-border-radius:15px;
-z-index:3000;
-overflow:hidden;
-}
 </style>
 </head>
 
 <body>
 
-<div class="top-bar">
-<button class="logout-header-btn" onclick="logout()">Quitter</button>
-</div>
-
 <header>
-<img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
 <h1 class="brand-title">ÉONIA</h1>
-<p id="page-title">Chargement...</p>
+<p id="page-title">Notre Collection</p>
 </header>
 
 <div id="client-menu" class="client-nav">
-<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
+<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
 <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
 </div>
 
 <div class="controls-area">
-<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 
-<div class="filter-nav">
+<input type="text"
+id="searchBox"
+class="search-input"
+placeholder="RECHERCHER UNE ESSENCE..."
+oninput="renderGrid()">
+
+<div id="filter-container" class="filter-nav">
 <button class="f-btn active" onclick="setFilter('all',this)">Tout</button>
+<button class="f-btn" onclick="setFilter('Fruitier',this)">Fruitiers</button>
 <button class="f-btn" onclick="setFilter('Arbre',this)">Arbres</button>
 <button class="f-btn" onclick="setFilter('Fleur',this)">Fleurs</button>
-<button class="f-btn" onclick="setFilter('Fruitier',this)">Fruitiers</button>
-</div>
 </div>
 
-<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
-Chargement...
 </div>
+
+<div id="status-msg">Synchronisation...</div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
+<button class="logout-btn" onclick="logout()">Quitter</button>
+
 <script>
 
-/* USER */
-const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
-const userPin = localStorage.getItem('user_pin') || '0000';
-const access = (userEmail === 'invite@eonia.com') ? 'guest' : 'client';
+const userEmail = localStorage.getItem('user_email');
+const userPin = localStorage.getItem('user_pin') || "0000";
 
-/* STATE */
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-const API_URL = "https://eonia-api.santhimi.workers.dev";
+if (!userEmail) window.location.href="index.html";
 
-/* LOGOUT */
-function logout(){
-localStorage.clear();
-window.location.href="index.html";
+if (userEmail !== 'invite@eonia.com') {
+document.getElementById('client-menu').style.display="flex";
 }
 
-/* LOAD DATA (FIX FINAL JARDIN) */
+const API_URL="https://eonia-api.santhimi.workers.dev";
+
 async function loadData(){
 
-document.getElementById('status-msg').innerText = "Synchronisation...";
+const statusMsg=document.getElementById('status-msg');
+const container=document.getElementById('catalogue-grid');
 
-let payload = {};
+container.innerHTML="";
+statusMsg.style.display='block';
+statusMsg.innerText="Chargement...";
 
-/* catalogue */
-if(currentView === 'catalogue'){
-payload = {
-type:"catalogue",
-email:"invite@eonia.com"
-};
-}
+const emailToSend =
+(currentView==='catalogue')
+?'invite@eonia.com'
+:userEmail;
 
-/* jardin */
-if(currentView === 'jardin'){
-payload = {
-type:"jardin",
-email:userEmail,
-pin:userPin
-};
-}
+document.getElementById('page-title').innerText=
+(currentView==='catalogue')
+?"Notre Collection"
+:"Mon Jardin";
 
-document.getElementById('page-title').innerText =
-(currentView === 'catalogue') ? "Collection" : "Mon Jardin";
+try{
 
-try {
-
-const res = await fetch(API_URL,{
+const response=await fetch(API_URL,{
 method:'POST',
 headers:{'Content-Type':'application/json'},
-body:JSON.stringify(payload)
+body:JSON.stringify({
+email:emailToSend,
+pin:userPin
+})
 });
 
-const data = await res.json();
+const data=await response.json();
 
-/* SAFE NORMALISATION */
-allPlants =
-Array.isArray(data) ? data :
-Array.isArray(data?.results) ? data.results :
-Array.isArray(data?.data) ? data.data :
-[];
+allPlants = Array.isArray(data) ? data : [];
 
-console.log("VIEW:", currentView, allPlants);
+/* FILTRE PUBLIE */
+if(currentView==="catalogue"){
+allPlants = allPlants.filter(p =>
+(p.Statut||"").toLowerCase()==="publié"
+);
+}
 
 renderGrid();
 
-} catch(e){
-console.error(e);
-document.getElementById('status-msg').innerText = "Erreur API";
-}
+}catch(error){
+
+statusMsg.innerText="Erreur connexion";
 
 }
 
-/* GRID (INCHANGÉ + SAFE) */
+}
+
 function renderGrid(){
 
-const container = document.getElementById('catalogue-grid');
-const search = document.getElementById('searchBox').value.toLowerCase();
+const container=document.getElementById('catalogue-grid');
+const statusMsg=document.getElementById('status-msg');
+const search=document.getElementById('searchBox').value.toLowerCase();
 
-container.innerHTML = "";
+container.innerHTML="";
 
-if(!allPlants) allPlants = [];
-
-let filtered = allPlants.filter(p=>{
-const name = (p["Nom commun"]||"").toLowerCase();
-const type = (activeFilter === 'all' || p.Type === activeFilter);
-return name.includes(search) && type;
+let filtered=allPlants.filter(p=>{
+const nom=(p["Nom commun"]||"").toLowerCase();
+const type=(activeFilter==='all'||p.Type===activeFilter);
+return nom.includes(search)&&type;
 });
 
-/* TRI A-Z (CONSERVÉ) */
 filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-if(filtered.length === 0){
-document.getElementById('status-msg').innerText = "Aucun résultat";
+if(filtered.length===0){
+statusMsg.style.display='block';
+statusMsg.innerText="Aucun résultat";
 return;
 }
 
-document.getElementById('status-msg').style.display="none";
+statusMsg.style.display='none';
 
 let lastLetter="";
 
 filtered.forEach(p=>{
 
-const nom = p["Nom commun"] || "Plante";
-const letter = nom.charAt(0).toUpperCase();
+const nom=p["Nom commun"]||"Plante";
+const letter=nom.charAt(0).toUpperCase();
 
-if(currentView==='catalogue' && search==="" && letter!==lastLetter){
+if(currentView==='catalogue' && letter!==lastLetter){
 const div=document.createElement('div');
 div.className="letter-divider";
 div.innerText=letter;
@@ -387,21 +329,21 @@ container.appendChild(div);
 lastLetter=letter;
 }
 
-const id = p.id || p.ID || p.id_botanique;
-
 const card=document.createElement('div');
 card.className="plant-card";
 
 card.onclick=()=>{
-window.location.href =
-(currentView==='catalogue')
-? `jardin.html?id_botanique=${id}`
-: `jardin.html?id=${p["ID_Plaque"]}`;
+const param =
+(currentView==='jardin')
+?`id=${p["ID_Plaque"]}`
+:`id_botanique=${p.id}`;
+
+window.location.href=`jardin.html?${param}`;
 };
 
 card.innerHTML=`
 <div class="img-container">
-<img class="plant-img" src="${p.Photo||''}">
+<img src="${p.Photo||''}" class="plant-img">
 </div>
 <div class="plant-info">
 <div class="plant-name">${nom}</div>
@@ -413,23 +355,33 @@ container.appendChild(card);
 
 }
 
-/* FILTER */
 function setFilter(type,btn){
 activeFilter=type;
-document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.f-btn')
+.forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 renderGrid();
 }
 
-/* SWITCH */
-function switchView(v){
-currentView=v;
-document.getElementById('btn-col').classList.toggle('active',v==='catalogue');
-document.getElementById('btn-jar').classList.toggle('active',v==='jardin');
+function switchView(view){
+
+currentView=view;
+
+document.getElementById('btn-col')
+.classList.toggle('active',view==='catalogue');
+
+document.getElementById('btn-jar')
+.classList.toggle('active',view==='jardin');
+
 loadData();
+
 }
 
-/* INIT */
+function logout(){
+localStorage.clear();
+window.location.href="index.html";
+}
+
 loadData();
 
 </script>
