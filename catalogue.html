@@ -3,78 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Catalogue</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+    <title>ÉONIA — Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
+        /* Garde tout ton style tel quel, il est parfait */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; }
-        .container { padding: 40px 20px; max-width: 1000px; margin: auto; }
-        h1 { font-weight: 200; text-transform: uppercase; letter-spacing: 5px; color: #4ade80; text-align: center; margin-bottom: 40px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
-        .card { background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
-        .card:hover { border-color: #4ade80; transform: translateY(-5px); }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #1a1a1a; }
-        .card-info { padding: 15px; text-align: center; }
-        .card-name { font-size: 0.9rem; text-transform: uppercase; color: #4ade80; letter-spacing: 1px; }
-
-        #loader { text-align: center; color: #4ade80; padding: 50px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        header { text-align: center; padding: 50px 20px 30px 20px; }
+        .logo-main { width: 90px; margin-bottom: 20px; opacity: 0.9; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.2rem; margin: 0; }
+        #page-title { font-size: 0.8rem; color: #4ade80; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
+        .client-nav { display: none; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; transition: 0.3s; }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+        .controls-area { max-width: 1000px; margin: 0 auto 30px auto; padding: 0 20px; text-align: center; }
+        .search-input { width: 100%; max-width: 400px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; text-align: center; margin-bottom: 20px; }
+        .filter-nav { display: flex; justify(content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #666; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s; }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
+        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; border-bottom: 1px solid #111; margin: 30px 0 10px 0; padding-bottom: 5px; font-weight: 200; letter-spacing: 5px; text-align: left; }
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; position: relative; }
+        .img-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in; }
+        .plant-img.loaded { opacity: 1; }
+        .plant-info { padding: 15px; text-align: center; }
+        .plant-name { font-size: 0.75rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        #status-msg { text-align: center; color: #4ade80; margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .logout-btn { display: block; margin: 40px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
+        #eonia-ai-trigger { position: fixed; bottom: 25px; right: 25px; z-index: 2000; cursor: pointer; display: flex; align-items: center; }
+        .ai-icon-circle { width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #4ade80; }
+        .ai-tooltip { background: #111; color: #4ade80; padding: 7px 14px; border-radius: 20px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 10px; border: 1px solid #1a1a1a; opacity: 0; transition: 0.4s; font-weight: 700; white-space: nowrap; }
+        #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>La Collection</h1>
-        <div id="loader">Ouverture du catalogue...</div>
-        <div id="grid" class="grid"></div>
+    <header>
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA Logo" class="logo-main">
+        <h1 class="brand-title">ÉONIA</h1>
+        <p id="page-title">Notre Collection</p>
+    </header>
+
+    <div id="client-menu" class="client-nav">
+        <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+        <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
     </div>
 
+    <div class="controls-area">
+        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
+        <div id="filter-container" class="filter-nav">
+            <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+            <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+            <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+            <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        </div>
+    </div>
+
+    <div id="status-msg">Synchronisation...</div>
+    <div id="catalogue-grid" class="catalog-container"></div>
+
+    <button class="logout-btn" onclick="logout()">Quitter</button>
+
 <script>
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    let currentView = 'catalogue'; 
+    let allPlants = [];
+    let activeFilter = 'all';
+
+    if (!userEmail) { window.location.href = "index.html"; }
+    if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
+
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    window.onload = async () => {
-        // On récupère ce qu'on a en mémoire (ou rien du tout)
-        const email = localStorage.getItem('user_email') || "invite";
-        const role = localStorage.getItem('user_role') || "public";
+    async function loadData() {
+        const statusMsg = document.getElementById('status-msg');
+        statusMsg.style.display = 'block';
+        statusMsg.innerText = "Chargement...";
+
+        const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+        document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
         try {
-            const res = await fetch(API_URL, {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // IMPORTANT : On demande explicitement le catalogue
-                body: JSON.stringify({ 
-                    action: "get_catalogue", 
-                    email: email,
-                    role: role 
-                })
+                body: JSON.stringify({ email: emailToSend, pin: userPin }) 
             });
+            allPlants = await response.json();
+            renderGrid();
+        } catch (error) {
+            statusMsg.innerText = "Erreur de connexion.";
+        }
+    }
 
-            const plantes = await res.json();
-            document.getElementById('loader').style.display = 'none';
+    function renderGrid() {
+        const container = document.getElementById('catalogue-grid');
+        const statusMsg = document.getElementById('status-msg');
+        const searchVal = document.getElementById('searchBox').value.toLowerCase();
+        container.innerHTML = "";
 
-            if (!plantes || plantes.length === 0) {
-                document.getElementById('loader').innerText = "Le catalogue est momentanément indisponible.";
-                return;
+        // On filtre
+        let filtered = allPlants.filter(p => {
+            const nom = (p["Nom commun"] || "").toLowerCase();
+            return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
+        });
+
+        // On trie par ordre alphabétique
+        filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
+
+        if (filtered.length === 0) {
+            statusMsg.style.display = 'block';
+            statusMsg.innerText = "Aucun résultat trouvé.";
+            return;
+        }
+
+        statusMsg.style.display = 'none';
+        let lastLetter = "";
+
+        filtered.forEach(p => {
+            const nom = p["Nom commun"] || "Spécimen";
+            const currentLetter = nom[0].toUpperCase();
+
+            // Affichage des lettres séparatrices
+            if (currentView === 'catalogue' && currentLetter !== lastLetter) {
+                const divider = document.createElement('div');
+                divider.className = "letter-divider";
+                divider.innerText = currentLetter;
+                container.appendChild(divider);
+                lastLetter = currentLetter;
             }
 
-            const grid = document.getElementById('grid');
-            plantes.forEach(p => {
-                // On crée chaque carte de plante
-                const card = `
-                    <a href="jardin.html?id=${p.id}" class="card">
-                        <img src="${p.Photo || ''}" alt="${p["Nom commun"]}">
-                        <div class="card-info">
-                            <span class="card-name">${p["Nom commun"]}</span>
-                        </div>
-                    </a>`;
-                grid.innerHTML += card;
-            });
+            const card = document.createElement('div');
+            card.className = "plant-card";
+            card.onclick = () => {
+                const param = (currentView === 'jardin') ? `id=${p["ID_Plaque"]}` : `id_botanique=${p.id}`;
+                window.location.href = `jardin.html?${param}`;
+            };
 
-        } catch (e) {
-            document.getElementById('loader').innerText = "Erreur de connexion au catalogue.";
-            console.error(e);
-        }
-    };
+            // Utilisation de p.Photo (comme dans ton original)
+            card.innerHTML = `
+                <div class="img-container">
+                    <img data-src="${p.Photo}" 
+                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                         class="plant-img lazy">
+                </div>
+                <div class="plant-info">
+                    <div class="plant-name">${nom}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        
+        handleLazyLoad();
+    }
+
+    function handleLazyLoad() {
+        const images = document.querySelectorAll('.plant-img.lazy');
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.add('loaded');
+                    obs.unobserve(img);
+                }
+            });
+        });
+        images.forEach(img => observer.observe(img));
+    }
+
+    function setFilter(type, btn) {
+        activeFilter = type;
+        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGrid();
+    }
+
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+        loadData();
+    }
+
+    function logout() { localStorage.clear(); window.location.href = "index.html"; }
+
+    loadData();
 </script>
 </body>
 </html>
