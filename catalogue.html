@@ -42,8 +42,9 @@
             width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
             border-radius: 50px; color: #fff; font-family: 'Raleway'; outline: none; 
             text-align: center; margin-bottom: 15px; font-size: 0.8rem; transition: 0.3s;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.05);
         }
-        .search-input:focus { border-color: #4ade80; background: #111; }
+        .search-input:focus { border-color: #4ade80; background: #111; box-shadow: 0 0 15px rgba(74, 222, 128, 0.15); }
 
         .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
         .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; transition: 0.3s; }
@@ -91,7 +92,7 @@
     </div>
 
     <div class="controls-area">
-        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UN SPÉCIMEN..." oninput="renderGrid()">
         <div id="filter-container" class="filter-nav">
             <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
             <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
@@ -143,9 +144,9 @@
 
     async function loadData() {
         const statusMsg = document.getElementById('status-msg');
+        statusMsg.style.display = 'block';
         statusMsg.innerText = "Synchronisation...";
         
-        // On demande toujours les données liées à l'email stocké
         const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
         document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
@@ -158,17 +159,19 @@
 
             const data = await response.json();
 
-            // LOGIQUE DE SÉCURITÉ CLIENT : 
-            // Si on cherche le jardin d'un client et que la liste est vide => ce n'est pas un client Éonia.
-            if (currentView === 'jardin' && data.length === 0 && userEmail !== 'invite@eonia.com') {
-                alert("Accès restreint aux clients ÉONIA possédant une plaque.");
-                logout();
+            if (currentView === 'jardin' && (!data || data.length === 0) && userEmail !== 'invite@eonia.com') {
+                statusMsg.innerText = "Aucune plaque enregistrée dans votre jardin.";
+                allPlants = [];
+                renderGrid();
                 return;
             }
 
-            allPlants = data;
+            allPlants = Array.isArray(data) ? data : [];
             renderGrid();
-        } catch (error) { statusMsg.innerText = "Erreur de connexion."; }
+        } catch (error) { 
+            statusMsg.innerText = "Erreur de connexion."; 
+            console.error(error);
+        }
     }
 
     function renderGrid() {
@@ -178,29 +181,58 @@
         
         let filtered = allPlants.filter(p => {
             const nom = (p["Nom commun"] || "").toLowerCase();
-            return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
+            const typeMatch = (activeFilter === 'all' || p.Type === activeFilter);
+            return nom.includes(searchVal) && typeMatch;
         });
 
         filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-        document.getElementById('status-msg').style.display = (filtered.length === 0) ? 'block' : 'none';
-        if (filtered.length === 0) { document.getElementById('status-msg').innerText = "Aucun résultat."; return; }
+        
+        const statusMsg = document.getElementById('status-msg');
+        if (filtered.length === 0) {
+            statusMsg.style.display = 'block';
+            statusMsg.innerText = "Aucun spécimen trouvé.";
+            return;
+        } else {
+            statusMsg.style.display = 'none';
+        }
 
         let lastLetter = "";
         filtered.forEach(p => {
             const nom = p["Nom commun"] || "Spécimen";
             const currentLetter = nom[0].toUpperCase();
-            if (currentView === 'catalogue' && currentLetter !== lastLetter) {
+            
+            // Séparateurs par lettre uniquement pour le catalogue complet
+            if (currentView === 'catalogue' && currentLetter !== lastLetter && searchVal === "") {
                 const divider = document.createElement('div');
                 divider.className = "letter-divider"; divider.innerText = currentLetter;
                 container.appendChild(divider); lastLetter = currentLetter;
             }
+
             const card = document.createElement('div');
             card.className = "plant-card";
+            
+            // RÉPARATION DE LA REDIRECTION ICI
             card.onclick = () => {
-                const url = (currentView === 'jardin') ? `jardin.html?id=${p["ID_Plaque"]}` : `jardin.html?id_botanique=${p.id}`;
-                window.location.href = url;
+                let targetUrl;
+                if (currentView === 'jardin') {
+                    // Pour le jardin client, on utilise l'ID de la plaque
+                    targetUrl = `jardin.html?id=${p["ID_Plaque"]}`;
+                } else {
+                    // Pour le catalogue, on utilise l'ID botanique (pour afficher la photo et les infos)
+                    // On s'assure d'utiliser la clé correcte issue de ton API (soit 'id', soit 'ID')
+                    const idBot = p.id || p.ID || p.id_botanique;
+                    targetUrl = `jardin.html?id_botanique=${idBot}`;
+                }
+                window.location.href = targetUrl;
             };
-            card.innerHTML = `<div class="img-container"><img src="${p.Photo}" class="plant-img"></div><div class="plant-info"><div class="plant-name">${nom}</div></div>`;
+
+            card.innerHTML = `
+                <div class="img-container">
+                    <img src="${p.Photo}" class="plant-img" loading="lazy">
+                </div>
+                <div class="plant-info">
+                    <div class="plant-name">${nom}</div>
+                </div>`;
             container.appendChild(card);
         });
     }
@@ -227,15 +259,27 @@
         const input = document.getElementById('chat-input');
         const box = document.getElementById('chat-messages');
         if (!input.value.trim()) return;
+        
         box.innerHTML += `<div style="background:#4ade80; color:#000; padding:10px; border-radius:12px; border-bottom-right-radius:0; align-self:flex-end;">${input.value}</div>`;
         conversationHistory.push({ role: "user", content: input.value });
-        input.value = ""; box.scrollTop = box.scrollHeight;
+        
+        const userText = input.value;
+        input.value = ""; 
+        box.scrollTop = box.scrollHeight;
+
         setTimeout(() => {
-            const rep = "Je recherche dans nos 500 espèces pour vous répondre...";
-            box.innerHTML += `<div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">${rep}</div>`;
-            conversationHistory.push({ role: "assistant", content: rep });
+            const typingId = Date.now();
+            box.innerHTML += `<div id="${typingId}" style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start; font-style:italic; font-size:0.7rem;">Éonia analyse votre demande...</div>`;
             box.scrollTop = box.scrollHeight;
-        }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById(typingId).remove();
+                const rep = "Je consulte notre base de données botanique pour vous répondre au mieux...";
+                box.innerHTML += `<div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">${rep}</div>`;
+                conversationHistory.push({ role: "assistant", content: rep });
+                box.scrollTop = box.scrollHeight;
+            }, 1500);
+        }, 500);
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
