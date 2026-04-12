@@ -9,8 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
 <style>
-
-/* ================= RESET ================= */
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
@@ -22,7 +20,7 @@ min-height:100vh;
 padding-top:60px;
 }
 
-/* ================= TOP BAR ================= */
+/* TOP BAR */
 .top-bar {
 position:fixed;
 top:0; left:0;
@@ -54,7 +52,7 @@ background:#4ade80;
 color:#000;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 header {
 text-align:center;
 padding:30px 20px;
@@ -76,7 +74,7 @@ margin-top:8px;
 letter-spacing:3px;
 }
 
-/* ================= NAV ================= */
+/* NAV */
 .client-nav {
 display:none;
 justify-content:center;
@@ -99,7 +97,7 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
-/* ================= SEARCH ================= */
+/* SEARCH */
 .controls-area {
 max-width:1000px;
 margin:auto;
@@ -120,7 +118,6 @@ font-size:0.8rem;
 margin-bottom:15px;
 }
 
-/* ================= FILTER ================= */
 .filter-nav {
 display:flex;
 justify-content:center;
@@ -144,7 +141,7 @@ border-color:#4ade80;
 color:#4ade80;
 }
 
-/* ================= GRID ================= */
+/* GRID */
 .catalog-container {
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
@@ -154,7 +151,7 @@ margin:auto;
 padding:20px;
 }
 
-/* ================= LETTER ================= */
+/* LETTER */
 .letter-divider {
 grid-column:1/-1;
 font-size:1.2rem;
@@ -164,7 +161,7 @@ font-weight:200;
 letter-spacing:6px;
 }
 
-/* ================= CARD ================= */
+/* CARD */
 .plant-card {
 background:#0c0c0c;
 border-radius:12px;
@@ -202,7 +199,7 @@ text-transform:uppercase;
 color:#bbb;
 }
 
-/* ================= AI ================= */
+/* AI */
 #eonia-ai-trigger {
 position:fixed;
 bottom:30px;
@@ -221,7 +218,7 @@ justify-content:center;
 border:1px solid #4ade80;
 }
 
-/* ================= CHAT ================= */
+/* CHAT */
 #ai-chat-window {
 display:none;
 position:fixed;
@@ -235,31 +232,26 @@ border-radius:15px;
 z-index:3000;
 overflow:hidden;
 }
-
 </style>
 </head>
 
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
 <button class="logout-header-btn" onclick="logout()">Quitter</button>
 </div>
 
-<!-- HEADER -->
 <header>
 <img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
 <h1 class="brand-title">ÉONIA</h1>
 <p id="page-title">Chargement...</p>
 </header>
 
-<!-- NAV -->
 <div id="client-menu" class="client-nav">
 <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
 <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
 </div>
 
-<!-- SEARCH -->
 <div class="controls-area">
 <input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 
@@ -279,30 +271,47 @@ Chargement...
 
 <script>
 
-/* ================= USER SAFE ================= */
+/* USER */
 const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
 const userPin = localStorage.getItem('user_pin') || '0000';
 const access = (userEmail === 'invite@eonia.com') ? 'guest' : 'client';
 
-/* ================= STATE ================= */
+/* STATE */
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 function logout(){
 localStorage.clear();
 window.location.href="index.html";
 }
 
-/* ================= LOAD DATA ================= */
+/* LOAD DATA (FIX FINAL JARDIN) */
 async function loadData(){
 
 document.getElementById('status-msg').innerText = "Synchronisation...";
 
-let emailToSend = (currentView === 'jardin') ? userEmail : 'invite@eonia.com';
+let payload = {};
+
+/* catalogue */
+if(currentView === 'catalogue'){
+payload = {
+type:"catalogue",
+email:"invite@eonia.com"
+};
+}
+
+/* jardin */
+if(currentView === 'jardin'){
+payload = {
+type:"jardin",
+email:userEmail,
+pin:userPin
+};
+}
 
 document.getElementById('page-title').innerText =
 (currentView === 'catalogue') ? "Collection" : "Mon Jardin";
@@ -312,22 +321,19 @@ try {
 const res = await fetch(API_URL,{
 method:'POST',
 headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-email: emailToSend,
-pin: userPin,
-access: access,
-view: currentView
-})
+body:JSON.stringify(payload)
 });
 
 const data = await res.json();
 
-/* NORMALISATION API */
+/* SAFE NORMALISATION */
 allPlants =
 Array.isArray(data) ? data :
 Array.isArray(data?.results) ? data.results :
 Array.isArray(data?.data) ? data.data :
 [];
+
+console.log("VIEW:", currentView, allPlants);
 
 renderGrid();
 
@@ -338,7 +344,7 @@ document.getElementById('status-msg').innerText = "Erreur API";
 
 }
 
-/* ================= GRID ================= */
+/* GRID (INCHANGÉ + SAFE) */
 function renderGrid(){
 
 const container = document.getElementById('catalogue-grid');
@@ -346,13 +352,15 @@ const search = document.getElementById('searchBox').value.toLowerCase();
 
 container.innerHTML = "";
 
+if(!allPlants) allPlants = [];
+
 let filtered = allPlants.filter(p=>{
 const name = (p["Nom commun"]||"").toLowerCase();
 const type = (activeFilter === 'all' || p.Type === activeFilter);
 return name.includes(search) && type;
 });
 
-/* TRI A-Z */
+/* TRI A-Z (CONSERVÉ) */
 filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
@@ -405,7 +413,7 @@ container.appendChild(card);
 
 }
 
-/* ================= FILTER ================= */
+/* FILTER */
 function setFilter(type,btn){
 activeFilter=type;
 document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
@@ -413,7 +421,7 @@ btn.classList.add('active');
 renderGrid();
 }
 
-/* ================= SWITCH ================= */
+/* SWITCH */
 function switchView(v){
 currentView=v;
 document.getElementById('btn-col').classList.toggle('active',v==='catalogue');
@@ -421,7 +429,7 @@ document.getElementById('btn-jar').classList.toggle('active',v==='jardin');
 loadData();
 }
 
-/* ================= INIT ================= */
+/* INIT */
 loadData();
 
 </script>
