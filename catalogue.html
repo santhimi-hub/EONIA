@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA — Collection & Jardin</title>
+<title>ÉONIA — Collection</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
 
@@ -153,6 +153,15 @@ text-transform:uppercase;
 color:#bbb;
 }
 
+/* LETTER A-Z */
+.letter-divider{
+grid-column:1/-1;
+font-size:1.2rem;
+color:#4ade80;
+margin:20px 0 10px 5px;
+letter-spacing:6px;
+}
+
 /* IA BUBBLE */
 #eonia-ai-trigger{
 position:fixed;
@@ -162,7 +171,6 @@ z-index:9999;
 cursor:pointer;
 display:flex;
 align-items:center;
-gap:10px;
 }
 
 .ai-icon-circle{
@@ -176,7 +184,6 @@ justify-content:center;
 box-shadow:0 0 20px rgba(74,222,128,0.5);
 }
 
-/* LOGO DANS BULLE EN VERT */
 .ai-icon-circle img{
 width:28px;
 filter:brightness(0) invert(1);
@@ -251,7 +258,7 @@ cursor:pointer;
 <header>
 <img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
 <h1 class="brand-title">ÉONIA</h1>
-<p id="page-title">Chargement...</p>
+<p id="page-title">Notre Collection</p>
 </header>
 
 <div id="client-menu" class="client-nav">
@@ -260,12 +267,19 @@ cursor:pointer;
 </div>
 
 <div class="controls-area">
-<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+<input id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <!-- IA -->
+<div id="eonia-ai-trigger" onclick="toggleChat()">
+<div class="ai-icon-circle">
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+</div>
+</div>
+
+<!-- CHAT -->
 <div id="ai-chat-window">
 <div class="chat-header">
 <span>Assistant ÉONIA</span>
@@ -282,12 +296,6 @@ Bonjour 🌿 comment puis-je vous aider ?
 </div>
 </div>
 
-<div id="eonia-ai-trigger" onclick="toggleChat()">
-<div class="ai-icon-circle">
-<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
-</div>
-</div>
-
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
@@ -298,17 +306,17 @@ let userPin=localStorage.getItem('user_pin')||"0000";
 let currentView="catalogue";
 let allPlants=[];
 
-/* SHOW MENU CLIENT */
+/* MENU CLIENT */
 if(userEmail!=="invite@eonia.com"){
 document.getElementById("client-menu").style.display="flex";
 }
 
+/* LOAD DATA */
 async function loadData(){
 
-const emailToSend=(currentView==="catalogue")?"invite@eonia.com":userEmail;
+const emailToSend="invite@eonia.com"; // catalogue toujours identique
 
-document.getElementById("page-title").innerText=
-currentView==="catalogue"?"Collection":"Mon Jardin";
+document.getElementById("page-title").innerText="Notre Collection";
 
 const res=await fetch(API_URL,{
 method:"POST",
@@ -316,15 +324,15 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 email:emailToSend,
 pin:userPin,
-view:currentView
+view:"catalogue"
 })
 });
 
 allPlants=await res.json();
-
 renderGrid();
 }
 
+/* GRID */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
@@ -340,19 +348,19 @@ filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-let last="";
+let lastLetter="";
 
 filtered.forEach(p=>{
 
 let name=p["Nom commun"]||"Plante";
 let letter=name[0].toUpperCase();
 
-if(letter!==last){
+if(letter!==lastLetter){
 let div=document.createElement("div");
 div.className="letter-divider";
 div.innerText=letter;
 container.appendChild(div);
-last=letter;
+lastLetter=letter;
 }
 
 let id=p["ID_Plaque"]||p.id;
@@ -361,7 +369,7 @@ let card=document.createElement("div");
 card.className="plant-card";
 
 card.onclick=()=>{
-window.location.href="jardin.html?id="+id;
+window.location.href="jardin.html?id_botanique="+id;
 };
 
 card.innerHTML=`
@@ -393,19 +401,10 @@ if(!input.value.trim())return;
 body.innerHTML+=`<div>🧑 ${input.value}</div>`;
 
 setTimeout(()=>{
-body.innerHTML+=`<div>🌿 Je vous aide à choisir la meilleure plante.</div>`;
-body.scrollTop=body.scrollHeight;
+body.innerHTML+=`<div>🌿 Je vous aide à trouver la meilleure plante.</div>`;
 },500);
 
 input.value="";
-}
-
-/* SWITCH */
-function switchView(v){
-currentView=v;
-document.getElementById("btn-col").classList.toggle("active",v==="catalogue");
-document.getElementById("btn-jar").classList.toggle("active",v==="jardin");
-loadData();
 }
 
 /* LOGOUT */
