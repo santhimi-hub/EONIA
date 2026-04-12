@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Expertise Botanique</title>
+    <title>ÉONIA</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; } 
@@ -22,7 +22,6 @@
 
         .auth-footer { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 4px; margin-top: -4px; min-height: 25px; }
         
-        /* Texte d'activation dynamique */
         #activation-help { 
             display: none; 
             font-size: 0.58rem; 
@@ -42,14 +41,28 @@
         .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; text-align: center; }
         .link-order:hover { color: #fff; }
         
-        .bottom-nav { margin-top: 40px; font-size: 0.8rem; }
-        .bottom-nav a { color: #ccc; text-decoration: none; margin: 0 15px; border-bottom: 1px solid transparent; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .bottom-nav { margin-top: 35px; }
+        .bottom-nav a { 
+            color: #ccc; 
+            text-decoration: none; 
+            margin: 0 15px; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2.5px; 
+            transition: 0.3s; 
+        }
         .bottom-nav a:hover { border-bottom: 1px solid #4ade80; color: #fff; }
         
         .content-section { padding: 100px 30px; text-align: center; background: #050505; }
         .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
         .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
         .highlight { color: #fff; font-weight: 500; }
+
+        @media (max-width: 600px) { 
+            .brand-title { font-size: 2.5rem; }
+            .tagline { margin-top: 20px; margin-bottom: 30px; }
+            .bottom-nav { margin-top: 25px; }
+        }
     </style>
 </head>
 <body>
@@ -73,8 +86,8 @@
         </div>
 
         <div class="bottom-nav">
-            <a href="#" onclick="accesInvite()">Accès Invité</a>
-            <a href="#concept">Notre Concept</a>
+            <a href="#" onclick="accesInvite()">Invité</a>
+            <a href="#concept">Concept</a>
         </div>
     </div>
 
