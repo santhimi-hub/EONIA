@@ -13,10 +13,10 @@
             font-family: 'Raleway', sans-serif; 
             -webkit-font-smoothing: antialiased; 
             min-height: 100vh;
-            padding-top: 60px; /* Espace pour la barre fixe */
+            padding-top: 60px;
         }
         
-        /* BARRE HAUTE FIXE (STICKY) */
+        /* BARRE HAUTE FIXE */
         .top-bar {
             position: fixed; top: 0; left: 0; width: 100%; height: 60px;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
@@ -32,18 +32,18 @@
         }
         .logout-header-btn:hover { background: #4ade80; color: #000; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); }
 
-        /* HEADER & LOGO */
+        /* HEADER */
         header { text-align: center; padding: 30px 20px 20px 20px; }
         .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
         .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; color: #fff; font-size: 2.1rem; margin: 0; }
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
 
-        /* NAVIGATION CLIENT */
+        /* NAV CLIENT */
         .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; margin-top: 15px; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 1px; transition: 0.3s; font-family: 'Raleway'; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 1px; transition: 0.3s; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); }
 
-        /* RECHERCHE ET FILTRES */
+        /* CONTROLES */
         .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
         .search-input { 
             width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; 
@@ -56,7 +56,7 @@
         .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; transition: 0.3s; }
         .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        /* GRILLE ET CARTES */
+        /* GRILLE */
         .catalog-container { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); 
             gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; 
@@ -68,39 +68,24 @@
             padding-bottom: 5px; font-weight: 200; letter-spacing: 6px; text-align: left;
         }
 
-        .plant-card { 
-            background: #0c0c0c; border-radius: 12px; overflow: hidden; 
-            border: 1px solid #1a1a1a; transition: 0.3s ease; cursor: pointer;
-        }
+        .plant-card { background: #0c0c0c; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.3s ease; cursor: pointer; }
         .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(74, 222, 128, 0.1); }
-
         .img-container { width: 100%; height: 145px; overflow: hidden; background: #000; }
-        .plant-img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            filter: grayscale(0.6) brightness(0.7); 
-            transition: 0.6s ease;
-        }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.6) brightness(0.7); transition: 0.6s ease; }
         .plant-card:hover .plant-img { filter: grayscale(0) brightness(1.1); transform: scale(1.1); }
-
         .plant-info { padding: 12px 5px; text-align: center; }
-        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; }
-        .plant-card:hover .plant-name { color: #fff; }
+        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* BULL IA & CHAT WINDOW */
+        /* CHAT IA */
         #eonia-ai-trigger { position: fixed; bottom: 30px; right: 25px; z-index: 2000; cursor: pointer; display: flex; align-items: center; transition: 0.3s; }
-        .ai-icon-circle { width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(74, 222, 128, 0.2); border: 1px solid #4ade80; }
-        .ai-tooltip { background: #111; color: #4ade80; padding: 8px 16px; border-radius: 20px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 12px; border: 1px solid #1a1a1a; opacity: 0; transition: 0.4s; pointer-events: none; font-weight: 700; transform: translateX(10px); }
+        .ai-icon-circle { width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #4ade80; }
+        .ai-tooltip { background: #111; color: #4ade80; padding: 8px 16px; border-radius: 20px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; margin-right: 12px; opacity: 0; transition: 0.4s; pointer-events: none; }
         #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(0); }
 
         #ai-chat-window {
             display: none; position: fixed; bottom: 95px; right: 25px; width: 320px; height: 450px;
             background: #0c0c0c; border: 1px solid #4ade80; border-radius: 15px; flex-direction: column;
             z-index: 3000; box-shadow: 0 15px 50px rgba(0,0,0,0.9); overflow: hidden;
-        }
-
-        @media (max-width: 450px) {
-            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
-            #ai-chat-window { width: 90%; right: 5%; bottom: 90px; }
         }
     </style>
 </head>
@@ -131,8 +116,7 @@
         </div>
     </div>
 
-    <div id="status-msg" style="text-align: center; color: #4ade80; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 20px;">Synchronisation...</div>
-    
+    <div id="status-msg" style="text-align: center; color: #4ade80; font-size: 0.7rem; margin-top: 20px;">Synchronisation...</div>
     <div id="catalogue-grid" class="catalog-container"></div>
 
     <div id="ai-chat-window">
@@ -142,12 +126,12 @@
         </div>
         <div id="chat-messages" style="flex:1; padding:15px; overflow-y:auto; font-size:0.8rem; color:#ddd; display:flex; flex-direction:column; gap:12px;">
             <div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">
-                Bonjour. Je suis là pour vous aider à trouver la plante idéale pour votre espace. Que recherchez-vous ?
+                Bonjour. Je suis là pour vous conseiller. Que recherchez-vous comme plante idéale ?
             </div>
         </div>
         <div style="padding:15px; border-top:1px solid #1a1a1a; display:flex; gap:10px; background:#080808;">
             <input type="text" id="chat-input" placeholder="Posez votre question..." style="flex:1; background:#000; border:1px solid #333; border-radius:20px; padding:10px 15px; color:#fff; font-family:'Raleway'; font-size:0.75rem; outline:none;">
-            <button onclick="envoyerQuestion()" style="background:#4ade80; border:none; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.3s;">
+            <button onclick="envoyerQuestion()" style="background:#4ade80; border:none; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="black"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
@@ -166,6 +150,7 @@
     let currentView = 'catalogue'; 
     let allPlants = []; 
     let activeFilter = 'all';
+    let conversationHistory = []; // MÉMOIRE DE LA SESSION
 
     if (!userEmail) { window.location.href = "index.html"; }
     if (userEmail !== 'invite@eonia.com') { document.getElementById('client-menu').style.display = 'flex'; }
@@ -190,7 +175,6 @@
 
     function renderGrid() {
         const container = document.getElementById('catalogue-grid');
-        const statusMsg = document.getElementById('status-msg');
         const searchVal = document.getElementById('searchBox').value.toLowerCase();
         container.innerHTML = "";
         let filtered = allPlants.filter(p => {
@@ -198,8 +182,7 @@
             return nom.includes(searchVal) && (activeFilter === 'all' || p.Type === activeFilter);
         });
         filtered.sort((a, b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-        statusMsg.style.display = (filtered.length === 0) ? 'block' : 'none';
-        if (filtered.length === 0) { statusMsg.innerText = "Aucun résultat."; return; }
+        document.getElementById('status-msg').style.display = (filtered.length === 0) ? 'block' : 'none';
 
         let lastLetter = "";
         filtered.forEach(p => {
@@ -231,19 +214,21 @@
     function envoyerQuestion() {
         const input = document.getElementById('chat-input');
         const box = document.getElementById('chat-messages');
-        if (!input.value.trim()) return;
+        const texte = input.value.trim();
+        if (!texte) return;
 
-        // Bulle Client
-        box.innerHTML += `<div style="background:#4ade80; color:#000; padding:10px; border-radius:12px; border-bottom-right-radius:0; align-self:flex-end;">${input.value}</div>`;
-        const q = input.value;
+        box.innerHTML += `<div style="background:#4ade80; color:#000; padding:10px; border-radius:12px; border-bottom-right-radius:0; align-self:flex-end;">${texte}</div>`;
+        conversationHistory.push({ role: "user", content: texte });
         input.value = "";
         box.scrollTop = box.scrollHeight;
 
-        // Réponse IA (Simulation)
         setTimeout(() => {
-            box.innerHTML += `<div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start; font-style:italic; color:#888;">Analyse de votre recherche...</div>`;
+            let rep = "Je recherche l'essence idéale dans notre catalogue de 500 espèces...";
+            if (conversationHistory.length > 2) rep = "Je prends en compte vos précisions pour affiner mes conseils botaniques.";
+            box.innerHTML += `<div style="background:#1a1a1a; padding:10px; border-radius:12px; border-bottom-left-radius:0; align-self:flex-start;">${rep}</div>`;
+            conversationHistory.push({ role: "assistant", content: rep });
             box.scrollTop = box.scrollHeight;
-        }, 800);
+        }, 1000);
     }
 
     function setFilter(type, btn) {
@@ -261,7 +246,6 @@
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
-
     document.getElementById('chat-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') envoyerQuestion(); });
 
     loadData();
