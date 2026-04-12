@@ -1,156 +1,418 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-    <style>
-        /* RESET & BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; } 
-        body, html { height: 100%; font-family: 'Raleway',sans-serif; background: #000; color: #fff; scroll-behavior:smooth; }
-        
-        /* HERO SECTION */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('background.jpg') center/cover no-repeat; }
-        .logo-main { width: 120px; margin-bottom: 25px; }
-        .brand-title { font-size: 4rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: #ffffff; margin: 0; line-height: 1; }
-        .tagline { font-style: italic; font-weight: 400; font-size: 0.9rem; color: #ffffff; margin-top: 35px; margin-bottom: 45px; }
-        
-        /* AUTHENTICATION */
-        .auth-container { display: flex; flex-direction: column; gap: 12px; width: 280px; }
-        input { width: 100%; padding: 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.15); color: white; outline: none; font-family: 'Raleway', sans-serif; text-align: center; }
-        
-        /* Suppression flèches input number */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ÉONIA</title>
 
-        .auth-footer { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 4px; margin-top: -4px; min-height: 25px; }
-        
-        #activation-help { 
-            display: none; 
-            font-size: 0.58rem; 
-            color: #4ade80; 
-            font-style: italic; 
-            text-align: left; 
-            max-width: 190px; 
-            line-height: 1.2;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
-        .pin-forgot { font-size: 0.6rem; color: rgba(255,255,255,0.5); text-decoration: none; transition: 0.3s; white-space: nowrap; margin-left: 5px; margin-top: 2px; }
-        .pin-forgot:hover { color: #fff; }
+<style>
 
-        .btn-main { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-top: 5px; }
-        .btn-main:hover { background: #4ade80; }
-        
-        .link-order { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-decoration: none; margin-top: 10px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; text-align: center; }
-        .link-order:hover { color: #fff; }
-        
-        /* BOTTOM NAVIGATION (Mis à jour en vert) */
-        .bottom-nav { margin-top: 35px; }
-        .bottom-nav a { 
-            color: #4ade80; /* Couleur verte demandée */
-            text-decoration: none; 
-            margin: 0 15px; 
-            font-size: 0.65rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2.5px; 
-            transition: 0.3s; 
-            font-weight: 500;
-        }
-        .bottom-nav a:hover { 
-            color: #fff; 
-            border-bottom: 1px solid #4ade80; 
-        }
-        
-        /* CONTENT SECTION */
-        .content-section { padding: 100px 30px; text-align: center; background: #050505; }
-        .content-section h2 { color: #4ade80; font-weight: 300; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-size: 1.5rem; }
-        .content-section p { max-width: 700px; margin: 0 auto 20px auto; line-height: 1.8; color: #bbb; }
-        .highlight { color: #fff; font-weight: 500; }
+/* RESET */
+* { margin:0; padding:0; box-sizing:border-box; }
 
-        @media (max-width: 600px) { 
-            .brand-title { font-size: 2.5rem; }
-            .tagline { margin-top: 20px; margin-bottom: 30px; }
-            .bottom-nav { margin-top: 25px; }
-        }
-    </style>
+body, html {
+height:100%;
+font-family:'Raleway',sans-serif;
+background:#000;
+color:#fff;
+scroll-behavior:smooth;
+}
+
+/* HERO */
+
+.hero {
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:
+linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
+url('background.jpg') center/cover no-repeat;
+animation:fadeIn 1.5s ease;
+}
+
+/* Logo */
+
+.logo-main {
+width:120px;
+margin-bottom:25px;
+opacity:0;
+animation:fadeUp 1.5s ease forwards;
+animation-delay:0.2s;
+transition:0.4s;
+}
+
+.logo-main:hover {
+transform:scale(1.05);
+}
+
+/* Title */
+
+.brand-title {
+font-size:4rem;
+font-weight:300;
+letter-spacing:6px;
+text-transform:uppercase;
+color:#ffffff;
+line-height:1;
+opacity:0;
+animation:fadeUp 1.5s ease forwards;
+animation-delay:0.4s;
+}
+
+/* Tagline */
+
+.tagline {
+font-style:italic;
+font-weight:400;
+font-size:0.9rem;
+color:#ffffff;
+margin-top:35px;
+margin-bottom:45px;
+opacity:0.8;
+opacity:0;
+animation:fadeUp 1.5s ease forwards;
+animation-delay:0.6s;
+}
+
+/* Auth */
+
+.auth-container {
+display:flex;
+flex-direction:column;
+gap:12px;
+width:280px;
+opacity:0;
+animation:fadeUp 1.5s ease forwards;
+animation-delay:0.8s;
+}
+
+input {
+width:100%;
+padding:14px;
+border-radius:8px;
+border:none;
+background:rgba(255,255,255,0.12);
+color:white;
+outline:none;
+font-family:'Raleway',sans-serif;
+text-align:center;
+transition:0.3s;
+}
+
+input:focus {
+background:rgba(255,255,255,0.18);
+}
+
+/* remove number arrows */
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+-webkit-appearance:none;
+margin:0;
+}
+
+input[type=number] {
+-moz-appearance:textfield;
+}
+
+.auth-footer {
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+padding:0 4px;
+margin-top:-4px;
+min-height:25px;
+}
+
+#activation-help {
+display:none;
+font-size:0.58rem;
+color:#4ade80;
+font-style:italic;
+text-align:left;
+max-width:190px;
+line-height:1.2;
+}
+
+.pin-forgot {
+font-size:0.6rem;
+color:rgba(255,255,255,0.5);
+text-decoration:none;
+transition:0.3s;
+white-space:nowrap;
+margin-left:5px;
+margin-top:2px;
+}
+
+.pin-forgot:hover {
+color:#fff;
+}
+
+/* Button */
+
+.btn-main {
+width:100%;
+padding:14px;
+background:#fff;
+color:#000;
+border:none;
+border-radius:50px;
+cursor:pointer;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:2px;
+transition:0.3s;
+margin-top:5px;
+}
+
+.btn-main:hover {
+background:#4ade80;
+transform:translateY(-2px);
+box-shadow:0 5px 15px rgba(74,222,128,0.25);
+}
+
+/* Link */
+
+.link-order {
+font-size:0.7rem;
+color:rgba(255,255,255,0.5);
+text-decoration:none;
+margin-top:10px;
+font-weight:400;
+letter-spacing:1px;
+text-transform:uppercase;
+transition:0.3s;
+text-align:center;
+}
+
+.link-order:hover {
+color:#fff;
+}
+
+/* Bottom Nav */
+
+.bottom-nav {
+margin-top:35px;
+opacity:0;
+animation:fadeUp 1.5s ease forwards;
+animation-delay:1s;
+}
+
+.bottom-nav a {
+color:#4ade80;
+text-decoration:none;
+margin:0 15px;
+font-size:0.65rem;
+text-transform:uppercase;
+letter-spacing:2.5px;
+transition:0.3s;
+font-weight:500;
+}
+
+.bottom-nav a:hover {
+color:#fff;
+border-bottom:1px solid #4ade80;
+}
+
+/* Content */
+
+.content-section {
+padding:100px 30px;
+text-align:center;
+background:#050505;
+}
+
+.content-section h2 {
+color:#4ade80;
+font-weight:300;
+text-transform:uppercase;
+letter-spacing:4px;
+margin-bottom:25px;
+font-size:1.5rem;
+}
+
+.content-section p {
+max-width:700px;
+margin:0 auto 20px auto;
+line-height:1.8;
+color:#bbb;
+}
+
+.highlight {
+color:#fff;
+font-weight:500;
+}
+
+/* Animations */
+
+@keyframes fadeUp {
+from {
+opacity:0;
+transform:translateY(20px);
+}
+to {
+opacity:1;
+transform:translateY(0);
+}
+}
+
+@keyframes fadeIn {
+from {opacity:0}
+to {opacity:1}
+}
+
+/* Mobile */
+
+@media (max-width:600px) {
+
+.brand-title {
+font-size:2.5rem;
+}
+
+.tagline {
+margin-top:20px;
+margin-bottom:30px;
+}
+
+.bottom-nav {
+margin-top:25px;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-    <div class="hero">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="ÉONIA" class="logo-main">
-        <h1 class="brand-title">ÉONIA</h1>
-        <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+<div class="hero">
 
-        <div class="auth-container">
-            <input type="email" placeholder="Email" id="email">
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <input type="number" placeholder="Code PIN" id="pin">
-                <div class="auth-footer">
-                    <p id="activation-help">Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.</p>
-                    <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
-                </div>
-            </div>
-            <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
-            <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
-        </div>
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
 
-        <div class="bottom-nav">
-            <a href="#" onclick="accesInvite()">Invité</a>
-            <a href="#concept">Concept</a>
-        </div>
-    </div>
+<h1 class="brand-title">ÉONIA</h1>
 
-    <section class="content-section" id="concept">
-        <h2>Notre Concept</h2>
-        <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <span class="highlight">Scanner, Cultiver, Raconter.</span></p>
-        
-        <h2 style="margin-top: 60px;">L'âme d'Éonia</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
-    </section>
+<p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+
+<div class="auth-container">
+
+<input type="email" placeholder="Email" id="email">
+
+<div style="display:flex;flex-direction:column;gap:8px;">
+
+<input type="number" placeholder="Code PIN" id="pin">
+
+<div class="auth-footer">
+
+<p id="activation-help">
+Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.
+</p>
+
+<a href="mailto:contact@eonia.com" class="pin-forgot">
+PIN oublié ?
+</a>
+
+</div>
+
+</div>
+
+<button class="btn-main" id="btn-entrer" onclick="validerConnexion()">
+ENTRER
+</button>
+
+<a href="commander.html" class="link-order">
+Commander votre plaque ÉONIA
+</a>
+
+</div>
+
+<div class="bottom-nav">
+<a href="#" onclick="accesInvite()">Invité</a>
+<a href="#concept">Concept</a>
+</div>
+
+</div>
+
+<section class="content-section" id="concept">
+
+<h2>Notre Concept</h2>
+
+<p>
+Éonia fusionne l'élégance du support et la puissance du numérique.
+Chaque plante a une histoire.
+<span class="highlight">
+Scanner, Cultiver, Raconter.
+</span>
+</p>
+
+<h2 style="margin-top:60px;">
+L'âme d'Éonia
+</h2>
+
+<p>
+Un journal de bord pour vos arbres,
+une empreinte pour l'éternité.
+Transmettez la mémoire de votre jardin
+aux générations futures.
+</p>
+
+</section>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const plaqueEnAttente = urlParams.get('id');
 
-    window.onload = () => {
-        if (plaqueEnAttente) {
-            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-            document.getElementById('activation-help').style.display = "block";
-        }
-    };
+const urlParams = new URLSearchParams(window.location.search);
+const plaqueEnAttente = urlParams.get('id');
 
-    document.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { validerConnexion(); }
-    });
+window.onload = () => {
+if (plaqueEnAttente) {
+document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+document.getElementById('activation-help').style.display = "block";
+}
+};
 
-    function validerConnexion() {
-        const mail = document.getElementById('email').value.toLowerCase().trim();
-        const pin = document.getElementById('pin').value.trim();
+document.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') { validerConnexion(); }
+});
 
-        if(!mail || !pin) {
-            alert("Veuillez remplir les deux champs.");
-            return; 
-        }
+function validerConnexion() {
 
-        localStorage.setItem('user_email', mail);
-        localStorage.setItem('user_pin', pin);
-        localStorage.setItem('eonia_access', 'client');
+const mail = document.getElementById('email').value.toLowerCase().trim();
+const pin = document.getElementById('pin').value.trim();
 
-        if (plaqueEnAttente) {
-            window.location.href = "jardin.html?id=" + plaqueEnAttente;
-        } else {
-            window.location.href = "catalogue.html";
-        }
-    }
+if(!mail || !pin) {
+alert("Veuillez remplir les deux champs.");
+return;
+}
 
-    function accesInvite() {
-        localStorage.clear();
-        localStorage.setItem('user_email', 'invite@eonia.com');
-        localStorage.setItem('user_pin', '0000');
-        localStorage.setItem('eonia_access', 'guest');
-        window.location.href = "catalogue.html";
-    }
+localStorage.setItem('user_email', mail);
+localStorage.setItem('user_pin', pin);
+localStorage.setItem('eonia_access', 'client');
+
+if (plaqueEnAttente) {
+window.location.href = "jardin.html?id=" + plaqueEnAttente;
+} else {
+window.location.href = "catalogue.html";
+}
+
+}
+
+function accesInvite() {
+
+localStorage.clear();
+
+localStorage.setItem('user_email','invite@eonia.com');
+localStorage.setItem('user_pin','0000');
+localStorage.setItem('eonia_access','guest');
+
+window.location.href="catalogue.html";
+
+}
+
 </script>
+
 </body>
 </html>
