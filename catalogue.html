@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA — Collection</title>
+<title>ÉONIA — Catalogue</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
 
 <style>
 
-/* RESET */
+/* BASE */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
@@ -67,29 +67,6 @@ color:#4ade80;
 margin-top:5px;
 }
 
-/* NAV */
-.client-nav{
-display:none;
-justify-content:center;
-gap:10px;
-margin:15px 0;
-}
-
-.nav-btn{
-background:none;
-border:1px solid #222;
-color:#fff;
-padding:6px 14px;
-border-radius:20px;
-font-size:0.6rem;
-cursor:pointer;
-}
-
-.nav-btn.active{
-border-color:#4ade80;
-color:#4ade80;
-}
-
 /* SEARCH */
 .controls-area{
 text-align:center;
@@ -117,6 +94,15 @@ max-width:1000px;
 margin:auto;
 }
 
+/* ALPHABET */
+.letter-divider{
+grid-column:1/-1;
+color:#4ade80;
+margin:20px 0 10px;
+letter-spacing:6px;
+}
+
+/* CARD */
 .plant-card{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
@@ -142,35 +128,13 @@ height:100%;
 object-fit:cover;
 }
 
-.plant-info{
-padding:10px;
-text-align:center;
-}
-
-.plant-name{
-font-size:0.65rem;
-text-transform:uppercase;
-color:#bbb;
-}
-
-/* LETTER A-Z */
-.letter-divider{
-grid-column:1/-1;
-font-size:1.2rem;
-color:#4ade80;
-margin:20px 0 10px 5px;
-letter-spacing:6px;
-}
-
-/* IA BUBBLE */
+/* IA */
 #eonia-ai-trigger{
 position:fixed;
 bottom:25px;
 right:25px;
 z-index:9999;
 cursor:pointer;
-display:flex;
-align-items:center;
 }
 
 .ai-icon-circle{
@@ -258,37 +222,23 @@ cursor:pointer;
 <header>
 <img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
 <h1 class="brand-title">ÉONIA</h1>
-<p id="page-title">Notre Collection</p>
+<p id="page-title">Catalogue</p>
 </header>
 
-<div id="client-menu" class="client-nav">
-<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
-<button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
-</div>
-
 <div class="controls-area">
-<input id="searchBox" class="search-input" placeholder="RECHERCHER UNE ESSENCE..." oninput="renderGrid()">
+<input id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <!-- IA -->
-<div id="eonia-ai-trigger" onclick="toggleChat()">
-<div class="ai-icon-circle">
-<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
-</div>
-</div>
-
-<!-- CHAT -->
 <div id="ai-chat-window">
 <div class="chat-header">
 <span>Assistant ÉONIA</span>
-<span onclick="toggleChat()" style="cursor:pointer;">✕</span>
+<span onclick="toggleChat()">✕</span>
 </div>
 
-<div id="chat-body" class="chat-body">
-Bonjour 🌿 comment puis-je vous aider ?
-</div>
+<div id="chat-body" class="chat-body">Bonjour 🌿</div>
 
 <div class="chat-input">
 <input id="chat-input" placeholder="Votre question...">
@@ -296,35 +246,26 @@ Bonjour 🌿 comment puis-je vous aider ?
 </div>
 </div>
 
+<div id="eonia-ai-trigger" onclick="toggleChat()">
+<div class="ai-icon-circle">
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+</div>
+</div>
+
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
 
-let userEmail=localStorage.getItem('user_email')||"invite@eonia.com";
-let userPin=localStorage.getItem('user_pin')||"0000";
-
-let currentView="catalogue";
 let allPlants=[];
 
-/* MENU CLIENT */
-if(userEmail!=="invite@eonia.com"){
-document.getElementById("client-menu").style.display="flex";
-}
-
-/* LOAD DATA */
+/* CATALOGUE = IDENTIQUE POUR TOUS */
 async function loadData(){
-
-const emailToSend="invite@eonia.com"; // catalogue toujours identique
-
-document.getElementById("page-title").innerText="Notre Collection";
 
 const res=await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-email:emailToSend,
-pin:userPin,
-view:"catalogue"
+email:"invite@eonia.com"
 })
 });
 
@@ -332,7 +273,6 @@ allPlants=await res.json();
 renderGrid();
 }
 
-/* GRID */
 function renderGrid(){
 
 const container=document.getElementById("catalogue-grid");
@@ -348,37 +288,35 @@ filtered.sort((a,b)=>
 (a["Nom commun"]||"").localeCompare(b["Nom commun"]||"")
 );
 
-let lastLetter="";
+let last="";
 
 filtered.forEach(p=>{
 
 let name=p["Nom commun"]||"Plante";
 let letter=name[0].toUpperCase();
 
-if(letter!==lastLetter){
+if(letter!==last){
 let div=document.createElement("div");
 div.className="letter-divider";
 div.innerText=letter;
 container.appendChild(div);
-lastLetter=letter;
+last=letter;
 }
 
-let id=p["ID_Plaque"]||p.id;
+let id=p["ID_Plaque"];
 
 let card=document.createElement("div");
 card.className="plant-card";
 
 card.onclick=()=>{
-window.location.href="jardin.html?id_botanique="+id;
+window.location.href="jardin.html?id="+id;
 };
 
 card.innerHTML=`
 <div class="img-container">
 <img class="plant-img" src="${p.Photo||''}">
 </div>
-<div class="plant-info">
-<div class="plant-name">${name}</div>
-</div>`;
+`;
 
 container.appendChild(card);
 
@@ -399,12 +337,11 @@ let body=document.getElementById("chat-body");
 if(!input.value.trim())return;
 
 body.innerHTML+=`<div>🧑 ${input.value}</div>`;
+input.value="";
 
 setTimeout(()=>{
-body.innerHTML+=`<div>🌿 Je vous aide à trouver la meilleure plante.</div>`;
+body.innerHTML+=`<div>🌿 Je vous guide vers la bonne plante.</div>`;
 },500);
-
-input.value="";
 }
 
 /* LOGOUT */
