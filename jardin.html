@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA — Plante</title>
+<title>ÉONIA — Mon Jardin</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
 
 <style>
 body{
@@ -15,134 +15,165 @@ color:#fff;
 font-family:'Raleway',sans-serif;
 }
 
-.container{
-max-width:800px;
-margin:auto;
+header{
+text-align:center;
 padding:30px 20px;
 }
 
 h1{
 color:#4ade80;
-text-transform:uppercase;
 font-weight:200;
 letter-spacing:4px;
-text-align:center;
-margin-bottom:20px;
+text-transform:uppercase;
 }
 
-img{
-width:100%;
-height:300px;
-object-fit:cover;
-border-radius:12px;
-margin-bottom:20px;
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
 }
 
-.box{
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:15px;
+}
+
+.card{
 background:#0c0c0c;
 border:1px solid #1a1a1a;
 border-radius:12px;
-padding:15px;
-margin-bottom:15px;
+overflow:hidden;
+cursor:pointer;
+transition:0.3s;
 }
 
-.label{
-color:#4ade80;
+.card:hover{
+border-color:#4ade80;
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:140px;
+object-fit:cover;
+}
+
+.name{
+padding:10px;
+text-align:center;
 font-size:0.7rem;
 text-transform:uppercase;
-letter-spacing:2px;
-margin-bottom:5px;
+color:#bbb;
 }
 
-.back{
-display:block;
+.empty{
 text-align:center;
-margin-top:30px;
-color:#4ade80;
-text-decoration:none;
+color:#555;
+padding:60px 20px;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+<h1>Mon Jardin</h1>
+</header>
+
 <div class="container">
-<h1 id="name">Chargement...</h1>
-
-<img id="img">
-
-<div class="box">
-<div class="label">Informations</div>
-<div id="info"></div>
+<div id="grid" class="grid"></div>
+<div id="empty" class="empty" style="display:none;">
+🌱 Aucun végétal dans votre jardin pour le moment
 </div>
-
-<div class="box">
-<div class="label">Culture</div>
-<div id="culture"></div>
-</div>
-
-<a class="back" href="catalogue.html">← Retour au catalogue</a>
 </div>
 
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
-const params=new URLSearchParams(window.location.search);
 
-/* ✅ IMPORTANT : récupération ID */
-const id = params.get("id") || params.get("id_botanique");
+let userEmail=localStorage.getItem("user_email") || "invite@eonia.com";
+let userPin=localStorage.getItem("user_pin") || "0000";
 
-if(!id){
-document.getElementById("name").innerText="Plante introuvable";
-throw new Error("ID manquant");
-}
+let allPlants=[];
+let userPlants=[];
 
-window.onload = async () => {
+window.onload=async()=>{
 
-try{
+await loadUser();
+await loadPlants();
+render();
+
+};
+
+async function loadUser(){
 
 const res=await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-action:"get_plante",
-id:id
+action:"get_user",
+email:userEmail,
+pin:userPin
 })
 });
 
 const data=await res.json();
 
-/* 🔴 sécurité : on prend UN SEUL objet */
-const p = Array.isArray(data) ? data[0] : data;
+/* plantes du client = IDs */
+userPlants = data?.plants || [];
 
-if(!p){
-document.getElementById("name").innerText="Plante introuvable";
+}
+
+async function loadPlants(){
+
+const res=await fetch(API_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+action:"get_catalogue"
+})
+});
+
+allPlants=await res.json();
+
+}
+
+function render(){
+
+const grid=document.getElementById("grid");
+const empty=document.getElementById("empty");
+
+grid.innerHTML="";
+
+const myPlants=allPlants.filter(p =>
+userPlants.includes(p.ID_Plaque || p.id)
+);
+
+if(myPlants.length===0){
+empty.style.display="block";
 return;
 }
 
-/* IMAGE */
-document.getElementById("img").src = p.Photo || "";
+myPlants.forEach(p=>{
 
-/* NOM */
-document.getElementById("name").innerText = p["Nom commun"] || "Sans nom";
+const div=document.createElement("div");
+div.className="card";
 
-/* INFOS */
-document.getElementById("info").innerText =
-p["Informations générales"] || "Aucune information";
-
-/* CULTURE */
-document.getElementById("culture").innerText =
-`Exposition: ${p.Exposition || "-"}
-Arrosage: ${p.Arrosage || "-"}
-Rusticité: ${p.Rusticite || "-"}
-Sol: ${p["Type de sol"] || "-"}`;
-
-}catch(e){
-document.getElementById("name").innerText="Erreur de chargement";
-console.error(e);
-}
-
+div.onclick=()=>{
+window.location.href="plante.html?id="+(p.ID_Plaque||p.id);
 };
+
+div.innerHTML=`
+<img src="${p.Photo||''}">
+<div class="name">${p["Nom commun"]||"Plante"}</div>
+`;
+
+grid.appendChild(div);
+
+});
+
+}
 
 </script>
 
