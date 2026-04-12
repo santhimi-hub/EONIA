@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
         
         header { text-align: center; padding: 40px 20px 20px 20px; }
         .logo-main { width: 80px; margin-bottom: 15px; opacity: 0.9; }
@@ -41,53 +41,59 @@
             gap: 15px; max-width: 1000px; margin: 0 auto; padding: 15px; 
         }
 
-        /* --- CORRECTION ICI : Structure de la carte --- */
         .plant-card { 
             background: #0c0c0c; border-radius: 12px; overflow: hidden; 
-            /* Bordure par défaut discrète */
             border: 1px solid #1a1a1a; 
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+            transition: transform 0.3s ease, border-color 0.3s ease; 
             cursor: pointer;
-            display: block; /* Pour que le hover fonctionne bien */
         }
-
-        /* --- CORRECTION ICI : Encadrement vert au survol --- */
-        .plant-card:hover { 
-            border-color: #4ade80; /* Vert ÉONIA */
-            transform: translateY(-4px); /* Soulèvement léger */
-            box-shadow: 0 10px 30px rgba(74, 222, 128, 0.15); /* Ombre portée verte */
-        }
+        .plant-card:hover { border-color: #4ade80; transform: translateY(-4px); }
 
         .img-container { width: 100%; height: 130px; overflow: hidden; background: #000; }
-
-        /* --- CORRECTION ICI : Effet "fade" par défaut sur la photo --- */
         .plant-img { 
             width: 100%; height: 100%; object-fit: cover; 
-            /* Fade : Un peu sombre et désaturé */
             filter: grayscale(0.5) brightness(0.7); 
             transition: filter 0.5s ease, transform 0.5s ease;
         }
-
-        /* --- CORRECTION ICI : Illumination au survol --- */
-        .plant-card:hover .plant-img { 
-            /* Illumination : Couleurs d'origine et luminosité augmentée */
-            filter: grayscale(0) brightness(1.1); 
-            transform: scale(1.08); /* Zoom léger */
-        }
+        .plant-card:hover .plant-img { filter: grayscale(0) brightness(1.1); transform: scale(1.08); }
 
         .plant-info { padding: 10px 5px; text-align: center; }
-        .plant-name { font-size: 0.65rem; color: #eee; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; transition: color 0.3s ease; }
+        .plant-name { font-size: 0.65rem; color: #eee; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; }
 
-        /* Le nom de la plante s'éclaire aussi au hover */
-        .plant-card:hover .plant-name { color: #fff; }
+        /* BOUTON QUITTER VISIBLE */
+        .logout-btn { 
+            display: block; margin: 50px auto 80px auto; background: none; 
+            border: 1px solid rgba(255,255,255,0.2); color: #888; 
+            padding: 10px 25px; border-radius: 30px; cursor: pointer; 
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        .logout-btn:hover { border-color: #ff4f4f; color: #ff4f4f; }
 
-        #status-msg { text-align: center; color: #4ade80; margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
-        .logout-btn { display: block; margin: 30px auto; background: none; border: 1px solid rgba(255,255,255,0.1); color: #444; padding: 6px 15px; border-radius: 30px; cursor: pointer; font-size: 0.55rem; text-transform: uppercase; transition: 0.3s; }
-        .logout-btn:hover { border-color: rgba(255,255,255,0.3); color: #888; }
+        /* BULL IA ÉONIA */
+        #eonia-ai-trigger { 
+            position: fixed; bottom: 25px; right: 25px; z-index: 2000; 
+            cursor: pointer; display: flex; align-items: center; transition: 0.3s; 
+        }
+        .ai-icon-circle { 
+            width: 50px; height: 50px; background: #fff; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3); border: 1px solid #4ade80; transition: 0.3s;
+        }
+        .ai-tooltip { 
+            background: #111; color: #4ade80; padding: 7px 14px; border-radius: 20px; 
+            font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; 
+            margin-right: 10px; border: 1px solid #1a1a1a; opacity: 0; 
+            transition: 0.4s; pointer-events: none; font-weight: 700; white-space: nowrap;
+            transform: translateX(10px);
+        }
+        #eonia-ai-trigger:hover .ai-tooltip { opacity: 1; transform: translateX(0); }
+        #eonia-ai-trigger:hover .ai-icon-circle { transform: scale(1.1); }
 
         @media (max-width: 400px) {
             .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .img-container { height: 110px; }
+            #eonia-ai-trigger { bottom: 20px; right: 20px; }
         }
     </style>
 </head>
@@ -117,7 +123,14 @@
     <div id="status-msg">Synchronisation...</div>
     <div id="catalogue-grid" class="catalog-container"></div>
 
-    <button class="logout-btn" onclick="logout()">Quitter</button>
+    <button class="logout-btn" onclick="logout()">Quitter la session</button>
+
+    <div id="eonia-ai-trigger" onclick="ouvrirChatIA()">
+        <span class="ai-tooltip">Expert Éonia</span>
+        <div class="ai-icon-circle">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width: 22px; filter: invert(1);" alt="IA">
+        </div>
+    </div>
 
 <script>
     const userEmail = localStorage.getItem('user_email');
@@ -132,9 +145,7 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
 
     async function loadData() {
-        const container = document.getElementById('catalogue-grid');
         const statusMsg = document.getElementById('status-msg');
-        container.innerHTML = "";
         statusMsg.style.display = 'block';
         statusMsg.innerText = "Synchronisation...";
 
@@ -218,6 +229,10 @@
         document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
         document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
         loadData();
+    }
+
+    function ouvrirChatIA() {
+        alert("L'Expert ÉONIA : Je suis à votre écoute pour toute question botanique générale sur la collection.");
     }
 
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
