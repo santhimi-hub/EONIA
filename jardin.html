@@ -71,6 +71,7 @@ color:#bbb;
 text-align:center;
 color:#555;
 padding:60px 20px;
+display:none;
 }
 </style>
 </head>
@@ -83,51 +84,58 @@ padding:60px 20px;
 
 <div class="container">
 <div id="grid" class="grid"></div>
-<div id="empty" class="empty" style="display:none;">
-🌱 Aucun végétal dans votre jardin pour le moment
-</div>
+<div id="empty" class="empty">🌱 Aucun végétal dans votre jardin pour le moment</div>
 </div>
 
 <script>
 
 const API_URL="https://eonia-api.santhimi.workers.dev";
 
-let userEmail=localStorage.getItem("user_email") || "invite@eonia.com";
-let userPin=localStorage.getItem("user_pin") || "0000";
+const userEmail = localStorage.getItem("user_email") || "invite@eonia.com";
+const userPin = localStorage.getItem("user_pin") || "0000";
 
-let allPlants=[];
-let userPlants=[];
+let allPlants = [];
+let userPlantIds = [];
 
-window.onload=async()=>{
-
-await loadUser();
-await loadPlants();
+/* ===================== LOAD JARDIN ===================== */
+window.onload = async () => {
+await loadUserPlants();
+await loadCatalogue();
 render();
-
 };
 
-async function loadUser(){
+/* ===================== 1. PLANTES DU USER ===================== */
+async function loadUserPlants(){
 
-const res=await fetch(API_URL,{
+try{
+const res = await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-action:"get_user",
+action:"get_jardin",
 email:userEmail,
 pin:userPin
 })
 });
 
-const data=await res.json();
+const data = await res.json();
 
-/* plantes du client = IDs */
-userPlants = data?.plants || [];
+/* IMPORTANT : sécurisation */
+userPlantIds = Array.isArray(data?.plants)
+? data.plants
+: [];
+
+}catch(e){
+userPlantIds = [];
+}
 
 }
 
-async function loadPlants(){
+/* ===================== 2. CATALOGUE GLOBAL ===================== */
+async function loadCatalogue(){
 
-const res=await fetch(API_URL,{
+try{
+const res = await fetch(API_URL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -135,41 +143,52 @@ action:"get_catalogue"
 })
 });
 
-allPlants=await res.json();
+allPlants = await res.json();
+
+}catch(e){
+allPlants = [];
+}
 
 }
 
+/* ===================== 3. RENDER ===================== */
 function render(){
 
-const grid=document.getElementById("grid");
-const empty=document.getElementById("empty");
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
 
-grid.innerHTML="";
+grid.innerHTML = "";
 
-const myPlants=allPlants.filter(p =>
-userPlants.includes(p.ID_Plaque || p.id)
-);
+/* match sécurisé ID_Plaque */
+const myPlants = allPlants.filter(p => {
+const id = String(p.ID_Plaque || p.id);
+return userPlantIds.includes(id);
+});
 
-if(myPlants.length===0){
-empty.style.display="block";
+if(myPlants.length === 0){
+empty.style.display = "block";
 return;
 }
 
+empty.style.display = "none";
+
 myPlants.forEach(p=>{
 
-const div=document.createElement("div");
-div.className="card";
+const id = p.ID_Plaque || p.id;
 
-div.onclick=()=>{
-window.location.href="plante.html?id="+(p.ID_Plaque||p.id);
+const card = document.createElement("div");
+card.className = "card";
+
+card.onclick = () => {
+window.location.href = "plante.html?id=" + id;
 };
 
-div.innerHTML=`
-<img src="${p.Photo||''}">
-<div class="name">${p["Nom commun"]||"Plante"}</div>
+card.innerHTML = `
+<img src="${p.Photo || ''}">
+<div class="name">${p["Nom commun"] || "Plante"}</div>
 `;
 
-grid.appendChild(div);
+grid.appendChild(card);
 
 });
 
