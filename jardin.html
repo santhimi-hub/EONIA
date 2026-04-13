@@ -16,7 +16,7 @@
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
         .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
         
-        /* Onglets Famille et Type */
+        /* Badges Famille et Type */
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
         .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
         .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
@@ -73,12 +73,9 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    const fromCatalogue = params.get('from') === 'catalogue';
 
-    document.getElementById('custom-back').onclick = function() {
-        if (fromCatalogue) window.location.href = 'catalogue.html';
-        else window.location.href = 'jardin.html';
-    };
+    // Garde le retour en arrière intelligent
+    document.getElementById('custom-back').onclick = () => window.history.back();
 
     async function loadPlant() {
         if (!plantId) return;
@@ -91,7 +88,7 @@
             });
             const allPlants = await response.json();
             
-            // On trouve la plante par son ID (id technique Notion ou ID_Plaque)
+            // Recherche par ID technique ou ID_Plaque
             const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
@@ -100,25 +97,27 @@
                 // Photo et Titres
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
-                document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
+                
+                // Utilise la colonne dédiée vue sur ta capture
+                document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
-                // Les Badges (Famille et Type)
+                // Badges (Famille et Type)
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
 
-                // La Grille d'infos (On mappe avec les noms exacts renvoyés par ton Worker)
+                // Grille d'infos (Noms sans accents comme dans ton Notion)
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
                 document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-                document.getElementById('p-diff').innerText = p["Difficulté"] || p["Difficulte"] || "-";
-                document.getElementById('p-rust').innerText = p["Rusticité"] || p["Rusticite"] || "-";
-                document.getElementById('p-taille').innerText = p["Taille"] || p["taille à maturité"] || "-";
+                document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
+                document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
+                document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille"] || "-";
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
                 
-                // Description
-                document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || 'Aucune description disponible.';
+                // Description (Vise la colonne Informations générales)
+                document.getElementById('p-desc').innerText = p["Informations générales"] || p["Description"] || "Aucune description disponible.";
             }
         } catch (error) {
-            console.error("Erreur de chargement des détails :", error);
+            console.error("Erreur:", error);
         }
     }
 
