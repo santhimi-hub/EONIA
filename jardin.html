@@ -16,7 +16,7 @@
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
         .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
         
-        /* Tes Onglets Famille et Type */
+        /* Onglets Famille et Type */
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
         .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
         .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
@@ -54,12 +54,12 @@
         </div>
 
         <div class="info-grid">
-            <div class="info-box"><div class="label">Arrosage</div><div id="p-arrosage" class="value"></div></div>
-            <div class="info-box"><div class="label">Exposition</div><div id="p-expo" class="value"></div></div>
-            <div class="info-box"><div class="label">Difficulté</div><div id="p-diff" class="value"></div></div>
-            <div class="info-box"><div class="label">Rusticité</div><div id="p-rust" class="value"></div></div>
-            <div class="info-box"><div class="label">Taille adulte</div><div id="p-taille" class="value"></div></div>
-            <div class="info-box"><div class="label">Persistance</div><div id="p-pers" class="value"></div></div>
+            <div class="info-box"><div class="label">Arrosage</div><div id="p-arrosage" class="value">-</div></div>
+            <div class="info-box"><div class="label">Exposition</div><div id="p-expo" class="value">-</div></div>
+            <div class="info-box"><div class="label">Difficulté</div><div id="p-diff" class="value">-</div></div>
+            <div class="info-box"><div class="label">Rusticité</div><div id="p-rust" class="value">-</div></div>
+            <div class="info-box"><div class="label">Taille adulte</div><div id="p-taille" class="value">-</div></div>
+            <div class="info-box"><div class="label">Persistance</div><div id="p-pers" class="value">-</div></div>
         </div>
 
         <div class="desc-box">
@@ -80,28 +80,6 @@
         else window.location.href = 'jardin.html';
     };
 
-    // La fonction "Détective" qui va chercher dans tes colonnes Notion
-    function findData(plant, labels) {
-        // On nettoie les labels pour la comparaison (pas d'accents, minuscule)
-        const clean = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        
-        for (let key in plant) {
-            const cleanKey = clean(key);
-            // Si la colonne contient l'un de nos mots-clés (ex: "famille" ou "family")
-            if (labels.some(l => cleanKey === clean(l) || cleanKey.includes(clean(l)))) {
-                const val = plant[key];
-                if (!val) continue;
-                // Si c'est du texte
-                if (typeof val === 'string') return val;
-                // Si c'est une liste Notion (Multi-select)
-                if (Array.isArray(val)) return val.map(v => v.name || v).join(', ');
-                // Si c'est un objet (Select)
-                if (val.name) return val.name;
-            }
-        }
-        return "-"; // Si vraiment rien n'est trouvé
-    }
-
     async function loadPlant() {
         if (!plantId) return;
         
@@ -113,39 +91,39 @@
             });
             const allPlants = await response.json();
             
-            // On trouve la plante par son ID
+            // On trouve la plante par son ID (id technique Notion ou ID_Plaque)
             const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
                 document.getElementById('section-detail').classList.remove('hidden');
+                
+                // Photo et Titres
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
+                document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
 
-                // --- REMPLISSAGE AVEC LA FONCTION DETECTIVE ---
+                // Les Badges (Famille et Type)
+                document.getElementById('p-famille').innerText = p["Famille"] || "-";
+                document.getElementById('p-type').innerText = p["Type"] || "-";
+
+                // La Grille d'infos (On mappe avec les noms exacts renvoyés par ton Worker)
+                document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
+                document.getElementById('p-expo').innerText = p["Exposition"] || "-";
+                document.getElementById('p-diff').innerText = p["Difficulté"] || p["Difficulte"] || "-";
+                document.getElementById('p-rust').innerText = p["Rusticité"] || p["Rusticite"] || "-";
+                document.getElementById('p-taille').innerText = p["Taille"] || p["taille à maturité"] || "-";
+                document.getElementById('p-pers').innerText = p["Persistance"] || "-";
                 
-                // On lui donne plusieurs variantes au cas où
-                document.getElementById('p-famille').innerText = findData(p, ["Famille"]);
-                document.getElementById('p-type').innerText = findData(p, ["Type", "Genre"]);
-                document.getElementById('p-sci').innerText = findData(p, ["Nom scientifique", "Scientifique"]);
-                document.getElementById('p-arrosage').innerText = findData(p, ["Arrosage", "Water"]);
-                document.getElementById('p-expo').innerText = findData(p, ["Exposition", "Soleil"]);
-                document.getElementById('p-diff').innerText = findData(p, ["Difficulte", "Difficulté"]);
-                document.getElementById('p-rust').innerText = findData(p, ["Rusticite", "Rusticité", "Résistance"]);
-                document.getElementById('p-taille').innerText = findData(p, ["Taille", "Hauteur"]);
-                document.getElementById('p-pers').innerText = findData(p, ["Persistance", "Feuillage"]);
-                
-                // Description (souvent une colonne longue)
-                document.getElementById('p-desc').innerText = findData(p, ["Description"]) || 'Aucune description disponible.';
+                // Description
+                document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || 'Aucune description disponible.';
             }
         } catch (error) {
-            console.error("Erreur de connexion à l'API");
+            console.error("Erreur de chargement des détails :", error);
         }
     }
 
     window.onload = loadPlant;
 </script>
-
-
 
 </body>
 </html>
