@@ -80,12 +80,26 @@
         else window.location.href = 'jardin.html';
     };
 
-    function cleanVal(val) {
-        if (!val) return "-";
-        if (typeof val === 'string') return val;
-        if (Array.isArray(val) && val.length > 0) return val[0].name || val[0] || "-";
-        if (val.name) return val.name;
-        return "-";
+    // La fonction "Détective" qui va chercher dans tes colonnes Notion
+    function findData(plant, labels) {
+        // On nettoie les labels pour la comparaison (pas d'accents, minuscule)
+        const clean = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        
+        for (let key in plant) {
+            const cleanKey = clean(key);
+            // Si la colonne contient l'un de nos mots-clés (ex: "famille" ou "family")
+            if (labels.some(l => cleanKey === clean(l) || cleanKey.includes(clean(l)))) {
+                const val = plant[key];
+                if (!val) continue;
+                // Si c'est du texte
+                if (typeof val === 'string') return val;
+                // Si c'est une liste Notion (Multi-select)
+                if (Array.isArray(val)) return val.map(v => v.name || v).join(', ');
+                // Si c'est un objet (Select)
+                if (val.name) return val.name;
+            }
+        }
+        return "-"; // Si vraiment rien n'est trouvé
     }
 
     async function loadPlant() {
@@ -99,36 +113,38 @@
             });
             const allPlants = await response.json();
             
-            // On cherche la plante
+            // On trouve la plante par son ID
             const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
-                // --- CETTE LIGNE EST CRUCIALE POUR COMPRENDRE ---
-                console.log("DONNÉES DE LA PLANTE :", p);
-                
                 document.getElementById('section-detail').classList.remove('hidden');
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
 
-                // On essaie de lire les clés telles qu'elles apparaissent souvent dans l'API
-                document.getElementById('p-sci').innerText = cleanVal(p["Nom scientifique"] || p["Scientifique"]);
-                document.getElementById('p-famille').innerText = cleanVal(p["Famille"]);
-                document.getElementById('p-type').innerText = cleanVal(p["Type"]);
-                document.getElementById('p-arrosage').innerText = cleanVal(p["Arrosage"]);
-                document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]);
-                document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"] || p["Difficulté"]);
-                document.getElementById('p-rust').innerText = cleanVal(p["rusticite"] || p["Rusticité"]);
-                document.getElementById('p-taille').innerText = cleanVal(p["taille à maturite"] || p["Taille"]);
-                document.getElementById('p-pers').innerText = cleanVal(p["Persistance"]);
-                document.getElementById('p-desc').innerText = p["Description"] || 'Aucune description disponible.';
-            } else {
-                console.log("Plante non trouvée pour l'ID:", plantId);
+                // --- REMPLISSAGE AVEC LA FONCTION DETECTIVE ---
+                
+                // On lui donne plusieurs variantes au cas où
+                document.getElementById('p-famille').innerText = findData(p, ["Famille"]);
+                document.getElementById('p-type').innerText = findData(p, ["Type", "Genre"]);
+                document.getElementById('p-sci').innerText = findData(p, ["Nom scientifique", "Scientifique"]);
+                document.getElementById('p-arrosage').innerText = findData(p, ["Arrosage", "Water"]);
+                document.getElementById('p-expo').innerText = findData(p, ["Exposition", "Soleil"]);
+                document.getElementById('p-diff').innerText = findData(p, ["Difficulte", "Difficulté"]);
+                document.getElementById('p-rust').innerText = findData(p, ["Rusticite", "Rusticité", "Résistance"]);
+                document.getElementById('p-taille').innerText = findData(p, ["Taille", "Hauteur"]);
+                document.getElementById('p-pers').innerText = findData(p, ["Persistance", "Feuillage"]);
+                
+                // Description (souvent une colonne longue)
+                document.getElementById('p-desc').innerText = findData(p, ["Description"]) || 'Aucune description disponible.';
             }
-        } catch (error) { console.error("Erreur API:", error); }
+        } catch (error) {
+            console.error("Erreur de connexion à l'API");
+        }
     }
 
     window.onload = loadPlant;
 </script>
+
 
 
 </body>
