@@ -70,25 +70,23 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
+    const userEmail = localStorage.getItem('userEmail') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
     async function loadPlant() {
         if (!plantId) return;
         try {
+            // On envoie l'email stocké pour savoir si on cherche dans Catalogue ou Jardin
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: 'invite@eonia.com' }) 
+                body: JSON.stringify({ email: userEmail }) 
             });
-            const allPlants = await response.json();
+            const allItems = await response.json();
             
-            // DIAGNOSTIC : On affiche la liste des colonnes reçues pour la première plante
-            if (allPlants.length > 0) {
-                console.log("Colonnes reçues :", Object.keys(allPlants[0]));
-            }
-
-            const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
+            // On cherche la correspondance (ID Notion ou ID Plaque)
+            const p = allItems.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
                 document.getElementById('section-detail').classList.remove('hidden');
@@ -97,23 +95,27 @@
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
+                
+                // Champs techniques
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
                 document.getElementById('p-expo').innerText = p["Exposition"] || "-";
                 document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
                 document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
                 document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille adulte"] || "-";
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
+                
+                // Description
                 document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || "Aucune description.";
             } else {
-                alert("Plante non trouvée dans la base. ID cherché : " + plantId);
+                console.log("Plante non trouvée localement, tentative via ID direct...");
+                // Optionnel : si pas trouvé dans la liste, on pourrait forcer un appel spécifique
             }
         } catch (e) { 
-            alert("Erreur de connexion au Worker : " + e.message);
+            console.error("Erreur de chargement :", e);
         }
     }
     window.onload = loadPlant;
 </script>
-
 
 </body>
 </html>
