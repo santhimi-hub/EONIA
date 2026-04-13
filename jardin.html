@@ -9,25 +9,17 @@
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        
-        /* Bouton Retour */
         .back-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-        
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
-        .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
-        
-        /* Badges Famille et Type */
+        .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; min-height: 1.2rem; }
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
         .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
         .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
         .badge-value { color: #eee; font-size: 0.75rem; text-transform: uppercase; font-weight: 500; }
-
-        /* Grille d'infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .info-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; }
         .label { color: #4ade80; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .value { color: #eee; font-size: 0.85rem; }
-        
         .desc-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px; margin-top: 20px; }
         .desc { line-height: 1.6; color: #ccc; font-size: 0.9rem; white-space: pre-wrap; }
     </style>
@@ -37,7 +29,6 @@
 <div class="container">
     <div id="section-detail" class="hidden">
         <button id="custom-back" class="back-btn">← Retour</button>
-        
         <img id="p-photo" class="hero-img">
         <h1 id="p-titre" style="font-size: 2.2rem; font-weight: 300; margin: 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
@@ -74,12 +65,24 @@
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
 
-    // Garde le retour en arrière intelligent
     document.getElementById('custom-back').onclick = () => window.history.back();
+
+    // Fonction de recherche intelligente dans l'objet plante
+    function getValue(obj, keys) {
+        for (let key of keys) {
+            if (obj[key] && obj[key] !== "") return obj[key];
+            // Test sans accents et en minuscule
+            let normalizedKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            for (let realKey in obj) {
+                let realNormalized = realKey.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                if (realNormalized === normalizedKey && obj[realKey]) return obj[realKey];
+            }
+        }
+        return "-";
+    }
 
     async function loadPlant() {
         if (!plantId) return;
-        
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -88,41 +91,32 @@
             });
             const allPlants = await response.json();
             
-            // Recherche par ID technique ou ID_Plaque
-            const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
+            // On cherche la plante par son ID ou ID_Plaque
+            const p = allPlants.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
             if (p) {
+                console.log("Données reçues pour cette plante :", p); // Vérification console
                 document.getElementById('section-detail').classList.remove('hidden');
                 
-                // Photo et Titres
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
-                
-                // Utilise la colonne dédiée vue sur ta capture
-                document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+                document.getElementById('p-sci').innerText = getValue(p, ["Nom scientifique"]);
 
-                // Badges (Famille et Type)
-                document.getElementById('p-famille').innerText = p["Famille"] || "-";
-                document.getElementById('p-type').innerText = p["Type"] || "-";
-
-                // Grille d'infos (Noms sans accents comme dans ton Notion)
-                document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
-                document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-                document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
-                document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
-                document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille"] || "-";
-                document.getElementById('p-pers').innerText = p["Persistance"] || "-";
+                // Remplissage avec la fonction intelligente
+                document.getElementById('p-famille').innerText = getValue(p, ["Famille"]);
+                document.getElementById('p-type').innerText = getValue(p, ["Type", "Style jardin"]);
+                document.getElementById('p-arrosage').innerText = getValue(p, ["Arrosage"]);
+                document.getElementById('p-expo').innerText = getValue(p, ["Exposition"]);
+                document.getElementById('p-diff').innerText = getValue(p, ["Difficulte", "Difficulté"]);
+                document.getElementById('p-rust').innerText = getValue(p, ["Rusticite", "Rusticité"]);
+                document.getElementById('p-taille').innerText = getValue(p, ["Taille à maturité", "Taille adulte"]);
+                document.getElementById('p-pers').innerText = getValue(p, ["Persistance"]);
                 
-                // Description (Vise la colonne Informations générales)
-                document.getElementById('p-desc').innerText = p["Informations générales"] || p["Description"] || "Aucune description disponible.";
+                document.getElementById('p-desc').innerText = getValue(p, ["Informations générales", "Description"]);
             }
-        } catch (error) {
-            console.error("Erreur:", error);
-        }
+        } catch (e) { console.error("Erreur:", e); }
     }
-
     window.onload = loadPlant;
 </script>
-
 </body>
 </html>
