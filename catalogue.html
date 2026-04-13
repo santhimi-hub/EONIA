@@ -10,6 +10,17 @@
         header{ text-align:center; padding:30px 20px; }
         h1{ color:#4ade80; font-weight:200; letter-spacing:4px; text-transform:uppercase; }
         .container{ max-width:1000px; margin:auto; padding:20px; }
+        
+        /* FILTRES */
+        .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .filter-btn { background: none; border: 1px solid #333; color: #888; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; transition: 0.3s; }
+        .filter-btn.active { border-color: #4ade80; color: #4ade80; }
+        
+        .alphabet { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 30px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px; }
+        .letter { background: none; border: none; color: #555; cursor: pointer; font-size: 0.8rem; padding: 5px; transition: 0.2s; }
+        .letter:hover, .letter.active { color: #4ade80; }
+
+        /* GRILLE */
         .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
         .card{ background:#0c0c0c; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; cursor:pointer; transition:0.3s; }
         .card:hover{ border-color:#4ade80; transform:translateY(-5px); }
@@ -20,11 +31,35 @@
 <body>
     <div class="container">
         <header><h1>Catalogue</h1></header>
+
+        <div class="filters" id="type-filters">
+            <button class="filter-btn active" onclick="filterByType('Tous', this)">Tous</button>
+            <button class="filter-btn" onclick="filterByType('Arbre', this)">Arbres</button>
+            <button class="filter-btn" onclick="filterByType('Fruitier', this)">Fruitiers</button>
+            <button class="filter-btn" onclick="filterByType('Arbuste', this)">Arbustes</button>
+            <button class="filter-btn" onclick="filterByType('Fleur', this)">Fleurs</button>
+        </div>
+
+        <div class="alphabet" id="alphabet"></div>
+
         <div id="grid" class="grid"></div>
     </div>
 
     <script>
         const API_URL = "https://eonia-api.santhimi.workers.dev";
+        let allPlants = [];
+        let currentType = "Tous";
+        let currentLetter = "Toutes";
+
+        // Initialisation de l'alphabet
+        function initAlphabet() {
+            const container = document.getElementById('alphabet');
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+            container.innerHTML = '<button class="letter active" onclick="filterByLetter(\'Toutes\', this)">Toutes</button>';
+            letters.forEach(l => {
+                container.innerHTML += `<button class="letter" onclick="filterByLetter('${l}', this)">${l}</button>`;
+            });
+        }
 
         async function loadCatalogue() {
             try {
@@ -33,19 +68,45 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "get_catalogue" })
                 });
-                const plants = await res.json();
-                renderGrid(plants);
+                allPlants = await res.json();
+                renderGrid();
             } catch (e) { console.error(e); }
         }
 
-        function renderGrid(plants) {
+        function filterByType(type, btn) {
+            currentType = type;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGrid();
+        }
+
+        function filterByLetter(letter, btn) {
+            currentLetter = letter;
+            document.querySelectorAll('.letter').forEach(l => l.classList.remove('active'));
+            btn.classList.add('active');
+            renderGrid();
+        }
+
+        function renderGrid() {
             const grid = document.getElementById("grid");
             grid.innerHTML = "";
-            plants.forEach(p => {
+
+            const filtered = allPlants.filter(p => {
+                const name = p["Nom commun"] || "";
+                // On gère le type Sélection Notion (.name)
+                const typeObj = p["Type"]?.name || p["Type"] || "";
+                
+                const matchType = (currentType === "Tous" || typeObj.includes(currentType));
+                const matchLetter = (currentLetter === "Toutes" || name.startsWith(currentLetter));
+                
+                return matchType && matchLetter;
+            });
+
+            filtered.forEach(p => {
                 const id = p.ID_Plaque || p.id;
                 const card = document.createElement("div");
                 card.className = "card";
-                // LIGNE CRUCIALE : On dit qu'on vient du catalogue
+                // Lien avec indicateur de provenance pour le bouton retour
                 card.onclick = () => window.location.href = `jardin.html?id=${id}&from=catalogue`;
                 card.innerHTML = `
                     <img src="${p.Photo || ''}">
@@ -55,7 +116,10 @@
             });
         }
 
-        window.onload = loadCatalogue;
+        window.onload = () => {
+            initAlphabet();
+            loadCatalogue();
+        };
     </script>
 </body>
 </html>
