@@ -10,17 +10,19 @@
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         
-        /* Style de la fiche */
+        /* Bouton Retour */
         .back-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
         .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
         
-        /* Conteneur des badges Famille et Type */
+        /* Tes Onglets Famille et Type */
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
-        .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; }
+        .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
         .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
         .badge-value { color: #eee; font-size: 0.75rem; text-transform: uppercase; font-weight: 500; }
 
+        /* Grille d'infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .info-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; }
         .label { color: #4ade80; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
@@ -41,13 +43,13 @@
         <div id="p-sci" class="sci-name"></div>
 
         <div class="badge-container">
-            <div id="badge-famille" class="badge">
+            <div class="badge">
                 <span class="badge-label">Famille</span>
-                <span id="p-famille" class="badge-value"></span>
+                <span id="p-famille" class="badge-value">-</span>
             </div>
-            <div id="badge-type" class="badge">
+            <div class="badge">
                 <span class="badge-label">Type</span>
-                <span id="p-type" class="badge-value"></span>
+                <span id="p-type" class="badge-value">-</span>
             </div>
         </div>
 
@@ -73,22 +75,21 @@
     const plantId = params.get('id');
     const fromCatalogue = params.get('from') === 'catalogue';
 
-    // Correction du bouton retour
+    // Gestion du retour
     document.getElementById('custom-back').onclick = function() {
-        if (fromCatalogue) {
-            window.location.href = 'catalogue.html';
-        } else {
-            window.location.href = 'jardin.html';
-        }
+        if (fromCatalogue) window.location.href = 'catalogue.html';
+        else window.location.href = 'jardin.html';
     };
 
-    // Fonction de secours améliorée (Gère les listes Notion pour l'abricotier)
+    // La fonction qui répare l'affichage de l'abricotier
     function cleanVal(val) {
-        if (!val) return "";
+        if (!val) return "-";
         if (typeof val === 'string') return val;
-        if (Array.isArray(val) && val[0] && val[0].name) return val[0].name; // SI LISTE
-        if (val.name) return val.name; // SI OBJET SIMPLE
-        return "";
+        // Si Notion envoie une liste (cas fréquent pour les types/familles)
+        if (Array.isArray(val) && val.length > 0) return val[0].name || val[0] || "-";
+        // Si Notion envoie un objet simple
+        if (val.name) return val.name;
+        return "-";
     }
 
     async function loadPlant() {
@@ -109,32 +110,20 @@
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
 
-                const familleStr = cleanVal(p["Famille"]);
-                const typeStr = cleanVal(p["Type"]);
+                // On injecte les valeurs propres dans tes onglets
+                document.getElementById('p-famille').innerText = cleanVal(p["Famille"]);
+                document.getElementById('p-type').innerText = cleanVal(p["Type"]);
 
-                if (familleStr) {
-                    document.getElementById('p-famille').innerText = familleStr;
-                    document.getElementById('badge-famille').classList.remove('hidden');
-                } else {
-                    document.getElementById('badge-famille').classList.add('hidden');
-                }
-
-                if (typeStr) {
-                    document.getElementById('p-type').innerText = typeStr;
-                    document.getElementById('badge-type').classList.remove('hidden');
-                } else {
-                    document.getElementById('badge-type').classList.add('hidden');
-                }
-
-                document.getElementById('p-arrosage').innerText = p["Arrosage"] || '-';
-                document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]) || '-';
-                document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"]) || '-';
-                document.getElementById('p-rust').innerText = p["rusticite"] || '-';
-                document.getElementById('p-taille').innerText = p["taille à maturite"] || '-';
-                document.getElementById('p-pers').innerText = cleanVal(p["Persistance"]) || '-';
+                // Grille d'infos
+                document.getElementById('p-arrosage').innerText = cleanVal(p["Arrosage"]);
+                document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]);
+                document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"]);
+                document.getElementById('p-rust').innerText = cleanVal(p["rusticite"]);
+                document.getElementById('p-taille').innerText = cleanVal(p["taille à maturite"]);
+                document.getElementById('p-pers').innerText = cleanVal(p["Persistance"]);
                 document.getElementById('p-desc').innerText = p["Description"] || 'Aucune description disponible.';
             }
-        } catch (error) { console.error("Erreur de chargement", error); }
+        } catch (error) { console.error("Erreur", error); }
     }
 
     window.onload = loadPlant;
