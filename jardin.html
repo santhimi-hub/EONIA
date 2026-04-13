@@ -75,7 +75,6 @@
 
     async function loadPlant() {
         if (!plantId) return;
-        
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -84,36 +83,37 @@
             });
             const allPlants = await response.json();
             
-            // On cherche la plante. On compare l'ID ou l'ID_Plaque
-            const p = allPlants.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+            // DIAGNOSTIC : On affiche la liste des colonnes reçues pour la première plante
+            if (allPlants.length > 0) {
+                console.log("Colonnes reçues :", Object.keys(allPlants[0]));
+            }
+
+            const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
                 document.getElementById('section-detail').classList.remove('hidden');
-                
-                // Remplissage direct (Assure-toi que les noms correspondent dans Notion)
                 document.getElementById('p-photo').src = p["Photo"] || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
-
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
                 document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-                document.getElementById('p-diff').innerText = p["Difficulté"] || p["Difficulte"] || "-";
-                document.getElementById('p-rust').innerText = p["Rusticité"] || p["Rusticite"] || "-";
-                document.getElementById('p-taille').innerText = p["Taille adulte"] || p["Taille à maturité"] || "-";
+                document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
+                document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
+                document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille adulte"] || "-";
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
-                
                 document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || "Aucune description.";
+            } else {
+                alert("Plante non trouvée dans la base. ID cherché : " + plantId);
             }
-        } catch (error) {
-            console.error("Erreur de chargement:", error);
+        } catch (e) { 
+            alert("Erreur de connexion au Worker : " + e.message);
         }
     }
-
     window.onload = loadPlant;
 </script>
+
 
 </body>
 </html>
