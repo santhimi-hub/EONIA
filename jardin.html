@@ -34,7 +34,7 @@
 
 <div class="container">
     <div id="section-detail" class="hidden">
-        <button class="back-btn" onclick="history.back()">← Retour</button>
+        <button id="custom-back" class="back-btn">← Retour</button>
         
         <img id="p-photo" class="hero-img">
         <h1 id="p-titre" style="font-size: 2.2rem; font-weight: 300; margin: 0;"></h1>
@@ -71,12 +71,23 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
+    const fromCatalogue = params.get('from') === 'catalogue';
 
-    // Fonction de secours pour lire les données Notion (Sélection ou Texte)
+    // Correction du bouton retour
+    document.getElementById('custom-back').onclick = function() {
+        if (fromCatalogue) {
+            window.location.href = 'catalogue.html';
+        } else {
+            window.location.href = 'jardin.html';
+        }
+    };
+
+    // Fonction de secours améliorée (Gère les listes Notion pour l'abricotier)
     function cleanVal(val) {
         if (!val) return "";
         if (typeof val === 'string') return val;
-        if (val.name) return val.name; // Pour les menus "Sélection"
+        if (Array.isArray(val) && val[0] && val[0].name) return val[0].name; // SI LISTE
+        if (val.name) return val.name; // SI OBJET SIMPLE
         return "";
     }
 
@@ -84,7 +95,6 @@
         if (!plantId) return;
         
         try {
-            // On récupère tout le catalogue pour trouver la plante
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -99,17 +109,23 @@
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
 
-                // Gestion des badges Famille et Type (avec étiquettes)
                 const familleStr = cleanVal(p["Famille"]);
                 const typeStr = cleanVal(p["Type"]);
 
-                if (familleStr) document.getElementById('p-famille').innerText = familleStr;
-                else document.getElementById('badge-famille').classList.add('hidden');
+                if (familleStr) {
+                    document.getElementById('p-famille').innerText = familleStr;
+                    document.getElementById('badge-famille').classList.remove('hidden');
+                } else {
+                    document.getElementById('badge-famille').classList.add('hidden');
+                }
 
-                if (typeStr) document.getElementById('p-type').innerText = typeStr;
-                else document.getElementById('badge-type').classList.add('hidden');
+                if (typeStr) {
+                    document.getElementById('p-type').innerText = typeStr;
+                    document.getElementById('badge-type').classList.remove('hidden');
+                } else {
+                    document.getElementById('badge-type').classList.add('hidden');
+                }
 
-                // Autres infos
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || '-';
                 document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]) || '-';
                 document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"]) || '-';
