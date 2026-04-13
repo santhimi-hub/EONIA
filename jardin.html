@@ -1,66 +1,67 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA</title>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
-<style>
-    body{ margin:0; background:#000; color:#fff; font-family:'Raleway',sans-serif; }
-    header{ text-align:center; padding:30px 20px; }
-    h1{ color:#4ade80; font-weight:200; letter-spacing:4px; text-transform:uppercase; }
-    .container{ max-width:1000px; margin:auto; padding:20px; }
-    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
-    .card{ background:#0c0c0c; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; cursor:pointer; transition:0.3s; }
-    .card:hover{ border-color:#4ade80; transform:translateY(-5px); }
-    .card img{ width:100%; height:140px; object-fit:cover; }
-    .name{ padding:10px; text-align:center; font-size:0.7rem; text-transform:uppercase; color:#bbb; }
-    
-    .detail-view { display:none; }
-    .hero-img { width:100%; height:45vh; object-fit:cover; border-radius:15px; margin-bottom:20px; border: 1px solid #1a1a1a; }
-    .plant-titles { margin-bottom: 25px; }
-    .sci-name { color: #4ade80; font-size: 0.85rem; font-style: italic; letter-spacing: 1px; opacity: 0.9; margin-top: 5px; }
-    .badge-container { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .badge { background: rgba(74, 222, 128, 0.1); color: #4ade80; padding: 2px 10px; border-radius: 4px; font-size: 0.6rem; text-transform: uppercase; border: 1px solid rgba(74, 222, 128, 0.2); }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .info-box { background:#0c0c0c; border:1px solid #1a1a1a; padding:15px; border-radius:12px; }
-    .label { color:#4ade80; font-size:0.55rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:5px; font-weight: 500; }
-    .value { color:#eee; font-size:0.85rem; }
-    .full-box { background:#0c0c0c; border:1px solid #1a1a1a; padding:20px; border-radius:12px; margin-bottom:20px; }
-    .desc { line-height:1.7; color:#ccc; font-size:0.9rem; white-space: pre-wrap; }
-    .back-btn { background:none; border:1px solid #4ade80; color:#4ade80; padding:10px 25px; border-radius:30px; cursor:pointer; margin-bottom:20px; font-size:0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+    <style>
+        body{ margin:0; background:#000; color:#fff; font-family:'Raleway',sans-serif; }
+        .container{ max-width:1000px; margin:auto; padding:20px; }
+        header{ text-align:center; padding:30px 20px; }
+        h1{ color:#4ade80; font-weight:200; letter-spacing:4px; text-transform:uppercase; }
+        
+        /* Grille Jardin */
+        .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
+        .card{ background:#0c0c0c; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; cursor:pointer; }
+        .card img{ width:100%; height:140px; object-fit:cover; }
+        .name{ padding:10px; text-align:center; font-size:0.7rem; text-transform:uppercase; color:#bbb; }
+        
+        /* Fiche Détail */
+        #section-detail { display:none; }
+        .hero-img { width:100%; height:45vh; object-fit:cover; border-radius:15px; margin-bottom:20px; border: 1px solid #1a1a1a; }
+        .sci-name { color: #4ade80; font-size: 0.85rem; font-style: italic; margin: 5px 0 15px 0; }
+        .badge-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .badge { background: rgba(74, 222, 128, 0.1); color: #4ade80; padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; text-transform: uppercase; border: 1px solid rgba(74, 222, 128, 0.2); }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-box { background:#0c0c0c; border:1px solid #1a1a1a; padding:15px; border-radius:12px; }
+        .label { color:#4ade80; font-size:0.55rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+        .value { color:#eee; font-size:0.85rem; }
+        .desc-box { background:#0c0c0c; border:1px solid #1a1a1a; padding:20px; border-radius:12px; margin-top:15px; }
+        .desc { line-height:1.6; color:#ccc; font-size:0.9rem; white-space: pre-wrap; }
+        .back-btn { background:none; border:1px solid #4ade80; color:#4ade80; padding:10px 20px; border-radius:30px; cursor:pointer; margin-bottom:20px; font-size:0.7rem; text-transform: uppercase; }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <div id="section-liste">
-        <header><h1 id="main-title">Mon Jardin</h1></header>
+        <header><h1>Mon Jardin</h1></header>
         <div id="grid" class="grid"></div>
-        <div id="empty" style="text-align:center; color:#555; padding:60px 20px; display:none;">🌱 Aucun végétal ici</div>
+        <div id="empty" style="text-align:center; color:#555; padding:60px; display:none;">🌱 Votre jardin est vide.</div>
     </div>
 
-    <div id="section-detail" class="detail-view">
+    <div id="section-detail">
         <button class="back-btn" id="btn-retour">← Retour</button>
-        <img id="p-photo" class="hero-img" src="">
-        <div class="plant-titles">
-            <h1 id="p-titre" style="text-align:left; margin:0; font-size: 2rem; font-weight: 400;"></h1>
-            <div id="p-sci" class="sci-name"></div>
-            <div class="badge-container">
-                <span id="p-famille" class="badge"></span>
-                <span id="p-type-badge" class="badge"></span>
-                <span id="p-persistance-badge" class="badge"></span>
-            </div>
+        <img id="p-photo" class="hero-img">
+        <h1 id="p-titre" style="text-align:left; margin:0; font-size: 1.8rem;"></h1>
+        <div id="p-sci" class="sci-name"></div>
+        
+        <div class="badge-container">
+            <span id="p-famille" class="badge"></span>
+            <span id="p-type" class="badge"></span>
         </div>
+
         <div class="info-grid">
-            <div class="info-box"><div class="label">Arrosage</div><div id="p-arrosage" class="value">-</div></div>
-            <div class="info-box"><div class="label">Exposition</div><div id="p-expo" class="value">-</div></div>
-            <div class="info-box"><div class="label">Difficulté</div><div id="p-difficulte" class="value">-</div></div>
-            <div class="info-box"><div class="label">Rusticité</div><div id="p-rusticite" class="value">-</div></div>
-            <div class="info-box"><div class="label">Taille adulte</div><div id="p-taille" class="value">-</div></div>
-            <div class="info-box"><div class="label">Origine</div><div id="p-origine" class="value">-</div></div>
+            <div class="info-box"><div class="label">Arrosage</div><div id="p-arrosage" class="value"></div></div>
+            <div class="info-box"><div class="label">Exposition</div><div id="p-expo" class="value"></div></div>
+            <div class="info-box"><div class="label">Difficulté</div><div id="p-diff" class="value"></div></div>
+            <div class="info-box"><div class="label">Rusticité</div><div id="p-rust" class="value"></div></div>
+            <div class="info-box"><div class="label">Taille adulte</div><div id="p-taille" class="value"></div></div>
+            <div class="info-box"><div class="label">Persistance</div><div id="p-pers" class="value"></div></div>
         </div>
-        <div class="full-box">
+
+        <div class="desc-box">
             <div class="label">Description & Conseils</div>
             <div id="p-desc" class="desc"></div>
         </div>
@@ -69,86 +70,72 @@
 
 <script>
 const API_URL="https://eonia-api.santhimi.workers.dev";
-const urlParams = new URLSearchParams(window.location.search);
-const plantId = urlParams.get('id');
-const source = urlParams.get('from'); // On regarde d'où on vient
+const params = new URLSearchParams(window.location.search);
+const plantId = params.get('id');
+const fromCatalogue = params.get('from') === 'catalogue';
 
-const userEmail = localStorage.getItem("user_email") || "invite@eonia.com";
-const userPin = localStorage.getItem("user_pin") || "0000";
-
-// Configuration du bouton retour
-const btnRetour = document.getElementById('btn-retour');
-btnRetour.onclick = () => {
-    if (source === 'catalogue') {
-        window.location.href = 'catalogue.html';
-    } else {
-        window.location.href = 'jardin.html';
-    }
+// Gestion du bouton retour pour revenir au bon endroit
+document.getElementById('btn-retour').onclick = () => {
+    if (fromCatalogue) window.location.href = 'catalogue.html';
+    else window.location.href = 'jardin.html';
 };
 
 window.onload = async () => {
-    const allPlants = await loadCatalogue();
+    const allPlants = await loadData();
+    
     if (plantId) {
+        // ON CACHE TOUT de suite la liste pour ne pas voir l'écran noir "Mon Jardin"
+        document.getElementById('section-liste').style.display = 'none';
         showDetail(allPlants, plantId);
     } else {
-        const userPlantIds = await loadUserPlants();
-        renderJardin(allPlants, userPlantIds);
+        renderJardin(allPlants);
     }
 };
 
-async function loadCatalogue(){
-    try{
-        const res = await fetch(API_URL,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"get_catalogue"}) });
-        return await res.json();
-    }catch(e){ return []; }
+async function loadData(){
+    const res = await fetch(API_URL,{ method:"POST", body:JSON.stringify({action:"get_catalogue"}) });
+    return await res.json();
 }
 
-async function loadUserPlants(){
-    if(userEmail === 'invite@eonia.com') return [];
-    try{
-        const res = await fetch(API_URL,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"get_jardin", email:userEmail, pin:userPin}) });
-        const data = await res.json();
-        return Array.isArray(data?.plants) ? data.plants : [];
-    }catch(e){ return []; }
-}
+function showDetail(all, id) {
+    const p = all.find(item => String(item.ID_Plaque || item.id) === id);
+    if(!p) return;
 
-function showDetail(allPlants, id) {
-    document.getElementById('section-liste').style.display = 'none';
     document.getElementById('section-detail').style.display = 'block';
-    const p = allPlants.find(item => String(item.ID_Plaque || item.id) === id);
-    if(p) {
-        document.getElementById('p-photo').src = p.Photo || '';
-        document.getElementById('p-titre').innerText = p["Nom commun"] || 'Végétal';
-        document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
-        document.getElementById('p-famille').innerText = p["Famille"]?.name || p["Famille"] || '-';
-        document.getElementById('p-type-badge').innerText = p["Type"]?.name || p["Type"] || '-';
-        document.getElementById('p-persistance-badge').innerText = p["Persistance"]?.name || p["Persistance"] || '-';
-        document.getElementById('p-expo').innerText = p["Exposition"]?.name || p["Exposition"] || '-';
-        document.getElementById('p-difficulte').innerText = p["Difficulte"]?.name || p["Difficulte"] || '-';
-        document.getElementById('p-origine').innerText = p["Origine"]?.name || p["Origine"] || '-';
-        document.getElementById('p-arrosage').innerText = p["Arrosage"] || '-';
-        document.getElementById('p-rusticite').innerText = p["rusticite"] || '-';
-        document.getElementById('p-taille').innerText = p["taille à maturite"] || '-';
-        document.getElementById('p-desc').innerText = p["Description"] || 'Aucun détail disponible.';
-    }
+    document.getElementById('p-photo').src = p.Photo || '';
+    document.getElementById('p-titre').innerText = p["Nom commun"] || '';
+    document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
+    document.getElementById('p-famille').innerText = p["Famille"]?.name || p["Famille"] || '-';
+    document.getElementById('p-type').innerText = p["Type"]?.name || p["Type"] || '-';
+    
+    document.getElementById('p-arrosage').innerText = p["Arrosage"] || '-';
+    document.getElementById('p-expo').innerText = p["Exposition"]?.name || p["Exposition"] || '-';
+    document.getElementById('p-diff').innerText = p["Difficulte"]?.name || p["Difficulte"] || '-';
+    document.getElementById('p-rust').innerText = p["rusticite"] || '-';
+    document.getElementById('p-taille').innerText = p["taille à maturite"] || '-';
+    document.getElementById('p-pers').innerText = p["Persistance"]?.name || p["Persistance"] || '-';
+    document.getElementById('p-desc').innerText = p["Description"] || 'Pas de description.';
 }
 
-function renderJardin(allPlants, userPlantIds) {
+async function renderJardin(all) {
     const grid = document.getElementById("grid");
-    const empty = document.getElementById("empty");
-    grid.innerHTML = "";
-    let myPlants = (userEmail === 'invite@eonia.com') ? allPlants : allPlants.filter(p => userPlantIds.includes(String(p.ID_Plaque || p.id)));
-    if(myPlants.length === 0) {
-        empty.style.display = "block";
-        return;
+    const userEmail = localStorage.getItem("user_email") || "invite@eonia.com";
+    
+    let plantsToShow = all;
+    if(userEmail !== "invite@eonia.com") {
+        const res = await fetch(API_URL,{ method:"POST", body:JSON.stringify({action:"get_jardin", email:userEmail, pin:localStorage.getItem("user_pin")}) });
+        const data = await res.json();
+        const myIds = data.plants || [];
+        plantsToShow = all.filter(p => myIds.includes(String(p.ID_Plaque || p.id)));
     }
-    empty.style.display = "none";
-    myPlants.forEach(p => {
-        const id = p.ID_Plaque || p.id;
+
+    if(plantsToShow.length === 0) document.getElementById('empty').style.display = 'block';
+    
+    plantsToShow.forEach(p => {
         const card = document.createElement("div");
         card.className = "card";
-        card.onclick = () => window.location.href = "jardin.html?id=" + id;
-        card.innerHTML = `<img src="${p.Photo || ''}"><div class="name">${p["Nom commun"] || "Plante"}</div>`;
+        card.onclick = () => window.location.href = `jardin.html?id=${p.ID_Plaque || p.id}`;
+        card.innerHTML = `<img src="${p.Photo}"><div class="name">${p["Nom commun"]}</div>`;
         grid.appendChild(card);
     });
 }
