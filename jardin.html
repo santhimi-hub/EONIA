@@ -80,14 +80,6 @@
         else window.location.href = 'jardin.html';
     };
 
-    // Fonction pour trouver une propriété sans se soucier des accents ou majuscules
-    function getNotionProp(obj, name) {
-        const normalize = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const target = normalize(name);
-        const key = Object.keys(obj).find(k => normalize(k) === target);
-        return key ? obj[key] : null;
-    }
-
     function cleanVal(val) {
         if (!val) return "-";
         if (typeof val === 'string') return val;
@@ -106,32 +98,38 @@
                 body: JSON.stringify({ email: 'invite@eonia.com' }) 
             });
             const allPlants = await response.json();
+            
+            // On cherche la plante
             const p = allPlants.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
+                // --- CETTE LIGNE EST CRUCIALE POUR COMPRENDRE ---
+                console.log("DONNÉES DE LA PLANTE :", p);
+                
                 document.getElementById('section-detail').classList.remove('hidden');
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
-                
-                // On utilise la fonction intelligente pour chaque champ
-                document.getElementById('p-sci').innerText = cleanVal(getNotionProp(p, "Nom scientifique"));
-                document.getElementById('p-famille').innerText = cleanVal(getNotionProp(p, "Famille"));
-                document.getElementById('p-type').innerText = cleanVal(getNotionProp(p, "Type"));
-                document.getElementById('p-arrosage').innerText = cleanVal(getNotionProp(p, "Arrosage"));
-                document.getElementById('p-expo').innerText = cleanVal(getNotionProp(p, "Exposition"));
-                document.getElementById('p-diff').innerText = cleanVal(getNotionProp(p, "Difficulte"));
-                document.getElementById('p-rust').innerText = cleanVal(getNotionProp(p, "Rusticite"));
-                document.getElementById('p-taille').innerText = cleanVal(getNotionProp(p, "Taille a maturite"));
-                document.getElementById('p-pers').innerText = cleanVal(getNotionProp(p, "Persistance"));
-                
-                const desc = getNotionProp(p, "Description");
-                document.getElementById('p-desc').innerText = desc || 'Aucune description disponible.';
+
+                // On essaie de lire les clés telles qu'elles apparaissent souvent dans l'API
+                document.getElementById('p-sci').innerText = cleanVal(p["Nom scientifique"] || p["Scientifique"]);
+                document.getElementById('p-famille').innerText = cleanVal(p["Famille"]);
+                document.getElementById('p-type').innerText = cleanVal(p["Type"]);
+                document.getElementById('p-arrosage').innerText = cleanVal(p["Arrosage"]);
+                document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]);
+                document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"] || p["Difficulté"]);
+                document.getElementById('p-rust').innerText = cleanVal(p["rusticite"] || p["Rusticité"]);
+                document.getElementById('p-taille').innerText = cleanVal(p["taille à maturite"] || p["Taille"]);
+                document.getElementById('p-pers').innerText = cleanVal(p["Persistance"]);
+                document.getElementById('p-desc').innerText = p["Description"] || 'Aucune description disponible.';
+            } else {
+                console.log("Plante non trouvée pour l'ID:", plantId);
             }
-        } catch (error) { console.error("Erreur", error); }
+        } catch (error) { console.error("Erreur API:", error); }
     }
 
     window.onload = loadPlant;
 </script>
+
 
 </body>
 </html>
