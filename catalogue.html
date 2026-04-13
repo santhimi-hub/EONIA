@@ -41,13 +41,7 @@
             border-radius: 20px;
             font-size: 0.6rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
             cursor: pointer;
-        }
-
-        .logout-header-btn:hover {
-            background: #4ade80;
-            color: #000;
         }
 
         header {
@@ -161,11 +155,12 @@
             overflow: hidden;
             border: 1px solid #1a1a1a;
             cursor: pointer;
-            transition: 0.3s;
             position: relative;
+            transition: 0.2s ease;
         }
 
         .plant-card:hover {
+            transform: translateY(-3px);
             border-color: #4ade80;
         }
 
@@ -221,8 +216,9 @@
 </header>
 
 <div id="client-menu" class="client-nav">
-    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
-    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+    <button class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
+    <button class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+    <button class="nav-btn" onclick="switchView('fav')">Favoris ★</button>
 </div>
 
 <div class="controls-area">
@@ -236,13 +232,7 @@
     </div>
 </div>
 
-<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
-    Synchronisation...
-</div>
-
 <div id="catalogue-grid" class="catalog-container"></div>
-
-<div id="ai-chat-window"></div>
 
 <script>
 
@@ -258,26 +248,27 @@ const API_URL = "https://eonia-api.santhimi.workers.dev";
 
 if (!userEmail) logout();
 
-if (userEmail !== 'invite@eonia.com')
-document.getElementById('client-menu').style.display = 'flex';
-
 function switchView(view) {
-    currentView = view;
 
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+currentView = view;
 
-    loadData();
+document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+if(view === 'catalogue') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+if(view === 'jardin') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+if(view === 'fav') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+
+loadData();
 }
 
 async function loadData() {
 
-document.getElementById('status-msg').innerText = "Synchronisation...";
+document.getElementById('page-title').innerText =
+currentView === 'catalogue' ? "Notre Collection"
+: currentView === 'jardin' ? "Mon Jardin"
+: "Mes Favoris";
 
 const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
-
-document.getElementById('page-title').innerText =
-(currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
 const response = await fetch(API_URL, {
 method: 'POST',
@@ -287,7 +278,6 @@ body: JSON.stringify({ email: emailToSend, pin: userPin })
 
 allPlants = await response.json();
 
-/* TRI ALPHABETIQUE A → Z */
 allPlants.sort((a,b) =>
 (a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
 );
@@ -327,18 +317,13 @@ const id = p.id || p["ID_Plaque"];
 
 const matchSearch = nom.includes(searchVal) || latin.includes(searchVal);
 
+const matchFav = (currentView !== 'fav' || favorites.includes(id));
+
 const matchType =
-(activeFilter === 'all' ||
-(activeFilter === 'fav' && favorites.includes(id)) ||
-type.includes(activeFilter.toLowerCase()));
+activeFilter === 'all' || type.includes(activeFilter.toLowerCase());
 
-return matchSearch && matchType;
-
+return matchSearch && matchFav && matchType;
 });
-
-document.getElementById('status-msg').innerText = "";
-document.getElementById('status-msg').style.display =
-(filtered.length === 0 ? "block" : "none");
 
 filtered.forEach(p => {
 
@@ -349,10 +334,10 @@ const nom = p["Nom commun"] || "Plante";
 const currentLetter = nom[0].toUpperCase();
 
 if (currentView === 'catalogue' && currentLetter !== lastLetter) {
-const divider = document.createElement('div');
-divider.className = "letter-divider";
-divider.innerText = currentLetter;
-container.appendChild(divider);
+const div = document.createElement('div');
+div.className = "letter-divider";
+div.innerText = currentLetter;
+container.appendChild(div);
 lastLetter = currentLetter;
 }
 
@@ -365,7 +350,7 @@ window.location.href = `jardin.html?id=${id}${source}`;
 };
 
 card.innerHTML = `
-${currentView === 'catalogue' ? `
+${currentView !== 'jardin' ? `
 <div class="fav-star ${isFav ? 'active' : ''}"
 onclick="event.stopPropagation(); toggleFav('${id}')">★</div>
 ` : ''}
