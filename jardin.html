@@ -1,200 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÉONIA — Mon Jardin</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
-
-<style>
-body{
-margin:0;
-background:#000;
-color:#fff;
-font-family:'Raleway',sans-serif;
-}
-
-header{
-text-align:center;
-padding:30px 20px;
-}
-
-h1{
-color:#4ade80;
-font-weight:200;
-letter-spacing:4px;
-text-transform:uppercase;
-}
-
-.container{
-max-width:1000px;
-margin:auto;
-padding:20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-gap:15px;
-}
-
-.card{
-background:#0c0c0c;
-border:1px solid #1a1a1a;
-border-radius:12px;
-overflow:hidden;
-cursor:pointer;
-transition:0.3s;
-}
-
-.card:hover{
-border-color:#4ade80;
-transform:translateY(-5px);
-}
-
-.card img{
-width:100%;
-height:140px;
-object-fit:cover;
-}
-
-.name{
-padding:10px;
-text-align:center;
-font-size:0.7rem;
-text-transform:uppercase;
-color:#bbb;
-}
-
-.empty{
-text-align:center;
-color:#555;
-padding:60px 20px;
-display:none;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA — Mon Jardin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+    <style>
+        body { margin:0; background:#000; color:#fff; font-family:'Raleway',sans-serif; }
+        header { text-align:center; padding:30px 20px; }
+        h1 { color:#4ade80; font-weight:200; letter-spacing:4px; text-transform:uppercase; }
+        .container { max-width:1000px; margin:auto; padding:20px; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
+        .card { background:#0c0c0c; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; cursor:pointer; transition:0.3s; }
+        .card:hover { border-color:#4ade80; transform:translateY(-5px); }
+        .card img { width:100%; height:140px; object-fit:cover; }
+        .name { padding:10px; text-align:center; font-size:0.7rem; text-transform:uppercase; color:#bbb; }
+        .empty { text-align:center; color:#555; padding:60px 20px; display:none; }
+    </style>
 </head>
-
 <body>
 
 <header>
-<h1>Mon Jardin</h1>
+    <h1 id="jardin-title">Mon Jardin</h1>
 </header>
 
 <div class="container">
-<div id="grid" class="grid"></div>
-<div id="empty" class="empty">🌱 Aucun végétal dans votre jardin pour le moment</div>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty">🌱 Aucun végétal dans votre jardin pour le moment</div>
 </div>
 
 <script>
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const userEmail = localStorage.getItem("user_email") || "invite@eonia.com";
+    const userPin = localStorage.getItem("user_pin") || "0000";
 
-const API_URL="https://eonia-api.santhimi.workers.dev";
+    let allPlants = [];
+    let userPlantIds = [];
 
-const userEmail = localStorage.getItem("user_email") || "invite@eonia.com";
-const userPin = localStorage.getItem("user_pin") || "0000";
+    window.onload = async () => {
+        await loadCatalogue();
+        if (userEmail !== 'invite@eonia.com') {
+            await loadUserPlants();
+        }
+        render();
+    };
 
-let allPlants = [];
-let userPlantIds = [];
+    async function loadUserPlants(){
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ action: "get_jardin", email: userEmail, pin: userPin })
+            });
+            const data = await res.json();
+            userPlantIds = Array.isArray(data?.plants) ? data.plants : [];
+        } catch(e) { userPlantIds = []; }
+    }
 
-/* ===================== LOAD JARDIN ===================== */
-window.onload = async () => {
-await loadUserPlants();
-await loadCatalogue();
-render();
-};
+    async function loadCatalogue(){
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({ action: "get_catalogue" })
+            });
+            allPlants = await res.json();
+        } catch(e) { allPlants = []; }
+    }
 
-/* ===================== 1. PLANTES DU USER ===================== */
-async function loadUserPlants(){
+    function render() {
+        const grid = document.getElementById("grid");
+        const empty = document.getElementById("empty");
+        grid.innerHTML = "";
 
-try{
-const res = await fetch(API_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-action:"get_jardin",
-email:userEmail,
-pin:userPin
-})
-});
+        let myPlants = [];
 
-const data = await res.json();
+        // Si invité, on montre tout le catalogue, sinon on filtre par le jardin de l'utilisateur
+        if (userEmail === 'invite@eonia.com') {
+            document.getElementById('jardin-title').innerText = "Collection ÉONIA";
+            myPlants = allPlants;
+        } else {
+            myPlants = allPlants.filter(p => {
+                const id = String(p.ID_Plaque || p.id);
+                return userPlantIds.includes(id);
+            });
+        }
 
-/* IMPORTANT : sécurisation */
-userPlantIds = Array.isArray(data?.plants)
-? data.plants
-: [];
+        if (myPlants.length === 0) {
+            empty.style.display = "block";
+            return;
+        }
 
-}catch(e){
-userPlantIds = [];
-}
+        empty.style.display = "none";
 
-}
+        myPlants.forEach(p => {
+            // On s'assure d'utiliser le bon ID pour le lien
+            const idLien = p.ID_Plaque || p.id;
 
-/* ===================== 2. CATALOGUE GLOBAL ===================== */
-async function loadCatalogue(){
+            const card = document.createElement("div");
+            card.className = "card";
+            
+            // Correction : On redirige vers la page de détails (jardin.html ou plante.html selon votre choix)
+            card.onclick = () => {
+                window.location.href = "jardin.html?id=" + idLien;
+            };
 
-try{
-const res = await fetch(API_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-action:"get_catalogue"
-})
-});
-
-allPlants = await res.json();
-
-}catch(e){
-allPlants = [];
-}
-
-}
-
-/* ===================== 3. RENDER ===================== */
-function render(){
-
-const grid = document.getElementById("grid");
-const empty = document.getElementById("empty");
-
-grid.innerHTML = "";
-
-/* match sécurisé ID_Plaque */
-const myPlants = allPlants.filter(p => {
-const id = String(p.ID_Plaque || p.id);
-return userPlantIds.includes(id);
-});
-
-if(myPlants.length === 0){
-empty.style.display = "block";
-return;
-}
-
-empty.style.display = "none";
-
-myPlants.forEach(p=>{
-
-const id = p.ID_Plaque || p.id;
-
-const card = document.createElement("div");
-card.className = "card";
-
-card.onclick = () => {
-window.location.href = "plante.html?id=" + id;
-};
-
-card.innerHTML = `
-<img src="${p.Photo || ''}">
-<div class="name">${p["Nom commun"] || "Plante"}</div>
-`;
-
-grid.appendChild(card);
-
-});
-
-}
-
+            card.innerHTML = `
+                <img src="${p.Photo || ''}">
+                <div class="name">${p["Nom commun"] || "Plante"}</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 </script>
-
 </body>
 </html>
