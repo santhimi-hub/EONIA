@@ -6,7 +6,6 @@
     <title>ÉONIA — Collection & Jardin</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
     <style>
-        /* [VOTRE STYLE RESTE INCHANGÉ] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
         .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -125,9 +124,9 @@
         
         let filtered = allPlants.filter(p => {
             const nom = (p["Nom commun"] || "").toLowerCase();
-            const typePlante = (p.Type && p.Type.name) ? p.Type.name.toLowerCase() : "";
+            const typePlante = (p.Type && p.Type.name) ? p.Type.name.toLowerCase() : (p.Type || "").toLowerCase();
             const matchesSearch = nom.includes(searchVal);
-            const matchesFilter = (activeFilter === 'all' || typePlante === activeFilter.toLowerCase());
+            const matchesFilter = (activeFilter === 'all' || typePlante.includes(activeFilter.toLowerCase()));
             return matchesSearch && matchesFilter;
         });
 
@@ -150,11 +149,11 @@
             const card = document.createElement('div');
             card.className = "plant-card";
             
-            // --- CORRECTION DU LIEN ICI ---
+            // --- CORRECTION DU LIEN POUR LE RETOUR ---
             card.onclick = () => {
-                // On utilise p.id pour la collection et ID_Plaque pour le jardin
                 const idFinal = (currentView === 'jardin') ? p["ID_Plaque"] : p.id;
-                window.location.href = `jardin.html?id=${idFinal}`;
+                const source = (currentView === 'catalogue') ? "&from=catalogue" : "";
+                window.location.href = `jardin.html?id=${idFinal}${source}`;
             };
             
             card.innerHTML = `
