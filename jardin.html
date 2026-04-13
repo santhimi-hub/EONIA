@@ -75,19 +75,23 @@
     const plantId = params.get('id');
     const fromCatalogue = params.get('from') === 'catalogue';
 
-    // Gestion du retour
     document.getElementById('custom-back').onclick = function() {
         if (fromCatalogue) window.location.href = 'catalogue.html';
         else window.location.href = 'jardin.html';
     };
 
-    // La fonction qui répare l'affichage de l'abricotier
+    // Fonction pour trouver une propriété sans se soucier des accents ou majuscules
+    function getNotionProp(obj, name) {
+        const normalize = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const target = normalize(name);
+        const key = Object.keys(obj).find(k => normalize(k) === target);
+        return key ? obj[key] : null;
+    }
+
     function cleanVal(val) {
         if (!val) return "-";
         if (typeof val === 'string') return val;
-        // Si Notion envoie une liste (cas fréquent pour les types/familles)
         if (Array.isArray(val) && val.length > 0) return val[0].name || val[0] || "-";
-        // Si Notion envoie un objet simple
         if (val.name) return val.name;
         return "-";
     }
@@ -108,25 +112,26 @@
                 document.getElementById('section-detail').classList.remove('hidden');
                 document.getElementById('p-photo').src = p.Photo || '';
                 document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
-                document.getElementById('p-sci').innerText = p["Nom scientifique"] || '';
-
-                // On injecte les valeurs propres dans tes onglets
-                document.getElementById('p-famille').innerText = cleanVal(p["Famille"]);
-                document.getElementById('p-type').innerText = cleanVal(p["Type"]);
-
-                // Grille d'infos
-                document.getElementById('p-arrosage').innerText = cleanVal(p["Arrosage"]);
-                document.getElementById('p-expo').innerText = cleanVal(p["Exposition"]);
-                document.getElementById('p-diff').innerText = cleanVal(p["Difficulte"]);
-                document.getElementById('p-rust').innerText = cleanVal(p["rusticite"]);
-                document.getElementById('p-taille').innerText = cleanVal(p["taille à maturite"]);
-                document.getElementById('p-pers').innerText = cleanVal(p["Persistance"]);
-                document.getElementById('p-desc').innerText = p["Description"] || 'Aucune description disponible.';
+                
+                // On utilise la fonction intelligente pour chaque champ
+                document.getElementById('p-sci').innerText = cleanVal(getNotionProp(p, "Nom scientifique"));
+                document.getElementById('p-famille').innerText = cleanVal(getNotionProp(p, "Famille"));
+                document.getElementById('p-type').innerText = cleanVal(getNotionProp(p, "Type"));
+                document.getElementById('p-arrosage').innerText = cleanVal(getNotionProp(p, "Arrosage"));
+                document.getElementById('p-expo').innerText = cleanVal(getNotionProp(p, "Exposition"));
+                document.getElementById('p-diff').innerText = cleanVal(getNotionProp(p, "Difficulte"));
+                document.getElementById('p-rust').innerText = cleanVal(getNotionProp(p, "Rusticite"));
+                document.getElementById('p-taille').innerText = cleanVal(getNotionProp(p, "Taille a maturite"));
+                document.getElementById('p-pers').innerText = cleanVal(getNotionProp(p, "Persistance"));
+                
+                const desc = getNotionProp(p, "Description");
+                document.getElementById('p-desc').innerText = desc || 'Aucune description disponible.';
             }
         } catch (error) { console.error("Erreur", error); }
     }
 
     window.onload = loadPlant;
 </script>
+
 </body>
 </html>
