@@ -138,6 +138,12 @@
             color: #4ade80;
         }
 
+        #plant-count {
+            font-size: 0.6rem;
+            color: #555;
+            margin-top: 8px;
+        }
+
         .catalog-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -145,13 +151,6 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        .letter-divider {
-            grid-column: 1 / -1;
-            font-size: 1.25rem;
-            color: #4ade80;
-            margin: 20px 0;
         }
 
         .plant-card {
@@ -198,17 +197,10 @@
             font-size: 14px;
             color: #555;
             cursor: pointer;
-            z-index: 5;
         }
 
         .fav-star.active {
             color: #4ade80;
-        }
-
-        #plant-count {
-            font-size: 0.6rem;
-            color: #555;
-            margin-top: 8px;
         }
 
     </style>
@@ -236,6 +228,7 @@
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('fav', this)">Favoris ★</button>
         <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
         <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
         <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
@@ -249,8 +242,6 @@
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
-
-<div id="ai-chat-window"></div>
 
 <script>
 
@@ -285,6 +276,12 @@ body: JSON.stringify({ email: emailToSend, pin: userPin })
 });
 
 allPlants = await response.json();
+
+/* TRI A → Z RESTAURÉ */
+allPlants.sort((a,b) =>
+(a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
+);
+
 renderGrid();
 }
 
@@ -314,10 +311,19 @@ const type = (p.Type && p.Type.name)
 ? p.Type.name.toLowerCase()
 : (p.Type || "").toLowerCase();
 
-return (
-(nom.includes(searchVal) || latin.includes(searchVal)) &&
-(activeFilter === 'all' || type.includes(activeFilter.toLowerCase()))
-);
+const id = p.id || p["ID_Plaque"];
+
+const matchSearch = nom.includes(searchVal) || latin.includes(searchVal);
+
+const matchType =
+(activeFilter === 'all' ||
+activeFilter === 'fav' ||
+type.includes(activeFilter.toLowerCase()));
+
+const matchFav =
+(activeFilter !== 'fav' || favorites.includes(id));
+
+return matchSearch && matchType && matchFav;
 
 });
 
@@ -338,7 +344,8 @@ window.location.href = `jardin.html?id=${id}${source}`;
 };
 
 card.innerHTML = `
-<div class="fav-star ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${id}')">★</div>
+<div class="fav-star ${isFav ? 'active' : ''}"
+onclick="event.stopPropagation(); toggleFav('${id}')">★</div>
 
 <div class="img-container">
 <img src="${p.Photo || 'https://via.placeholder.com/300'}" class="plant-img">
