@@ -138,12 +138,6 @@
             color: #4ade80;
         }
 
-        #plant-count {
-            font-size: 0.6rem;
-            color: #555;
-            margin-top: 8px;
-        }
-
         .catalog-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -151,6 +145,14 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .letter-divider {
+            grid-column: 1 / -1;
+            font-size: 1.25rem;
+            color: #4ade80;
+            margin: 15px 0;
+            letter-spacing: 6px;
         }
 
         .plant-card {
@@ -228,13 +230,10 @@
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-        <button class="f-btn" onclick="setFilter('fav', this)">Favoris ★</button>
         <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
         <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
         <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
     </div>
-
-    <div id="plant-count"></div>
 </div>
 
 <div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
@@ -242,6 +241,8 @@
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
+
+<div id="ai-chat-window"></div>
 
 <script>
 
@@ -260,6 +261,15 @@ if (!userEmail) logout();
 if (userEmail !== 'invite@eonia.com')
 document.getElementById('client-menu').style.display = 'flex';
 
+function switchView(view) {
+    currentView = view;
+
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+
+    loadData();
+}
+
 async function loadData() {
 
 document.getElementById('status-msg').innerText = "Synchronisation...";
@@ -277,7 +287,7 @@ body: JSON.stringify({ email: emailToSend, pin: userPin })
 
 allPlants = await response.json();
 
-/* TRI A → Z RESTAURÉ */
+/* TRI ALPHABETIQUE A → Z */
 allPlants.sort((a,b) =>
 (a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
 );
@@ -302,6 +312,8 @@ const searchVal = document.getElementById('searchBox').value.toLowerCase();
 
 container.innerHTML = "";
 
+let lastLetter = "";
+
 let filtered = allPlants.filter(p => {
 
 const nom = (p["Nom commun"] || "").toLowerCase();
@@ -317,23 +329,32 @@ const matchSearch = nom.includes(searchVal) || latin.includes(searchVal);
 
 const matchType =
 (activeFilter === 'all' ||
-activeFilter === 'fav' ||
+(activeFilter === 'fav' && favorites.includes(id)) ||
 type.includes(activeFilter.toLowerCase()));
 
-const matchFav =
-(activeFilter !== 'fav' || favorites.includes(id));
-
-return matchSearch && matchType && matchFav;
+return matchSearch && matchType;
 
 });
 
-document.getElementById('plant-count').innerText =
-filtered.length + " plantes";
+document.getElementById('status-msg').innerText = "";
+document.getElementById('status-msg').style.display =
+(filtered.length === 0 ? "block" : "none");
 
 filtered.forEach(p => {
 
 const id = p.id || p["ID_Plaque"];
 const isFav = favorites.includes(id);
+
+const nom = p["Nom commun"] || "Plante";
+const currentLetter = nom[0].toUpperCase();
+
+if (currentView === 'catalogue' && currentLetter !== lastLetter) {
+const divider = document.createElement('div');
+divider.className = "letter-divider";
+divider.innerText = currentLetter;
+container.appendChild(divider);
+lastLetter = currentLetter;
+}
 
 const card = document.createElement('div');
 card.className = "plant-card";
@@ -344,19 +365,22 @@ window.location.href = `jardin.html?id=${id}${source}`;
 };
 
 card.innerHTML = `
+${currentView === 'catalogue' ? `
 <div class="fav-star ${isFav ? 'active' : ''}"
 onclick="event.stopPropagation(); toggleFav('${id}')">★</div>
+` : ''}
 
 <div class="img-container">
 <img src="${p.Photo || 'https://via.placeholder.com/300'}" class="plant-img">
 </div>
 
 <div class="plant-info">
-<div class="plant-name">${p["Nom commun"] || "Plante"}</div>
+<div class="plant-name">${nom}</div>
 </div>
 `;
 
 container.appendChild(card);
+
 });
 
 }
@@ -366,11 +390,6 @@ activeFilter = type;
 document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
 btn.classList.add('active');
 renderGrid();
-}
-
-function switchView(view) {
-currentView = view;
-loadData();
 }
 
 function logout() {
