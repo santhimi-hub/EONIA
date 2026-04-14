@@ -55,50 +55,71 @@
         .client-nav {
             display: none;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            margin-top: 15px;
+            gap: 15px;
+            margin: 20px auto;
         }
 
         .nav-btn {
             background: none;
             border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
-            padding: 7px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .nav-btn { font-size: 0.85rem; padding: 12px 25px; }
         }
 
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
+        .controls-area { max-width: 1000px; margin: 0 auto 10px auto; padding: 0 15px; text-align: center; }
 
         .search-input {
             width: 100%;
-            max-width: 350px;
-            padding: 12px;
+            max-width: 450px;
+            padding: 14px;
             background: #0c0c0c;
             border: 1px solid #1a1a1a;
             border-radius: 50px;
             color: #fff;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             outline: none;
+            font-size: 0.9rem;
         }
 
-        .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        /* NOUVEAU COMPTEUR */
+        #plant-counter {
+            font-size: 0.65rem;
+            color: #4ade80;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 
         .f-btn {
             background: none;
             border: 1px solid #1a1a1a;
-            color: #555;
-            padding: 5px 12px;
+            color: #777;
+            padding: 8px 18px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.5rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .f-btn { font-size: 0.75rem; padding: 10px 22px; }
         }
 
         .f-btn.active { border-color: #4ade80; color: #4ade80; }
@@ -107,166 +128,121 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
             gap: 20px;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
+        @media (min-width: 768px) {
+            .catalog-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; }
+        }
+
         .letter-divider {
             grid-column: 1 / -1;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: #4ade80;
-            margin: 15px 0;
-            letter-spacing: 6px;
+            margin: 20px 0 10px 0;
+            letter-spacing: 8px;
             text-align: left;
+            border-bottom: 1px solid rgba(74, 222, 128, 0.1);
         }
 
         .plant-card {
             background: #0c0c0c;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             border: 1px solid #1a1a1a;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.3s transform ease, 0.3s border-color ease;
             position: relative;
         }
 
-        .plant-card:hover { border-color: #4ade80; }
-        .img-container { width: 100%; height: 145px; overflow: hidden; position: relative; }
-        .plant-img { width: 100%; height: 100%; object-fit: cover; }
-        .plant-info { padding: 12px 5px; text-align: center; }
-        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; }
+        .plant-card:hover { border-color: #4ade80; transform: translateY(-5px); }
 
-        /* BOUTON ÉTOILE FAVORIS */
+        .img-container { width: 100%; height: 160px; overflow: hidden; position: relative; }
+        @media (min-width: 768px) { .img-container { height: 220px; } }
+
+        .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .plant-card:hover .plant-img { transform: scale(1.05); }
+
+        .plant-info { padding: 15px 10px; text-align: center; }
+        .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+
         .fav-star {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.5);
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #555;
-            font-size: 1.1rem;
+            color: #fff;
+            font-size: 1.2rem;
             transition: 0.3s;
             z-index: 10;
+            backdrop-filter: blur(5px);
         }
 
-        .fav-star.active {
-            color: #4ade80;
-            background: rgba(0,0,0,0.7);
-        }
+        .fav-star.active { color: #4ade80; }
 
-        /* IA WINDOW & BUBBLE */
         #ai-bubble {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            bottom: 30px;
+            right: 30px;
             background: #000;
             border: 1px solid #4ade80;
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
             z-index: 4000;
+            font-size: 1.5rem;
         }
 
         #ai-window {
             position: fixed;
-            bottom: 95px;
-            right: 20px;
-            width: 320px;
-            max-width: 85vw;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-width: 90vw;
             background: #0c0c0c;
             border: 1px solid #1a1a1a;
-            border-radius: 15px;
+            border-radius: 20px;
             display: none;
             flex-direction: column;
             overflow: hidden;
             z-index: 4000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
         #ai-header {
             background: #1a1a1a;
-            padding: 12px;
-            font-size: 0.7rem;
+            padding: 15px;
+            font-size: 0.8rem;
             color: #4ade80;
             text-transform: uppercase;
             border-bottom: 1px solid #333;
         }
 
-        #ai-messages {
-            height: 250px;
-            overflow-y: auto;
-            padding: 15px;
-            font-size: 0.8rem;
-            color: #ccc;
-        }
-
-        .ai-msg {
-            margin-bottom: 12px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: #161616;
-            width: fit-content;
-            max-width: 90%;
-        }
-
+        #ai-messages { height: 300px; overflow-y: auto; padding: 20px; font-size: 0.85rem; color: #ccc; }
+        .ai-msg { margin-bottom: 15px; padding: 10px 14px; border-radius: 12px; background: #161616; width: fit-content; max-width: 85%; }
         .user-msg { background: #4ade80; color: #000; margin-left: auto; }
 
-        .ai-input-container {
-            display: flex;
-            background: #000;
-            border-top: 1px solid #1a1a1a;
-            align-items: center;
-            padding: 0 10px;
-        }
-
-        #ai-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 15px;
-            color: #fff;
-            outline: none;
-            font-family: 'Raleway', sans-serif;
-        }
-
-        #ai-voice-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            color: #4ade80;
-            padding: 10px;
-        }
-
-        #ai-send-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-        }
-
-        #ai-send-btn svg { fill: #4ade80; width: 22px; height: 22px; }
-
+        .ai-input-container { display: flex; background: #000; border-top: 1px solid #1a1a1a; align-items: center; padding: 5px 15px; }
+        #ai-input { flex: 1; background: transparent; border: none; padding: 15px 0; color: #fff; outline: none; font-family: 'Raleway', sans-serif; font-size: 0.9rem; }
+        #ai-voice-btn, #ai-send-btn { background: none; border: none; cursor: pointer; padding: 10px; }
+        #ai-send-btn svg { fill: #4ade80; width: 24px; height: 24px; }
+        #ai-voice-btn { font-size: 1.2rem; color: #4ade80; }
         #ai-voice-btn.recording { color: #ff4444; animation: pulse 1.5s infinite; }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 
@@ -288,7 +264,9 @@
 </div>
 
 <div class="controls-area">
-    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="onSearchInput()">
+    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="onSearchInput()">
+    
+    <div id="plant-counter">0 PLANTE TROUVÉE</div>
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
@@ -299,8 +277,8 @@
     </div>
 </div>
 
-<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
-    Synchronisation...
+<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.8rem;margin-top:20px;letter-spacing:1px;">
+    Synchronisation en cours...
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
@@ -344,26 +322,21 @@ function initAI() {
     const msgBox = document.getElementById('ai-messages');
     const name = (userEmail && userEmail !== 'invite@eonia.com') ? userEmail.split('@')[0] : "cher ami";
     msgBox.innerHTML = "";
-    addMessage(`Bonjour ${name} ! Ravi de vous aider. Pour mettre une plante en favoris, cliquez simplement sur la petite étoile ⭐️.`, "ai-msg");
+    addMessage(`Bonjour ${name} ! Je suis là pour vous aider à explorer les ${allPlants.length} plantes de notre catalogue. Que cherchez-vous ?`, "ai-msg");
 }
 
 function startAIVoice() {
     const btn = document.getElementById("ai-voice-btn");
     const SpeechRecognition = window.SpeechRecognition || window.webkitRecognition || window.webkitSpeechRecognition;
-
     if (!SpeechRecognition) return alert("Micro non supporté");
-
     const recognition = new SpeechRecognition();
     recognition.lang = "fr-FR";
     btn.classList.add("recording");
     recognition.start();
-
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById("ai-input").value = transcript;
+    recognition.onresult = (event) => {
+        document.getElementById("ai-input").value = event.results[0][0].transcript;
         processAI();
     };
-
     recognition.onend = () => btn.classList.remove("recording");
 }
 
@@ -371,43 +344,27 @@ function processAI() {
     const input = document.getElementById('ai-input');
     const query = input.value.toLowerCase().trim();
     if (!query) return;
-
     addMessage(input.value, 'user-msg');
     input.value = "";
-
     setTimeout(() => {
         let results = [...allPlants];
-        const filters = {
-            soleil: query.includes("soleil"),
-            ombre: query.includes("ombre"),
-            arbre: query.includes("arbre"),
-            fleur: query.includes("fleur"),
-            fruit: query.includes("fruit")
-        };
-
-        if (filters.soleil) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("soleil"));
-        if (filters.ombre) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("ombre"));
-        if (filters.arbre) results = results.filter(p => (p.Type || "").toLowerCase().includes("arbre"));
-        if (filters.fleur) results = results.filter(p => (p.Type || "").toLowerCase().includes("fleur"));
-        if (filters.fruit) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
-
-        let response = "";
+        if (query.includes("soleil")) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("soleil"));
+        if (query.includes("ombre")) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("ombre"));
+        if (query.includes("arbre")) results = results.filter(p => (p.Type || "").toLowerCase().includes("arbre"));
+        if (query.includes("fleur")) results = results.filter(p => (p.Type || "").toLowerCase().includes("fleur"));
+        if (query.includes("fruit")) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
+        
         if (results.length > 0 && results.length < allPlants.length) {
-            const ex = results[0]["Nom commun"];
-            response = `Bien sûr ! J'ai trouvé ${results.length} plante(s) correspondantes, comme le **${ex}**. Je les ai affichées dans votre liste.`;
+            addMessage(`J'ai trouvé ${results.length} plantes. Je les affiche pour vous.`, "ai-msg");
             document.getElementById("searchBox").value = query;
             renderGrid();
         } else {
-            response = "Je n'ai pas trouvé de plante précise. N'hésitez pas à essayer des mots-clés comme 'soleil', 'fruitier' ou 'arbre' !";
+            addMessage("Je n'ai pas trouvé de correspondance précise, mais essayez 'soleil' ou 'fruitier' !", "ai-msg");
         }
-        addMessage(response, "ai-msg");
     }, 400);
 }
 
-function handleAI(e) {
-    if (!e || e.key === 'Enter') processAI();
-}
-
+function handleAI(e) { if (!e || e.key === 'Enter') processAI(); }
 function addMessage(txt, cls) {
     const msgBox = document.getElementById('ai-messages');
     const div = document.createElement('div');
@@ -418,19 +375,16 @@ function addMessage(txt, cls) {
 }
 
 function toggleFavorite(e, id) {
-    e.stopPropagation(); // Empêche d'ouvrir la fiche plante
-    if (!id) return;
-    if (favorites.includes(id)) {
-        favorites = favorites.filter(f => f !== id);
-    } else {
-        favorites.push(id);
-    }
+    e.stopPropagation();
+    if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+    else favorites.push(id);
     localStorage.setItem("eonia_fav", JSON.stringify(favorites));
     renderGrid();
 }
 
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
+    const counterEl = document.getElementById('plant-counter');
     const searchVal = document.getElementById('searchBox').value.toLowerCase();
     container.innerHTML = "";
     let lastLetter = "";
@@ -444,7 +398,11 @@ function renderGrid() {
         return matchSearch && matchType;
     });
 
-    document.getElementById('status-msg').style.display = (filtered.length === 0 ? "block" : "none");
+    // Mise à jour du compteur
+    const count = filtered.length;
+    counterEl.textContent = `${count} PLANTE${count > 1 ? 'S' : ''} TROUVÉE${count > 1 ? 'S' : ''}`;
+
+    document.getElementById('status-msg').style.display = (count === 0 ? "block" : "none");
 
     filtered.forEach(p => {
         const nom = p["Nom commun"] || "Plante";
@@ -463,13 +421,12 @@ function renderGrid() {
         const card = document.createElement('div');
         card.className = "plant-card";
         card.onclick = () => window.location.href = `jardin.html?id=${id}`;
-
         card.innerHTML = `
             <div class="img-container">
                 <div class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${id}')">
                     ${isFav ? '★' : '☆'}
                 </div>
-                <img src="${p.Photo || ''}" class="plant-img">
+                <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info"><div class="plant-name">${nom}</div></div>
         `;
@@ -486,13 +443,12 @@ function setFilter(type, btn) {
 
 function onSearchInput() {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(renderGrid, 200);
+    searchTimeout = setTimeout(renderGrid, 250);
 }
 
 function loadData() {
     const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
     document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
-
     fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -503,9 +459,6 @@ function loadData() {
         allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
         renderGrid();
         document.getElementById('status-msg').innerText = "";
-    })
-    .catch(() => {
-        document.getElementById('status-msg').innerText = "Erreur de synchronisation";
     });
 }
 
@@ -517,7 +470,6 @@ function toggleAI() {
 }
 
 function logout() { localStorage.clear(); window.location.href = "index.html"; }
-
 loadData();
 </script>
 
