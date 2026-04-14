@@ -28,8 +28,8 @@
             align-items:center;
             text-align:center;
             background: 
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
-    url('background.jpg') center/cover no-repeat;
+                linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
+                url('background.jpg') center/cover no-repeat;
             animation: fadeIn 1.2s ease;
         }
 
@@ -161,6 +161,7 @@
             letter-spacing:1px;
             text-transform:uppercase;
             transition:0.3s;
+            text-align: center;
         }
 
         .link-order:hover { color:#fff; }
@@ -170,26 +171,29 @@
             opacity:0;
             animation: fadeUp 1s ease forwards;
             animation-delay: 1s;
+            display: flex;
+            gap: 20px;
         }
 
         .bottom-nav a {
             color:#4ade80;
             text-decoration:none;
-            margin:0 15px;
             font-size:0.65rem;
             text-transform:uppercase;
             letter-spacing:2.5px;
             transition:0.3s;
             font-weight:500;
+            cursor: pointer;
         }
 
         .bottom-nav a:hover { color:#fff; }
 
-        /* SECTION */
+        /* SECTION CONTENT */
         .content-section {
             padding:100px 30px;
             text-align:center;
             background:#050505;
+            border-top: 1px solid #1a1a1a;
         }
 
         .content-section h2 {
@@ -210,6 +214,18 @@
 
         .highlight { color:#fff; font-weight:500; }
 
+        .pillar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 60px auto 0 auto;
+        }
+
+        .pillar-item span { font-size: 2rem; display: block; margin-bottom: 15px; }
+        .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
+
         /* ANIMATIONS */
         @keyframes fadeUp {
             from { opacity:0; transform:translateY(20px); }
@@ -225,6 +241,7 @@
         @media (max-width:600px) {
             .brand-title { font-size:2.5rem; }
             .tagline { margin-top:20px; margin-bottom:30px; }
+            .pillar-grid { gap: 30px; }
         }
     </style>
 </head>
@@ -232,27 +249,17 @@
 <body>
 
 <main class="hero">
-
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Éonia Logo">
-
+    
     <h1 class="brand-title">ÉONIA</h1>
-
+    
     <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
 
     <div class="auth-container">
-
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
 
         <div style="display:flex;flex-direction:column;gap:8px;">
-            
-            <input type="password"
-                   id="pin"
-                   placeholder="Code PIN"
-                   inputmode="numeric"
-                   pattern="[0-9]*"
-                   maxlength="6"
-                   autocomplete="one-time-code"
-                   required>
+            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
 
             <div class="auth-footer">
                 <p id="activation-help">
@@ -262,38 +269,50 @@
             </div>
         </div>
 
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">
-            ENTRER
-        </button>
-
+        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
-
     </div>
 
     <nav class="bottom-nav">
-    <a href="#" onclick="accesInvite()">Invité</a>
-    <a href="a-propos.html">À Propos</a> </nav>
-
-
+        <a href="#" onclick="accesInvite()">Invité</a>
+        <a href="#concept">Le Concept</a>
+        <a href="a-propos.html">Notre Histoire</a>
+    </nav>
 </main>
 
 <section class="content-section" id="concept">
-
     <h2>Notre Concept</h2>
-
     <p>
         Éonia fusionne l'élégance du support et la puissance du numérique.  
         Chaque plante a une histoire. <br>
         <span class="highlight">Scanner, Cultiver, Raconter.</span>
     </p>
 
-    <h2 style="margin-top:60px;">L'âme d'Éonia</h2>
+    <div class="pillar-grid">
+        <div class="pillar-item">
+            <span>🌿</span>
+            <h3>Scanner</h3>
+            <p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p>
+        </div>
+        <div class="pillar-item">
+            <span>📖</span>
+            <h3>Raconter</h3>
+            <p>Créez un journal de bord vivant pour documenter sa croissance.</p>
+        </div>
+        <div class="pillar-item">
+            <span>♾️</span>
+            <h3>Transmettre</h3>
+            <p>Faites vivre la mémoire de votre jardin pour les générations futures.</p>
+        </div>
+    </div>
 
+    <h2 style="margin-top:80px;">L'âme d'Éonia</h2>
     <p>
         Un journal de bord pour vos arbres, une empreinte pour l'éternité.  
         Transmettez la mémoire de votre jardin aux générations futures.
     </p>
-
+    
+    <a href="a-propos.html" style="display: inline-block; margin-top: 40px; color: #4ade80; text-decoration: none; font-size: 0.6rem; letter-spacing: 2px; border-bottom: 1px solid #4ade80; padding-bottom: 5px; text-transform: uppercase;">Découvrir notre philosophie</a>
 </section>
 
 <script>
@@ -307,7 +326,6 @@
         }
     };
 
-    // UX améliorée clavier
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') validerConnexion();
     });
@@ -315,14 +333,12 @@
     function validerConnexion() {
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if(!emailRegex.test(mail)) {
             alert("Veuillez entrer une adresse email valide.");
             return;
         }
-
         if(pin.length < 4) {
             alert("Veuillez entrer un code PIN (4 chiffres minimum).");
             return;
