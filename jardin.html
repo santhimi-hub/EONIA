@@ -27,6 +27,20 @@
         
         .desc-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px; margin-top: 20px; }
         .desc { line-height: 1.6; color: #ccc; font-size: 0.9rem; white-space: pre-wrap; }
+
+        /* Style pour la zone de commande */
+        .order-cta {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 15px;
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.02) 0%, rgba(0,0,0,0) 100%);
+        }
+        .order-cta p { font-size: 0.8rem; color: #bbb; margin-bottom: 20px; letter-spacing: 1px; }
+        .btn-order { background: #4ade80; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+        .btn-order:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(74,222,128,0.2); }
     </style>
 </head>
 <body>
@@ -63,6 +77,11 @@
             <div class="label">Description & Conseils</div>
             <div id="p-desc" class="desc"></div>
         </div>
+
+        <div id="cta-invite" class="order-cta hidden">
+            <p>Donnez vie à cette plante dans votre jardin</p>
+            <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
+        </div>
     </div>
 </div>
 
@@ -70,14 +89,15 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    const userEmail = localStorage.getItem('userEmail') || 'invite@eonia.com';
+    
+    // On harmonise la clé pour être sûr de bien détecter l'invité
+    const userEmail = localStorage.getItem('user_email') || localStorage.getItem('userEmail') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
     async function loadPlant() {
         if (!plantId) return;
         try {
-            // On envoie l'email stocké pour savoir si on cherche dans Catalogue ou Jardin
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -85,7 +105,6 @@
             });
             const allItems = await response.json();
             
-            // On cherche la correspondance (ID Notion ou ID Plaque)
             const p = allItems.find(item => String(item.id || item.ID_Plaque) === plantId);
 
             if (p) {
@@ -96,19 +115,18 @@
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
                 
-                // Champs techniques
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
                 document.getElementById('p-expo').innerText = p["Exposition"] || "-";
                 document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
                 document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
                 document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille adulte"] || "-";
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
-                
-                // Description
                 document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || "Aucune description.";
-            } else {
-                console.log("Plante non trouvée localement, tentative via ID direct...");
-                // Optionnel : si pas trouvé dans la liste, on pourrait forcer un appel spécifique
+
+                // AFFICHAGE DU CTA SI INVITE
+                if (userEmail === 'invite@eonia.com' || localStorage.getItem('eonia_access') === 'guest') {
+                    document.getElementById('cta-invite').classList.remove('hidden');
+                }
             }
         } catch (e) { 
             console.error("Erreur de chargement :", e);
