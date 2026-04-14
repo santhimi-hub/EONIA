@@ -362,4 +362,29 @@ function validerConnexion() {
     }
 
     if (!/^[0-9]{4,6}$/.test(pin)) {
-        error.innerText = "PIN : 4 à 6 chiffres uniquement
+        error.innerText = "PIN : 4 à 6 chiffres uniquement";
+        return;
+    }
+
+    localStorage.setItem('user_email', mail);
+    localStorage.setItem('user_pin', pin);
+    localStorage.setItem('eonia_access', 'client');
+
+    if (plaqueEnAttente) {
+        window.location.href = "jardin.html?id=" + plaqueEnAttente;
+    } else {
+        window.location.href = "catalogue.html";
+    }
+}
+
+function accesInvite() {
+    localStorage.clear();
+    localStorage.setItem('user_email', 'invite@eonia.com');
+    localStorage.setItem('user_pin', '0000');
+    localStorage.setItem('eonia_access', 'guest');
+    window.location.href = "catalogue.html";
+}
+</script>
+
+</body>
+</html>
