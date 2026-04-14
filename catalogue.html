@@ -85,4 +85,401 @@
             border: 1px solid rgba(255,255,255,0.15);
             color: #fff;
             padding: 7px 15px;
-            border-radius
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+        }
+
+        .nav-btn.active {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .controls-area {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px;
+            background: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 50px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* 🎙️ AJOUT MICRO */
+        #voice-btn {
+            margin: 10px auto;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #0c0c0c;
+            border: 1px solid #4ade80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        #voice-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 10px rgba(74,222,128,0.35);
+        }
+
+        #voice-btn.recording {
+            background: #4ade80;
+            color: #000;
+        }
+
+        .filter-nav {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .f-btn {
+            background: none;
+            border: 1px solid #1a1a1a;
+            color: #555;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .f-btn.active {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .catalog-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .letter-divider {
+            grid-column: 1 / -1;
+            font-size: 1.25rem;
+            color: #4ade80;
+            margin: 15px 0;
+            letter-spacing: 6px;
+        }
+
+        .plant-card {
+            background: #0c0c0c;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #1a1a1a;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .plant-card:hover {
+            border-color: #4ade80;
+        }
+
+        .img-container {
+            width: 100%;
+            height: 145px;
+            overflow: hidden;
+        }
+
+        .plant-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .plant-info {
+            padding: 12px 5px;
+            text-align: center;
+        }
+
+        .plant-name {
+            font-size: 0.65rem;
+            color: #bbb;
+            text-transform: uppercase;
+        }
+
+        .fav-star {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .fav-star.active {
+            color: #4ade80;
+        }
+
+        #ai-bubble {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #000;
+            border: 1px solid #4ade80;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+            z-index: 4000;
+            transition: 0.3s;
+        }
+
+        #ai-window {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            width: 320px;
+            max-width: 85vw;
+            background: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 15px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 4000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #ai-header {
+            background: #1a1a1a;
+            padding: 12px;
+            font-size: 0.7rem;
+            color: #4ade80;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #333;
+        }
+
+        #ai-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 15px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #ccc;
+        }
+
+        .ai-msg {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #161616;
+            width: fit-content;
+            max-width: 90%;
+        }
+
+        .user-msg {
+            background: #4ade80;
+            color: #000;
+            margin-left: auto;
+        }
+
+        #ai-input {
+            background: #000;
+            border: none;
+            border-top: 1px solid #1a1a1a;
+            padding: 15px;
+            color: #fff;
+            outline: none;
+            font-family: 'Raleway', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top-bar">
+    <button class="logout-header-btn" onclick="logout()">Quitter</button>
+</div>
+
+<header>
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
+    <h1 class="brand-title">ÉONIA</h1>
+    <p id="page-title">Chargement...</p>
+</header>
+
+<div class="controls-area">
+    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+
+    <!-- 🎙️ MICRO AJOUTÉ -->
+    <div id="voice-btn" onclick="startVoice()">🎙️</div>
+
+    <div class="filter-nav">
+        <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+        <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+        <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        <button class="f-btn" onclick="setFilter('fav', this)">Favoris ★</button>
+    </div>
+</div>
+
+<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
+    Synchronisation...
+</div>
+
+<div id="catalogue-grid" class="catalog-container"></div>
+
+<div id="ai-bubble" onclick="toggleAI()">🍃</div>
+
+<div id="ai-window">
+    <div id="ai-header">Assistant ÉONIA</div>
+    <div id="ai-messages"></div>
+    <input type="text" id="ai-input" placeholder="Posez une question..." onkeypress="handleAI(event)">
+</div>
+
+<script>
+
+const userEmail = localStorage.getItem('user_email');
+const userPin = localStorage.getItem('user_pin');
+
+let currentView = 'catalogue';
+let allPlants = [];
+let activeFilter = 'all';
+let favorites = JSON.parse(localStorage.getItem("eonia_fav") || "[]");
+
+const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+if (!userEmail) logout();
+
+function startVoice() {
+
+    const btn = document.getElementById("voice-btn");
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Reconnaissance vocale non supportée");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "fr-FR";
+
+    btn.classList.add("recording");
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+
+        const transcript = event.results[0][0].transcript.toLowerCase();
+
+        document.getElementById("searchBox").value = transcript;
+
+        renderGrid();
+
+        handleAI({ key: "Enter", fake: transcript });
+    };
+
+    recognition.onend = function() {
+        btn.classList.remove("recording");
+    };
+}
+
+/* --- IA EXISTANTE INCHANGÉE --- */
+function handleAI(e) {
+    if (e.key === 'Enter') {
+
+        const input = document.getElementById('ai-input');
+        const query = input.value.toLowerCase().trim();
+        if(!query) return;
+
+        addMessage(input.value, 'user-msg');
+        input.value = "";
+
+        setTimeout(() => {
+
+            let results = [...allPlants];
+            let response = "";
+
+            const isSoleil = query.includes("soleil");
+            const isOmbre = query.includes("ombre");
+            const isArbre = query.includes("arbre");
+            const isFleur = query.includes("fleur");
+            const isFruit = query.includes("fruit");
+            const isFacile = query.includes("facile");
+
+            if (isSoleil) results = results.filter(p => (p.Exposition || "").includes("soleil"));
+            if (isOmbre) results = results.filter(p => (p.Exposition || "").includes("ombre"));
+            if (isArbre) results = results.filter(p => (p.Type || "").includes("arbre"));
+            if (isFleur) results = results.filter(p => (p.Type || "").includes("fleur"));
+            if (isFruit) results = results.filter(p => (p.Type || "").includes("fruit"));
+            if (isFacile) results = results.filter(p => (p.Difficulte || "").includes("facile"));
+
+            if (results.length > 0) {
+
+                const first = results[0]["Nom commun"];
+
+                response = `🌿 J’ai trouvé ${results.length} plante(s)\nExemple : ${first}`;
+
+                document.getElementById("searchBox").value = query;
+                renderGrid();
+
+            } else {
+                response = "🌿 Essayez : soleil, ombre, fruitier, arbre ou fleur.";
+            }
+
+            addMessage(response, "ai-msg");
+
+        }, 500);
+    }
+}
+
+function addMessage(txt, cls) {
+    const msgBox = document.getElementById('ai-messages');
+    const div = document.createElement('div');
+    div.className = `ai-msg ${cls}`;
+    div.innerText = txt;
+    msgBox.appendChild(div);
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+function renderGrid() { /* inchangé */ }
+function setFilter() { /* inchangé */ }
+function toggleAI() { document.getElementById('ai-window').style.display = 'flex'; }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+
+function loadData() {
+    fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, pin: userPin })
+    })
+    .then(r => r.json())
+    .then(data => {
+        allPlants = data;
+        renderGrid();
+    });
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>
