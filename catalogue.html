@@ -8,45 +8,295 @@
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
-        
-        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logout-header-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; }
-        
-        header { text-align: center; padding: 30px 20px 20px 20px; }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Raleway', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 3000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logout-header-btn {
+            background: none;
+            border: 1px solid #4ade80;
+            color: #4ade80;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+        }
+
+        .logout-header-btn:hover {
+            background: #4ade80;
+            color: #000;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px 20px 20px;
+        }
+
         .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
-        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
-        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
-        .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
-        .search-input { width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 15px; }
+        .brand-title {
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            font-size: 2.1rem;
+        }
 
-        .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
-        .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; }
-        .f-btn.active { border-color: #4ade80; color: #4ade80; }
+        #page-title {
+            font-size: 0.7rem;
+            color: #4ade80;
+            margin-top: 8px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
 
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .plant-card { background: #0c0c0c; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; position: relative; }
-        .img-container { width: 100%; height: 145px; overflow: hidden; }
-        .plant-img { width: 100%; height: 100%; object-fit: cover; }
-        .plant-info { padding: 12px 5px; text-align: center; }
-        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; }
-        .fav-star { position: absolute; top: 8px; right: 8px; font-size: 14px; color: #555; cursor: pointer; z-index: 5; }
-        .fav-star.active { color: #4ade80; }
+        .client-nav {
+            display: none;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            margin-top: 15px;
+        }
 
-        /* IA ÉONIA BULLE */
-        #ai-bubble { position: fixed; bottom: 25px; right: 25px; background: #000; border: 1px solid #4ade80; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 4000; }
-        #ai-window { position: fixed; bottom: 95px; right: 20px; width: 320px; max-width: 85vw; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 4000; }
-        #ai-header { background: #1a1a1a; padding: 12px; font-size: 0.7rem; color: #4ade80; text-transform: uppercase; }
-        #ai-messages { height: 250px; overflow-y: auto; padding: 15px; font-size: 0.8rem; color: #ccc; }
-        .ai-msg { margin-bottom: 12px; padding: 8px 12px; border-radius: 10px; background: #161616; width: fit-content; max-width: 90%; }
-        .user-msg { background: #4ade80; color: #000; margin-left: auto; }
-        
-        /* CONTENEUR INPUT IA + MICRO */
-        .ai-input-area { display: flex; background: #000; border-top: 1px solid #1a1a1a; align-items: center; padding-right: 10px; }
-        #ai-input { flex: 1; background: transparent; border: none; padding: 15px; color: #fff; outline: none; }
-        #ai-mic-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; filter: grayscale(1); transition: 0.3s; }
-        #ai-mic-btn.active { filter: grayscale(0); transform: scale(1.2); }
+        .nav-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 7px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+        }
+
+        .nav-btn.active {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .controls-area {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px;
+            background: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 50px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .filter-nav {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .f-btn {
+            background: none;
+            border: 1px solid #1a1a1a;
+            color: #555;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .f-btn.active {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .catalog-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .letter-divider {
+            grid-column: 1 / -1;
+            font-size: 1.25rem;
+            color: #4ade80;
+            margin: 15px 0;
+            letter-spacing: 6px;
+            text-align: left;
+        }
+
+        .plant-card {
+            background: #0c0c0c;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #1a1a1a;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .plant-card:hover {
+            border-color: #4ade80;
+        }
+
+        .img-container {
+            width: 100%;
+            height: 145px;
+            overflow: hidden;
+        }
+
+        .plant-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .plant-info {
+            padding: 12px 5px;
+            text-align: center;
+        }
+
+        .plant-name {
+            font-size: 0.65rem;
+            color: #bbb;
+            text-transform: uppercase;
+        }
+
+        /* IA WINDOW & BUBBLE */
+        #ai-bubble {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #000;
+            border: 1px solid #4ade80;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+            z-index: 4000;
+        }
+
+        #ai-window {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            width: 320px;
+            max-width: 85vw;
+            background: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 15px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 4000;
+        }
+
+        #ai-header {
+            background: #1a1a1a;
+            padding: 12px;
+            font-size: 0.7rem;
+            color: #4ade80;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+        }
+
+        #ai-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 15px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .ai-msg {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #161616;
+            width: fit-content;
+            max-width: 90%;
+        }
+
+        .user-msg {
+            background: #4ade80;
+            color: #000;
+            margin-left: auto;
+        }
+
+        /* INPUT AREA AVEC MICRO DANS IA */
+        .ai-input-container {
+            display: flex;
+            background: #000;
+            border-top: 1px solid #1a1a1a;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        #ai-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 15px;
+            color: #fff;
+            outline: none;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        #ai-voice-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #4ade80;
+            padding: 10px;
+        }
+
+        #ai-voice-btn.recording {
+            color: #ff4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
     </style>
 </head>
 
@@ -62,6 +312,11 @@
     <p id="page-title">Chargement...</p>
 </header>
 
+<div id="client-menu" class="client-nav">
+    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+</div>
+
 <div class="controls-area">
     <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
 
@@ -74,7 +329,10 @@
     </div>
 </div>
 
-<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">Synchronisation...</div>
+<div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.7rem;margin-top:20px;">
+    Synchronisation...
+</div>
+
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <div id="ai-bubble" onclick="toggleAI()">🍃</div>
@@ -82,70 +340,88 @@
 <div id="ai-window">
     <div id="ai-header">Assistant ÉONIA</div>
     <div id="ai-messages"></div>
-    <div class="ai-input-area">
-        <input type="text" id="ai-input" placeholder="Posez une question..." onkeypress="if(event.key==='Enter') handleAI()">
-        <button id="ai-mic-btn" onclick="startAIMic()">🎙️</button>
+    <div class="ai-input-container">
+        <input type="text" id="ai-input" placeholder="Posez une question..." onkeypress="handleAI(event)">
+        <button id="ai-voice-btn" onclick="startAIVoice()">🎙️</button>
     </div>
 </div>
 
 <script>
-const API_URL = "https://eonia-api.santhimi.workers.dev";
 const userEmail = localStorage.getItem('user_email');
+const userPin = localStorage.getItem('user_pin');
+const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 let favorites = JSON.parse(localStorage.getItem("eonia_fav") || "[]");
 
 if (!userEmail) logout();
+if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
 
-// --- MICRO DÉDIÉ À L'IA ---
-function startAIMic() {
+function switchView(view) {
+    currentView = view;
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+    loadData();
+}
+
+// MICRO DÉDIÉ UNIQUEMENT À L'IA
+function startAIVoice() {
+    const btn = document.getElementById("ai-voice-btn");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (!SpeechRecognition) return alert("Micro non supporté");
 
     const recognition = new SpeechRecognition();
     recognition.lang = "fr-FR";
-    const btn = document.getElementById("ai-mic-btn");
-    
-    btn.classList.add("active");
+    btn.classList.add("recording");
     recognition.start();
 
-    recognition.onresult = (event) => {
+    recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
-        document.getElementById('ai-input').value = transcript;
-        handleAI(); // On lance l'IA direct après avoir parlé
+        document.getElementById("ai-input").value = transcript;
+        handleAI({ key: "Enter" }); // Lance l'IA automatiquement
     };
 
-    recognition.onend = () => btn.classList.remove("active");
+    recognition.onend = () => btn.classList.remove("recording");
 }
 
-function handleAI() {
-    const input = document.getElementById('ai-input');
-    const query = input.value.toLowerCase().trim();
-    if(!query) return;
+function handleAI(e) {
+    if (e.key === 'Enter') {
+        const input = document.getElementById('ai-input');
+        const query = input.value.toLowerCase().trim();
+        if(!query) return;
 
-    addMessage(input.value, 'user-msg');
-    input.value = "";
+        addMessage(input.value, 'user-msg');
+        input.value = "";
 
-    setTimeout(() => {
-        let results = allPlants.filter(p => {
-            const nom = (p["Nom commun"] || "").toLowerCase();
-            const desc = (p.Description || "").toLowerCase();
-            const type = (p.Type || "").toLowerCase();
-            const expo = (p.Exposition || "").toLowerCase();
-            
-            return nom.includes(query) || desc.includes(query) || type.includes(query) || expo.includes(query);
-        });
+        setTimeout(() => {
+            let results = [...allPlants];
+            let response = "";
 
-        let response = "";
-        if (results.length > 0) {
-            response = `🌿 J'ai trouvé ${results.length} plante(s). Je filtre votre catalogue !`;
-            document.getElementById("searchBox").value = query;
-            renderGrid();
-        } else {
-            response = "🌿 Je n'ai pas trouvé de plante spécifique. Essayez 'soleil', 'fruitier' ou 'fleur'.";
-        }
-        addMessage(response, "ai-msg");
-    }, 500);
+            const isSoleil = query.includes("soleil");
+            const isOmbre = query.includes("ombre");
+            const isArbre = query.includes("arbre");
+            const isFleur = query.includes("fleur");
+            const isFruit = query.includes("fruit");
+
+            if (isSoleil) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("soleil"));
+            if (isOmbre) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("ombre"));
+            if (isArbre) results = results.filter(p => (p.Type || "").toLowerCase().includes("arbre"));
+            if (isFleur) results = results.filter(p => (p.Type || "").toLowerCase().includes("fleur"));
+            if (isFruit) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
+
+            if (results.length > 0 && results.length < allPlants.length) {
+                response = `🌿 J'ai trouvé ${results.length} plante(s). Je les affiche pour vous !`;
+                document.getElementById("searchBox").value = query;
+                renderGrid();
+            } else {
+                response = "🌿 Je n'ai pas trouvé de plante précise. Essayez : soleil, fruitier ou arbre.";
+            }
+            addMessage(response, "ai-msg");
+        }, 500);
+    }
 }
 
 function addMessage(txt, cls) {
@@ -157,48 +433,79 @@ function addMessage(txt, cls) {
     msgBox.scrollTop = msgBox.scrollHeight;
 }
 
-function toggleAI() {
-    const win = document.getElementById('ai-window');
-    win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-}
-
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
-    const search = document.getElementById('searchBox').value.toLowerCase();
+    const searchVal = document.getElementById('searchBox').value.toLowerCase();
     container.innerHTML = "";
-    
-    const filtered = allPlants.filter(p => {
-        const matchSearch = (p["Nom commun"] || "").toLowerCase().includes(search);
-        const id = p.id || p.ID_Plaque;
-        const matchFilter = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || (p.Type === activeFilter);
-        return matchSearch && matchFilter;
+    let lastLetter = "";
+
+    let filtered = allPlants.filter(p => {
+        const nom = (p["Nom commun"] || "").toLowerCase();
+        const id = p.id || p["ID_Plaque"];
+        const type = (p.Type || "").toLowerCase();
+        const matchSearch = nom.includes(searchVal);
+        const matchType = (activeFilter === 'all' || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase()));
+        return matchSearch && matchType;
     });
+
+    document.getElementById('status-msg').style.display = (filtered.length === 0 ? "block" : "none");
 
     filtered.forEach(p => {
+        const nom = p["Nom commun"] || "Plante";
+        const currentLetter = nom[0].toUpperCase();
+
+        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter !== 'fav' && !searchVal) {
+            const divider = document.createElement('div');
+            divider.className = "letter-divider";
+            divider.innerText = currentLetter;
+            container.appendChild(divider);
+            lastLetter = currentLetter;
+        }
+
         const card = document.createElement('div');
         card.className = "plant-card";
-        card.innerHTML = `<div class="img-container"><img src="${p.Photo || ''}" class="plant-img"></div><div class="plant-info"><div class="plant-name">${p["Nom commun"]}</div></div>`;
         card.onclick = () => window.location.href = `jardin.html?id=${p.id || p.ID_Plaque}`;
+        card.innerHTML = `
+            <div class="img-container"><img src="${p.Photo || ''}" class="plant-img"></div>
+            <div class="plant-info"><div class="plant-name">${nom}</div></div>
+        `;
         container.appendChild(card);
     });
-    document.getElementById('status-msg').style.display = "none";
 }
 
-function setFilter(f, btn) {
-    activeFilter = f;
+function setFilter(type, btn) {
+    activeFilter = type;
     document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderGrid();
 }
 
 function loadData() {
-    fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({email: userEmail}) })
-    .then(r => r.json()).then(data => { allPlants = data; renderGrid(); });
+    const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+    document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+
+    fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailToSend, pin: userPin })
+    })
+    .then(r => r.json())
+    .then(data => {
+        allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
+        renderGrid();
+        document.getElementById('status-msg').innerText = "";
+    });
+}
+
+function toggleAI() {
+    const win = document.getElementById('ai-window');
+    win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
 }
 
 function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
 loadData();
 </script>
+
 </body>
 </html>
