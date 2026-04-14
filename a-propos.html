@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA | Notre Philosophie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Raleway', sans-serif;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 60px 25px; }
+
+        header { text-align: center; margin-bottom: 80px; }
+        .logo-small { width: 60px; margin-bottom: 20px; opacity: 0.8; }
+        h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { color: #4ade80; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; }
+
+        .content-block { margin-bottom: 100px; opacity: 0; transform: translateY(30px); transition: 1s all ease; }
+        .content-block.visible { opacity: 1; transform: translateY(0); }
+
+        h2 { font-weight: 400; font-size: 1.5rem; margin-bottom: 25px; color: #4ade80; }
+        p { color: #ccc; font-size: 1rem; margin-bottom: 20px; font-weight: 300; }
+        
+        .highlight { color: #fff; font-weight: 500; }
+
+        .manifesto {
+            background: rgba(255,255,255,0.03);
+            padding: 40px;
+            border-left: 2px solid #4ade80;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: #4ade80;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            border: 1px solid #4ade80;
+            padding: 12px 25px;
+            border-radius: 50px;
+            transition: 0.3s;
+        }
+        .back-link:hover { background: #4ade80; color: #000; }
+
+        /* Effet visuel pour les images */
+        .img-placeholder {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(45deg, #050505, #111);
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-small" alt="Logo">
+        <h1>ÉONIA</h1>
+        <div class="subtitle">L'Éternité Végétale</div>
+    </header>
+
+    <section class="content-block" id="vision">
+        <h2>Notre Vision</h2>
+        <p>Un jardin n'est pas qu'une collection de plantes, c'est une <span class="highlight">galerie de souvenirs</span>. Derrière chaque arbre planté se cache une histoire : une naissance, un hommage, ou simplement le temps qui passe.</p>
+        <p>ÉONIA est née de la volonté de relier ces deux mondes : la force brute de la nature et la précision du numérique. Nous créons un pont entre le sol et le ciel, entre vos racines et vos souvenirs.</p>
+    </section>
+
+    <div class="img-placeholder">Image : Une plaque ÉONIA dans un jardin brumeux</div>
+
+    <section class="content-block">
+        <h2>Le Concept</h2>
+        <div class="manifesto">
+            "Nous ne vendons pas des étiquettes botaniques. Nous créons des capsules temporelles pour votre patrimoine vivant."
+        </div>
+        <p style="margin-top: 30px;">Chaque plaque ÉONIA est équipée d'une puce <span class="highlight">NFC</span> et d'un <span class="highlight">QR Code</span> unique. En un simple geste, sans application à installer, vous accédez à l'âme de votre plante.</p>
+    </section>
+
+    <section class="content-block">
+        <h2>Pourquoi ÉONIA ?</h2>
+        <p><strong style="color: #fff;">Transmission :</strong> Transmettez l'accès à votre jardin à vos proches. Les données de vos arbres deviennent un héritage familial.</p>
+        <p><strong style="color: #fff;">Savoir-faire :</strong> Nos fiches botaniques sont conçues pour vous accompagner dans le soin de vos végétaux, avec l'aide de notre intelligence végétale intégrée.</p>
+        <p><strong style="color: #fff;">Esthétique :</strong> Un design minimaliste qui s'intègre avec respect dans chaque paysage, du jardin sauvage au parc millénaire.</p>
+    </section>
+
+    <center>
+        <a href="index.html" class="back-link">Retour à l'accueil</a>
+    </center>
+</div>
+
+<script>
+    // Petit script pour faire apparaître les blocs au défilement
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.content-block').forEach(block => {
+        observer.observe(block);
+    });
+</script>
+
+</body>
+</html>
