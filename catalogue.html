@@ -45,32 +45,12 @@
             cursor: pointer;
         }
 
-        .logout-header-btn:hover {
-            background: #4ade80;
-            color: #000;
-        }
+        .logout-header-btn:hover { background: #4ade80; color: #000; }
 
-        header {
-            text-align: center;
-            padding: 30px 20px 20px 20px;
-        }
-
+        header { text-align: center; padding: 30px 20px 20px 20px; }
         .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
-
-        .brand-title {
-            font-weight: 300;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            font-size: 2.1rem;
-        }
-
-        #page-title {
-            font-size: 0.7rem;
-            color: #4ade80;
-            margin-top: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
+        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
         .client-nav {
             display: none;
@@ -91,17 +71,9 @@
             text-transform: uppercase;
         }
 
-        .nav-btn.active {
-            border-color: #4ade80;
-            color: #4ade80;
-        }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        .controls-area {
-            max-width: 1000px;
-            margin: 0 auto 20px auto;
-            padding: 0 15px;
-            text-align: center;
-        }
+        .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
 
         .search-input {
             width: 100%;
@@ -113,14 +85,10 @@
             color: #fff;
             text-align: center;
             margin-bottom: 10px;
+            outline: none;
         }
 
-        .filter-nav {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
 
         .f-btn {
             background: none;
@@ -133,10 +101,7 @@
             text-transform: uppercase;
         }
 
-        .f-btn.active {
-            border-color: #4ade80;
-            color: #4ade80;
-        }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
         .catalog-container {
             display: grid;
@@ -166,32 +131,11 @@
             position: relative;
         }
 
-        .plant-card:hover {
-            border-color: #4ade80;
-        }
-
-        .img-container {
-            width: 100%;
-            height: 145px;
-            overflow: hidden;
-        }
-
-        .plant-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .plant-info {
-            padding: 12px 5px;
-            text-align: center;
-        }
-
-        .plant-name {
-            font-size: 0.65rem;
-            color: #bbb;
-            text-transform: uppercase;
-        }
+        .plant-card:hover { border-color: #4ade80; }
+        .img-container { width: 100%; height: 145px; overflow: hidden; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; }
+        .plant-info { padding: 12px 5px; text-align: center; }
+        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; }
 
         /* IA WINDOW & BUBBLE */
         #ai-bubble {
@@ -252,11 +196,7 @@
             max-width: 90%;
         }
 
-        .user-msg {
-            background: #4ade80;
-            color: #000;
-            margin-left: auto;
-        }
+        .user-msg { background: #4ade80; color: #000; margin-left: auto; }
 
         .ai-input-container {
             display: flex;
@@ -283,10 +223,8 @@
             font-size: 1.1rem;
             color: #4ade80;
             padding: 10px;
-            transition: 0.2s;
         }
 
-        /* BOUTON ENVOI RELOOKÉ */
         #ai-send-btn {
             background: none;
             border: none;
@@ -295,30 +233,17 @@
             align-items: center;
             justify-content: center;
             padding: 5px;
-            transition: 0.3s;
         }
 
-        #ai-send-btn svg {
-            fill: #4ade80;
-            width: 20px;
-            height: 20px;
-        }
+        #ai-send-btn svg { fill: #4ade80; width: 22px; height: 22px; }
 
-        #ai-send-btn:hover {
-            transform: scale(1.1);
-        }
-
-        #ai-voice-btn.recording {
-            color: #ff4444;
-            animation: pulse 1.5s infinite;
-        }
+        #ai-voice-btn.recording { color: #ff4444; animation: pulse 1.5s infinite; }
 
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-
     </style>
 </head>
 
@@ -340,7 +265,7 @@
 </div>
 
 <div class="controls-area">
-    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="renderGrid()">
+    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER..." oninput="onSearchInput()">
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
@@ -380,6 +305,7 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 let favorites = JSON.parse(localStorage.getItem("eonia_fav") || "[]");
+let searchTimeout = null;
 
 if (!userEmail) logout();
 if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
@@ -394,10 +320,10 @@ function switchView(view) {
 function initAI() {
     const msgBox = document.getElementById('ai-messages');
     const name = (userEmail && userEmail !== 'invite@eonia.com') ? userEmail.split('@')[0] : "cher ami";
-    msgBox.innerHTML = `<div class="ai-msg">Bonjour ${name} ! Ravi de vous aider. Je connais parfaitement notre collection. Que recherchez-vous aujourd'hui ?</div>`;
+    msgBox.innerHTML = "";
+    addMessage(`Bonjour ${name} ! Ravi de vous aider. Je connais parfaitement notre collection. Que recherchez-vous aujourd'hui ?`, "ai-msg");
 }
 
-// MICRO 100% ISOLÉ POUR L'IA
 function startAIVoice() {
     const btn = document.getElementById("ai-voice-btn");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -411,60 +337,72 @@ function startAIVoice() {
 
     recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
-        // On écrit uniquement dans l'input de l'IA
         document.getElementById("ai-input").value = transcript;
-        handleAI(null); 
+        processAI();
     };
 
     recognition.onend = () => btn.classList.remove("recording");
 }
 
+function processAI() {
+    const input = document.getElementById('ai-input');
+    const query = input.value.toLowerCase().trim();
+    if (!query) return;
+
+    addMessage(input.value, 'user-msg');
+    input.value = "";
+
+    setTimeout(() => {
+        let results = [...allPlants];
+        const filters = {
+            soleil: query.includes("soleil"),
+            ombre: query.includes("ombre"),
+            arbre: query.includes("arbre"),
+            fleur: query.includes("fleur"),
+            fruit: query.includes("fruit")
+        };
+
+        if (filters.soleil) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("soleil"));
+        if (filters.ombre) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("ombre"));
+        if (filters.arbre) results = results.filter(p => (p.Type || "").toLowerCase().includes("arbre"));
+        if (filters.fleur) results = results.filter(p => (p.Type || "").toLowerCase().includes("fleur"));
+        if (filters.fruit) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
+
+        let response = "";
+        if (results.length > 0 && results.length < allPlants.length) {
+            const ex = results[0]["Nom commun"];
+            response = `Bien sûr ! J'ai trouvé ${results.length} plante(s) correspondantes, comme le **${ex}**. Je les ai affichées dans votre liste.`;
+            document.getElementById("searchBox").value = query;
+            renderGrid();
+        } else {
+            response = "Je n'ai pas trouvé de plante précise. N'hésitez pas à essayer des mots-clés comme 'soleil', 'fruitier' ou 'arbre' !";
+        }
+        addMessage(response, "ai-msg");
+    }, 400);
+}
+
 function handleAI(e) {
-    if (e === null || e.key === 'Enter') {
-        const input = document.getElementById('ai-input');
-        const query = input.value.toLowerCase().trim();
-        if(!query) return;
-
-        addMessage(input.value, 'user-msg');
-        input.value = "";
-
-        setTimeout(() => {
-            let results = [...allPlants];
-            let response = "";
-
-            const isSoleil = query.includes("soleil");
-            const isOmbre = query.includes("ombre");
-            const isArbre = query.includes("arbre");
-            const isFleur = query.includes("fleur");
-            const isFruit = query.includes("fruit");
-
-            if (isSoleil) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("soleil"));
-            if (isOmbre) results = results.filter(p => (p.Exposition || "").toLowerCase().includes("ombre"));
-            if (isArbre) results = results.filter(p => (p.Type || "").toLowerCase().includes("arbre"));
-            if (isFleur) results = results.filter(p => (p.Type || "").toLowerCase().includes("fleur"));
-            if (isFruit) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
-
-            if (results.length > 0 && results.length < allPlants.length) {
-                const ex = results[0]["Nom commun"];
-                response = `Bien sûr ! J'ai trouvé ${results.length} plante(s) correspondantes, comme le **${ex}**. Je les ai affichées dans votre liste.`;
-                // Ici l'IA met à jour la recherche globale pour filtrer le catalogue
-                document.getElementById("searchBox").value = query;
-                renderGrid();
-            } else {
-                response = "Je n'ai pas trouvé de plante précise pour cette demande. N'hésitez pas à essayer des mots-clés comme 'soleil', 'fruitier' ou 'arbre' !";
-            }
-            addMessage(response, "ai-msg");
-        }, 500);
-    }
+    if (!e || e.key === 'Enter') processAI();
 }
 
 function addMessage(txt, cls) {
     const msgBox = document.getElementById('ai-messages');
     const div = document.createElement('div');
     div.className = `ai-msg ${cls}`;
-    div.innerText = txt;
+    div.textContent = txt;
     msgBox.appendChild(div);
     msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+function toggleFavorite(id) {
+    if (!id) return;
+    if (favorites.includes(id)) {
+        favorites = favorites.filter(f => f !== id);
+    } else {
+        favorites.push(id);
+    }
+    localStorage.setItem("eonia_fav", JSON.stringify(favorites));
+    if (activeFilter === 'fav') renderGrid();
 }
 
 function renderGrid() {
@@ -478,7 +416,7 @@ function renderGrid() {
         const id = p.id || p["ID_Plaque"];
         const type = (p.Type || "").toLowerCase();
         const matchSearch = nom.includes(searchVal);
-        const matchType = (activeFilter === 'all' || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase()));
+        const matchType = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase());
         return matchSearch && matchType;
     });
 
@@ -486,19 +424,22 @@ function renderGrid() {
 
     filtered.forEach(p => {
         const nom = p["Nom commun"] || "Plante";
+        const id = p.id || p.ID_Plaque;
         const currentLetter = nom[0].toUpperCase();
 
         if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter !== 'fav' && !searchVal) {
             const divider = document.createElement('div');
             divider.className = "letter-divider";
-            divider.innerText = currentLetter;
+            divider.textContent = currentLetter;
             container.appendChild(divider);
             lastLetter = currentLetter;
         }
 
         const card = document.createElement('div');
         card.className = "plant-card";
-        card.onclick = () => window.location.href = `jardin.html?id=${p.id || p.ID_Plaque}`;
+        card.onclick = () => window.location.href = `jardin.html?id=${id}`;
+        card.ondblclick = (e) => { e.preventDefault(); toggleFavorite(id); };
+
         card.innerHTML = `
             <div class="img-container"><img src="${p.Photo || ''}" class="plant-img"></div>
             <div class="plant-info"><div class="plant-name">${nom}</div></div>
@@ -512,6 +453,11 @@ function setFilter(type, btn) {
     document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderGrid();
+}
+
+function onSearchInput() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(renderGrid, 200);
 }
 
 function loadData() {
@@ -528,16 +474,17 @@ function loadData() {
         allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
         renderGrid();
         document.getElementById('status-msg').innerText = "";
+    })
+    .catch(() => {
+        document.getElementById('status-msg').innerText = "Erreur de synchronisation";
     });
 }
 
 function toggleAI() {
     const win = document.getElementById('ai-window');
-    const isOpening = (win.style.display !== 'flex');
-    win.style.display = isOpening ? 'flex' : 'none';
-    if (isOpening && document.getElementById('ai-messages').innerHTML === "") {
-        initAI();
-    }
+    const open = win.style.display !== 'flex';
+    win.style.display = open ? 'flex' : 'none';
+    if (open && document.getElementById('ai-messages').innerHTML === "") initAI();
 }
 
 function logout() { localStorage.clear(); window.location.href = "index.html"; }
