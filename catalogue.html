@@ -258,7 +258,6 @@
             margin-left: auto;
         }
 
-        /* INPUT AREA AVEC MICRO DANS IA */
         .ai-input-container {
             display: flex;
             background: #000;
@@ -284,6 +283,15 @@
             font-size: 1.1rem;
             color: #4ade80;
             padding: 10px;
+        }
+
+        #ai-send-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #4ade80;
+            padding: 5px;
         }
 
         #ai-voice-btn.recording {
@@ -342,7 +350,8 @@
     <div id="ai-messages"></div>
     <div class="ai-input-container">
         <input type="text" id="ai-input" placeholder="Posez une question..." onkeypress="handleAI(event)">
-        <button id="ai-voice-btn" onclick="startAIVoice()">🎙️</button>
+        <button id="ai-voice-btn" onclick="startAIVoice()" title="Parler">🎙️</button>
+        <button id="ai-send-btn" onclick="handleAI(null)" title="Envoyer">➞</button>
     </div>
 </div>
 
@@ -366,7 +375,13 @@ function switchView(view) {
     loadData();
 }
 
-// MICRO DÉDIÉ UNIQUEMENT À L'IA
+// MESSAGE D'ACCUEIL POLI
+function initAI() {
+    const msgBox = document.getElementById('ai-messages');
+    const name = (userEmail && userEmail !== 'invite@eonia.com') ? userEmail.split('@')[0] : "cher ami";
+    msgBox.innerHTML = `<div class="ai-msg">Bonjour ${name} ! Ravi de vous aider. Je connais parfaitement notre collection. Que recherchez-vous aujourd'hui ?</div>`;
+}
+
 function startAIVoice() {
     const btn = document.getElementById("ai-voice-btn");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -381,14 +396,15 @@ function startAIVoice() {
     recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
         document.getElementById("ai-input").value = transcript;
-        handleAI({ key: "Enter" }); // Lance l'IA automatiquement
+        handleAI(null); 
     };
 
     recognition.onend = () => btn.classList.remove("recording");
 }
 
 function handleAI(e) {
-    if (e.key === 'Enter') {
+    // Si e est null (bouton ➞) ou si c'est la touche Enter
+    if (e === null || e.key === 'Enter') {
         const input = document.getElementById('ai-input');
         const query = input.value.toLowerCase().trim();
         if(!query) return;
@@ -413,11 +429,12 @@ function handleAI(e) {
             if (isFruit) results = results.filter(p => (p.Type || "").toLowerCase().includes("fruit"));
 
             if (results.length > 0 && results.length < allPlants.length) {
-                response = `🌿 J'ai trouvé ${results.length} plante(s). Je les affiche pour vous !`;
+                const ex = results[0]["Nom commun"];
+                response = `Bien sûr ! J'ai trouvé ${results.length} plante(s) correspondantes, comme le **${ex}**. Je les ai affichées dans votre liste.`;
                 document.getElementById("searchBox").value = query;
                 renderGrid();
             } else {
-                response = "🌿 Je n'ai pas trouvé de plante précise. Essayez : soleil, fruitier ou arbre.";
+                response = "Je n'ai pas trouvé de plante précise pour cette demande. N'hésitez pas à essayer des mots-clés comme 'soleil', 'fruitier' ou 'arbre' !";
             }
             addMessage(response, "ai-msg");
         }, 500);
@@ -499,7 +516,11 @@ function loadData() {
 
 function toggleAI() {
     const win = document.getElementById('ai-window');
-    win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+    const isOpening = (win.style.display !== 'flex');
+    win.style.display = isOpening ? 'flex' : 'none';
+    if (isOpening && document.getElementById('ai-messages').innerHTML === "") {
+        initAI();
+    }
 }
 
 function logout() { localStorage.clear(); window.location.href = "index.html"; }
