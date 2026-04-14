@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
     <style>
-        /* RESET & BASE */
         * { margin:0; padding:0; box-sizing:border-box; }
 
         body, html {
@@ -19,7 +18,6 @@
             scroll-behavior:smooth;
         }
 
-        /* HERO SECTION */
         .hero {
             height:100vh;
             display:flex;
@@ -27,13 +25,12 @@
             justify-content:center;
             align-items:center;
             text-align:center;
-            background: 
+            background:
                 linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
                 url('background.jpg') center/cover no-repeat;
             animation: fadeIn 1.2s ease;
         }
 
-        /* LOGO & TITRE */
         .logo-main {
             width:120px;
             margin-bottom:25px;
@@ -69,7 +66,6 @@
             animation-delay: 0.6s;
         }
 
-        /* FORMULAIRE AUTH */
         .auth-container {
             display:flex;
             flex-direction:column;
@@ -130,7 +126,6 @@
 
         .pin-forgot:hover { color:#fff; }
 
-        /* BOUTON */
         .btn-main {
             width:100%;
             padding:14px;
@@ -171,8 +166,8 @@
             opacity:0;
             animation: fadeUp 1s ease forwards;
             animation-delay: 1s;
-            display: flex;
-            gap: 25px;
+            display:flex;
+            gap:25px;
         }
 
         .bottom-nav a {
@@ -183,17 +178,16 @@
             letter-spacing:2.5px;
             transition:0.3s;
             font-weight:500;
-            cursor: pointer;
+            cursor:pointer;
         }
 
         .bottom-nav a:hover { color:#fff; }
 
-        /* SECTION CONTENT */
         .content-section {
             padding:100px 30px;
             text-align:center;
             background:#050505;
-            border-top: 1px solid #1a1a1a;
+            border-top:1px solid #1a1a1a;
         }
 
         .content-section h2 {
@@ -215,26 +209,31 @@
         .highlight { color:#fff; font-weight:500; }
 
         .pillar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            max-width: 1000px;
-            margin: 60px auto 0 auto;
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+            gap:40px;
+            max-width:1000px;
+            margin:60px auto 0 auto;
         }
 
-        .pillar-item span { font-size: 2rem; display: block; margin-bottom: 15px; }
-        .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-        .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
+        .pillar-item span { font-size:2rem; display:block; margin-bottom:15px; }
+        .pillar-item h3 {
+            font-size:0.75rem;
+            color:#4ade80;
+            letter-spacing:2px;
+            text-transform:uppercase;
+            margin-bottom:10px;
+        }
+        .pillar-item p { font-size:0.85rem; color:#888; line-height:1.5; }
 
         .manifesto-box {
-            max-width: 700px;
-            margin: 80px auto 0 auto;
-            text-align: left;
-            border-left: 2px solid #4ade80;
-            padding-left: 30px;
+            max-width:700px;
+            margin:80px auto 0 auto;
+            text-align:left;
+            border-left:2px solid #4ade80;
+            padding-left:30px;
         }
 
-        /* ANIMATIONS */
         @keyframes fadeUp {
             from { opacity:0; transform:translateY(20px); }
             to { opacity:1; transform:translateY(0); }
@@ -245,29 +244,38 @@
             to { opacity:1; }
         }
 
-        /* MOBILE */
         @media (max-width:600px) {
             .brand-title { font-size:2.5rem; }
+            .auth-container { width:90%; }
             .tagline { margin-top:20px; margin-bottom:30px; }
-            .pillar-grid { gap: 30px; }
         }
+
+        #error {
+            color:#ff4d4d;
+            font-size:0.75rem;
+            text-align:center;
+            margin-top:5px;
+            transition:0.3s;
+        }
+
+        #error:empty { display:none; }
     </style>
 </head>
 
 <body>
 
 <main class="hero">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Éonia Logo">
-    
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
+
     <h1 class="brand-title">ÉONIA</h1>
-    
+
     <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
 
     <div class="auth-container">
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
 
         <div style="display:flex;flex-direction:column;gap:8px;">
-            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" maxlength="4" required>
+            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" maxlength="6" required>
 
             <div class="auth-footer">
                 <p id="activation-help">
@@ -277,21 +285,24 @@
             </div>
         </div>
 
+        <p id="error"></p>
+
         <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
+
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
     </div>
 
     <nav class="bottom-nav">
-        <a href="#" onclick="accesInvite()">Accès Invité</a>
+        <a onclick="accesInvite()">Accès Invité</a>
         <a href="#concept">Le Concept</a>
     </nav>
 </main>
 
 <section class="content-section" id="concept">
     <h2>Notre Concept</h2>
+
     <p>
-        Éonia fusionne l'élégance du support et la puissance du numérique.  
-        Chaque plante a une histoire. <br>
+        Éonia fusionne l'élégance du support et la puissance du numérique.
         <span class="highlight">Scanner, Cultiver, Raconter.</span>
     </p>
 
@@ -299,84 +310,56 @@
         <div class="pillar-item">
             <span>🌿</span>
             <h3>Scanner</h3>
-            <p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p>
+            <p>Accès immédiat à l'identité de la plante.</p>
         </div>
+
         <div class="pillar-item">
             <span>📖</span>
             <h3>Raconter</h3>
-            <p>Créez un journal de bord vivant pour documenter sa croissance.</p>
+            <p>Journal de croissance vivant.</p>
         </div>
+
         <div class="pillar-item">
             <span>♾️</span>
             <h3>Transmettre</h3>
-            <p>Faites vivre la mémoire de votre jardin pour les générations futures.</p>
+            <p>Mémoire du jardin pour les générations futures.</p>
         </div>
     </div>
 
     <div class="manifesto-box">
-        <h2 style="text-align: left; font-size: 1.2rem; margin-bottom: 20px;">L'Âme d'Éonia</h2>
-        <p style="color: #ccc; margin-bottom: 20px; text-align: left; max-width: 100%;">
-            Un jardin n'est pas qu'une collection de plantes, c'est une <span class="highlight">galerie de souvenirs</span>. Derrière chaque arbre planté se cache une histoire : une naissance, un hommage, ou simplement le temps qui passe.
-        </p>
-        <p style="color: #ccc; text-align: left; max-width: 100%;">
-            Nous créons un pont entre le sol et le ciel, entre vos racines et vos souvenirs. Nos plaques sont des <span class="highlight">capsules temporelles</span> conçues pour que votre patrimoine vivant ne s'efface jamais.
-        </p>
-        
-        <a href="a-propos.html" style="display: inline-block; margin-top: 30px; color: #4ade80; text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; border-bottom: 1px solid #4ade80; padding-bottom: 5px; text-transform: uppercase; font-weight: 500;">
-            Découvrir notre philosophie
-        </a>
+        <h2>L'Âme d'Éonia</h2>
+        <p>Un jardin est une galerie de souvenirs vivants.</p>
     </div>
 </section>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const plaqueEnAttente = urlParams.get('id');
+const urlParams = new URLSearchParams(window.location.search);
+const plaqueEnAttente = urlParams.get('id');
 
-    window.onload = () => {
-        if (plaqueEnAttente) {
-            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-            document.getElementById('activation-help').style.display = "block";
-        }
-    };
+window.onload = () => {
+    if (plaqueEnAttente) {
+        document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+        document.getElementById('activation-help').style.display = "block";
+    }
+};
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') validerConnexion();
-    });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') validerConnexion();
+});
 
-    function validerConnexion() {
-        const mail = document.getElementById('email').value.toLowerCase().trim();
-        const pin = document.getElementById('pin').value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function validerConnexion() {
+    const mail = document.getElementById('email').value.toLowerCase().trim();
+    const pin = document.getElementById('pin').value.trim();
+    const error = document.getElementById('error');
 
-        if(!emailRegex.test(mail)) {
-            alert("Veuillez entrer une adresse email valide.");
-            return;
-        }
-        if (!/^[0-9]{4,6}$/.test(pin)) {
-    alert("PIN : 4 chiffres uniquement.");
-    return;
-        }
-        }
+    error.innerText = "";
 
-        localStorage.setItem('user_email', mail);
-        localStorage.setItem('user_pin', pin);
-        localStorage.setItem('eonia_access', 'client');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (plaqueEnAttente) {
-            window.location.href = "jardin.html?id=" + plaqueEnAttente;
-        } else {
-            window.location.href = "catalogue.html";
-        }
+    if (!emailRegex.test(mail)) {
+        error.innerText = "Email invalide";
+        return;
     }
 
-    function accesInvite() {
-        localStorage.clear();
-        localStorage.setItem('user_email', 'invite@eonia.com');
-        localStorage.setItem('user_pin', '0000');
-        localStorage.setItem('eonia_access', 'guest');
-        window.location.href = "catalogue.html";
-    }
-</script>
-
-</body>
-</html>
+    if (!/^[0-9]{4,6}$/.test(pin)) {
+        error.innerText = "PIN : 4 à 6 chiffres uniquement
