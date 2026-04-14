@@ -267,7 +267,7 @@
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
 
         <div style="display:flex;flex-direction:column;gap:8px;">
-            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
+            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" maxlength="4" required>
 
             <div class="auth-footer">
                 <p id="activation-help">
@@ -352,9 +352,10 @@
             alert("Veuillez entrer une adresse email valide.");
             return;
         }
-        if(pin.length < 4) {
-            alert("Veuillez entrer un code PIN (4 chiffres minimum).");
-            return;
+        if (!/^[0-9]{4,6}$/.test(pin)) {
+    alert("PIN : 4 chiffres uniquement.");
+    return;
+        }
         }
 
         localStorage.setItem('user_email', mail);
