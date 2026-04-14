@@ -7,204 +7,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
 
     <style>
+        /* TES STYLES ORIGINAUX */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background: #000;
-            color: #fff;
-            font-family: 'Raleway', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-            padding-top: 60px;
-        }
-
-        .top-bar {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 60px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 3000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .logout-header-btn {
-            background: none;
-            border: 1px solid #4ade80;
-            color: #4ade80;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-        }
-
-        .logout-header-btn:hover {
-            background: #4ade80;
-            color: #000;
-        }
-
-        header {
-            text-align: center;
-            padding: 30px 20px 20px 20px;
-        }
-
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logout-header-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; }
+        header { text-align: center; padding: 30px 20px 20px 20px; }
         .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
+        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
+        .client-nav { display: none; justify-content: center; gap: 12px; margin-bottom: 25px; margin-top: 15px; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 15px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+        .controls-area { max-width: 1000px; margin: 0 auto 20px auto; padding: 0 15px; text-align: center; }
+        .search-input { width: 100%; max-width: 350px; padding: 12px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 10px; }
+        .filter-nav { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #555; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.5rem; text-transform: uppercase; }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; }
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .letter-divider { grid-column: 1 / -1; font-size: 1.25rem; color: #4ade80; margin: 15px 0; letter-spacing: 6px; }
+        .plant-card { background: #0c0c0c; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; position: relative; }
+        .img-container { width: 100%; height: 145px; overflow: hidden; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; }
+        .plant-info { padding: 12px 5px; text-align: center; }
+        .plant-name { font-size: 0.65rem; color: #bbb; text-transform: uppercase; }
+        .fav-star { position: absolute; top: 8px; right: 8px; font-size: 14px; color: #555; cursor: pointer; z-index: 10; }
+        .fav-star.active { color: #4ade80; }
 
-        .brand-title {
-            font-weight: 300;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            font-size: 2.1rem;
-        }
-
-        #page-title {
-            font-size: 0.7rem;
-            color: #4ade80;
-            margin-top: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .client-nav {
-            display: none;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            margin-top: 15px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #fff;
-            padding: 7px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-        }
-
-        .nav-btn.active {
-            border-color: #4ade80;
-            color: #4ade80;
-        }
-
-        .controls-area {
-            max-width: 1000px;
-            margin: 0 auto 20px auto;
-            padding: 0 15px;
-            text-align: center;
-        }
-
-        .search-input {
-            width: 100%;
-            max-width: 350px;
-            padding: 12px;
-            background: #0c0c0c;
-            border: 1px solid #1a1a1a;
-            border-radius: 50px;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .filter-nav {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .f-btn {
-            background: none;
-            border: 1px solid #1a1a1a;
-            color: #555;
-            padding: 5px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .f-btn.active {
-            border-color: #4ade80;
-            color: #4ade80;
-        }
-
-        .catalog-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-            gap: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .letter-divider {
-            grid-column: 1 / -1;
-            font-size: 1.25rem;
-            color: #4ade80;
-            margin: 15px 0;
-            letter-spacing: 6px;
-        }
-
-        .plant-card {
-            background: #0c0c0c;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #1a1a1a;
-            cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-        }
-
-        .plant-card:hover {
-            border-color: #4ade80;
-        }
-
-        .img-container {
-            width: 100%;
-            height: 145px;
-            overflow: hidden;
-        }
-
-        .plant-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .plant-info {
-            padding: 12px 5px;
-            text-align: center;
-        }
-
-        .plant-name {
-            font-size: 0.65rem;
-            color: #bbb;
-            text-transform: uppercase;
-        }
-
-        .fav-star {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 14px;
-            color: #555;
-            cursor: pointer;
-        }
-
-        .fav-star.active {
-            color: #4ade80;
-        }
-
+        /* --- STYLES IA ÉONIA --- */
+        #ai-bubble { position: fixed; bottom: 20px; right: 20px; background: #000; border: 1px solid #4ade80; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3); z-index: 4000; transition: 0.3s; }
+        #ai-bubble:hover { transform: scale(1.1); }
+        #ai-window { position: fixed; bottom: 85px; right: 20px; width: 320px; max-width: 85vw; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 15px; display: none; flex-direction: column; overflow: hidden; z-index: 4000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #ai-header { background: #1a1a1a; padding: 12px; font-size: 0.7rem; color: #4ade80; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; }
+        #ai-messages { height: 250px; overflow-y: auto; padding: 15px; font-size: 0.8rem; line-height: 1.4; color: #ccc; }
+        .ai-msg { margin-bottom: 12px; padding: 8px 12px; border-radius: 10px; background: #161616; width: fit-content; max-width: 90%; }
+        .user-msg { background: #4ade80; color: #000; margin-left: auto; }
+        #ai-input { background: #000; border: none; border-top: 1px solid #1a1a1a; padding: 15px; color: #fff; outline: none; font-family: 'Raleway', sans-serif; }
+        .hidden { display: none !important; }
     </style>
 </head>
 
@@ -233,6 +72,7 @@
         <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
         <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
         <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        <button class="f-btn" onclick="setFilter('fav', this)">Favoris ★</button>
     </div>
 </div>
 
@@ -242,13 +82,19 @@
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
-<div id="ai-chat-window"></div>
+<div id="ai-bubble" onclick="toggleAI()">
+    <span style="font-size: 1.2rem;">🍃</span>
+</div>
+
+<div id="ai-window">
+    <div id="ai-header">Assistant ÉONIA</div>
+    <div id="ai-messages"></div>
+    <input type="text" id="ai-input" placeholder="Posez une question..." onkeypress="handleAI(event)">
+</div>
 
 <script>
-
 const userEmail = localStorage.getItem('user_email');
 const userPin = localStorage.getItem('user_pin');
-
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
@@ -257,148 +103,151 @@ let favorites = JSON.parse(localStorage.getItem("eonia_fav") || "[]");
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 
 if (!userEmail) logout();
-
-if (userEmail !== 'invite@eonia.com')
-document.getElementById('client-menu').style.display = 'flex';
-
-function switchView(view) {
-    currentView = view;
-
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-
-    loadData();
-}
+if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
 
 async function loadData() {
+    document.getElementById('status-msg').innerText = "Synchronisation...";
+    const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+    document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
 
-document.getElementById('status-msg').innerText = "Synchronisation...";
-
-const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
-
-document.getElementById('page-title').innerText =
-(currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
-
-const response = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ email: emailToSend, pin: userPin })
-});
-
-allPlants = await response.json();
-
-/* TRI ALPHABETIQUE A → Z */
-allPlants.sort((a,b) =>
-(a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
-);
-
-renderGrid();
-}
-
-function toggleFav(id) {
-if (favorites.includes(id)) {
-favorites = favorites.filter(f => f !== id);
-} else {
-favorites.push(id);
-}
-localStorage.setItem("eonia_fav", JSON.stringify(favorites));
-renderGrid();
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: emailToSend, pin: userPin })
+        });
+        allPlants = await response.json();
+        allPlants.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
+        renderGrid();
+        initAI(); // Initialise l'IA après le chargement des données
+    } catch(e) {
+        document.getElementById('status-msg').innerText = "Erreur de connexion";
+    }
 }
 
 function renderGrid() {
+    const container = document.getElementById('catalogue-grid');
+    const searchVal = document.getElementById('searchBox').value.toLowerCase();
+    container.innerHTML = "";
+    let lastLetter = "";
 
-const container = document.getElementById('catalogue-grid');
-const searchVal = document.getElementById('searchBox').value.toLowerCase();
+    let filtered = allPlants.filter(p => {
+        const nom = (p["Nom commun"] || "").toLowerCase();
+        const latin = (p["Nom scientifique"] || p["Nom latin"] || "").toLowerCase();
+        const type = (p.Type && p.Type.name) ? p.Type.name.toLowerCase() : (p.Type || "").toLowerCase();
+        const id = p.id || p["ID_Plaque"];
 
-container.innerHTML = "";
+        const matchSearch = nom.includes(searchVal) || latin.includes(searchVal);
+        const matchType = (activeFilter === 'all' || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase()));
+        return matchSearch && matchType;
+    });
 
-let lastLetter = "";
+    document.getElementById('status-msg').style.display = (filtered.length === 0 ? "block" : "none");
+    if(filtered.length === 0) document.getElementById('status-msg').innerText = "Aucun résultat";
 
-let filtered = allPlants.filter(p => {
+    filtered.forEach(p => {
+        const id = p.id || p["ID_Plaque"];
+        const isFav = favorites.includes(id);
+        const nom = p["Nom commun"] || "Plante";
+        const currentLetter = nom[0].toUpperCase();
 
-const nom = (p["Nom commun"] || "").toLowerCase();
-const latin = (p["Nom latin"] || "").toLowerCase();
+        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter !== 'fav') {
+            const divider = document.createElement('div');
+            divider.className = "letter-divider";
+            divider.innerText = currentLetter;
+            container.appendChild(divider);
+            lastLetter = currentLetter;
+        }
 
-const type = (p.Type && p.Type.name)
-? p.Type.name.toLowerCase()
-: (p.Type || "").toLowerCase();
+        const card = document.createElement('div');
+        card.className = "plant-card";
+        card.onclick = () => window.location.href = `jardin.html?id=${id}${currentView === 'catalogue' ? '&from=catalogue' : ''}`;
 
-const id = p.id || p["ID_Plaque"];
-
-const matchSearch = nom.includes(searchVal) || latin.includes(searchVal);
-
-const matchType =
-(activeFilter === 'all' ||
-(activeFilter === 'fav' && favorites.includes(id)) ||
-type.includes(activeFilter.toLowerCase()));
-
-return matchSearch && matchType;
-
-});
-
-document.getElementById('status-msg').innerText = "";
-document.getElementById('status-msg').style.display =
-(filtered.length === 0 ? "block" : "none");
-
-filtered.forEach(p => {
-
-const id = p.id || p["ID_Plaque"];
-const isFav = favorites.includes(id);
-
-const nom = p["Nom commun"] || "Plante";
-const currentLetter = nom[0].toUpperCase();
-
-if (currentView === 'catalogue' && currentLetter !== lastLetter) {
-const divider = document.createElement('div');
-divider.className = "letter-divider";
-divider.innerText = currentLetter;
-container.appendChild(divider);
-lastLetter = currentLetter;
+        card.innerHTML = `
+            ${currentView === 'catalogue' ? `<div class="fav-star ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${id}')">★</div>` : ''}
+            <div class="img-container"><img src="${p.Photo || 'https://via.placeholder.com/300'}" class="plant-img"></div>
+            <div class="plant-info"><div class="plant-name">${nom}</div></div>
+        `;
+        container.appendChild(card);
+    });
 }
 
-const card = document.createElement('div');
-card.className = "plant-card";
-
-card.onclick = () => {
-const source = (currentView === 'catalogue') ? "&from=catalogue" : "";
-window.location.href = `jardin.html?id=${id}${source}`;
-};
-
-card.innerHTML = `
-${currentView === 'catalogue' ? `
-<div class="fav-star ${isFav ? 'active' : ''}"
-onclick="event.stopPropagation(); toggleFav('${id}')">★</div>
-` : ''}
-
-<div class="img-container">
-<img src="${p.Photo || 'https://via.placeholder.com/300'}" class="plant-img">
-</div>
-
-<div class="plant-info">
-<div class="plant-name">${nom}</div>
-</div>
-`;
-
-container.appendChild(card);
-
-});
-
+function toggleFav(id) {
+    if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+    else favorites.push(id);
+    localStorage.setItem("eonia_fav", JSON.stringify(favorites));
+    renderGrid();
 }
 
 function setFilter(type, btn) {
-activeFilter = type;
-document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-renderGrid();
+    activeFilter = type;
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid();
 }
 
-function logout() {
-localStorage.clear();
-window.location.href = "index.html";
+function switchView(view) {
+    currentView = view;
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+    loadData();
 }
+
+/* --- LOGIQUE IA ÉONIA --- */
+function toggleAI() {
+    const win = document.getElementById('ai-window');
+    win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+}
+
+function initAI() {
+    const msgBox = document.getElementById('ai-messages');
+    const name = userEmail !== 'invite@eonia.com' ? userEmail.split('@')[0] : "cher ami";
+    msgBox.innerHTML = `<div class="ai-msg">Bonjour ${name} ! Je suis l'assistant ÉONIA. Comment puis-je vous aider dans votre recherche ?</div>`;
+}
+
+function handleAI(e) {
+    if (e.key === 'Enter') {
+        const input = document.getElementById('ai-input');
+        const query = input.value.toLowerCase();
+        if(!query) return;
+
+        addMessage(input.value, 'user-msg');
+        input.value = "";
+
+        setTimeout(() => {
+            let response = "Désolé, je ne trouve pas de réponse précise. Essayez de chercher par type (arbre, fleur...) ou par nom !";
+            
+            // Recherche simple dans les données
+            const results = allPlants.filter(p => 
+                query.includes((p["Nom commun"] || "").toLowerCase()) || 
+                (p.Description || p["Informations générales"] || "").toLowerCase().includes(query) ||
+                (p.Type || "").toLowerCase().includes(query)
+            );
+
+            if(results.length > 0) {
+                response = `J'ai trouvé ${results.length} plante(s) correspondante(s), dont le **${results[0]["Nom commun"]}**. Vous pouvez les voir dans la liste !`;
+                // On applique automatiquement la recherche
+                document.getElementById('searchBox').value = query;
+                renderGrid();
+            }
+
+            addMessage(response, 'ai-msg');
+        }, 600);
+    }
+}
+
+function addMessage(txt, cls) {
+    const msgBox = document.getElementById('ai-messages');
+    const div = document.createElement('div');
+    div.className = `ai-msg ${cls}`;
+    div.innerText = txt;
+    msgBox.appendChild(div);
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
 loadData();
-
 </script>
 
 </body>
