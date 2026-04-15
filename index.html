@@ -240,24 +240,30 @@
 
         /* STYLE DU LIEN PHILOSOPHIE */
         .link-philosophy {
-            display: inline-block;
-            margin-top: 30px;
-            color: #4ade80;
-            text-decoration: none;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #4ade80;
-            padding-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 500;
-            transition: 0.3s ease;
-        }
+    display: inline-block;
+    margin-top: 30px;
+    color: #4ade80 !important; /* Force le vert même si le navigateur veut mettre du bleu */
+    text-decoration: none;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #4ade80;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
 
-        .link-philosophy:hover {
-            color: #fff;
-            border-color: #fff;
-            transform: translateY(-2px);
-        }
+/* On s'assure que le lien reste clair une fois cliqué (évite le violet/bleu) */
+.link-philosophy:visited {
+    color: #4ade80 !important;
+}
+
+.link-philosophy:hover {
+    color: #fff !important;
+    border-color: #fff;
+    transform: translateY(-2px);
+}
+
 
         /* ANIMATIONS */
         @keyframes fadeUp {
