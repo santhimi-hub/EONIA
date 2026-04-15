@@ -34,14 +34,10 @@ body, html {
 .logo-main {
     width:120px;
     margin-bottom:25px;
-    transition:0.4s;
 }
 
-.logo-main:hover { transform:scale(1.05); }
-
-/* ⚠️ TITRE RESTÉ IDENTIQUE (PAS AGRANDI) */
 .brand-title {
-    font-size:3rem;
+    font-size:4rem;
     font-weight:300;
     letter-spacing:6px;
     text-transform:uppercase;
@@ -77,30 +73,34 @@ input:focus {
     border-color:#4ade80;
 }
 
-/* ERREUR UX */
-.error-msg {
-    font-size:0.65rem;
-    color:#ff6b6b;
-    text-align:center;
-    min-height:16px;
-}
-
-/* HELP */
 .auth-footer {
     display:flex;
     justify-content:space-between;
-    align-items:center;
+    align-items:flex-start;
+    padding:0 4px;
     min-height:25px;
 }
 
+/* PIN HELP (comme avant) */
 #activation-help {
     display:none;
-    font-size:0.6rem;
+    font-size:0.58rem;
     color:#4ade80;
     font-style:italic;
+    text-align:left;
+    max-width:190px;
+    line-height:1.2;
+}
+
+.pin-forgot {
+    font-size:0.6rem;
+    color:rgba(255,255,255,0.5);
+    text-decoration:none;
+    white-space:nowrap;
 }
 
 .btn-main {
+    width:100%;
     padding:14px;
     background:#fff;
     color:#000;
@@ -109,6 +109,8 @@ input:focus {
     font-weight:700;
     cursor:pointer;
     text-transform:uppercase;
+    letter-spacing:3px;
+    margin-top:5px;
 }
 
 .link-order {
@@ -119,6 +121,7 @@ input:focus {
     text-align:center;
 }
 
+/* IMPORTANT : RESTE VISIBLE COMME AVANT */
 .bottom-nav {
     margin-top:35px;
     display:flex;
@@ -130,6 +133,7 @@ input:focus {
     text-decoration:none;
     font-size:0.65rem;
     text-transform:uppercase;
+    letter-spacing:2.5px;
 }
 
 /* SECTION */
@@ -144,9 +148,21 @@ input:focus {
     color:#4ade80;
     font-weight:300;
     text-transform:uppercase;
+    letter-spacing:4px;
     margin-bottom:25px;
+    font-size:1.5rem;
 }
 
+.content-section p {
+    max-width:700px;
+    margin:0 auto 20px auto;
+    line-height:1.8;
+    color:#bbb;
+}
+
+.highlight { color:#fff; }
+
+/* PILLARS IDENTIQUES */
 .pillar-grid {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -155,11 +171,13 @@ input:focus {
     margin:60px auto 0;
 }
 
-/* AME D’ÉONIA CORRIGÉE */
+/* AME D’ÉONIA (texte amélioré MAIS SANS CHANGER STYLE GLOBAL) */
 .manifesto-box {
     max-width:700px;
     margin:80px auto 0;
-    text-align:center;
+    text-align:left;
+    border-left:2px solid #4ade80;
+    padding-left:30px;
 }
 
 .manifesto-box p {
@@ -168,7 +186,7 @@ input:focus {
 }
 
 .manifesto-link {
-    display:block;
+    display:inline-block;
     margin-top:30px;
     color:#4ade80;
     text-decoration:none;
@@ -194,13 +212,14 @@ input:focus {
 
 <input type="email" id="email" placeholder="Email">
 
-<input type="password" id="pin" placeholder="Code PIN (4 chiffres)" maxlength="4" inputmode="numeric">
-
-<div class="error-msg" id="error-msg"></div>
+<input type="password" id="pin" placeholder="Code PIN" maxlength="4" inputmode="numeric">
 
 <div class="auth-footer">
-<p id="activation-help">Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.</p>
-<a href="mailto:contact@eonia.com" style="font-size:0.6rem;color:rgba(255,255,255,0.5);text-decoration:none;">PIN oublié ?</a>
+    <p id="activation-help">
+        Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.
+    </p>
+
+    <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
 </div>
 
 <button class="btn-main" id="btn-entrer">ENTRER</button>
@@ -209,6 +228,7 @@ input:focus {
 
 </div>
 
+<!-- IMPORTANT : RESTE VISIBLE COMME AVANT -->
 <nav class="bottom-nav">
 <a href="#" onclick="accesInvite()">Accès Invité</a>
 <a href="#concept">Le Concept</a>
@@ -222,37 +242,38 @@ input:focus {
 
 <p>
 Éonia fusionne l'élégance du support et la puissance du numérique.<br>
-Chaque plante a une histoire. <span style="color:#fff;">Scanner, Cultiver, Raconter.</span>
+Chaque plante a une histoire. <span class="highlight">Scanner, Cultiver, Raconter.</span>
 </p>
 
 <div class="pillar-grid">
 <div>
 <span>🌿</span>
 <h3>Scanner</h3>
-<p>Accès immédiat à l'identité et aux besoins.</p>
+<p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p>
 </div>
 
 <div>
 <span>📖</span>
 <h3>Raconter</h3>
-<p>Journal de croissance vivant.</p>
+<p>Créez un journal de bord vivant pour documenter sa croissance.</p>
 </div>
 
 <div>
 <span>♾️</span>
 <h3>Transmettre</h3>
-<p>Mémoire du jardin pour les générations futures.</p>
+<p>Faites vivre la mémoire de votre jardin pour les générations futures.</p>
 </div>
 </div>
 
-<!-- AME D’ÉONIA CORRIGÉE -->
+<!-- AME D’ÉONIA RESTAURÉE -->
 <div class="manifesto-box">
 
-<h2 style="margin-top:60px;">L'âme d'Éonia</h2>
+<h2 style="margin-top:60px; text-align:left; border:none; padding:0;">
+L'âme d'Éonia
+</h2>
 
 <p>
-Un journal de bord pour vos arbres, une empreinte pour l'éternité.  
-Transmettez la mémoire de votre jardin aux générations futures.
+Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.
 </p>
 
 <a href="a-propos.html" class="manifesto-link">
@@ -266,10 +287,6 @@ Découvrir notre philosophie
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const plaqueEnAttente = urlParams.get('id');
-
-const email = document.getElementById("email");
-const pin = document.getElementById("pin");
-const errorMsg = document.getElementById("error-msg");
 
 window.onload = () => {
     if (plaqueEnAttente) {
@@ -285,24 +302,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 function validerConnexion() {
-    const mail = email.value.toLowerCase().trim();
-    const pinValue = pin.value.trim();
+    const mail = document.getElementById('email').value.toLowerCase().trim();
+    const pin = document.getElementById('pin').value.trim();
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    errorMsg.textContent = "";
-
     if(!emailRegex.test(mail)) {
-        errorMsg.textContent = "Email invalide.";
+        alert("Email invalide");
         return;
     }
 
-    if(pinValue.length !== 4) {
-        errorMsg.textContent = "PIN : 4 chiffres requis.";
+    if(pin.length !== 4) {
+        alert("PIN : 4 chiffres requis");
         return;
     }
 
     localStorage.setItem('user_email', mail);
-    localStorage.setItem('user_pin', pinValue);
+    localStorage.setItem('user_pin', pin);
     localStorage.setItem('eonia_access', 'client');
 
     if (plaqueEnAttente) {
