@@ -229,10 +229,14 @@
         .manifesto-box {
     max-width: 700px;
     margin: 80px auto 0 auto;
-    text-align: center; /* Centre le texte et le lien */
-    border-left: none;  /* Enlève le trait vert à gauche */
-    padding-left: 0;    /* Enlève le décalage à gauche */
+    text-align: center;
+    border-left: none; /* Supprime le trait vert */
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centre le contenu horizontalement */
 }
+
 
 
         /* ANIMATIONS */
@@ -315,12 +319,18 @@
     </div>
 
     <div class="manifesto-box">
-    <h2>L'âme d'Éonia</h2> <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
+    <h2>L'âme d'Éonia</h2>
     
-    <a href="a-propos.html" style="display: inline-block; margin-top: 30px; color: #4ade80; text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; border-bottom: 1px solid #4ade80; padding-bottom: 5px; text-transform: uppercase; font-weight: 500;">
+    <p>
+        Un journal de bord pour vos arbres, une empreinte pour l'éternité. 
+        Transmettez la mémoire de votre jardin aux générations futures.
+    </p>
+    
+    <a href="a-propos.html" class="link-philosophy">
         Découvrir notre philosophie
     </a>
 </div>
+
 
 </section>
 
