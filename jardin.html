@@ -89,49 +89,82 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    
-    // On harmonise la clé pour être sûr de bien détecter l'invité
     const userEmail = localStorage.getItem('user_email') || localStorage.getItem('userEmail') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
     async function loadPlant() {
         if (!plantId) return;
+
+        // 1. On prépare les données de base
+        let requestBody = { email: userEmail };
+
+        // 2. On essaie de récupérer la Géolocalisation
+        if (navigator.geolocation && userEmail !== 'invite@eonia.com') {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    // Si le client accepte : on ajoute les coordonnées
+                    requestBody.lat = position.coords.latitude;
+                    requestBody.lon = position.coords.longitude;
+                    await fetchAndDisplay(requestBody);
+                },
+                async () => {
+                    // Si le client refuse ou erreur : on lance sans GPS
+                    await fetchAndDisplay(requestBody);
+                }
+            );
+        } else {
+            // Pour les invités ou si pas de GPS dispo
+            await fetchAndDisplay(requestBody);
+        }
+    }
+
+    async function fetchAndDisplay(bodyData) {
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail }) 
+                body: JSON.stringify(bodyData) 
             });
             const allItems = await response.json();
             
-            const p = allItems.find(item => String(item.id || item.ID_Plaque) === plantId);
+            // On cherche la plante (soit par ID de plaque, soit par ID catalogue)
+            const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
             if (p) {
                 document.getElementById('section-detail').classList.remove('hidden');
                 document.getElementById('p-photo').src = p["Photo"] || '';
-                document.getElementById('p-titre').innerText = p["Nom commun"] || 'Spécimen';
+                document.getElementById('p-titre').innerText = (p["est_dans_jardin"] && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
                 
                 document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
                 document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-                document.getElementById('p-diff').innerText = p["Difficulte"] || p["Difficulté"] || "-";
-                document.getElementById('p-rust').innerText = p["Rusticite"] || p["Rusticité"] || "-";
-                document.getElementById('p-taille').innerText = p["Taille à maturité"] || p["Taille adulte"] || "-";
+                document.getElementById('p-diff').innerText = p["Difficulté"] || "-";
+                document.getElementById('p-rust').innerText = p["Rusticité"] || "-";
+                document.getElementById('p-taille').innerText = p["Taille à maturité"] || "-";
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
-                document.getElementById('p-desc').innerText = p["Description"] || p["Informations générales"] || "Aucune description.";
+                document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
 
-                // AFFICHAGE DU CTA SI INVITE
-                if (userEmail === 'invite@eonia.com' || localStorage.getItem('eonia_access') === 'guest') {
+                // --- GESTION DES ALERTES MÉTÉO ---
+                if (p["Alertes"] && p["Alertes"].length > 0) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.style = "background: rgba(255, 50, 50, 0.2); border: 1px solid #ff3232; color: #ff3232; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold;";
+                    alertDiv.innerText = p["Alertes"].join(' / ');
+                    document.getElementById('section-detail').prepend(alertDiv);
+                }
+
+                // Affichage du CTA si invité
+                if (userEmail === 'invite@eonia.com') {
                     document.getElementById('cta-invite').classList.remove('hidden');
                 }
             }
         } catch (e) { 
-            console.error("Erreur de chargement :", e);
+            console.error("Erreur :", e);
         }
     }
+
     window.onload = loadPlant;
 </script>
 
