@@ -226,18 +226,38 @@
         .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
 
+        /* MANIFESTO BOX CENTRÉE */
         .manifesto-box {
-    max-width: 700px;
-    margin: 80px auto 0 auto;
-    text-align: center;
-    border-left: none; /* Supprime le trait vert */
-    padding-left: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centre le contenu horizontalement */
-}
+            max-width: 700px;
+            margin: 80px auto 0 auto;
+            text-align: center;
+            border-left: none; 
+            padding-left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        /* STYLE DU LIEN PHILOSOPHIE */
+        .link-philosophy {
+            display: inline-block;
+            margin-top: 30px;
+            color: #4ade80;
+            text-decoration: none;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #4ade80;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: 0.3s ease;
+        }
 
+        .link-philosophy:hover {
+            color: #fff;
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
 
         /* ANIMATIONS */
         @keyframes fadeUp {
@@ -319,19 +339,15 @@
     </div>
 
     <div class="manifesto-box">
-    <h2>L'âme d'Éonia</h2>
-    
-    <p>
-        Un journal de bord pour vos arbres, une empreinte pour l'éternité. 
-        Transmettez la mémoire de votre jardin aux générations futures.
-    </p>
-    
-    <a href="a-propos.html" class="link-philosophy">
-        Découvrir notre philosophie
-    </a>
-</div>
-
-
+        <h2>L'âme d'Éonia</h2>
+        <p>
+            Un journal de bord pour vos arbres, une empreinte pour l'éternité. 
+            Transmettez la mémoire de votre jardin aux générations futures.
+        </p>
+        <a href="a-propos.html" class="link-philosophy">
+            Découvrir notre philosophie
+        </a>
+    </div>
 </section>
 
 <script>
