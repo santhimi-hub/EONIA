@@ -115,6 +115,31 @@
     }
 }
 
+async function loadPlant() {
+    if (!plantId) return;
+
+    // 1. On affiche la plante immédiatement (sans météo au début)
+    let requestBody = { email: userEmail };
+    await fetchAndDisplay(requestBody);
+
+    // 2. On tente la géoloc pour la météo (seulement si pas invité)
+    if (navigator.geolocation && userEmail !== 'invite@eonia.com') {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                console.log("Géoloc réussie, mise à jour météo...");
+                requestBody.lat = position.coords.latitude;
+                requestBody.lon = position.coords.longitude;
+                // 3. On relance le fetch pour obtenir les alertes météo du Worker
+                await fetchAndDisplay(requestBody);
+            },
+            (error) => {
+                console.warn("Géoloc refusée ou erreur:", error.message);
+            },
+            { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
+        );
+    }
+}
+
 async function fetchAndDisplay(bodyData) {
     try {
         const response = await fetch(API_URL, {
@@ -123,21 +148,28 @@ async function fetchAndDisplay(bodyData) {
             body: JSON.stringify(bodyData) 
         });
         const allItems = await response.json();
-        
-        // On cherche la plante avec toutes les variantes d'ID possibles
-        const p = allItems.find(item => 
-            String(item.id) === String(plantId) || 
-            String(item.ID_Plaque) === String(plantId)
-        );
+        const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
         if (p) {
             document.getElementById('section-detail').classList.remove('hidden');
+            
+            // --- GESTION DES ALERTES MÉTÉO ---
+            // On supprime l'ancienne alerte si elle existe (pour les mises à jour)
+            const oldAlert = document.getElementById('weather-alert');
+            if (oldAlert) oldAlert.remove();
+
+            if (p["Alertes"] && p["Alertes"].length > 0) {
+                const alertDiv = document.createElement('div');
+                alertDiv.id = "weather-alert";
+                alertDiv.style = "background: rgba(74, 222, 128, 0.1); border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center; animation: fadeIn 0.5s ease;";
+                // On affiche les alertes météo (ex: "Risque de gel", "Canicule")
+                alertDiv.innerHTML = "🌤️ ÉONIA MÉTÉO : " + p["Alertes"].join(' / ');
+                document.getElementById('section-detail').prepend(alertDiv);
+            }
+
+            // --- REMPLISSAGE DES DONNÉES ---
             document.getElementById('p-photo').src = p["Photo"] || '';
-            
-            // Priorité au surnom si la plante est au client
-            const titreAffichage = (p["est_dans_jardin"] && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
-            document.getElementById('p-titre').innerText = titreAffichage;
-            
+            document.getElementById('p-titre').innerText = (p["est_dans_jardin"] && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
             document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
             document.getElementById('p-famille').innerText = p["Famille"] || "-";
             document.getElementById('p-type').innerText = p["Type"] || "-";
@@ -149,27 +181,11 @@ async function fetchAndDisplay(bodyData) {
             document.getElementById('p-pers').innerText = p["Persistance"] || "-";
             document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
 
-            // Alertes Météo
-            const existingAlert = document.getElementById('weather-alert');
-            if (existingAlert) existingAlert.remove();
-
-            if (p["Alertes"] && p["Alertes"].length > 0) {
-                const alertDiv = document.createElement('div');
-                alertDiv.id = "weather-alert";
-                alertDiv.style = "background: rgba(255, 50, 50, 0.2); border: 1px solid #ff3232; color: #ff3232; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center;";
-                alertDiv.innerText = "⚠️ " + p["Alertes"].join(' / ');
-                document.getElementById('section-detail').prepend(alertDiv);
-            }
-
             if (userEmail === 'invite@eonia.com') {
                 document.getElementById('cta-invite').classList.remove('hidden');
             }
-        } else {
-            console.error("Plante non trouvée dans la base");
         }
-    } catch (e) { 
-        console.error("Erreur de fetch :", e);
-    }
+    } catch (e) { console.error("Erreur d'affichage :", e); }
 }
 
     window.onload = loadPlant;
