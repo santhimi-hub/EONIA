@@ -10,156 +10,105 @@
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* MÉTÉO */
-        #weather-container {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px; padding: 20px; margin-bottom: 25px;
-            display: flex; justify-content: space-around; align-items: center; min-height: 80px;
-        }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
+        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; min-height: 80px; }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
         .w-icon { font-size: 1.8rem; }
         .w-temp { font-size: 0.9rem; }
-        .btn-geo { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #111; }
+        .btn-geo { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
-        
-        /* GRILLE D'INFOS */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box.highlight { border-left: 4px solid var(--accent); border-color: rgba(74, 222, 128, 0.2); padding: 10px 15px; }
-        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; font-weight: bold; }
+        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
-
-        /* DESCRIPTION */
-        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-top: 10px; }
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: bold; border-left: 2px solid var(--accent); padding-left: 10px; }
-        .desc-text { line-height: 1.8; color: #aaa; font-size: 0.95rem; }
-
-        /* BOUTON COMMANDER ORIGINAL */
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
         .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
-        .order-cta h3 { font-weight: 400; margin-bottom: 20px; font-size: 1rem; }
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
-        .btn-order:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(74, 222, 128, 0.4); }
-
-        #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
+        #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <button onclick="window.history.back()" class="back-btn">← Retour</button>
-    <div id="weather-container" class="hidden"></div>
-    <img id="p-photo" class="hero-img" src="">
-    
-    <div style="display: flex; align-items: center; margin-bottom: 5px;">
-        <h1 id="p-titre" style="font-size: 2.1rem; font-weight: 200; margin: 0;">Chargement...</h1>
-        <button id="btn-edit-surnom" class="hidden" onclick="changeSurnom()">ÉDITER LE SURNOM</button>
+    <div class="container">
+        <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        <div id="weather-container" class="hidden"></div>
+        <img id="p-photo" class="hero-img">
+        <div style="display:flex; align-items:center;">
+            <h1 id="p-titre" style="font-size:2.1rem; font-weight:200;"></h1>
+            <button id="btn-edit-surnom" class="hidden" onclick="changeSurnom()">ÉDITER</button>
+        </div>
+        <div id="p-sci" class="sci-name"></div>
+        <div class="info-grid" id="p-grid"></div>
+        <div class="desc-box">
+            <div class="section-title">DESCRIPTION</div>
+            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+        </div>
+        <div id="cta-invite" class="order-cta">
+            <h3 style="font-weight:400; margin-bottom:20px;">Immortalisez cette plante dans votre jardin</h3>
+            <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
+        </div>
     </div>
-    <div id="p-sci" class="sci-name"></div>
 
-    <div class="info-grid" id="p-grid"></div>
+    <script>
+        const API_URL = "https://eonia-api.santhimi.workers.dev";
+        const plantId = new URLSearchParams(window.location.search).get('id');
+        const userEmail = localStorage.getItem('user_email');
+        const userPin = localStorage.getItem('user_pin');
 
-    <div class="desc-box">
-        <div class="section-title">DESCRIPTION</div>
-        <div id="p-desc" class="desc-text"></div>
-    </div>
-
-    <div id="cta-invite" class="order-cta hidden">
-        <h3>Immortalisez cette plante dans votre jardin</h3>
-        <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
-    </div>
-</div>
-
-<script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-    const plantId = new URLSearchParams(window.location.search).get('id');
-    const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
-    const userPin = localStorage.getItem('user_pin');
-
-    // CHARGEMENT ULTRA RAPIDE
-    async function init() {
-        if (!plantId) return;
-        
-        // On essaie de récupérer les données en cache pour ne pas attendre l'API
-        const cached = localStorage.getItem('eonia_last_data');
-        if (cached) {
-            const p = JSON.parse(cached).find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-            if (p) render(p);
-        }
-
-        try {
-            const lat = localStorage.getItem('user_lat');
-            const lon = localStorage.getItem('user_lon');
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: plantId, lat, lon })
-            });
-            const data = await response.json();
-            localStorage.setItem('eonia_last_data', JSON.stringify(data));
+        async function init() {
+            const cached = localStorage.getItem('eonia_cache');
+            if (cached) {
+                const p = JSON.parse(cached).find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+                if (p) render(p);
+            }
+            const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId, lat, lon }) });
+            const data = await res.json();
             const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
             if (p) render(p);
-        } catch (e) { console.error(e); }
-    }
-
-    function render(p) {
-        document.getElementById('p-photo').src = p.Photo || '';
-        document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
-        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        document.getElementById('p-desc').innerText = p.Description || "Détails à venir.";
-
-        const weatherBox = document.getElementById('weather-container');
-        if (p.est_dans_jardin) {
-            weatherBox.classList.remove('hidden');
-            if (p.Alertes && p.Alertes.length > 0) {
-                weatherBox.innerHTML = p.Alertes.map(str => {
-                    const [day, icon, temp] = str.split('|');
-                    return `<div class="w-col"><span class="w-day">${day}</span><span class="w-icon">${icon}</span><span class="w-temp">${temp}</span></div>`;
-                }).join('');
-            } else {
-                weatherBox.innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
-            }
-            document.getElementById('btn-edit-surnom').classList.remove('hidden');
         }
 
-        const grid = document.getElementById('p-grid');
-        const fields = [{l: "TYPE", v: p.Type, h: true},{l: "FAMILLE", v: p.Famille, h: true},
-            {l: "Arrosage", v: p.Arrosage},{l: "Exposition", v: p.Exposition},
-            {l: "Difficulté", v: p.Difficulté},{l: "Rusticité", v: p.Rusticité},
-            {l: "Taille", v: p.Taille},{l: "Feuillage", v: p.Feuillage}];
+        function render(p) {
+            document.getElementById('p-photo').src = p.Photo;
+            document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
+            document.getElementById('p-sci').innerText = p["Nom scientifique"];
+            document.getElementById('p-desc').innerText = p.Description;
 
-        grid.innerHTML = fields.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v || "-"}</div></div>`).join('');
+            if (p.est_dans_jardin) {
+                document.getElementById('weather-container').classList.remove('hidden');
+                document.getElementById('btn-edit-surnom').classList.remove('hidden');
+                if (p.Alertes) {
+                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
+                        const [d, i, t] = str.split('|');
+                        return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('weather-container').innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
+                }
+            }
+            const fields = [{l:"TYPE", v:p.Type, h:true},{l:"FAMILLE", v:p.Famille, h:true},{l:"Arrosage", v:p.Arrosage},{l:"Exposition", v:p.Exposition},{l:"Difficulté", v:p.Difficulté},{l:"Rusticité", v:p.Rusticité}];
+            document.getElementById('p-grid').innerHTML = fields.map(f => `<div class="info-box ${f.h?'highlight':''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+        }
 
-        // AFFICHE LE BOUTON SI INVITE OU SI CLIENT (Même catalogue)
-        document.getElementById('cta-invite').classList.remove('hidden');
-    }
+        function askGeo() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                localStorage.setItem('user_lat', pos.coords.latitude);
+                localStorage.setItem('user_lon', pos.coords.longitude);
+                init();
+            });
+        }
 
-    function askGeo() {
-        navigator.geolocation.getCurrentPosition((pos) => {
-            localStorage.setItem('user_lat', pos.coords.latitude);
-            localStorage.setItem('user_lon', pos.coords.longitude);
-            init(); 
-        }, (err) => { alert("Position requise pour la météo."); });
-    }
-
-    async function changeSurnom() {
-        const nouveau = prompt("Entrez le nouveau surnom :");
-        if (!nouveau) return;
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_surnom', plantId: plantId, surnom: nouveau })
-        });
-        if (res.ok) { location.reload(); }
-    }
-
-    init();
-</script>
+        async function changeSurnom() {
+            const n = prompt("Nouveau surnom :");
+            if (n) {
+                await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_surnom', plantId, surnom: n }) });
+                location.reload();
+            }
+        }
+        init();
+    </script>
 </body>
 </html>
