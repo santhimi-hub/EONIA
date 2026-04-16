@@ -46,7 +46,7 @@
             <div class="section-title">DESCRIPTION</div>
             <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
-        <div id="cta-invite" class="order-cta">
+        <div id="cta-invite" class="order-cta hidden">
             <h3 style="font-weight:400; margin-bottom:20px;">Immortalisez cette plante dans votre jardin</h3>
             <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
         </div>
@@ -77,20 +77,50 @@
             document.getElementById('p-sci').innerText = p["Nom scientifique"];
             document.getElementById('p-desc').innerText = p.Description;
 
+            const weatherContainer = document.getElementById('weather-container');
+            const editBtn = document.getElementById('btn-edit-surnom');
+            const ctaCommande = document.getElementById('cta-invite');
+
             if (p.est_dans_jardin) {
-                document.getElementById('weather-container').classList.remove('hidden');
-                document.getElementById('btn-edit-surnom').classList.remove('hidden');
+                // Vue JARDIN : météo et édition ON, commande OFF
+                weatherContainer.classList.remove('hidden');
+                editBtn.classList.remove('hidden');
+                ctaCommande.classList.add('hidden');
+
                 if (p.Alertes) {
-                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
+                    weatherContainer.innerHTML = p.Alertes.map(str => {
                         const [d, i, t] = str.split('|');
                         return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
                     }).join('');
                 } else {
-                    document.getElementById('weather-container').innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
+                    weatherContainer.innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
                 }
+            } else {
+                // Vue CATALOGUE : météo et édition OFF, commande ON
+                weatherContainer.classList.add('hidden');
+                editBtn.classList.add('hidden');
+                ctaCommande.classList.remove('hidden');
             }
-            const fields = [{l:"TYPE", v:p.Type, h:true},{l:"FAMILLE", v:p.Famille, h:true},{l:"Arrosage", v:p.Arrosage},{l:"Exposition", v:p.Exposition},{l:"Difficulté", v:p.Difficulté},{l:"Rusticité", v:p.Rusticité}];
-            document.getElementById('p-grid').innerHTML = fields.map(f => `<div class="info-box ${f.h?'highlight':''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+
+            // Grille d'informations incluant Taille, Floraison et Feuillage
+            const fields = [
+                {l:"TYPE", v:p.Type, h:true},
+                {l:"FAMILLE", v:p.Famille, h:true},
+                {l:"Arrosage", v:p.Arrosage},
+                {l:"Exposition", v:p.Exposition},
+                {l:"Taille", v:p.Taille},
+                {l:"Floraison", v:p.Floraison},
+                {l:"Difficulté", v:p.Difficulté},
+                {l:"Rusticité", v:p.Rusticité},
+                {l:"Feuillage", v:p.Feuillage}
+            ];
+            
+            document.getElementById('p-grid').innerHTML = fields.map(f => `
+                <div class="info-box ${f.h?'highlight':''}">
+                    <div class="label">${f.l}</div>
+                    <div class="value">${f.v||"-"}</div>
+                </div>
+            `).join('');
         }
 
         function askGeo() {
