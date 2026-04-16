@@ -6,46 +6,84 @@
     <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
+        
+        /* Météo */
         #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; min-height: 80px; }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
         .w-icon { font-size: 1.8rem; }
         .w-temp { font-size: 0.9rem; }
-        .btn-geo { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        
+        /* Grille Infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box.highlight { border-left: 4px solid var(--accent); border-color: rgba(74, 222, 128, 0.2); padding: 10px 15px; }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
-        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        
+        /* Arrosage */
+        .watering-card { background: linear-gradient(135deg, #0f172a 0%, #000 100%); border: 1px solid #1e293b; border-radius: 20px; padding: 20px; margin: 20px 0; text-align: center; }
+        .btn-water { background: var(--water); color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; cursor: pointer; transition: 0.3s; }
+        .next-watering { font-size: 0.7rem; color: #94a3b8; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .status-ok { color: var(--accent); }
+        .status-late { color: #f87171; font-weight: bold; }
+
+        /* Notes & Desc */
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .private-section { background: #0a0a0a; border: 1px dashed var(--accent); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
         .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
+        
+        /* CTA */
         .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
         .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
-        #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
+        .btn-action-small { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        
         <div id="weather-container" class="hidden"></div>
+
         <img id="p-photo" class="hero-img">
-        <div style="display:flex; align-items:center;">
-            <h1 id="p-titre" style="font-size:2.1rem; font-weight:200;"></h1>
-            <button id="btn-edit-surnom" class="hidden" onclick="changeSurnom()">ÉDITER</button>
+
+        <div style="display:flex; align-items:center; justify-content: space-between;">
+            <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin: 0;"></h1>
+            <button id="btn-edit-surnom" class="hidden btn-action-small" onclick="changeSurnom()">ÉDITER</button>
         </div>
         <div id="p-sci" class="sci-name"></div>
+
+        <div id="watering-area" class="hidden">
+            <div class="watering-card">
+                <div class="section-title">Entretien Rapide</div>
+                <button class="btn-water" onclick="doWatering()">💦 J'ai arrosé</button>
+                <div id="watering-status" class="next-watering">Calcul du rappel...</div>
+            </div>
+        </div>
+
         <div class="info-grid" id="p-grid"></div>
+
+        <div id="private-area" class="hidden">
+            <div class="private-section">
+                <div class="section-title">Carnet de bord</div>
+                <div id="p-plantation" style="font-size: 0.75rem; color: var(--accent); margin-bottom: 10px;"></div>
+                <div id="p-note" style="line-height:1.6; color:#eee; font-size:0.9rem; font-style: italic;"></div>
+            </div>
+        </div>
+
         <div class="desc-box">
-            <div class="section-title">DESCRIPTION</div>
+            <div class="section-title">Description & Conseils</div>
             <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
+
         <div id="cta-invite" class="order-cta hidden">
             <h3 style="font-weight:400; margin-bottom:20px;">Immortalisez cette plante dans votre jardin</h3>
             <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
@@ -77,32 +115,37 @@
             document.getElementById('p-sci').innerText = p["Nom scientifique"];
             document.getElementById('p-desc').innerText = p.Description;
 
-            const weatherContainer = document.getElementById('weather-container');
-            const editBtn = document.getElementById('btn-edit-surnom');
-            const ctaCommande = document.getElementById('cta-invite');
-
             if (p.est_dans_jardin) {
-                // Vue JARDIN : météo et édition ON, commande OFF
-                weatherContainer.classList.remove('hidden');
-                editBtn.classList.remove('hidden');
-                ctaCommande.classList.add('hidden');
+                // Éléments spécifiques au propriétaire
+                document.getElementById('weather-container').classList.remove('hidden');
+                document.getElementById('btn-edit-surnom').classList.remove('hidden');
+                document.getElementById('watering-area').classList.remove('hidden');
+                document.getElementById('private-area').classList.remove('hidden');
+                document.getElementById('cta-invite').classList.add('hidden'); // Cacher commande
 
+                // Météo
                 if (p.Alertes) {
-                    weatherContainer.innerHTML = p.Alertes.map(str => {
+                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
                         const [d, i, t] = str.split('|');
                         return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
                     }).join('');
-                } else {
-                    weatherContainer.innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
                 }
+
+                // Notes et Plantation
+                if(p.Date_Plantation) {
+                    const d = new Date(p.Date_Plantation).toLocaleDateString('fr-FR', {year: 'numeric', month: 'long', day: 'numeric'});
+                    document.getElementById('p-plantation').innerText = "📍 Plantée le " + d;
+                }
+                document.getElementById('p-note').innerText = p.Note_Privee || "Aucune note personnelle ajoutée.";
+
+                // Logique Rappel Arrosage
+                updateWateringStatus(p.Dernier_Arrosage, p.Frequence_Arrosage);
+
             } else {
-                // Vue CATALOGUE : météo et édition OFF, commande ON
-                weatherContainer.classList.add('hidden');
-                editBtn.classList.add('hidden');
-                ctaCommande.classList.remove('hidden');
+                // Vue catalogue
+                document.getElementById('cta-invite').classList.remove('hidden');
             }
 
-            // Grille d'informations incluant Taille, Floraison et Feuillage
             const fields = [
                 {l:"TYPE", v:p.Type, h:true},
                 {l:"FAMILLE", v:p.Famille, h:true},
@@ -114,21 +157,38 @@
                 {l:"Rusticité", v:p.Rusticité},
                 {l:"Feuillage", v:p.Feuillage}
             ];
-            
-            document.getElementById('p-grid').innerHTML = fields.map(f => `
-                <div class="info-box ${f.h?'highlight':''}">
-                    <div class="label">${f.l}</div>
-                    <div class="value">${f.v||"-"}</div>
-                </div>
-            `).join('');
+            document.getElementById('p-grid').innerHTML = fields.map(f => `<div class="info-box ${f.h?'highlight':''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
         }
 
-        function askGeo() {
-            navigator.geolocation.getCurrentPosition(pos => {
-                localStorage.setItem('user_lat', pos.coords.latitude);
-                localStorage.setItem('user_lon', pos.coords.longitude);
-                init();
+        function updateWateringStatus(lastDate, frequency) {
+            const statusEl = document.getElementById('watering-status');
+            const freq = parseInt(frequency) || 7;
+            if (!lastDate || lastDate === "-") {
+                statusEl.innerText = "Aucun arrosage enregistré";
+                return;
+            }
+            const next = new Date(lastDate);
+            next.setDate(next.getDate() + freq);
+            const diff = Math.ceil((next - new Date()) / (1000 * 60 * 60 * 24));
+
+            if (diff > 0) statusEl.innerHTML = `Prochain arrosage dans <span class="status-ok">${diff} jour(s)</span>`;
+            else if (diff === 0) statusEl.innerHTML = `<span class="status-late">À FAIRE AUJOURD'HUI</span>`;
+            else statusEl.innerHTML = `<span class="status-late">RETARD DE ${Math.abs(diff)} JOUR(S)</span>`;
+        }
+
+        async function doWatering() {
+            const btn = document.querySelector('.btn-water');
+            btn.innerText = "ENREGISTREMENT...";
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId: plantId })
             });
+            if (res.ok) {
+                btn.innerText = "✅ ENREGISTRÉ";
+                btn.style.background = "#4ade80";
+                setTimeout(() => location.reload(), 1200);
+            }
         }
 
         async function changeSurnom() {
@@ -138,6 +198,7 @@
                 location.reload();
             }
         }
+
         init();
     </script>
 </body>
