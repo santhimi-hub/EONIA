@@ -37,9 +37,9 @@
 
         /* Infos Plante */
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 5px; opacity: 0.7; }
+        .type-famille { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         
-        .badge-container { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; transition: 0.3s; }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; }
@@ -72,6 +72,7 @@
             <button id="btn-edit-surnom" class="hidden">EDITER</button>
         </div>
         <div id="p-sci" class="sci-name"></div>
+        <div id="p-type-famille" class="type-famille"></div>
 
         <div class="info-grid" id="p-grid"></div>
 
@@ -91,7 +92,6 @@
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
     
-    // RECUPERATION SECURISEE DES IDENTIFIANTS
     const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
     const userPin = localStorage.getItem('user_pin');
 
@@ -106,11 +106,7 @@
 
     async function fetchAndDisplay(coords = null) {
         try {
-            const body = { 
-                email: userEmail, 
-                pin: userPin, // AJOUT DU PIN POUR LE WORKER
-                plantId: plantId 
-            };
+            const body = { email: userEmail, pin: userPin, plantId: plantId };
             if (coords) { body.lat = coords.lat; body.lon = coords.lon; }
 
             const response = await fetch(API_URL, {
@@ -119,7 +115,6 @@
                 body: JSON.stringify(body)
             });
 
-            // GESTION DU PIN FAUX
             if (response.status === 401) {
                 alert("Session expirée ou PIN incorrect.");
                 localStorage.clear();
@@ -130,7 +125,6 @@
             if (!response.ok) throw new Error("Erreur API");
             
             const allItems = await response.json();
-            // Recherche par ID botanique ou ID Plaque
             const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
             if (!p) throw new Error("Plante introuvable");
@@ -140,7 +134,7 @@
 
             const isOwner = p["est_dans_jardin"] === true;
 
-            // 1. MÉTÉO
+            // 1. MÉTÉO (Uniquement si propriétaire)
             const weatherBox = document.getElementById('weather-container');
             if (isOwner) {
                 weatherBox.classList.remove('hidden');
@@ -182,14 +176,24 @@
             document.getElementById('p-photo').src = p["Photo"] || '';
             document.getElementById('p-titre').innerText = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
             document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+            
+            // Affichage Type | Famille
+            document.getElementById('p-type-famille').innerText = `${p.Type || "-"} | ${p.Famille || "-"}`;
+            
             document.getElementById('p-desc').innerText = p["Description"] || "";
 
+            // GRID INFOS - Utilisation des clés exactes du Worker
             const fields = [
-                {l: "Arrosage", v: p.Arrosage}, {l: "Exposition", v: p.Exposition},
-                {l: "Difficulté", v: p.Difficulté}, {l: "Rusticité", v: p.Rusticité},
-                {l: "Taille", v: p["Taille à maturité"]}, {l: "Feuillage", v: p.Persistance}
+                {l: "Arrosage", v: p.Arrosage}, 
+                {l: "Exposition", v: p.Exposition},
+                {l: "Difficulté", v: p.Difficulté}, 
+                {l: "Rusticité", v: p.Rusticité},
+                {l: "Taille", v: p.Taille}, // Corrigé
+                {l: "Feuillage", v: p.Feuillage} // Corrigé
             ];
-            const grid = document.getElementById('p-grid'); grid.innerHTML = "";
+            
+            const grid = document.getElementById('p-grid'); 
+            grid.innerHTML = "";
             fields.forEach(f => {
                 grid.appendChild(el('div', {className: 'info-box'}, [
                     el('div', {className: 'label', innerText: f.l}),
