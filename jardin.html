@@ -33,14 +33,14 @@
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; transition: 0.2s; }
         
-        /* Cadres TYPE et FAMILLE plus petits et stylisés */
+        /* Cadres TYPE et FAMILLE : Bordure verte conservée, texte blanc */
         .info-box.highlight { 
-            border-left: 3px solid var(--accent); 
+            border-left: 4px solid var(--accent); /* Épaisseur prononcée */
             border-color: rgba(74, 222, 128, 0.2);
-            padding: 10px 15px; /* Plus compact */
+            padding: 10px 15px;
         }
-        .info-box.highlight .label { font-size: 0.5rem; }
-        .info-box.highlight .value { font-size: 0.75rem; color: var(--accent); }
+        .info-box.highlight .label { font-size: 0.5rem; color: var(--accent); }
+        .info-box.highlight .value { font-size: 0.75rem; color: #fff; } /* Retour au blanc */
         
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; font-weight: bold; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
@@ -50,7 +50,20 @@
         .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: bold; border-left: 2px solid var(--accent); padding-left: 10px; }
         .desc-text { line-height: 1.8; color: #aaa; font-size: 0.95rem; }
 
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 30px; }
+        /* ZONE COMMANDE ORIGINALE */
+        .order-cta { 
+            margin-top: 40px; padding: 40px 20px; text-align: center; 
+            border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; 
+            background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); 
+        }
+        .order-cta h3 { font-weight: 400; margin-bottom: 20px; font-size: 1rem; }
+        .btn-order { 
+            background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; 
+            font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; 
+            cursor: pointer; transition: 0.3s; 
+        }
+        .btn-order:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(74, 222, 128, 0.4); }
+
         #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
@@ -58,9 +71,7 @@
 
 <div class="container">
     <button onclick="window.history.back()" class="back-btn">← Retour</button>
-    
     <div id="weather-container" class="hidden"></div>
-
     <img id="p-photo" class="hero-img" src="">
     
     <div style="display: flex; align-items: center; margin-bottom: 5px;">
@@ -76,7 +87,8 @@
         <div id="p-desc" class="desc-text"></div>
     </div>
 
-    <div id="cta-invite" class="hidden">
+    <div id="cta-invite" class="order-cta hidden">
+        <h3>Immortalisez cette plante dans votre jardin</h3>
         <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
     </div>
 </div>
@@ -92,13 +104,11 @@
         try {
             const lat = localStorage.getItem('user_lat');
             const lon = localStorage.getItem('user_lon');
-            
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, pin: userPin, plantId: plantId, lat, lon })
             });
-            
             const data = await response.json();
             const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
             if (p) render(p);
@@ -147,20 +157,14 @@
         if (p.est_dans_jardin) document.getElementById('btn-edit-surnom').classList.remove('hidden');
     }
 
-    // Nouvelle fonction Géo simplifiée pour éviter les blocages
     function askGeo() {
         if (!navigator.geolocation) return alert("Géolocalisation non supportée");
-        
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                localStorage.setItem('user_lat', pos.coords.latitude);
-                localStorage.setItem('user_lon', pos.coords.longitude);
-                // On relance init pour ne pas perdre l'état de la page
-                init(); 
-            },
-            (err) => { alert("Veuillez autoriser l'accès à la position dans vos réglages."); },
-            { enableHighAccuracy: true, timeout: 5000 }
-        );
+        navigator.geolocation.getCurrentPosition((pos) => {
+            localStorage.setItem('user_lat', pos.coords.latitude);
+            localStorage.setItem('user_lon', pos.coords.longitude);
+            init(); 
+        }, (err) => { alert("Veuillez autoriser l'accès à la position."); }, 
+        { enableHighAccuracy: true, timeout: 5000 });
     }
 
     init();
