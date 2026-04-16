@@ -94,7 +94,6 @@
             font-size: 0.9rem;
         }
 
-        /* NOUVEAU COMPTEUR */
         #plant-counter {
             font-size: 0.65rem;
             color: #4ade80;
@@ -396,7 +395,6 @@ function renderGrid() {
         const type = (p.Type || "").toLowerCase();
         const matchType = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase());
         
-        // --- LE FILTRE INDISPENSABLE ---
         if (currentView === 'jardin' && p.est_dans_jardin !== true) return false;
         
         return matchSearch && matchType;
@@ -446,18 +444,40 @@ function onSearchInput() {
 }
 
 function loadData() {
+    const statusMsg = document.getElementById('status-msg');
     const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+    
+    statusMsg.innerText = "Synchronisation en cours...";
     document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
+
     fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailToSend, pin: userPin })
     })
-    .then(r => r.json())
+    .then(r => {
+        if (r.status === 401) {
+            alert("Erreur : Email ou PIN ÉONIA incorrect.");
+            logout();
+            throw new Error("Authentification échouée");
+        }
+        if (!r.ok) throw new Error("Erreur serveur");
+        return r.json();
+    })
     .then(data => {
+        if (currentView === 'jardin' && data.length === 0 && userEmail !== 'invite@eonia.com') {
+            alert("Vous n'avez pas encore de plaque ÉONIA enregistrée sur ce compte.");
+            switchView('catalogue');
+            return;
+        }
+
         allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
         renderGrid();
-        document.getElementById('status-msg').innerText = "";
+        statusMsg.innerText = "";
+    })
+    .catch(err => {
+        console.error(err);
+        statusMsg.innerText = "Erreur de connexion.";
     });
 }
 
