@@ -392,30 +392,24 @@ function renderGrid() {
     let filtered = allPlants.filter(p => {
         const nom = (p["Nom commun"] || "").toLowerCase();
         const id = p.id || p["ID_Plaque"];
-        const type = (p.Type || "").toLowerCase();
-        
         const matchSearch = nom.includes(searchVal);
+        const type = (p.Type || "").toLowerCase();
         const matchType = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase());
         
-        // --- FILTRE LOGIQUE POUR L'ONGLET JARDIN ---
-        if (currentView === 'jardin' && p.est_dans_jardin !== true) {
-            return false;
-        }
+        // --- LE FILTRE INDISPENSABLE ---
+        if (currentView === 'jardin' && p.est_dans_jardin !== true) return false;
         
         return matchSearch && matchType;
     });
 
     const count = filtered.length;
     counterEl.textContent = `${count} PLANTE${count > 1 ? 'S' : ''} TROUVÉE${count > 1 ? 'S' : ''}`;
-    document.getElementById('status-msg').style.display = (count === 0 ? "block" : "none");
 
     filtered.forEach(p => {
-        // Affiche le surnom si on est dans le jardin, sinon le nom commun
         const nomAffiche = (currentView === 'jardin' && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || "Plante");
         const id = p.id || p.ID_Plaque;
         const currentLetter = nomAffiche[0].toUpperCase();
-        const isFav = favorites.includes(id);
-
+        
         if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter !== 'fav' && !searchVal) {
             const divider = document.createElement('div');
             divider.className = "letter-divider";
@@ -426,18 +420,13 @@ function renderGrid() {
 
         const card = document.createElement('div');
         card.className = "plant-card";
-        // On s'assure d'envoyer l'ID au fichier jardin.html
         card.onclick = () => window.location.href = `jardin.html?id=${id}`;
         card.innerHTML = `
             <div class="img-container">
-                <div class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, '${id}')">
-                    ${isFav ? '★' : '☆'}
-                </div>
                 <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info">
-                <div class="plant-name">${nomAffiche}</div>
-                ${(currentView === 'jardin' && p["Surnom"]) ? `<div style="font-size:0.55rem; color:#4ade80; margin-top:4px; opacity:0.8; font-style:italic;">${p["Nom commun"]}</div>` : ''}
+                <div class="plant-name" style="font-size:0.7rem;">${nomAffiche}</div>
             </div>
         `;
         container.appendChild(card);
