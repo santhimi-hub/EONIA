@@ -152,6 +152,13 @@
             box-shadow:0 5px 15px rgba(74,222,128,0.3);
         }
 
+        .btn-main:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .link-order {
             font-size:0.7rem;
             color:rgba(255,255,255,0.5);
@@ -226,44 +233,34 @@
         .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
 
-        /* MANIFESTO BOX CENTRÉE */
         .manifesto-box {
             max-width: 700px;
             margin: 80px auto 0 auto;
             text-align: center;
-            border-left: none; 
-            padding-left: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* STYLE DU LIEN PHILOSOPHIE */
         .link-philosophy {
-    display: inline-block;
-    margin-top: 30px;
-    color: #4ade80 !important; /* Force le vert même si le navigateur veut mettre du bleu */
-    text-decoration: none;
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    border-bottom: 1px solid #4ade80;
-    padding-bottom: 5px;
-    text-transform: uppercase;
-    font-weight: 500;
-    transition: 0.3s ease;
-}
+            display: inline-block;
+            margin-top: 30px;
+            color: #4ade80 !important;
+            text-decoration: none;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #4ade80;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: 0.3s ease;
+        }
 
-/* On s'assure que le lien reste clair une fois cliqué (évite le violet/bleu) */
-.link-philosophy:visited {
-    color: #4ade80 !important;
-}
-
-.link-philosophy:hover {
-    color: #fff !important;
-    border-color: #fff;
-    transform: translateY(-2px);
-}
-
+        .link-philosophy:hover {
+            color: #fff !important;
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
 
         /* ANIMATIONS */
         @keyframes fadeUp {
@@ -276,11 +273,9 @@
             to { opacity:1; }
         }
 
-        /* MOBILE */
         @media (max-width:600px) {
             .brand-title { font-size:2.5rem; }
             .tagline { margin-top:20px; margin-bottom:30px; }
-            .pillar-grid { gap: 30px; }
         }
     </style>
 </head>
@@ -298,7 +293,7 @@
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
 
         <div style="display:flex;flex-direction:column;gap:8px;">
-            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
+            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" required>
 
             <div class="auth-footer">
                 <p id="activation-help">
@@ -357,6 +352,8 @@
 </section>
 
 <script>
+    // --- CONFIGURATION ---
+    const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id');
 
@@ -371,7 +368,8 @@
         if (e.key === 'Enter') validerConnexion();
     });
 
-    function validerConnexion() {
+    async function validerConnexion() {
+        const btn = document.getElementById('btn-entrer');
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -381,18 +379,43 @@
             return;
         }
         if(pin.length < 4) {
-            alert("Veuillez entrer un code PIN (4 chiffres minimum).");
+            alert("Le code PIN doit comporter 4 chiffres.");
             return;
         }
 
-        localStorage.setItem('user_email', mail);
-        localStorage.setItem('user_pin', pin);
-        localStorage.setItem('eonia_access', 'client');
+        // Animation de chargement
+        const originalText = btn.innerText;
+        btn.innerText = "VÉRIFICATION...";
+        btn.disabled = true;
 
-        if (plaqueEnAttente) {
-            window.location.href = "jardin.html?id=" + plaqueEnAttente;
-        } else {
-            window.location.href = "catalogue.html";
+        try {
+            const response = await fetch(WORKER_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: mail, pin: pin })
+            });
+
+            if (response.ok) {
+                // Stockage sécurisé
+                localStorage.setItem('user_email', mail);
+                localStorage.setItem('user_pin', pin);
+                localStorage.setItem('eonia_access', 'client');
+
+                // Redirection
+                if (plaqueEnAttente) {
+                    window.location.href = "jardin.html?id=" + plaqueEnAttente;
+                } else {
+                    window.location.href = "catalogue.html";
+                }
+            } else {
+                alert("Email ou PIN incorrect pour ce jardin.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert("Erreur réseau. Vérifiez votre connexion.");
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
     }
 
