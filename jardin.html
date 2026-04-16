@@ -135,11 +135,10 @@
                 document.getElementById('section-detail').classList.remove('hidden');
                 const isOwner = p["est_dans_jardin"] === true;
 
-                // --- 1. GESTION MÉTÉO (UNIQUEMENT PROPRIÉTAIRE) ---
+                // --- 1. GESTION MÉTÉO (AVEC MÉMOIRE GPS) ---
                 const container = document.getElementById('weather-container');
                 
                 if (isOwner) {
-                    // Si je possède la plante, j'affiche le bandeau
                     container.classList.remove('hidden');
 
                     if (p.Alertes && p.Alertes.length > 0) {
@@ -156,14 +155,20 @@
                         });
                         container.innerHTML = html;
                     } else {
-                        // Demande de GPS si pas encore de météo
+                        // Pas encore de météo : on affiche le bouton
                         container.innerHTML = `
                             <div class="geo-request">
                                 <span>Activer la météo locale pour votre jardin ?</span>
                                 <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
                             </div>`;
+                        
                         document.getElementById('enable-geo').onclick = () => {
                             navigator.geolocation.getCurrentPosition((pos) => {
+                                // SAUVEGARDE DANS LE NAVIGATEUR
+                                localStorage.setItem('user_lat', pos.coords.latitude);
+                                localStorage.setItem('user_lon', pos.coords.longitude);
+                                
+                                // Relance avec les données
                                 fetchAndDisplay({ 
                                     email: userEmail, 
                                     plantId: plantId, 
@@ -174,7 +179,6 @@
                         };
                     }
                 } else {
-                    // Si je ne suis pas le proprio, je cache tout le bloc
                     container.classList.add('hidden');
                 }
 
@@ -194,7 +198,7 @@
                     };
                 }
 
-                // --- 3. REMPLISSAGE INFOS ---
+                // --- 3. INFOS ---
                 document.getElementById('p-photo').src = p["Photo"] || '';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
@@ -214,8 +218,27 @@
         } catch (e) { console.error("Erreur de chargement", e); }
     }
 
-    // Lancement au chargement
-    window.onload = () => { if (plantId) fetchAndDisplay({ email: userEmail, plantId: plantId }); };
+    // --- LANCEMENT INTELLIGENT ---
+    window.onload = () => {
+        if (!plantId) return;
+
+        // On vérifie si on a déjà des coordonnées en mémoire
+        const savedLat = localStorage.getItem('user_lat');
+        const savedLon = localStorage.getItem('user_lon');
+
+        if (savedLat && savedLon) {
+            // Si oui, on les utilise tout de suite !
+            fetchAndDisplay({ 
+                email: userEmail, 
+                plantId: plantId, 
+                lat: parseFloat(savedLat), 
+                lon: parseFloat(savedLon) 
+            });
+        } else {
+            // Sinon, chargement normal (le bouton GPS s'affichera)
+            fetchAndDisplay({ email: userEmail, plantId: plantId });
+        }
+    };
 </script>
 </body>
 </html>
