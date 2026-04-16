@@ -14,6 +14,7 @@
         
         /* --- DESIGN METEO STYLE APPLE --- */
         #weather-container {
+            position: relative;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -34,6 +35,19 @@
         .w-day { font-size: 0.6rem; color: #aaa; text-transform: uppercase; font-weight: bold; }
         .w-icon { font-size: 1.8rem; }
         .w-temp { font-size: 0.85rem; color: #fff; }
+
+        #reset-gps {
+            position: absolute;
+            right: 15px;
+            bottom: 8px;
+            opacity: 0.3;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        #reset-gps:hover { opacity: 1; color: #4ade80; }
 
         /* --- INFOS PLANTE --- */
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
@@ -135,9 +149,8 @@
                 document.getElementById('section-detail').classList.remove('hidden');
                 const isOwner = p["est_dans_jardin"] === true;
 
-                // --- 1. GESTION MÉTÉO (AVEC MÉMOIRE GPS) ---
+                // --- GESTION MÉTÉO ---
                 const container = document.getElementById('weather-container');
-                
                 if (isOwner) {
                     container.classList.remove('hidden');
 
@@ -153,36 +166,38 @@
                                 </div>`;
                             }
                         });
+                        // Ajout du bouton de réinitialisation discret
+                        html += `<div id="reset-gps">📍 Changer de lieu</div>`;
                         container.innerHTML = html;
+
+                        document.getElementById('reset-gps').onclick = () => {
+                            if(confirm("Voulez-vous mettre à jour votre position GPS pour la météo ?")) {
+                                localStorage.removeItem('user_lat');
+                                localStorage.removeItem('user_lon');
+                                location.reload();
+                            }
+                        };
                     } else {
-                        // Pas encore de météo : on affiche le bouton
                         container.innerHTML = `
                             <div class="geo-request">
                                 <span>Activer la météo locale pour votre jardin ?</span>
                                 <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
                             </div>`;
-                        
                         document.getElementById('enable-geo').onclick = () => {
                             navigator.geolocation.getCurrentPosition((pos) => {
-                                // SAUVEGARDE DANS LE NAVIGATEUR
                                 localStorage.setItem('user_lat', pos.coords.latitude);
                                 localStorage.setItem('user_lon', pos.coords.longitude);
-                                
-                                // Relance avec les données
-                                fetchAndDisplay({ 
-                                    email: userEmail, 
-                                    plantId: plantId, 
-                                    lat: pos.coords.latitude, 
-                                    lon: pos.coords.longitude 
-                                });
-                            }, (err) => { alert("Localisation refusée."); });
+                                fetchAndDisplay({ email: userEmail, plantId: plantId, lat: pos.coords.latitude, lon: pos.coords.longitude });
+                            }, (err) => { 
+                                alert("Erreur GPS : Localisation refusée. Vérifiez les réglages de votre navigateur."); 
+                            });
                         };
                     }
                 } else {
                     container.classList.add('hidden');
                 }
 
-                // --- 2. TITRE & SURNOM ---
+                // --- TITRE & SURNOM ---
                 const mainTitle = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
                 document.getElementById('p-titre').innerText = mainTitle;
                 
@@ -198,7 +213,7 @@
                     };
                 }
 
-                // --- 3. INFOS ---
+                // --- INFOS ---
                 document.getElementById('p-photo').src = p["Photo"] || '';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
@@ -215,27 +230,17 @@
                     document.getElementById('cta-invite').classList.remove('hidden');
                 }
             }
-        } catch (e) { console.error("Erreur de chargement", e); }
+        } catch (e) { console.error("Erreur", e); }
     }
 
-    // --- LANCEMENT INTELLIGENT ---
+    // Chargement avec vérification du stockage local
     window.onload = () => {
         if (!plantId) return;
-
-        // On vérifie si on a déjà des coordonnées en mémoire
-        const savedLat = localStorage.getItem('user_lat');
-        const savedLon = localStorage.getItem('user_lon');
-
-        if (savedLat && savedLon) {
-            // Si oui, on les utilise tout de suite !
-            fetchAndDisplay({ 
-                email: userEmail, 
-                plantId: plantId, 
-                lat: parseFloat(savedLat), 
-                lon: parseFloat(savedLon) 
-            });
+        const lat = localStorage.getItem('user_lat');
+        const lon = localStorage.getItem('user_lon');
+        if (lat && lon) {
+            fetchAndDisplay({ email: userEmail, plantId: plantId, lat: parseFloat(lat), lon: parseFloat(lon) });
         } else {
-            // Sinon, chargement normal (le bouton GPS s'affichera)
             fetchAndDisplay({ email: userEmail, plantId: plantId });
         }
     };
