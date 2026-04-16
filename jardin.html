@@ -3,92 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Jardin & Évolution</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+    <title>ÉONIA — Mon Jardin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
-        
-        /* Météo */
-        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; min-height: 80px; }
-        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
-        .w-icon { font-size: 1.8rem; }
-        .w-temp { font-size: 0.9rem; }
-        .btn-geo { background: var(--accent); color: #000; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer; }
 
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
-        
-        /* Grille */
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
-        .info-box.highlight { border-left: 4px solid var(--accent); border-color: rgba(74, 222, 128, 0.2); padding: 10px 15px; }
-        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; color: #fff; }
+        /* HEADER & RETOUR */
+        .back-btn { background: none; border: 1px solid var(--border); color: #888; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; }
 
-        /* Entretien & Evolution */
-        .card-special { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin: 20px 0; }
-        .btn-water { background: var(--water); color: #000; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-        .edit-tool { cursor: pointer; border-bottom: 1px dashed #444; transition: 0.2s; }
-        .edit-tool:hover { border-color: var(--accent); color: #fff; }
-        
-        /* Photos Evolution */
-        .evo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .evo-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
-        .btn-add-photo { background: #1a1a1a; border: 1px dashed #444; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #444; cursor: pointer; }
+        /* BOUTON COMMANDER (Refonte complète) */
+        .cta-container { margin: 40px 0; padding: 20px; text-align: center; }
+        .btn-order-premium {
+            display: block;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .btn-order-premium:active { transform: scale(0.96); }
 
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
-        .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
+        /* ARROSAGE & NOTES */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; }
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--accent); padding-left: 10px; }
+        
+        .btn-water { background: var(--water); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+        .cancel-link { color: #555; font-size: 0.7rem; display: block; margin-top: 15px; text-decoration: underline; cursor: pointer; text-align: center; }
+
+        /* FORMULAIRE & CALENDRIER */
+        input[type="date"], textarea {
+            width: 100%; background: #151515; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-family: inherit; margin-bottom: 20px; box-sizing: border-box; font-size: 0.9rem;
+        }
+        .save-btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer; }
+
+        /* PHOTOS EVOLUTION */
+        .photo-zone { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border: 1px dashed #333; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .photo-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+        .photo-label { z-index: 1; font-size: 0.75rem; color: #888; text-align: center; }
+        
     </style>
 </head>
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
-        
-        <div id="weather-container" class="hidden">
-             <button class="btn-geo" onclick="askGeo()">📍 ACTIVER LA MÉTÉO</button>
+
+        <div id="p-header" style="margin-bottom: 30px;">
+            <h1 id="p-titre" style="font-size:2.2rem; margin:0; font-weight:200;">Chargement...</h1>
+            <p id="p-sci" style="color:var(--accent); font-style:italic; font-size:0.9rem; opacity:0.8;"></p>
         </div>
 
-        <img id="p-photo" class="hero-img">
+        <div id="owner-area" class="hidden">
+            <div class="card">
+                <div class="section-title">Entretien</div>
+                <button class="btn-water" onclick="updateWater(false)">💦 J'AI ARROSÉ AUJOURD'HUI</button>
+                <div id="water-info" style="font-size:0.75rem; color:#666; margin-top:15px; text-align:center;"></div>
+                <span id="btn-cancel" class="cancel-link hidden" onclick="updateWater(true)">Erreur ? Annuler l'arrosage</span>
+            </div>
 
-        <div style="display:flex; align-items:center; justify-content: space-between;">
-            <h1 id="p-titre" style="font-size:2.1rem; font-weight:200;"></h1>
-            <button id="btn-edit-surnom" class="hidden btn-geo" onclick="editField('Surnom_Perso', 'Nouveau surnom')">ÉDITER</button>
-        </div>
-        <div id="p-sci" class="sci-name"></div>
+            <div class="card">
+                <div class="section-title">Journal de bord</div>
+                <label style="font-size:0.7rem; color:#666; display:block; margin-bottom:8px;">DATE DE PLANTATION</label>
+                <input type="date" id="input-date" onchange="showSave()">
+                
+                <label style="font-size:0.7rem; color:#666; display:block; margin-bottom:8px;">NOTES PRIVÉES</label>
+                <textarea id="input-note" rows="3" placeholder="Observation, taille, engrais..." oninput="showSave()"></textarea>
+                
+                <button id="btn-save" class="save-btn hidden" onclick="saveData()">ENREGISTRER LES MODIFICATIONS</button>
+            </div>
 
-        <div id="watering-area" class="hidden card-special" style="text-align: center;">
-            <div class="section-title" style="text-align: left;">Entretien</div>
-            <button class="btn-water" onclick="doWatering()">💦 J'AI ARROSÉ AUJOURD'HUI</button>
-            <div id="watering-status" style="font-size: 0.7rem; color: #888; margin-top: 10px;"></div>
-        </div>
-
-        <div class="info-grid" id="p-grid"></div>
-
-        <div id="private-area" class="hidden card-special">
-            <div class="section-title">Carnet de bord</div>
-            <p style="font-size: 0.8rem; color: #888;">Date de plantation : <span id="p-plantation" class="edit-tool" onclick="editField('Date_Plantation', 'Format AAAA-MM-JJ')">Ajouter une date</span></p>
-            <div id="p-note" class="edit-tool" style="font-size: 0.95rem; line-height: 1.6; color: #ccc;" onclick="editField('Note_Privee', 'Votre note privée')">Appuyez ici pour écrire une note...</div>
-        </div>
-
-        <div id="evo-area" class="hidden card-special">
-            <div class="section-title">Évolution en images</div>
-            <div class="evo-grid" id="evo-gallery">
-                <div class="btn-add-photo" onclick="alert('Fonctionnalité : uploader une image vers Notion en cours de développement')">+</div>
+            <div class="card">
+                <div class="section-title">Évolution en photo</div>
+                <div class="photo-zone" onclick="document.getElementById('cam-input').click()">
+                    <img id="preview" class="hidden">
+                    <span class="photo-label">📸 APPUYER POUR PRENDRE UNE PHOTO</span>
+                </div>
+                <input type="file" id="cam-input" accept="image/*" capture="camera" class="hidden" onchange="previewPhoto(this)">
             </div>
         </div>
 
-        <div class="desc-box">
-            <div class="section-title">Description</div>
-            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+        <div id="botany-info" class="card">
+            <div class="section-title">Informations</div>
+            <div id="p-desc" style="color:#aaa; line-height:1.7; font-size:0.95rem;"></div>
         </div>
 
-        <div id="cta-invite" class="order-cta hidden">
-            <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
+        <div id="cta-order" class="cta-container hidden">
+            <p style="color:#666; font-size:0.8rem; margin-bottom:20px;">Cette plante vous plaît ?</p>
+            <button class="btn-order-premium" onclick="window.location.href='commander.html'">
+                Commander ma plaque Éonia
+            </button>
         </div>
     </div>
 
@@ -99,104 +115,68 @@
         const userPin = localStorage.getItem('user_pin');
 
         async function init() {
-            const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
-            try {
-                const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId, lat, lon }) });
-                const data = await res.json();
-                const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-                if (p) render(p);
-            } catch (e) { console.error("Erreur chargement", e); }
-        }
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId })
+            });
+            const data = await res.json();
+            const p = data.find(i => String(i.id) === plantId || String(i.ID_Plaque) === plantId);
+            
+            if (!p) return;
 
-        function render(p) {
-            document.getElementById('p-photo').src = p.Photo;
             document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
             document.getElementById('p-sci').innerText = p["Nom scientifique"];
             document.getElementById('p-desc').innerText = p.Description;
 
             if (p.est_dans_jardin) {
-                document.getElementById('weather-container').classList.remove('hidden');
-                document.getElementById('btn-edit-surnom').classList.remove('hidden');
-                document.getElementById('watering-area').classList.remove('hidden');
-                document.getElementById('private-area').classList.remove('hidden');
-                document.getElementById('evo-area').classList.remove('hidden');
-
-                // Météo
-                if (p.Alertes) {
-                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
-                        const [d, i, t] = str.split('|');
-                        return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
-                    }).join('');
+                document.getElementById('owner-area').classList.remove('hidden');
+                document.getElementById('input-date').value = p.Date_Plantation || "";
+                document.getElementById('input-note').value = p.Note_Privee || "";
+                
+                if (p.Dernier_Arrosage && p.Dernier_Arrosage !== "-") {
+                    const d = new Date(p.Dernier_Arrosage);
+                    document.getElementById('water-info').innerText = "Dernier arrosage : le " + d.toLocaleDateString();
+                    document.getElementById('btn-cancel').classList.remove('hidden');
                 }
-
-                // Hydratation des champs
-                if (p.Date_Plantation && p.Date_Plantation !== "-") {
-                    document.getElementById('p-plantation').innerText = p.Date_Plantation;
-                }
-                if (p.Note_Privee && p.Note_Privee !== "-") {
-                    document.getElementById('p-note').innerText = p.Note_Privee;
-                }
-
-                // Arrosage
-                const last = p.Dernier_Arrosage && p.Dernier_Arrosage !== "-" ? new Date(p.Dernier_Arrosage) : null;
-                const freq = parseInt(p.Frequence_Arrosage) || 7;
-                const statusEl = document.getElementById('watering-status');
-                if (last) {
-                    const next = new Date(last); next.setDate(next.getDate() + freq);
-                    const diff = Math.ceil((next - new Date()) / (1000 * 60 * 60 * 24));
-                    statusEl.innerHTML = diff >= 0 ? `Prochain arrosage dans ${diff} jour(s)` : `Retard de ${Math.abs(diff)} jour(s)`;
-                } else { statusEl.innerText = "Aucun historique."; }
-
             } else {
-                document.getElementById('cta-invite').classList.remove('hidden');
+                document.getElementById('cta-order').classList.remove('hidden');
             }
-
-            const fields = [
-                {l:"TYPE", v:p.Type, h:true}, {l:"FAMILLE", v:p.Famille, h:true},
-                {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition},
-                {l:"Taille", v:p.Taille}, {l:"Floraison", v:p.Floraison},
-                {l:"Difficulté", v:p.Difficulté}, {l:"Rusticité", v:p.Rusticité}, {l:"Feuillage", v:p.Feuillage}
-            ];
-            document.getElementById('p-grid').innerHTML = fields.map(f => `<div class="info-box ${f.h?'highlight':''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
         }
 
-        async function editField(field, label) {
-            const newVal = prompt(`${label} :`);
-            if (newVal === null) return;
-
-            const actionMap = {
-                'Surnom_Perso': 'update_surnom',
-                'Note_Privee': 'update_note', // Tu devras ajouter cette action dans ton Worker
-                'Date_Plantation': 'update_date' // Et celle-là aussi
-            };
-
-            const res = await fetch(API_URL, {
+        async function updateWater(cancel) {
+            await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    email: userEmail, pin: userPin, 
-                    action: actionMap[field] || 'update_generic', 
-                    plantId, field: field, value: newVal, surnom: newVal 
-                })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId, cancel })
             });
-            if (res.ok) location.reload();
+            location.reload();
         }
 
-        async function doWatering() {
-            const res = await fetch(API_URL, {
+        function showSave() { document.getElementById('btn-save').classList.remove('hidden'); }
+
+        async function saveData() {
+            const date = document.getElementById('input-date').value;
+            const note = document.getElementById('input-note').value;
+            await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId, date, note })
             });
-            if (res.ok) location.reload();
+            document.getElementById('btn-save').classList.add('hidden');
+            alert("Enregistré !");
         }
 
-        function askGeo() {
-            navigator.geolocation.getCurrentPosition(pos => {
-                localStorage.setItem('user_lat', pos.coords.latitude);
-                localStorage.setItem('user_lon', pos.coords.longitude);
-                init();
-            }, (err) => alert("Merci d'autoriser la géolocalisation pour la météo."));
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.getElementById('preview');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         init();
