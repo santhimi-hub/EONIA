@@ -3,100 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Jardin & Météo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;600&display=swap" rel="stylesheet">
+    <title>ÉONIA — Détails</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: auto; padding: 20px; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
+        
+        /* MÉTÉO */
+        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; min-height: 80px; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
+        .w-icon { font-size: 1.8rem; }
+        .w-temp { font-size: 0.9rem; }
+        .btn-geo { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        
+        /* GRILLE INFOS */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
+        .info-box.highlight { border-left: 4px solid var(--accent); border-color: rgba(74, 222, 128, 0.2); padding: 10px 15px; }
+        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .info-box .value { font-size: 0.85rem; color: #fff; }
+        
+        /* CARNET D'ENTRETIEN (NOUVEAU) */
+        .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .btn-water { background: var(--water); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; margin-bottom: 10px; }
+        .water-date { font-size: 0.7rem; color: #666; text-align: center; display: block; margin-bottom: 5px; }
+        .btn-cancel-water { background: none; border: none; color: #444; font-size: 0.65rem; text-decoration: underline; width: 100%; cursor: pointer; }
+        
+        input[type="date"], textarea { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 10px; box-sizing: border-box; }
+        .btn-save { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; font-size: 0.75rem; margin-top: 15px; cursor: pointer; }
 
-        /* MÉTÉO (RESTAURÉE) */
-        .weather-bar { 
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(10px); border: 1px solid var(--border);
-            border-radius: 24px; padding: 15px; margin-bottom: 25px;
-            display: flex; justify-content: space-around; align-items: center;
-        }
-        .w-day { font-size: 0.6rem; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .w-icon { font-size: 1.5rem; margin-bottom: 5px; }
-        .w-temp { font-size: 0.8rem; font-weight: 400; }
-
-        .plant-hero { width: 100%; height: 250px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; border: 1px solid var(--border); }
-
-        .main-title { font-size: 2.2rem; margin: 0; font-weight: 200; }
-        .sci-title { color: var(--accent); font-style: italic; font-size: 0.9rem; opacity: 0.7; margin-bottom: 25px; }
-
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; }
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-left: 2px solid var(--accent); padding-left: 10px; }
-
-        /* GRILLE DE DONNÉES (EMPLACEMENT RESTAURÉ) */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 25px; }
-        .info-box { background: #111; border: 1px solid #1a1a1a; padding: 12px; border-radius: 14px; }
-        .info-label { font-size: 0.55rem; color: #555; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .info-value { font-size: 0.8rem; color: #fff; }
-
-        .btn-water { background: var(--water); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; cursor: pointer; }
-        .cancel-link { color: #444; font-size: 0.7rem; display: block; margin-top: 10px; text-align: center; cursor: pointer; text-decoration: underline; }
-
-        input[type="date"], textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-bottom: 15px; box-sizing: border-box; }
-        .save-btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; }
-
-        /* BOUTON COMMANDER AMÉLIORÉ */
-        .btn-order-premium { 
-            display: block; width: 100%; padding: 20px; border-radius: 18px; text-align: center; font-weight: 700;
-            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: #000; text-decoration: none;
-            box-shadow: 0 10px 20px rgba(74, 222, 128, 0.2); margin: 30px 0;
-        }
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
+        
+        .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
+        #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <button onclick="window.history.back()" style="background:none; border:none; color:var(--accent); cursor:pointer; margin-bottom:15px;">← RETOUR</button>
+        <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        <div id="weather-container" class="hidden"></div>
+        
+        <img id="p-photo" class="hero-img">
+        
+        <div style="display:flex; align-items:center; margin-bottom:5px;">
+            <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0;"></h1>
+            <button id="btn-edit-surnom" class="hidden" onclick="changeSurnom()">ÉDITER</button>
+        </div>
+        <div id="p-sci" class="sci-name"></div>
 
-        <div id="weather-section" class="weather-bar hidden"></div>
-
-        <img id="p-img" class="plant-hero hidden">
-
-        <h1 id="p-titre" class="main-title">Chargement...</h1>
-        <div id="p-sci" class="sci-title"></div>
-
-        <div id="owner-tools" class="hidden">
-            <div class="card">
-                <div class="section-title">Entretien Rapide</div>
-                <button class="btn-water" onclick="updateWater(false)">💦 MARQUER COMME ARROSÉ</button>
-                <div id="water-info" style="font-size:0.7rem; color:#555; text-align:center; margin-top:10px;"></div>
-                <span id="btn-cancel" class="cancel-link hidden" onclick="updateWater(true)">Annuler l'arrosage</span>
+        <div id="owner-area" class="hidden">
+            <div class="maintenance-card">
+                <div class="section-title">ENTRETIEN</div>
+                <button class="btn-water" onclick="manageWatering(false)">💦 MARQUER COMME ARROSÉ</button>
+                <span id="last-water-text" class="water-date">Dernier arrosage : Jamais</span>
+                <button id="btn-cancel-water" class="btn-cancel-water hidden" onclick="manageWatering(true)">Annuler l'erreur</button>
             </div>
 
-            <div class="card">
-                <div class="section-title">Journal de Suivi</div>
-                <label class="info-label">Date de plantation</label>
-                <input type="date" id="input-date" onchange="showSave()">
-                <label class="info-label">Mes notes</label>
-                <textarea id="input-note" rows="3" placeholder="Notes..." oninput="showSave()"></textarea>
-                <button id="btn-save" class="save-btn hidden" onclick="saveData()">ENREGISTRER</button>
+            <div class="maintenance-card">
+                <div class="section-title">JOURNAL DE BORD</div>
+                <label class="sci-name" style="font-size:0.6rem; margin:0;">DATE DE PLANTATION (Calendrier)</label>
+                <input type="date" id="plant-date" onchange="showSave()">
+                
+                <label class="sci-name" style="font-size:0.6rem; margin:15px 0 0 0; display:block;">MES NOTES</label>
+                <textarea id="plant-note" rows="3" placeholder="Notes de croissance..." oninput="showSave()"></textarea>
+                
+                <button id="btn-save-note" class="btn-save hidden" onclick="saveJournal()">ENREGISTRER LE JOURNAL</button>
             </div>
         </div>
 
-        <div class="card">
-            <div class="section-title">Fiche Technique</div>
-            <div class="info-grid">
-                <div class="info-box"><span class="info-label">Arrosage</span><div id="v-arr">-</div></div>
-                <div class="info-box"><span class="info-label">Exposition</span><div id="v-exp">-</div></div>
-                <div class="info-box"><span class="info-label">Difficulté</span><div id="v-dif">-</div></div>
-                <div class="info-box"><span class="info-label">Type</span><div id="v-type">-</div></div>
-                <div class="info-box"><span class="info-label">Taille</span><div id="v-taille">-</div></div>
-                <div class="info-box"><span class="info-label">Floraison</span><div id="v-flo">-</div></div>
-                <div class="info-box"><span class="info-label">Rusticité</span><div id="v-rust">-</div></div>
-                <div class="info-box"><span class="info-label">Feuillage</span><div id="v-feu">-</div></div>
-            </div>
-            <div class="section-title">Description</div>
-            <p id="p-desc" style="color:#888; font-size:0.9rem; line-height:1.6;"></p>
+        <div class="info-grid" id="p-grid"></div>
+
+        <div class="desc-box">
+            <div class="section-title">DESCRIPTION</div>
+            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
 
-        <div id="cta-order" class="hidden">
-            <a href="commander.html" class="btn-order-premium">Commander ma plaque Éonia</a>
+        <div id="cta-invite" class="order-cta hidden">
+            <h3 style="font-weight:400; margin-bottom:20px;">Immortalisez cette plante dans votre jardin</h3>
+            <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
         </div>
     </div>
 
@@ -105,75 +98,109 @@
         const plantId = new URLSearchParams(window.location.search).get('id');
         const userEmail = localStorage.getItem('user_email');
         const userPin = localStorage.getItem('user_pin');
-        const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
 
         async function init() {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId, lat, lon })
+            const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId, lat, lon }) 
             });
             const data = await res.json();
-            const p = data.find(i => String(i.id) === plantId || String(i.ID_Plaque) === plantId);
-            
-            if (!p) return;
+            const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+            if (p) render(p);
+        }
 
-            // Image et Titres
-            if (p.Photo) { document.getElementById('p-img').src = p.Photo; document.getElementById('p-img').classList.remove('hidden'); }
+        function render(p) {
+            document.getElementById('p-photo').src = p.Photo;
             document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
             document.getElementById('p-sci').innerText = p["Nom scientifique"];
             document.getElementById('p-desc').innerText = p.Description;
 
-            // Grille technique
-            document.getElementById('v-arr').innerText = p.Arrosage;
-            document.getElementById('v-exp').innerText = p.Exposition;
-            document.getElementById('v-dif').innerText = p.Difficulté;
-            document.getElementById('v-type').innerText = p.Type;
-            document.getElementById('v-taille').innerText = p.Taille;
-            document.getElementById('v-flo').innerText = p.Floraison;
-            document.getElementById('v-rust').innerText = p.Rusticité;
-            document.getElementById('v-feu').innerText = p.Feuillage;
-
-            // Météo
-            if (p.Alertes) {
-                const w = document.getElementById('weather-section');
-                w.innerHTML = p.Alertes.map(str => {
-                    const [d, i, t] = str.split('|');
-                    return `<div style="text-align:center"><div class="w-day">${d}</div><div class="w-icon">${i}</div><div class="w-temp">${t}</div></div>`;
-                }).join('');
-                w.classList.remove('hidden');
-            }
-
             if (p.est_dans_jardin) {
-                document.getElementById('owner-tools').classList.remove('hidden');
-                document.getElementById('input-date').value = p.Date_Plantation || "";
-                document.getElementById('input-note').value = p.Note_Privee || "";
+                document.getElementById('owner-area').classList.remove('hidden');
+                document.getElementById('weather-container').classList.remove('hidden');
+                document.getElementById('btn-edit-surnom').classList.remove('hidden');
+                
+                // Météo
+                if (p.Alertes) {
+                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
+                        const [d, i, t] = str.split('|');
+                        return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('weather-container').innerHTML = `<button class="btn-geo" onclick="askGeo()">ACTIVER LA MÉTÉO 📍</button>`;
+                }
+
+                // Données Journal
+                document.getElementById('plant-date').value = p.Date_Plantation || "";
+                document.getElementById('plant-note').value = p.Note_Privee || "";
                 if (p.Dernier_Arrosage && p.Dernier_Arrosage !== "-") {
-                    document.getElementById('water-info').innerText = "Dernier arrosage : " + new Date(p.Dernier_Arrosage).toLocaleDateString();
-                    document.getElementById('btn-cancel').classList.remove('hidden');
+                    const d = new Date(p.Dernier_Arrosage);
+                    document.getElementById('last-water-text').innerText = "Arrosé le " + d.toLocaleDateString();
+                    document.getElementById('btn-cancel-water').classList.remove('hidden');
                 }
             } else {
-                document.getElementById('cta-order').classList.remove('hidden');
+                document.getElementById('cta-invite').classList.remove('hidden');
             }
+
+            // Grille avec Type, Famille et nouveaux champs
+            const fields = [
+                {l:"TYPE", v:p.Type, h:true},
+                {l:"FAMILLE", v:p.Famille, h:true},
+                {l:"Arrosage", v:p.Arrosage},
+                {l:"Exposition", v:p.Exposition},
+                {l:"Difficulté", v:p.Difficulté},
+                {l:"Taille", v:p.Taille},
+                {l:"Floraison", v:p.Floraison},
+                {l:"Feuillage", v:p.Feuillage},
+                {l:"Rusticité", v:p.Rusticité}
+            ];
+            document.getElementById('p-grid').innerHTML = fields.map(f => `
+                <div class="info-box ${f.h?'highlight':''}">
+                    <div class="label">${f.l}</div>
+                    <div class="value">${f.v||"-"}</div>
+                </div>`).join('');
         }
 
-        async function updateWater(cancel) {
-            await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId, cancel })
+        // --- ACTIONS ---
+        async function manageWatering(cancel) {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId, cancel }) 
             });
             location.reload();
         }
 
-        function showSave() { document.getElementById('btn-save').classList.remove('hidden'); }
+        function showSave() { document.getElementById('btn-save-note').classList.remove('hidden'); }
 
-        async function saveData() {
-            const date = document.getElementById('input-date').value;
-            const note = document.getElementById('input-note').value;
-            await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId, date, note })
+        async function saveJournal() {
+            const date = document.getElementById('plant-date').value;
+            const note = document.getElementById('plant-note').value;
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId, date, note }) 
             });
-            document.getElementById('btn-save').classList.add('hidden');
-            alert("Journal mis à jour !");
+            document.getElementById('btn-save-note').classList.add('hidden');
+            alert("Journal enregistré !");
+        }
+
+        async function changeSurnom() {
+            const n = prompt("Nouveau surnom :");
+            if (n) {
+                await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_surnom', plantId, surnom: n }) });
+                location.reload();
+            }
+        }
+
+        function askGeo() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                localStorage.setItem('user_lat', pos.coords.latitude);
+                localStorage.setItem('user_lon', pos.coords.longitude);
+                init();
+            });
         }
 
         init();
