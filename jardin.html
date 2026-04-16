@@ -7,63 +7,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
-        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: auto; padding: 20px; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
 
-        /* HEADER & RETOUR */
-        .back-btn { background: none; border: 1px solid var(--border); color: #888; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; }
+        .back-btn { background: none; border: 1px solid var(--border); color: #888; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
 
-        /* BOUTON COMMANDER (Refonte complète) */
-        .cta-container { margin: 40px 0; padding: 20px; text-align: center; }
-        .btn-order-premium {
-            display: block;
-            width: 100%;
-            max-width: 350px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-            color: #000;
-            text-decoration: none;
-            border-radius: 18px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .btn-order-premium:active { transform: scale(0.96); }
+        /* IMAGE D'ENTÊTE */
+        .plant-hero { width: 100%; height: 300px; border-radius: 24px; object-fit: cover; margin-bottom: 20px; border: 1px solid var(--border); }
 
-        /* ARROSAGE & NOTES */
+        /* TITRES */
+        .header-zone { margin-bottom: 30px; }
+        .main-title { font-size: 2.4rem; margin: 0; font-weight: 200; letter-spacing: -1px; }
+        .sci-title { color: var(--accent); font-style: italic; font-size: 1rem; opacity: 0.8; margin-top: 5px; }
+
+        /* CARTES */
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; }
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--accent); padding-left: 10px; }
-        
-        .btn-water { background: var(--water); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
-        .cancel-link { color: #555; font-size: 0.7rem; display: block; margin-top: 15px; text-decoration: underline; cursor: pointer; text-align: center; }
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--accent); padding-left: 10px; font-weight: 600; }
 
-        /* FORMULAIRE & CALENDRIER */
-        input[type="date"], textarea {
-            width: 100%; background: #151515; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-family: inherit; margin-bottom: 20px; box-sizing: border-box; font-size: 0.9rem;
-        }
-        .save-btn { background: #fff; color: #000; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer; }
+        /* GRILLE DE RUBRIQUES */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        .info-item { background: #151515; padding: 15px; border-radius: 15px; border: 1px solid #222; }
+        .info-label { font-size: 0.6rem; color: #555; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .info-value { font-size: 0.85rem; color: #ccc; font-weight: 400; }
 
-        /* PHOTOS EVOLUTION */
-        .photo-zone { position: relative; width: 100%; aspect-ratio: 16/9; background: #111; border: 1px dashed #333; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .photo-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
-        .photo-label { z-index: 1; font-size: 0.75rem; color: #888; text-align: center; }
-        
+        /* ACTIONS PROPRIÉTAIRE */
+        .btn-water { background: var(--water); color: #000; border: none; padding: 18px; border-radius: 18px; width: 100%; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .btn-water:active { transform: scale(0.98); }
+        .cancel-link { color: #444; font-size: 0.7rem; display: block; margin-top: 15px; text-decoration: underline; cursor: pointer; text-align: center; }
+
+        /* INPUTS */
+        input[type="date"], textarea { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-family: inherit; margin-bottom: 20px; box-sizing: border-box; }
+        .save-btn { background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer; }
+
+        /* BOUTON COMMANDER */
+        .btn-order-premium { display: block; width: 100%; padding: 20px; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: #000; text-decoration: none; border-radius: 18px; font-weight: 700; text-align: center; box-shadow: 0 10px 20px rgba(74, 222, 128, 0.2); }
     </style>
 </head>
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
 
-        <div id="p-header" style="margin-bottom: 30px;">
-            <h1 id="p-titre" style="font-size:2.2rem; margin:0; font-weight:200;">Chargement...</h1>
-            <p id="p-sci" style="color:var(--accent); font-style:italic; font-size:0.9rem; opacity:0.8;"></p>
+        <img id="p-image" class="plant-hero hidden" src="" alt="Plante">
+
+        <div class="header-zone">
+            <h1 id="p-titre" class="main-title">...</h1>
+            <div id="p-sci" class="sci-title"></div>
         </div>
 
         <div id="owner-area" class="hidden">
@@ -75,36 +64,33 @@
             </div>
 
             <div class="card">
-                <div class="section-title">Journal de bord</div>
-                <label style="font-size:0.7rem; color:#666; display:block; margin-bottom:8px;">DATE DE PLANTATION</label>
+                <div class="section-title">Mon Journal</div>
+                <label class="info-label">Date de plantation</label>
                 <input type="date" id="input-date" onchange="showSave()">
-                
-                <label style="font-size:0.7rem; color:#666; display:block; margin-bottom:8px;">NOTES PRIVÉES</label>
-                <textarea id="input-note" rows="3" placeholder="Observation, taille, engrais..." oninput="showSave()"></textarea>
-                
-                <button id="btn-save" class="save-btn hidden" onclick="saveData()">ENREGISTRER LES MODIFICATIONS</button>
-            </div>
-
-            <div class="card">
-                <div class="section-title">Évolution en photo</div>
-                <div class="photo-zone" onclick="document.getElementById('cam-input').click()">
-                    <img id="preview" class="hidden">
-                    <span class="photo-label">📸 APPUYER POUR PRENDRE UNE PHOTO</span>
-                </div>
-                <input type="file" id="cam-input" accept="image/*" capture="camera" class="hidden" onchange="previewPhoto(this)">
+                <label class="info-label">Mes Notes</label>
+                <textarea id="input-note" rows="3" placeholder="Notes privées..." oninput="showSave()"></textarea>
+                <button id="btn-save" class="save-btn hidden" onclick="saveData()">ENREGISTRER</button>
             </div>
         </div>
 
-        <div id="botany-info" class="card">
-            <div class="section-title">Informations</div>
-            <div id="p-desc" style="color:#aaa; line-height:1.7; font-size:0.95rem;"></div>
+        <div class="card">
+            <div class="section-title">À propos</div>
+            <p id="p-desc" style="color:#888; line-height:1.6; font-size:0.9rem; margin-bottom:25px;"></p>
+            
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">Arrosage</span><div id="v-arr" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Exposition</span><div id="v-exp" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Difficulté</span><div id="v-dif" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Type</span><div id="v-type" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Taille</span><div id="v-taille" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Floraison</span><div id="v-flo" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Rusticité</span><div id="v-rust" class="info-value">-</div></div>
+                <div class="info-item"><span class="info-label">Feuillage</span><div id="v-feu" class="info-value">-</div></div>
+            </div>
         </div>
 
-        <div id="cta-order" class="cta-container hidden">
-            <p style="color:#666; font-size:0.8rem; margin-bottom:20px;">Cette plante vous plaît ?</p>
-            <button class="btn-order-premium" onclick="window.location.href='commander.html'">
-                Commander ma plaque Éonia
-            </button>
+        <div id="cta-order" class="hidden" style="margin: 40px 0;">
+            <a href="commander.html" class="btn-order-premium">Commander ma plaque Éonia</a>
         </div>
     </div>
 
@@ -125,18 +111,34 @@
             
             if (!p) return;
 
+            // Remplissage des données
             document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
             document.getElementById('p-sci').innerText = p["Nom scientifique"];
             document.getElementById('p-desc').innerText = p.Description;
+            
+            if (p.Photo) {
+                const img = document.getElementById('p-image');
+                img.src = p.Photo;
+                img.classList.remove('hidden');
+            }
+
+            // Grille d'infos
+            document.getElementById('v-arr').innerText = p.Arrosage;
+            document.getElementById('v-exp').innerText = p.Exposition;
+            document.getElementById('v-dif').innerText = p.Difficulté;
+            document.getElementById('v-type').innerText = p.Type;
+            document.getElementById('v-taille').innerText = p.Taille;
+            document.getElementById('v-flo').innerText = p.Floraison;
+            document.getElementById('v-rust').innerText = p.Rusticité;
+            document.getElementById('v-feu').innerText = p.Feuillage;
 
             if (p.est_dans_jardin) {
                 document.getElementById('owner-area').classList.remove('hidden');
                 document.getElementById('input-date').value = p.Date_Plantation || "";
                 document.getElementById('input-note').value = p.Note_Privee || "";
-                
                 if (p.Dernier_Arrosage && p.Dernier_Arrosage !== "-") {
                     const d = new Date(p.Dernier_Arrosage);
-                    document.getElementById('water-info').innerText = "Dernier arrosage : le " + d.toLocaleDateString();
+                    document.getElementById('water-info').innerText = "Arrosé le " + d.toLocaleDateString();
                     document.getElementById('btn-cancel').classList.remove('hidden');
                 }
             } else {
@@ -164,19 +166,7 @@
                 body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId, date, note })
             });
             document.getElementById('btn-save').classList.add('hidden');
-            alert("Enregistré !");
-        }
-
-        function previewPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = document.getElementById('preview');
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+            alert("Journal mis à jour");
         }
 
         init();
