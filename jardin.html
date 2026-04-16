@@ -89,107 +89,91 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    const userEmail = localStorage.getItem('user_email') || localStorage.getItem('userEmail') || 'invite@eonia.com';
+    const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
     async function loadPlant() {
-    if (!plantId) return;
+        if (!plantId) return;
 
-    let requestBody = { email: userEmail };
+        // 1. On lance l'affichage immédiatement (Données de base)
+        console.log("Chargement initial pour :", plantId);
+        await fetchAndDisplay({ email: userEmail });
 
-    // Sur mobile, le GPS peut bloquer. On lance le chargement immédiatement
-    // et on mettra à jour la météo SI le GPS répond plus tard.
-    fetchAndDisplay(requestBody); 
-
-    if (navigator.geolocation && userEmail !== 'invite@eonia.com') {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                requestBody.lat = position.coords.latitude;
-                requestBody.lon = position.coords.longitude;
-                fetchAndDisplay(requestBody); // Recharge avec la météo
-            },
-            () => { console.log("GPS refusé ou indisponible"); },
-            { timeout: 5000 }
-        );
-    }
-}
-
-async function loadPlant() {
-    if (!plantId) return;
-
-    // 1. On affiche la plante immédiatement (sans météo au début)
-    let requestBody = { email: userEmail };
-    await fetchAndDisplay(requestBody);
-
-    // 2. On tente la géoloc pour la météo (seulement si pas invité)
-    if (navigator.geolocation && userEmail !== 'invite@eonia.com') {
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                console.log("Géoloc réussie, mise à jour météo...");
-                requestBody.lat = position.coords.latitude;
-                requestBody.lon = position.coords.longitude;
-                // 3. On relance le fetch pour obtenir les alertes météo du Worker
-                await fetchAndDisplay(requestBody);
-            },
-            (error) => {
-                console.warn("Géoloc refusée ou erreur:", error.message);
-            },
-            { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
-        );
-    }
-}
-
-async function fetchAndDisplay(bodyData) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bodyData) 
-        });
-        const allItems = await response.json();
-        const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-
-        if (p) {
-            document.getElementById('section-detail').classList.remove('hidden');
-            
-            // --- GESTION DES ALERTES MÉTÉO ---
-            // On supprime l'ancienne alerte si elle existe (pour les mises à jour)
-            const oldAlert = document.getElementById('weather-alert');
-            if (oldAlert) oldAlert.remove();
-
-            if (p["Alertes"] && p["Alertes"].length > 0) {
-                const alertDiv = document.createElement('div');
-                alertDiv.id = "weather-alert";
-                alertDiv.style = "background: rgba(74, 222, 128, 0.1); border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center; animation: fadeIn 0.5s ease;";
-                // On affiche les alertes météo (ex: "Risque de gel", "Canicule")
-                alertDiv.innerHTML = "🌤️ ÉONIA MÉTÉO : " + p["Alertes"].join(' / ');
-                document.getElementById('section-detail').prepend(alertDiv);
-            }
-
-            // --- REMPLISSAGE DES DONNÉES ---
-            document.getElementById('p-photo').src = p["Photo"] || '';
-            document.getElementById('p-titre').innerText = (p["est_dans_jardin"] && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
-            document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-            document.getElementById('p-famille').innerText = p["Famille"] || "-";
-            document.getElementById('p-type').innerText = p["Type"] || "-";
-            document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
-            document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-            document.getElementById('p-diff').innerText = p["Difficulté"] || "-";
-            document.getElementById('p-rust').innerText = p["Rusticité"] || "-";
-            document.getElementById('p-taille').innerText = p["Taille à maturité"] || "-";
-            document.getElementById('p-pers').innerText = p["Persistance"] || "-";
-            document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
-
-            if (userEmail === 'invite@eonia.com') {
-                document.getElementById('cta-invite').classList.remove('hidden');
-            }
+        // 2. On FORCE la demande de géolocalisation
+        if ("geolocation" in navigator) {
+            console.log("Demande de géoloc envoyée...");
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    console.log("Position reçue :", position.coords.latitude, position.coords.longitude);
+                    // On relance avec les coordonnées pour avoir la météo
+                    await fetchAndDisplay({
+                        email: userEmail,
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    console.error("Erreur Géoloc (Code " + error.code + "): " + error.message);
+                },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+            );
+        } else {
+            console.error("Le navigateur ne supporte pas la géolocalisation");
         }
-    } catch (e) { console.error("Erreur d'affichage :", e); }
-}
+    }
+
+    async function fetchAndDisplay(bodyData) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData) 
+            });
+            const allItems = await response.json();
+            
+            // Recherche de la plante
+            const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+
+            if (p) {
+                document.getElementById('section-detail').classList.remove('hidden');
+                
+                // --- AFFICHAGE ALERTE MÉTÉO ---
+                const oldAlert = document.getElementById('weather-alert');
+                if (oldAlert) oldAlert.remove();
+
+                if (p["Alertes"] && p["Alertes"].length > 0) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.id = "weather-alert";
+                    alertDiv.style = "background: rgba(74, 222, 128, 0.15); border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center;";
+                    alertDiv.innerHTML = "🌤️ MÉTÉO ÉONIA : " + p["Alertes"].join(' / ');
+                    document.getElementById('section-detail').prepend(alertDiv);
+                }
+
+                // --- REMPLISSAGE CHAMPS ---
+                document.getElementById('p-photo').src = p["Photo"] || '';
+                document.getElementById('p-titre').innerText = (p["est_dans_jardin"] && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
+                document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+                document.getElementById('p-famille').innerText = p["Famille"] || "-";
+                document.getElementById('p-type').innerText = p["Type"] || "-";
+                document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
+                document.getElementById('p-expo').innerText = p["Exposition"] || "-";
+                document.getElementById('p-diff').innerText = p["Difficulté"] || "-";
+                document.getElementById('p-rust').innerText = p["Rusticité"] || "-";
+                document.getElementById('p-taille').innerText = p["Taille à maturité"] || "-";
+                document.getElementById('p-pers').innerText = p["Persistance"] || "-";
+                document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
+
+                if (userEmail === 'invite@eonia.com') {
+                    document.getElementById('cta-invite').classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            console.error("Erreur API :", e);
+        }
+    }
 
     window.onload = loadPlant;
 </script>
-
 </body>
 </html>
