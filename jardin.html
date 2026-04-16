@@ -10,30 +10,41 @@
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-        #weather-container { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; }
+        
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .back-btn:hover { background: var(--accent); color: #000; }
+
+        /* MÉTÉO STYLE APPLE */
+        #weather-container {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px; padding: 20px; margin-bottom: 25px;
+            display: flex; justify-content: space-around; align-items: center;
+        }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .w-day { font-size: 0.65rem; color: #888; text-transform: uppercase; }
+        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
         .w-icon { font-size: 2rem; }
         .w-temp { font-size: 0.9rem; }
+        .btn-geo { background: var(--accent); color: #000; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 8px; opacity: 0.7; }
+        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
-        /* Style pour Type et Famille précisés */
-        .type-famille-box { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; line-height: 1.6; }
-        .type-famille-box b { color: var(--accent); font-weight: 500; margin-right: 5px; }
+        /* GRILLE D'INFOS */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; border-left: 2px solid transparent; transition: 0.3s; }
+        /* Le petit contour vert discret dont tu parlais */
+        .info-box.highlight { border-color: rgba(74, 222, 128, 0.3); border-left: 2px solid var(--accent); }
+        
+        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; font-weight: bold; }
+        .info-box .value { font-size: 0.85rem; color: #fff; }
 
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; }
-        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; }
-
-        /* Titre de rubrique Description */
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: bold; border-left: 2px solid var(--accent); padding-left: 10px; }
-        .desc-box { margin-top: 25px; background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        /* SECTION DESCRIPTION */
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-top: 10px; }
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: bold; }
         .desc-text { line-height: 1.8; color: #aaa; font-size: 0.95rem; }
 
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 30px; }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 30px; letter-spacing: 1px; }
         #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
@@ -42,25 +53,22 @@
 <div class="container">
     <div id="section-detail">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        
         <div id="weather-container" class="hidden"></div>
+
         <img id="p-photo" class="hero-img">
         
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <h1 id="p-titre" style="font-size: 2.4rem; font-weight: 200; margin: 0;"></h1>
             <button id="btn-edit-surnom" class="hidden">ÉDITER</button>
         </div>
-        
         <div id="p-sci" class="sci-name"></div>
-        
-        <div class="type-famille-box">
-            <div><b>TYPE :</b> <span id="p-type"></span></div>
-            <div><b>FAMILLE :</b> <span id="p-famille"></span></div>
-        </div>
 
-        <div class="info-grid" id="p-grid"></div>
+        <div class="info-grid" id="p-grid">
+            </div>
 
         <div class="desc-box">
-            <div class="section-title">Description</div>
+            <div class="section-title">DESCRIPTION</div>
             <div id="p-desc" class="desc-text"></div>
         </div>
 
@@ -76,43 +84,84 @@
     const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
     const userPin = localStorage.getItem('user_pin');
 
-    async function fetchAndDisplay() {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: plantId })
-        });
-        const data = await response.json();
-        const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-        if (!p) return;
+    async function fetchAndDisplay(coords = null) {
+        try {
+            const body = { email: userEmail, pin: userPin, plantId: plantId };
+            if (coords) { body.lat = coords.lat; body.lon = coords.lon; }
 
-        document.getElementById('p-photo').src = p.Photo || '';
-        document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
-        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        
-        // Remplissage Type et Famille
-        document.getElementById('p-type').innerText = p.Type || "-";
-        document.getElementById('p-famille').innerText = p.Famille || "-";
-        
-        document.getElementById('p-desc').innerText = p.Description || "Aucune description disponible.";
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            
+            const data = await response.json();
+            const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+            if (!p) return;
 
-        const fields = [
-            {l: "Arrosage", v: p.Arrosage}, {l: "Exposition", v: p.Exposition},
-            {l: "Difficulté", v: p.Difficulté}, {l: "Rusticité", v: p.Rusticité},
-            {l: "Taille", v: p.Taille}, {l: "Feuillage", v: p.Feuillage}
-        ];
-        const grid = document.getElementById('p-grid');
-        grid.innerHTML = "";
-        fields.forEach(f => {
-            const box = document.createElement('div'); box.className = 'info-box';
-            box.innerHTML = `<div class="label">${f.l}</div><div class="value">${f.v || "-"}</div>`;
-            grid.appendChild(box);
-        });
+            // 1. MÉTÉO
+            const weatherBox = document.getElementById('weather-container');
+            if (p.est_dans_jardin) {
+                weatherBox.classList.remove('hidden');
+                if (p.Alertes && p.Alertes.length > 0) {
+                    weatherBox.innerHTML = p.Alertes.map(str => {
+                        const [day, icon, temp] = str.split('|');
+                        return `<div class="w-col"><span class="w-day">${day}</span><span class="w-icon">${icon}</span><span class="w-temp">${temp}</span></div>`;
+                    }).join('');
+                } else {
+                    weatherBox.innerHTML = `<div style="text-align:center"><div style="font-size:0.6rem;color:#666">Suivi météo du jardin</div><button class="btn-geo" id="btn-geo">ACTIVER LA MÉTÉO 📍</button></div>`;
+                    document.getElementById('btn-geo').onclick = () => {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            localStorage.setItem('user_lat', pos.coords.latitude);
+                            localStorage.setItem('user_lon', pos.coords.longitude);
+                            fetchAndDisplay({lat: pos.coords.latitude, lon: pos.coords.longitude});
+                        });
+                    };
+                }
+            }
 
-        if (userEmail === 'invite@eonia.com') document.getElementById('cta-invite').classList.remove('hidden');
-        if (p.est_dans_jardin) document.getElementById('btn-edit-surnom').classList.remove('hidden');
+            // 2. INFOS GÉNÉRALES
+            document.getElementById('p-photo').src = p.Photo || '';
+            document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
+            document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+            document.getElementById('p-desc').innerText = p.Description || "Informations botaniques en cours de rédaction.";
+
+            // 3. GRILLE DE CASES (Type & Famille en premier avec contour vert)
+            const grid = document.getElementById('p-grid');
+            grid.innerHTML = "";
+
+            // Les deux rubriques spéciales
+            const specials = [
+                {l: "TYPE", v: p.Type, h: true},
+                {l: "FAMILLE", v: p.Famille, h: true}
+            ];
+            
+            // Les rubriques standard
+            const standards = [
+                {l: "Arrosage", v: p.Arrosage}, 
+                {l: "Exposition", v: p.Exposition},
+                {l: "Difficulté", v: p.Difficulté}, 
+                {l: "Rusticité", v: p.Rusticité},
+                {l: "Taille", v: p.Taille}, 
+                {l: "Feuillage", v: p.Feuillage}
+            ];
+
+            [...specials, ...standards].forEach(f => {
+                const box = document.createElement('div');
+                box.className = `info-box ${f.h ? 'highlight' : ''}`;
+                box.innerHTML = `<div class="label">${f.l}</div><div class="value">${f.v || "-"}</div>`;
+                grid.appendChild(box);
+            });
+
+            if (userEmail === 'invite@eonia.com') document.getElementById('cta-invite').classList.remove('hidden');
+            if (p.est_dans_jardin) document.getElementById('btn-edit-surnom').classList.remove('hidden');
+
+        } catch (e) { console.error(e); }
     }
-    fetchAndDisplay();
+
+    const lat = localStorage.getItem('user_lat');
+    const lon = localStorage.getItem('user_lon');
+    fetchAndDisplay(lat ? {lat, lon} : null);
 </script>
 </body>
 </html>
