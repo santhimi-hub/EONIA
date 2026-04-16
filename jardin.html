@@ -7,81 +7,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
-        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        #weather-container { background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .w-day { font-size: 0.65rem; color: #888; text-transform: uppercase; }
+        .w-icon { font-size: 2rem; }
+        .w-temp { font-size: 0.9rem; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 8px; opacity: 0.7; }
         
-        /* Skeleton Loading */
-        .skeleton { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 200% 100%; animation: pulse 1.5s infinite; border-radius: 12px; }
-        @keyframes pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        /* Style pour Type et Famille précisés */
+        .type-famille-box { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; line-height: 1.6; }
+        .type-famille-box b { color: var(--accent); font-weight: 500; margin-right: 5px; }
 
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .back-btn:hover { background: var(--accent); color: #000; }
-
-        /* Météo Apple Style */
-        #weather-container {
-            position: relative;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px; padding: 20px; margin-bottom: 25px;
-            display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-        }
-        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.3s; }
-        .w-col:hover { transform: translateY(-5px); }
-        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
-        .w-icon { font-size: 2rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-        .w-temp { font-size: 0.9rem; font-weight: 500; }
-        #reset-gps { font-size: 0.6rem; color: var(--accent); cursor: pointer; opacity: 0.6; }
-
-        /* Infos Plante */
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 5px; opacity: 0.7; }
-        .type-famille { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
-        
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; transition: 0.3s; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; color: #fff; }
+        .info-box .value { font-size: 0.85rem; }
 
-        .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
-        .btn-order:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(74, 222, 128, 0.4); }
+        /* Titre de rubrique Description */
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: bold; border-left: 2px solid var(--accent); padding-left: 10px; }
+        .desc-box { margin-top: 25px; background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        .desc-text { line-height: 1.8; color: #aaa; font-size: 0.95rem; }
 
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 30px; }
         #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
-        .btn-geo { background: var(--accent); color: #000; border: none; padding: 10px 15px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="loading-skeleton">
-        <div class="skeleton" style="height: 40px; width: 100px; margin-bottom: 20px;"></div>
-        <div class="skeleton" style="height: 100px; width: 100%; margin-bottom: 25px;"></div>
-        <div class="skeleton" style="height: 40vh; width: 100%; margin-bottom: 20px;"></div>
-    </div>
-
-    <div id="section-detail" class="hidden">
-        <button id="custom-back" class="back-btn">← Retour</button>
+    <div id="section-detail">
+        <button onclick="window.history.back()" class="back-btn">← Retour</button>
         <div id="weather-container" class="hidden"></div>
         <img id="p-photo" class="hero-img">
         
         <div style="display: flex; align-items: center; margin-bottom: 5px;">
             <h1 id="p-titre" style="font-size: 2.4rem; font-weight: 200; margin: 0;"></h1>
-            <button id="btn-edit-surnom" class="hidden">EDITER</button>
+            <button id="btn-edit-surnom" class="hidden">ÉDITER</button>
         </div>
+        
         <div id="p-sci" class="sci-name"></div>
-        <div id="p-type-famille" class="type-famille"></div>
+        
+        <div class="type-famille-box">
+            <div><b>TYPE :</b> <span id="p-type"></span></div>
+            <div><b>FAMILLE :</b> <span id="p-famille"></span></div>
+        </div>
 
         <div class="info-grid" id="p-grid"></div>
 
-        <div class="desc-box" style="margin-top: 25px; background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border);">
-            <div id="p-desc" style="line-height: 1.8; color: #aaa; font-size: 0.95rem;"></div>
+        <div class="desc-box">
+            <div class="section-title">Description</div>
+            <div id="p-desc" class="desc-text"></div>
         </div>
 
-        <div id="cta-invite" class="order-cta hidden">
-            <h3 style="font-weight: 400; margin-bottom: 20px;">Immortalisez cette plante dans votre jardin</h3>
+        <div id="cta-invite" class="hidden">
             <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
         </div>
     </div>
@@ -89,147 +72,47 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    const params = new URLSearchParams(window.location.search);
-    const plantId = params.get('id');
-    
+    const plantId = new URLSearchParams(window.location.search).get('id');
     const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
     const userPin = localStorage.getItem('user_pin');
 
-    document.getElementById('custom-back').onclick = () => window.history.back();
+    async function fetchAndDisplay() {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: plantId })
+        });
+        const data = await response.json();
+        const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
+        if (!p) return;
 
-    const el = (tag, props = {}, children = []) => {
-        const element = document.createElement(tag);
-        Object.assign(element, props);
-        children.forEach(child => element.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
-        return element;
-    };
+        document.getElementById('p-photo').src = p.Photo || '';
+        document.getElementById('p-titre').innerText = (p.est_dans_jardin && p.Surnom) ? p.Surnom : p["Nom commun"];
+        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+        
+        // Remplissage Type et Famille
+        document.getElementById('p-type').innerText = p.Type || "-";
+        document.getElementById('p-famille').innerText = p.Famille || "-";
+        
+        document.getElementById('p-desc').innerText = p.Description || "Aucune description disponible.";
 
-    async function fetchAndDisplay(coords = null) {
-        try {
-            const body = { email: userEmail, pin: userPin, plantId: plantId };
-            if (coords) { body.lat = coords.lat; body.lon = coords.lon; }
+        const fields = [
+            {l: "Arrosage", v: p.Arrosage}, {l: "Exposition", v: p.Exposition},
+            {l: "Difficulté", v: p.Difficulté}, {l: "Rusticité", v: p.Rusticité},
+            {l: "Taille", v: p.Taille}, {l: "Feuillage", v: p.Feuillage}
+        ];
+        const grid = document.getElementById('p-grid');
+        grid.innerHTML = "";
+        fields.forEach(f => {
+            const box = document.createElement('div'); box.className = 'info-box';
+            box.innerHTML = `<div class="label">${f.l}</div><div class="value">${f.v || "-"}</div>`;
+            grid.appendChild(box);
+        });
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-
-            if (response.status === 401) {
-                alert("Session expirée ou PIN incorrect.");
-                localStorage.clear();
-                window.location.href = "index.html";
-                return;
-            }
-
-            if (!response.ok) throw new Error("Erreur API");
-            
-            const allItems = await response.json();
-            const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-
-            if (!p) throw new Error("Plante introuvable");
-
-            document.getElementById('loading-skeleton').classList.add('hidden');
-            document.getElementById('section-detail').classList.remove('hidden');
-
-            const isOwner = p["est_dans_jardin"] === true;
-
-            // 1. MÉTÉO (Uniquement si propriétaire)
-            const weatherBox = document.getElementById('weather-container');
-            if (isOwner) {
-                weatherBox.classList.remove('hidden');
-                weatherBox.innerHTML = ""; 
-                if (p.Alertes && p.Alertes.length > 0) {
-                    p.Alertes.forEach(str => {
-                        const [day, icon, temp] = str.split('|');
-                        if(day && icon && temp) {
-                            weatherBox.appendChild(el('div', {className: 'w-col'}, [
-                                el('span', {className: 'w-day'}, [day]),
-                                el('span', {className: 'w-icon'}, [icon]),
-                                el('span', {className: 'w-temp'}, [temp])
-                            ]));
-                        }
-                    });
-                    const resetBtn = el('div', {id: 'reset-gps', innerText: '📍 Actualiser'});
-                    resetBtn.onclick = () => {
-                        localStorage.removeItem('user_lat'); localStorage.removeItem('user_lon');
-                        fetchAndDisplay();
-                    };
-                    weatherBox.appendChild(resetBtn);
-                } else {
-                    const btnGeo = el('button', {className: 'btn-geo', innerText: 'ACTIVER LA MÉTÉO LOCALE 📍'});
-                    btnGeo.onclick = () => {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                            const c = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                            localStorage.setItem('user_lat', c.lat); localStorage.setItem('user_lon', c.lon);
-                            fetchAndDisplay(c);
-                        });
-                    };
-                    weatherBox.appendChild(el('div', {style:'text-align:center'}, [
-                        el('div', {style:'font-size:0.6rem;color:#666', innerText: "Suivi météo de votre jardin"}),
-                        btnGeo
-                    ]));
-                }
-            }
-
-            // 2. REMPLISSAGE DONNÉES
-            document.getElementById('p-photo').src = p["Photo"] || '';
-            document.getElementById('p-titre').innerText = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
-            document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-            
-            // Affichage Type | Famille
-            document.getElementById('p-type-famille').innerText = `${p.Type || "-"} | ${p.Famille || "-"}`;
-            
-            document.getElementById('p-desc').innerText = p["Description"] || "";
-
-            // GRID INFOS - Utilisation des clés exactes du Worker
-            const fields = [
-                {l: "Arrosage", v: p.Arrosage}, 
-                {l: "Exposition", v: p.Exposition},
-                {l: "Difficulté", v: p.Difficulté}, 
-                {l: "Rusticité", v: p.Rusticité},
-                {l: "Taille", v: p.Taille}, // Corrigé
-                {l: "Feuillage", v: p.Feuillage} // Corrigé
-            ];
-            
-            const grid = document.getElementById('p-grid'); 
-            grid.innerHTML = "";
-            fields.forEach(f => {
-                grid.appendChild(el('div', {className: 'info-box'}, [
-                    el('div', {className: 'label', innerText: f.l}),
-                    el('div', {className: 'value', innerText: f.v || "-"})
-                ]));
-            });
-
-            if (isOwner) {
-                const btn = document.getElementById('btn-edit-surnom');
-                btn.classList.remove('hidden');
-                btn.onclick = async () => {
-                    const n = prompt("Nouveau surnom :", p.Surnom || p["Nom commun"]);
-                    if(n) {
-                        await fetch(API_URL, { 
-                            method:'POST', 
-                            headers:{'Content-Type':'application/json'}, 
-                            body:JSON.stringify({action:"updateSurnom", email:userEmail, pin:userPin, plantId:plantId, newSurnom:n})
-                        });
-                        fetchAndDisplay();
-                    }
-                };
-            }
-
-            if (userEmail === 'invite@eonia.com') document.getElementById('cta-invite').classList.remove('hidden');
-
-        } catch (e) {
-            console.error(e);
-            alert("Erreur de chargement des détails.");
-        }
+        if (userEmail === 'invite@eonia.com') document.getElementById('cta-invite').classList.remove('hidden');
+        if (p.est_dans_jardin) document.getElementById('btn-edit-surnom').classList.remove('hidden');
     }
-
-    window.onload = () => {
-        const lat = localStorage.getItem('user_lat');
-        const lon = localStorage.getItem('user_lon');
-        fetchAndDisplay(lat ? {lat, lon} : null);
-    };
+    fetchAndDisplay();
 </script>
 </body>
 </html>
