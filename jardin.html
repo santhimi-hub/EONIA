@@ -94,19 +94,14 @@
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
-    async function loadPlant() {
-        if (!plantId) return;
-
-        // 1. Chargement immédiat des données
-        await fetchAndDisplay({ email: userEmail, pin: userPin });
-
-        // 2. Géolocalisation : UNIQUEMENT pour le client (pas invite@eonia.com)
+    // Fonction pour activer la météo (appelée au clic ou au chargement)
+    async function activateWeather() {
         const isClient = userEmail && userEmail !== 'invite@eonia.com';
         
         if (isClient && "geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 async (position) => {
-                    // Si on récupère la position, on recharge pour avoir la météo
+                    console.log("Position captée !");
                     await fetchAndDisplay({
                         email: userEmail,
                         pin: userPin,
@@ -114,10 +109,8 @@
                         lon: position.coords.longitude
                     });
                 },
-                (error) => {
-                    console.warn("Géoloc ignorée ou refusée par l'utilisateur.");
-                },
-                { enableHighAccuracy: false, timeout: 8000 }
+                (err) => { console.error("Erreur GPS : ", err.message); },
+                { enableHighAccuracy: false, timeout: 10000 }
             );
         }
     }
@@ -130,35 +123,31 @@
                 body: JSON.stringify(bodyData) 
             });
             const allItems = await response.json();
-            
-            // On cherche la plante correspondante
             const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
             if (p) {
-                // Rendre la section visible
                 document.getElementById('section-detail').classList.remove('hidden');
-
-                // --- LOGIQUE CLIENT : MÉTEO ET OPTIONS ---
                 const isOwner = p["est_dans_jardin"] === true;
-                
-                // On affiche la météo seulement si c'est le propriétaire
+
+                // Affichage Météo (Bandeau vert)
                 const oldAlert = document.getElementById('weather-alert');
                 if (oldAlert) oldAlert.remove();
 
                 if (isOwner && p["Alertes"] && p["Alertes"].length > 0) {
                     const alertDiv = document.createElement('div');
                     alertDiv.id = "weather-alert";
-                    alertDiv.style = "background: rgba(74, 222, 128, 0.1); border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center;";
+                    alertDiv.style = "background: #4ade8022; border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center;";
                     alertDiv.innerHTML = "🌤️ ÉONIA MÉTÉO : " + p["Alertes"].join(' / ');
                     document.getElementById('section-detail').prepend(alertDiv);
                 }
 
-                // --- REMPLISSAGE DES DONNÉES ---
+                // Données de la plante
                 document.getElementById('p-photo').src = p["Photo"] || '';
                 
-                // Titre : Surnom si client, sinon Nom Commun
+                // --- ASTUCE MOBILE : On permet de cliquer sur la photo pour forcer la météo si elle n'est pas venue ---
+                document.getElementById('p-photo').onclick = activateWeather;
+
                 document.getElementById('p-titre').innerText = (isOwner && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
-                
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
@@ -170,17 +159,21 @@
                 document.getElementById('p-pers').innerText = p["Persistance"] || "-";
                 document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
 
-                // Affichage du CTA pour les invités uniquement
                 if (userEmail === 'invite@eonia.com') {
                     document.getElementById('cta-invite').classList.remove('hidden');
                 }
             }
-        } catch (e) {
-            console.error("Erreur de synchronisation.");
-        }
+        } catch (e) { console.error("Erreur Synchro"); }
     }
 
-    window.onload = loadPlant;
+    // Lancement au chargement
+    window.onload = async () => {
+        if (!plantId) return;
+        // On charge les infos d'abord
+        await fetchAndDisplay({ email: userEmail, pin: userPin });
+        // On tente la météo automatiquement
+        activateWeather();
+    };
 </script>
 </body>
 </html>
