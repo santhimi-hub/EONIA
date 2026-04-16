@@ -76,7 +76,7 @@
     <div id="section-detail" class="hidden">
         <button id="custom-back" class="back-btn">← Retour</button>
         
-        <div id="weather-container"></div>
+        <div id="weather-container" class="hidden"></div>
 
         <img id="p-photo" class="hero-img">
         
@@ -135,32 +135,47 @@
                 document.getElementById('section-detail').classList.remove('hidden');
                 const isOwner = p["est_dans_jardin"] === true;
 
-                // --- 1. MÉTÉO STYLE APPLE ---
+                // --- 1. GESTION MÉTÉO (UNIQUEMENT PROPRIÉTAIRE) ---
                 const container = document.getElementById('weather-container');
-                if (p.Alertes && p.Alertes.length > 0) {
-                    let html = "";
-                    p.Alertes.forEach(str => {
-                        const bits = str.split('|'); 
-                        if(bits.length > 1) {
-                            html += `<div class="w-col">
-                                <span class="w-day">${bits[0]}</span>
-                                <span class="w-icon">${bits[1]}</span>
-                                <span class="w-temp">${bits[2]}</span>
+                
+                if (isOwner) {
+                    // Si je possède la plante, j'affiche le bandeau
+                    container.classList.remove('hidden');
+
+                    if (p.Alertes && p.Alertes.length > 0) {
+                        let html = "";
+                        p.Alertes.forEach(str => {
+                            const bits = str.split('|'); 
+                            if(bits.length > 1) {
+                                html += `<div class="w-col">
+                                    <span class="w-day">${bits[0]}</span>
+                                    <span class="w-icon">${bits[1]}</span>
+                                    <span class="w-temp">${bits[2]}</span>
+                                </div>`;
+                            }
+                        });
+                        container.innerHTML = html;
+                    } else {
+                        // Demande de GPS si pas encore de météo
+                        container.innerHTML = `
+                            <div class="geo-request">
+                                <span>Activer la météo locale pour votre jardin ?</span>
+                                <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
                             </div>`;
-                        }
-                    });
-                    container.innerHTML = html;
+                        document.getElementById('enable-geo').onclick = () => {
+                            navigator.geolocation.getCurrentPosition((pos) => {
+                                fetchAndDisplay({ 
+                                    email: userEmail, 
+                                    plantId: plantId, 
+                                    lat: pos.coords.latitude, 
+                                    lon: pos.coords.longitude 
+                                });
+                            }, (err) => { alert("Localisation refusée."); });
+                        };
+                    }
                 } else {
-                    container.innerHTML = `
-                        <div class="geo-request">
-                            <span>Activer la météo locale pour vos plantes ?</span>
-                            <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
-                        </div>`;
-                    document.getElementById('enable-geo').onclick = () => {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                            fetchAndDisplay({ email: userEmail, plantId: plantId, lat: pos.coords.latitude, lon: pos.coords.longitude });
-                        }, (err) => { alert("Localisation refusée."); });
-                    };
+                    // Si je ne suis pas le proprio, je cache tout le bloc
+                    container.classList.add('hidden');
                 }
 
                 // --- 2. TITRE & SURNOM ---
@@ -179,7 +194,7 @@
                     };
                 }
 
-                // --- 3. INFOS ---
+                // --- 3. REMPLISSAGE INFOS ---
                 document.getElementById('p-photo').src = p["Photo"] || '';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
