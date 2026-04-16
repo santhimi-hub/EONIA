@@ -12,9 +12,47 @@
         
         .back-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
         
+        /* --- DESIGN METEO STYLE APPLE --- */
+        #weather-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-around;
+            min-height: 80px;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .geo-request { text-align: center; font-size: 0.8rem; display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .btn-geo { background: #4ade80; color: #000; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; align-self: center; font-family: 'Raleway'; font-size: 0.7rem; }
+        
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .w-day { font-size: 0.6rem; color: #aaa; text-transform: uppercase; font-weight: bold; }
+        .w-icon { font-size: 1.8rem; }
+        .w-temp { font-size: 0.85rem; color: #fff; }
+
+        /* --- INFOS PLANTE --- */
         .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
         .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
         
+        #btn-edit-surnom {
+            background: rgba(74, 222, 128, 0.15);
+            border: 1px solid #4ade80;
+            color: #4ade80;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            margin-left: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Raleway';
+            vertical-align: middle;
+        }
+
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
         .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
         .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
@@ -28,19 +66,8 @@
         .desc-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px; margin-top: 20px; }
         .desc { line-height: 1.6; color: #ccc; font-size: 0.9rem; white-space: pre-wrap; }
 
-        /* Style pour la zone de commande */
-        .order-cta {
-            margin-top: 40px;
-            margin-bottom: 40px;
-            padding: 30px 20px;
-            text-align: center;
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            border-radius: 15px;
-            background: linear-gradient(180deg, rgba(74, 222, 128, 0.02) 0%, rgba(0,0,0,0) 100%);
-        }
-        .order-cta p { font-size: 0.8rem; color: #bbb; margin-bottom: 20px; letter-spacing: 1px; }
-        .btn-order { background: #4ade80; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
-        .btn-order:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(74,222,128,0.2); }
+        .order-cta { margin-top: 40px; margin-bottom: 40px; padding: 30px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 15px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.02) 0%, rgba(0,0,0,0) 100%); }
+        .btn-order { background: #4ade80; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -49,19 +76,20 @@
     <div id="section-detail" class="hidden">
         <button id="custom-back" class="back-btn">← Retour</button>
         
+        <div id="weather-container"></div>
+
         <img id="p-photo" class="hero-img">
-        <h1 id="p-titre" style="font-size: 2.2rem; font-weight: 300; margin: 0;"></h1>
+        
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <h1 id="p-titre" style="font-size: 2.2rem; font-weight: 300; margin: 0;"></h1>
+            <button id="btn-edit-surnom" class="hidden">Modifier</button>
+        </div>
+        
         <div id="p-sci" class="sci-name"></div>
 
         <div class="badge-container">
-            <div class="badge">
-                <span class="badge-label">Famille</span>
-                <span id="p-famille" class="badge-value">-</span>
-            </div>
-            <div class="badge">
-                <span class="badge-label">Type</span>
-                <span id="p-type" class="badge-value">-</span>
-            </div>
+            <div class="badge"><span class="badge-label">Famille</span><span id="p-famille" class="badge-value">-</span></div>
+            <div class="badge"><span class="badge-label">Type</span><span id="p-type" class="badge-value">-</span></div>
         </div>
 
         <div class="info-grid">
@@ -89,31 +117,9 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
-    const userEmail = localStorage.getItem('user_email');
-    const userPin = localStorage.getItem('user_pin');
+    const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
-
-    // Fonction pour activer la météo (appelée au clic ou au chargement)
-    async function activateWeather() {
-        const isClient = userEmail && userEmail !== 'invite@eonia.com';
-        
-        if (isClient && "geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    console.log("Position captée !");
-                    await fetchAndDisplay({
-                        email: userEmail,
-                        pin: userPin,
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
-                    });
-                },
-                (err) => { console.error("Erreur GPS : ", err.message); },
-                { enableHighAccuracy: false, timeout: 10000 }
-            );
-        }
-    }
 
     async function fetchAndDisplay(bodyData) {
         try {
@@ -129,25 +135,52 @@
                 document.getElementById('section-detail').classList.remove('hidden');
                 const isOwner = p["est_dans_jardin"] === true;
 
-                // Affichage Météo (Bandeau vert)
-                const oldAlert = document.getElementById('weather-alert');
-                if (oldAlert) oldAlert.remove();
-
-                if (isOwner && p["Alertes"] && p["Alertes"].length > 0) {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.id = "weather-alert";
-                    alertDiv.style = "background: #4ade8022; border: 1px solid #4ade80; color: #4ade80; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-align:center;";
-                    alertDiv.innerHTML = "🌤️ ÉONIA MÉTÉO : " + p["Alertes"].join(' / ');
-                    document.getElementById('section-detail').prepend(alertDiv);
+                // --- 1. MÉTÉO STYLE APPLE ---
+                const container = document.getElementById('weather-container');
+                if (p.Alertes && p.Alertes.length > 0) {
+                    let html = "";
+                    p.Alertes.forEach(str => {
+                        const bits = str.split('|'); 
+                        if(bits.length > 1) {
+                            html += `<div class="w-col">
+                                <span class="w-day">${bits[0]}</span>
+                                <span class="w-icon">${bits[1]}</span>
+                                <span class="w-temp">${bits[2]}</span>
+                            </div>`;
+                        }
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="geo-request">
+                            <span>Activer la météo locale pour vos plantes ?</span>
+                            <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
+                        </div>`;
+                    document.getElementById('enable-geo').onclick = () => {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            fetchAndDisplay({ email: userEmail, plantId: plantId, lat: pos.coords.latitude, lon: pos.coords.longitude });
+                        }, (err) => { alert("Localisation refusée."); });
+                    };
                 }
 
-                // Données de la plante
-                document.getElementById('p-photo').src = p["Photo"] || '';
+                // --- 2. TITRE & SURNOM ---
+                const mainTitle = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
+                document.getElementById('p-titre').innerText = mainTitle;
                 
-                // --- ASTUCE MOBILE : On permet de cliquer sur la photo pour forcer la météo si elle n'est pas venue ---
-                document.getElementById('p-photo').onclick = activateWeather;
+                if (isOwner) {
+                    const btnEdit = document.getElementById('btn-edit-surnom');
+                    btnEdit.classList.remove('hidden');
+                    btnEdit.onclick = async () => {
+                        const n = prompt("Comment s'appelle votre plante ?", mainTitle);
+                        if(n && n !== mainTitle) {
+                            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action:"updateSurnom", email:userEmail, plantId:plantId, newSurnom:n })});
+                            location.reload();
+                        }
+                    };
+                }
 
-                document.getElementById('p-titre').innerText = (isOwner && p["Surnom"]) ? p["Surnom"] : (p["Nom commun"] || 'Spécimen');
+                // --- 3. INFOS ---
+                document.getElementById('p-photo').src = p["Photo"] || '';
                 document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
                 document.getElementById('p-famille').innerText = p["Famille"] || "-";
                 document.getElementById('p-type').innerText = p["Type"] || "-";
@@ -163,17 +196,11 @@
                     document.getElementById('cta-invite').classList.remove('hidden');
                 }
             }
-        } catch (e) { console.error("Erreur Synchro"); }
+        } catch (e) { console.error("Erreur de chargement", e); }
     }
 
     // Lancement au chargement
-    window.onload = async () => {
-        if (!plantId) return;
-        // On charge les infos d'abord
-        await fetchAndDisplay({ email: userEmail, pin: userPin });
-        // On tente la météo automatiquement
-        activateWeather();
-    };
+    window.onload = () => { if (plantId) fetchAndDisplay({ email: userEmail, plantId: plantId }); };
 </script>
 </body>
 </html>
