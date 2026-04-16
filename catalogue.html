@@ -166,26 +166,7 @@
 
         .plant-info { padding: 15px 10px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
-
-        .fav-star {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.2rem;
-            transition: 0.3s;
-            z-index: 10;
-            backdrop-filter: blur(5px);
-        }
-
-        .fav-star.active { color: #4ade80; }
+        .plant-type-label { font-size: 0.6rem; color: #4ade80; margin-top: 5px; opacity: 0.8; text-transform: uppercase; }
 
         #ai-bubble {
             position: fixed;
@@ -314,7 +295,7 @@ function switchView(view) {
     currentView = view;
     document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
     document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-    loadData();
+    renderGrid();
 }
 
 function initAI() {
@@ -373,14 +354,6 @@ function addMessage(txt, cls) {
     msgBox.scrollTop = msgBox.scrollHeight;
 }
 
-function toggleFavorite(e, id) {
-    e.stopPropagation();
-    if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-    else favorites.push(id);
-    localStorage.setItem("eonia_fav", JSON.stringify(favorites));
-    renderGrid();
-}
-
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
     const counterEl = document.getElementById('plant-counter');
@@ -392,10 +365,11 @@ function renderGrid() {
         const nom = (p["Nom commun"] || "").toLowerCase();
         const id = p.id || p["ID_Plaque"];
         const matchSearch = nom.includes(searchVal);
-        const type = (p.Type || "").toLowerCase();
-        const matchType = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || type.includes(activeFilter.toLowerCase());
+        const typePlante = (p.Type || "").toLowerCase();
         
-        if (currentView === 'jardin' && p.est_dans_jardin !== true) return false;
+        const matchType = (activeFilter === 'all') || (activeFilter === 'fav' && favorites.includes(id)) || typePlante.includes(activeFilter.toLowerCase());
+        
+        if (currentView === 'jardin' && !p.est_dans_jardin) return false;
         
         return matchSearch && matchType;
     });
@@ -408,7 +382,7 @@ function renderGrid() {
         const id = p.id || p.ID_Plaque;
         const currentLetter = nomAffiche[0].toUpperCase();
         
-        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter !== 'fav' && !searchVal) {
+        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter === 'all' && !searchVal) {
             const divider = document.createElement('div');
             divider.className = "letter-divider";
             divider.textContent = currentLetter;
@@ -424,7 +398,8 @@ function renderGrid() {
                 <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info">
-                <div class="plant-name" style="font-size:0.7rem;">${nomAffiche}</div>
+                <div class="plant-name">${nomAffiche}</div>
+                <div class="plant-type-label">${p.Type !== "-" ? p.Type : ""}</div>
             </div>
         `;
         container.appendChild(card);
@@ -445,7 +420,8 @@ function onSearchInput() {
 
 function loadData() {
     const statusMsg = document.getElementById('status-msg');
-    const emailToSend = (currentView === 'catalogue') ? 'invite@eonia.com' : userEmail;
+    // On envoie toujours le vrai mail utilisateur pour récupérer les propriétés "est_dans_jardin"
+    const emailToSend = userEmail; 
     
     statusMsg.innerText = "Synchronisation en cours...";
     document.getElementById('page-title').innerText = (currentView === 'catalogue') ? "Notre Collection" : "Mon Jardin";
@@ -461,16 +437,9 @@ function loadData() {
             logout();
             throw new Error("Authentification échouée");
         }
-        if (!r.ok) throw new Error("Erreur serveur");
         return r.json();
     })
     .then(data => {
-        if (currentView === 'jardin' && data.length === 0 && userEmail !== 'invite@eonia.com') {
-            alert("Vous n'avez pas encore de plaque ÉONIA enregistrée sur ce compte.");
-            switchView('catalogue');
-            return;
-        }
-
         allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
         renderGrid();
         statusMsg.innerText = "";
