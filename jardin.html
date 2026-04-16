@@ -6,122 +6,84 @@
     <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         
-        .back-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* --- DESIGN METEO STYLE APPLE --- */
+        /* Skeleton Loading */
+        .skeleton { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 200% 100%; animation: pulse 1.5s infinite; border-radius: 12px; }
+        @keyframes pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .back-btn:hover { background: var(--accent); color: #000; }
+
+        /* Météo Apple Style Amélioré */
         #weather-container {
             position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-around;
-            min-height: 80px;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 24px; padding: 20px; margin-bottom: 25px;
+            display: flex; justify-content: space-around; align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
         }
-        .geo-request { text-align: center; font-size: 0.8rem; display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .btn-geo { background: #4ade80; color: #000; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; align-self: center; font-family: 'Raleway'; font-size: 0.7rem; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.3s; }
+        .w-col:hover { transform: translateY(-5px); }
+        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
+        .w-icon { font-size: 2rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        .w-temp { font-size: 0.9rem; font-weight: 500; }
+
+        /* Infos Plante */
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
-        .w-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .w-day { font-size: 0.6rem; color: #aaa; text-transform: uppercase; font-weight: bold; }
-        .w-icon { font-size: 1.8rem; }
-        .w-temp { font-size: 0.85rem; color: #fff; }
-
-        #reset-gps {
-            position: absolute;
-            right: 15px;
-            bottom: 8px;
-            opacity: 0.3;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-        #reset-gps:hover { opacity: 1; color: #4ade80; }
-
-        /* --- INFOS PLANTE --- */
-        .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
-        .sci-name { color: #4ade80; font-size: 0.9rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
-        
-        #btn-edit-surnom {
-            background: rgba(74, 222, 128, 0.15);
-            border: 1px solid #4ade80;
-            color: #4ade80;
-            padding: 5px 12px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            margin-left: 15px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: 'Raleway';
-            vertical-align: middle;
-        }
-
-        .badge-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
-        .badge { background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 8px 15px; border-radius: 8px; min-width: 110px; }
-        .badge-label { color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; opacity: 0.7; }
-        .badge-value { color: #eee; font-size: 0.75rem; text-transform: uppercase; font-weight: 500; }
+        .badge-container { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; }
+        .badge { background: rgba(74, 222, 128, 0.03); border: 1px solid rgba(74, 222, 128, 0.15); padding: 10px 18px; border-radius: 12px; min-width: 100px; transition: 0.3s; }
+        .badge:hover { transform: translateY(-3px); border-color: var(--accent); background: rgba(74, 222, 128, 0.08); }
+        .badge-label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: 5px; }
+        .badge-value { color: #fff; font-size: 0.8rem; font-weight: 500; }
 
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .info-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; }
-        .label { color: #4ade80; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .value { color: #eee; font-size: 0.85rem; }
-        
-        .desc-box { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px; margin-top: 20px; }
-        .desc { line-height: 1.6; color: #ccc; font-size: 0.9rem; white-space: pre-wrap; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 16px; transition: 0.3s; }
+        .info-box:hover { border-color: #333; }
 
-        .order-cta { margin-top: 40px; margin-bottom: 40px; padding: 30px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 15px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.02) 0%, rgba(0,0,0,0) 100%); }
-        .btn-order { background: #4ade80; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
+        .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+        .btn-order:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(74, 222, 128, 0.4); }
+
+        #btn-edit-surnom { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div id="loading-skeleton">
+        <div class="skeleton" style="height: 40px; width: 100px; margin-bottom: 20px;"></div>
+        <div class="skeleton" style="height: 100px; width: 100%; margin-bottom: 25px;"></div>
+        <div class="skeleton" style="height: 40vh; width: 100%; margin-bottom: 20px;"></div>
+    </div>
+
     <div id="section-detail" class="hidden">
         <button id="custom-back" class="back-btn">← Retour</button>
-        
         <div id="weather-container" class="hidden"></div>
-
         <img id="p-photo" class="hero-img">
         
-        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-            <h1 id="p-titre" style="font-size: 2.2rem; font-weight: 300; margin: 0;"></h1>
-            <button id="btn-edit-surnom" class="hidden">Modifier</button>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <h1 id="p-titre" style="font-size: 2.4rem; font-weight: 200; margin: 0;"></h1>
+            <button id="btn-edit-surnom" class="hidden">EDITER</button>
         </div>
-        
         <div id="p-sci" class="sci-name"></div>
 
-        <div class="badge-container">
-            <div class="badge"><span class="badge-label">Famille</span><span id="p-famille" class="badge-value">-</span></div>
-            <div class="badge"><span class="badge-label">Type</span><span id="p-type" class="badge-value">-</span></div>
-        </div>
+        <div class="badge-container" id="p-badges"></div>
+        <div class="info-grid" id="p-grid"></div>
 
-        <div class="info-grid">
-            <div class="info-box"><div class="label">Arrosage</div><div id="p-arrosage" class="value">-</div></div>
-            <div class="info-box"><div class="label">Exposition</div><div id="p-expo" class="value">-</div></div>
-            <div class="info-box"><div class="label">Difficulté</div><div id="p-diff" class="value">-</div></div>
-            <div class="info-box"><div class="label">Rusticité</div><div id="p-rust" class="value">-</div></div>
-            <div class="info-box"><div class="label">Taille adulte</div><div id="p-taille" class="value">-</div></div>
-            <div class="info-box"><div class="label">Persistance</div><div id="p-pers" class="value">-</div></div>
-        </div>
-
-        <div class="desc-box">
-            <div class="label">Description & Conseils</div>
-            <div id="p-desc" class="desc"></div>
+        <div class="desc-box" style="margin-top: 25px; background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border);">
+            <div id="p-desc" style="line-height: 1.8; color: #aaa; font-size: 0.95rem;"></div>
         </div>
 
         <div id="cta-invite" class="order-cta hidden">
-            <p>Donnez vie à cette plante dans votre jardin</p>
+            <h3 style="font-weight: 400; margin-bottom: 20px;">Immortalisez cette plante dans votre jardin</h3>
             <button class="btn-order" onclick="window.location.href='commander.html'">Commander ma plaque ÉONIA</button>
         </div>
     </div>
@@ -129,120 +91,131 @@
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const API_KEY = "TON_SECRET_ICI"; // ⚠️ À ajouter aussi dans ton Worker !
     const params = new URLSearchParams(window.location.search);
     const plantId = params.get('id');
     const userEmail = localStorage.getItem('user_email') || 'invite@eonia.com';
 
     document.getElementById('custom-back').onclick = () => window.history.back();
 
-    async function fetchAndDisplay(bodyData) {
+    // Helper pour créer des éléments DOM proprement (Sécurité XSS)
+    const el = (tag, props = {}, children = []) => {
+        const element = document.createElement(tag);
+        Object.assign(element, props);
+        children.forEach(child => element.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
+        return element;
+    };
+
+    async function fetchAndDisplay(coords = null) {
         try {
+            const body = { email: userEmail, plantId: plantId };
+            if (coords) { body.lat = coords.lat; body.lon = coords.lon; }
+
             const response = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyData) 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY 
+                },
+                body: JSON.stringify(body)
             });
+
+            if (!response.ok) throw new Error("Erreur API");
             const allItems = await response.json();
             const p = allItems.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
 
-            if (p) {
-                document.getElementById('section-detail').classList.remove('hidden');
-                const isOwner = p["est_dans_jardin"] === true;
+            if (!p) throw new Error("Plante introuvable");
 
-                // --- GESTION MÉTÉO ---
-                const container = document.getElementById('weather-container');
-                if (isOwner) {
-                    container.classList.remove('hidden');
+            // UI : Cacher skeleton, montrer contenu
+            document.getElementById('loading-skeleton').classList.add('hidden');
+            document.getElementById('section-detail').classList.remove('hidden');
 
-                    if (p.Alertes && p.Alertes.length > 0) {
-                        let html = "";
-                        p.Alertes.forEach(str => {
-                            const bits = str.split('|'); 
-                            if(bits.length > 1) {
-                                html += `<div class="w-col">
-                                    <span class="w-day">${bits[0]}</span>
-                                    <span class="w-icon">${bits[1]}</span>
-                                    <span class="w-temp">${bits[2]}</span>
-                                </div>`;
-                            }
-                        });
-                        // Ajout du bouton de réinitialisation discret
-                        html += `<div id="reset-gps">📍 Changer de lieu</div>`;
-                        container.innerHTML = html;
+            const isOwner = p["est_dans_jardin"] === true;
 
-                        document.getElementById('reset-gps').onclick = () => {
-                            if(confirm("Voulez-vous mettre à jour votre position GPS pour la météo ?")) {
-                                localStorage.removeItem('user_lat');
-                                localStorage.removeItem('user_lon');
-                                location.reload();
-                            }
-                        };
-                    } else {
-                        container.innerHTML = `
-                            <div class="geo-request">
-                                <span>Activer la météo locale pour votre jardin ?</span>
-                                <button class="btn-geo" id="enable-geo">ACTIVER LE GPS 📍</button>
-                            </div>`;
-                        document.getElementById('enable-geo').onclick = () => {
-                            navigator.geolocation.getCurrentPosition((pos) => {
-                                localStorage.setItem('user_lat', pos.coords.latitude);
-                                localStorage.setItem('user_lon', pos.coords.longitude);
-                                fetchAndDisplay({ email: userEmail, plantId: plantId, lat: pos.coords.latitude, lon: pos.coords.longitude });
-                            }, (err) => { 
-                                alert("Erreur GPS : Localisation refusée. Vérifiez les réglages de votre navigateur."); 
-                            });
-                        };
-                    }
-                } else {
-                    container.classList.add('hidden');
-                }
-
-                // --- TITRE & SURNOM ---
-                const mainTitle = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
-                document.getElementById('p-titre').innerText = mainTitle;
-                
-                if (isOwner) {
-                    const btnEdit = document.getElementById('btn-edit-surnom');
-                    btnEdit.classList.remove('hidden');
-                    btnEdit.onclick = async () => {
-                        const n = prompt("Comment s'appelle votre plante ?", mainTitle);
-                        if(n && n !== mainTitle) {
-                            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action:"updateSurnom", email:userEmail, plantId:plantId, newSurnom:n })});
-                            location.reload();
+            // 1. MÉTÉO (DOM Pur)
+            const weatherBox = document.getElementById('weather-container');
+            if (isOwner) {
+                weatherBox.classList.remove('hidden');
+                weatherBox.innerHTML = ""; // Clear
+                if (p.Alertes && p.Alertes.length > 0) {
+                    p.Alertes.forEach(str => {
+                        const [day, icon, temp] = str.split('|');
+                        if(day && icon && temp) {
+                            weatherBox.appendChild(el('div', {className: 'w-col'}, [
+                                el('span', {className: 'w-day'}, [day]),
+                                el('span', {className: 'w-icon'}, [icon]),
+                                el('span', {className: 'w-temp'}, [temp])
+                            ]));
+                        }
+                    });
+                    const resetBtn = el('div', {id: 'reset-gps', innerText: '📍 Actualiser le lieu'});
+                    resetBtn.onclick = () => {
+                        if(confirm("Nous allons redemander votre position pour actualiser la météo.")) {
+                            localStorage.removeItem('user_lat'); localStorage.removeItem('user_lon');
+                            fetchAndDisplay();
                         }
                     };
-                }
-
-                // --- INFOS ---
-                document.getElementById('p-photo').src = p["Photo"] || '';
-                document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-                document.getElementById('p-famille').innerText = p["Famille"] || "-";
-                document.getElementById('p-type').innerText = p["Type"] || "-";
-                document.getElementById('p-arrosage').innerText = p["Arrosage"] || "-";
-                document.getElementById('p-expo').innerText = p["Exposition"] || "-";
-                document.getElementById('p-diff').innerText = p["Difficulté"] || "-";
-                document.getElementById('p-rust').innerText = p["Rusticité"] || "-";
-                document.getElementById('p-taille').innerText = p["Taille à maturité"] || "-";
-                document.getElementById('p-pers').innerText = p["Persistance"] || "-";
-                document.getElementById('p-desc').innerText = p["Description"] || "Aucune description.";
-
-                if (userEmail === 'invite@eonia.com') {
-                    document.getElementById('cta-invite').classList.remove('hidden');
+                    weatherBox.appendChild(resetBtn);
+                } else {
+                    const btnGeo = el('button', {className: 'btn-geo', innerText: 'ACTIVER LA MÉTÉO LOCALE 📍'});
+                    btnGeo.onclick = () => {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            const c = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                            localStorage.setItem('user_lat', c.lat); localStorage.setItem('user_lon', c.lon);
+                            fetchAndDisplay(c);
+                        });
+                    };
+                    weatherBox.appendChild(el('div', {className:'geo-request'}, [
+                        el('span', {}, ["Personnalisez le suivi météo de votre jardin"]),
+                        btnGeo
+                    ]));
                 }
             }
-        } catch (e) { console.error("Erreur", e); }
+
+            // 2. DONNÉES
+            document.getElementById('p-photo').src = p["Photo"] || '';
+            document.getElementById('p-titre').innerText = (isOwner && p.Surnom) ? p.Surnom : (p["Nom commun"] || 'Spécimen');
+            document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+            document.getElementById('p-desc').innerText = p["Description"] || "";
+
+            // Badges & Grid (Génération dynamique)
+            const fields = [
+                {l: "Arrosage", v: p.Arrosage}, {l: "Exposition", v: p.Exposition},
+                {l: "Difficulté", v: p.Difficulté}, {l: "Rusticité", v: p.Rusticité},
+                {l: "Taille", v: p["Taille à maturité"]}, {l: "Feuillage", v: p.Persistance}
+            ];
+            const grid = document.getElementById('p-grid'); grid.innerHTML = "";
+            fields.forEach(f => {
+                grid.appendChild(el('div', {className: 'info-box'}, [
+                    el('div', {className: 'label', innerText: f.l}),
+                    el('div', {className: 'value', innerText: f.v || "-"})
+                ]));
+            });
+
+            if (isOwner) {
+                const btn = document.getElementById('btn-edit-surnom');
+                btn.classList.remove('hidden');
+                btn.onclick = async () => {
+                    const n = prompt("Nouveau surnom :", p.Surnom || p["Nom commun"]);
+                    if(n) {
+                        await fetch(API_URL, { method:'POST', headers:{'x-api-key':API_KEY}, body:JSON.stringify({action:"updateSurnom", email:userEmail, plantId:plantId, newSurnom:n})});
+                        fetchAndDisplay(); // Refresh sans reload !
+                    }
+                };
+            }
+
+            if (userEmail === 'invite@eonia.com') document.getElementById('cta-invite').classList.remove('hidden');
+
+        } catch (e) {
+            console.error(e);
+            alert("Erreur de connexion. Veuillez réessayer.");
+        }
     }
 
-    // Chargement avec vérification du stockage local
     window.onload = () => {
-        if (!plantId) return;
         const lat = localStorage.getItem('user_lat');
         const lon = localStorage.getItem('user_lon');
-        if (lat && lon) {
-            fetchAndDisplay({ email: userEmail, plantId: plantId, lat: parseFloat(lat), lon: parseFloat(lon) });
-        } else {
-            fetchAndDisplay({ email: userEmail, plantId: plantId });
-        }
+        fetchAndDisplay(lat ? {lat, lon} : null);
     };
 </script>
 </body>
