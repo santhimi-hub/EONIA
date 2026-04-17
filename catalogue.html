@@ -90,20 +90,14 @@
 
 <script>
 const userEmail = localStorage.getItem('user_email');
-const userPin = localStorage.getItem('user_pin'); // Changé de sessionStorage à localStorage
+const userPin = localStorage.getItem('user_pin'); 
 const API_URL = "https://eonia-api.santhimi.workers.dev";
-
-// Dans loadData(), ajoute l'email dans la clé de cache pour plus de sécurité
-async function loadData() {
-    const cacheKey = `eonia_cache_${userEmail}`;
-    const cached = localStorage.getItem(cacheKey);
-    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
-    // ... reste du code utilisant cacheKey ...
 
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
+// Sécurité redirection
 if (!userEmail) logout();
 if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
 
@@ -127,7 +121,8 @@ function renderGrid() {
 
         if (currentView === 'jardin' && !p.est_dans_jardin) return false;
 
-        return nom.includes(searchVal) && (activeFilter === 'all' || type.includes(activeFilter.toLowerCase()));
+        const matchesFilter = activeFilter === 'all' || (type && type.includes(activeFilter.toLowerCase()));
+        return nom.includes(searchVal) && matchesFilter;
     });
 
     document.getElementById('plant-counter').textContent =
@@ -164,11 +159,12 @@ function renderGrid() {
     });
 }
 
-// ⚡ VERSION RAPIDE
 async function loadData() {
-    const cached = localStorage.getItem('eonia_cache');
-    const cacheTime = localStorage.getItem('eonia_cache_time');
+    const cacheKey = `eonia_cache_${userEmail}`;
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
 
+    // Affichage immédiat si cache valide (5 min)
     if (cached && cacheTime && (Date.now() - cacheTime < 300000)) {
         allPlants = JSON.parse(cached);
         renderGrid();
@@ -181,19 +177,27 @@ async function loadData() {
             body: JSON.stringify({ email: userEmail, pin: userPin })
         });
 
+        if (!res.ok) throw new Error("Erreur Serveur");
+
         const data = await res.json();
 
         allPlants = data.sort((a,b) =>
             (a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
         );
 
-        localStorage.setItem('eonia_cache', JSON.stringify(allPlants));
-        localStorage.setItem('eonia_cache_time', Date.now());
+        // Mise à jour du cache
+        localStorage.setItem(cacheKey, JSON.stringify(allPlants));
+        localStorage.setItem(`${cacheKey}_time`, Date.now());
 
         renderGrid();
 
     } catch (e) {
-        console.error("Erreur :", e);
+        console.error("Erreur de chargement :", e);
+        // En cas d'erreur, on essaie quand même d'afficher le vieux cache s'il existe
+        if (cached) {
+            allPlants = JSON.parse(cached);
+            renderGrid();
+        }
     }
 }
 
