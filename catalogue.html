@@ -39,10 +39,12 @@
         <h1 class="brand-title">ÉONIA</h1>
         <p id="page-title">Notre Collection</p>
     </header>
+
     <div id="client-menu" class="client-nav">
         <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
         <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
     </div>
+
     <div class="controls-area">
         <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
         <div id="plant-counter">0 PLANTE TROUVÉE</div>
@@ -53,6 +55,7 @@
             <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
         </div>
     </div>
+
     <div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.8rem;"></div>
     <div id="catalogue-grid" class="catalog-container"></div>
 
@@ -84,39 +87,83 @@
             let filtered = allPlants.filter(p => {
                 const nom = (p["Nom commun"] || "").toLowerCase();
                 const type = (p.Type || "").toLowerCase();
+                // Vue Jardin : on ne montre que ce qui appartient au client
                 if (currentView === 'jardin' && !p.est_dans_jardin) return false;
+                // Filtre par texte et par bouton catégorie (Type)
                 return nom.includes(searchVal) && (activeFilter === 'all' || type.includes(activeFilter.toLowerCase()));
             });
 
             document.getElementById('plant-counter').textContent = `${filtered.length} PLANTE${filtered.length > 1 ? 'S' : ''} TROUVÉE${filtered.length > 1 ? 'S' : ''}`;
 
             filtered.forEach(p => {
-                const nomAffiche = (currentView === 'jardin' && p.Surnom) ? p.Surnom : p["Nom commun"];
+                const nomAffiche = p["Nom commun"] || "Plante sans nom";
                 const currentLetter = nomAffiche[0].toUpperCase();
+
+                // Ajout des lettres alphabétiques uniquement en mode catalogue complet
                 if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter === 'all' && !searchVal) {
-                    const div = document.createElement('div'); div.className = "letter-divider"; div.textContent = currentLetter;
-                    container.appendChild(div); lastLetter = currentLetter;
+                    const div = document.createElement('div'); 
+                    div.className = "letter-divider"; 
+                    div.textContent = currentLetter;
+                    container.appendChild(div); 
+                    lastLetter = currentLetter;
                 }
-                const card = document.createElement('div'); card.className = "plant-card";
-                card.onclick = () => window.location.href = `jardin.html?id=${p.id || p.ID_Plaque}`;
-                card.innerHTML = `<div class="img-container"><img src="${p.Photo}" class="plant-img" loading="lazy"></div><div class="plant-info"><div class="plant-name">${nomAffiche}</div></div>`;
+
+                const card = document.createElement('div'); 
+                card.className = "plant-card";
+                // On utilise l'ID pour ouvrir la page détails
+                card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
+                card.innerHTML = `
+                    <div class="img-container">
+                        <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
+                    </div>
+                    <div class="plant-info">
+                        <div class="plant-name">${nomAffiche}</div>
+                    </div>
+                `;
                 container.appendChild(card);
             });
         }
 
         async function loadData() {
+            // 1. Affichage immédiat du cache pour la fluidité
             const cached = localStorage.getItem('eonia_cache');
-            if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
+            if (cached) { 
+                allPlants = JSON.parse(cached); 
+                renderGrid(); 
+            }
 
-            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin }) });
-            const data = await res.json();
-            allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-            localStorage.setItem('eonia_cache', JSON.stringify(allPlants));
-            renderGrid();
+            // 2. Mise à jour réelle depuis l'API
+            try {
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ email: userEmail, pin: userPin }) 
+                });
+                const data = await res.json();
+                
+                // Tri alphabétique
+                allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
+                
+                // Mise à jour du cache et de l'écran
+                localStorage.setItem('eonia_cache', JSON.stringify(allPlants));
+                renderGrid();
+            } catch (e) {
+                console.error("Erreur de chargement :", e);
+            }
         }
 
-        function setFilter(t, b) { activeFilter = t; document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); renderGrid(); }
-        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+        function setFilter(t, b) { 
+            activeFilter = t; 
+            document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active')); 
+            b.classList.add('active'); 
+            renderGrid(); 
+        }
+
+        function logout() { 
+            localStorage.clear(); 
+            window.location.href = "index.html"; 
+        }
+
         loadData();
     </script>
 </body>
