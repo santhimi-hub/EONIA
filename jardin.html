@@ -103,18 +103,28 @@
         );
     }
 
-    async function loadData(lat, lon) {
-        try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, plantId: rawPlantId, lat, lon }) 
-            });
-            const data = await res.json();
-            const p = data.find(item => (item.id && item.id.replace(/-/g, "") === plantIdClean) || item.id === rawPlantId);
-            if (p) render(p);
-        } catch (e) { document.getElementById('p-titre').innerText = "Erreur..."; }
+async function loadData(lat, lon) {
+    try {
+        const userPin = localStorage.getItem('user_pin');
+        const res = await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
+        });
+        const data = await res.json();
+        
+        // Recherche plus précise
+        const p = data.find(item => {
+            const cleanItemId = item.id.replace(/-/g, "");
+            return cleanItemId === plantIdClean || item.id === rawPlantId;
+        });
+
+        if (p) render(p);
+        else document.getElementById('p-titre').innerText = "Plante introuvable";
+    } catch (e) { 
+        document.getElementById('p-titre').innerText = "Erreur de connexion"; 
     }
+}
 
     function render(p) {
         document.getElementById('p-photo').src = p.Photo || '';
