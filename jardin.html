@@ -57,12 +57,30 @@
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
 
-        <div id="owner-area" class="hidden">
-            <div class="maintenance-card">
-                <div class="section-title">ENTRETIEN & HISTORIQUE</div>
-                <button class="btn-water" onclick="recordWatering()">💦 MARQUER COMME ARROSÉ</button>
-                <div id="watering-history" class="history-list"></div>
-            </div>
+       <div id="owner-area" class="hidden">
+    <div class="maintenance-card">
+        <div class="section-title">ENTRETIEN & HISTORIQUE</div>
+        <button class="btn-water" onclick="recordWatering()">💦 MARQUER COMME ARROSÉ</button>
+        
+        <button id="btn-undo-water" class="hidden" onclick="undoWatering()" 
+                style="background:none; border:none; color:#ff4444; font-size:0.6rem; text-decoration:underline; margin-top:10px; cursor:pointer; width:100%;">
+            Annuler le dernier arrosage (erreur)
+        </button>
+
+        <div id="watering-history" class="history-list"></div>
+    </div>
+
+    <div class="maintenance-card">
+        <div class="section-title">JOURNAL DE BORD</div>
+        <label style="font-size: 0.6rem; color: var(--accent);">DATE DE PLANTATION</label>
+        <input type="date" id="plant-date" onchange="showSave()">
+        
+        <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES PERSONNELLES</label>
+        <textarea id="plant-note" rows="3" placeholder="Notes de croissance..." oninput="showSave()"></textarea>
+        
+        <button id="btn-save-note" class="btn-save hidden" onclick="saveJournal()">💾 ENREGISTRER LES MODIFICATIONS</button>
+    </div>
+</div>
 
             <div class="maintenance-card">
                 <div class="section-title">ÉVOLUTION (PHOTOS)</div>
