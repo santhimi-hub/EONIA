@@ -7,22 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
-        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; min-height: 100vh; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
         #weather-container { 
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 24px; 
-            padding: 20px; 
-            margin-bottom: 25px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 80px; 
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; padding: 20px; margin-bottom: 25px; 
+            display: flex; justify-content: center; align-items: center; min-height: 80px; 
         }
         .geo-btn { background: var(--accent); color: #000; border: none; padding: 10px 15px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
@@ -30,7 +24,7 @@
         .w-icon { font-size: 1.8rem; }
         .w-temp { font-size: 0.9rem; }
         
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #111; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
@@ -40,28 +34,38 @@
         .info-box .value { font-size: 0.85rem; color: #fff; }
         
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .btn-water { background: var(--water); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+        .btn-water { background: var(--water); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .btn-water:active { transform: scale(0.98); }
         .history-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; }
         .history-tag { font-size: 0.6rem; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; color: #888; border: 1px solid #333; }
 
         .galerie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
         .galerie-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
-        .btn-add-photo { background: #222; border: 1px dashed var(--accent); color: var(--accent); height: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+        .btn-add-photo { background: #222; border: 1px dashed var(--accent); color: var(--accent); height: 100%; min-height: 80px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
 
         .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
         .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
         
         .btn-save { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 15px; display: none; }
         textarea, input[type="date"] { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 10px; box-sizing: border-box; font-family: inherit;}
+        
+        /* État de chargement */
+        .loading-shimmer { background: linear-gradient(90deg, #0c0c0c 25%, #1a1a1a 50%, #0c0c0c 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
-        <div id="weather-container"></div>
+        
+        <div id="weather-container">
+            <div style="text-align:center;">
+                <p style="font-size:0.6rem; color:#888; margin-bottom:10px;">Vérification de la météo...</p>
+            </div>
+        </div>
         
         <img id="p-photo" class="hero-img">
-        <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
+        <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;">Chargement...</h1>
         <div id="p-sci" class="sci-name"></div>
 
         <div id="owner-area" class="hidden">
@@ -96,77 +100,109 @@
 
         <div class="desc-box">
             <div class="section-title">DESCRIPTION</div>
-            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;">Récupération des données...</div>
         </div>
     </div>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    const rawPlantId = new URLSearchParams(window.location.search).get('id');
-    const plantId = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
-    const userEmail = localStorage.getItem('user_email');
+    
+    // 1. Extraction robuste de l'ID (depuis ?id=... ou ?plantId=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const rawPlantId = urlParams.get('id') || urlParams.get('plantId');
+    const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
+
+    const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
     const userPin = localStorage.getItem('user_pin');
     
-    // Récupération Géo
     let lat = localStorage.getItem('user_lat');
     let lon = localStorage.getItem('user_lon');
 
     async function init() {
-        if (!plantId) return;
+        if (!rawPlantId) {
+            document.getElementById('p-titre').innerText = "Erreur : ID manquant";
+            return;
+        }
+
         try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
+                body: JSON.stringify({ 
+                    email: userEmail, 
+                    action: "get_details", // On précise l'action pour le worker
+                    plantId: rawPlantId, 
+                    lat, lon 
+                }) 
             });
+            
             const data = await res.json();
-            const p = data.find(item => item.id.replace(/-/g, "") === plantId || item.ID_Plaque === rawPlantId);
-            if (p) render(p);
-        } catch (e) { console.error("Erreur API", e); }
+            
+            // On cherche la plante dans le catalogue reçu
+            const p = data.find(item => 
+                item.id.replace(/-/g, "") === plantIdClean || 
+                item.ID_Plaque === rawPlantId
+            );
+
+            if (p) {
+                render(p);
+            } else {
+                document.getElementById('p-titre').innerText = "Plante non trouvée";
+            }
+        } catch (e) { 
+            console.error("Erreur API", e);
+            document.getElementById('p-titre').innerText = "Erreur de connexion";
+        }
     }
 
     function render(p) {
+        // Remplissage des textes de base
         document.getElementById('p-photo').src = p.Photo || '';
-        document.getElementById('p-titre').innerText = p["Nom commun"];
-        document.getElementById('p-sci').innerText = p["Nom scientifique"];
-        document.getElementById('p-desc').innerText = p.Description;
+        document.getElementById('p-titre').innerText = p["Nom commun"] || "Sans nom";
+        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+        document.getElementById('p-desc').innerText = p.Description || "Pas de description disponible.";
 
-        // Gestion Météo Localisée
+        // --- MÉTÉO ---
         const weatherBox = document.getElementById('weather-container');
         if (lat && lon && p.Alertes) {
             weatherBox.style.justifyContent = "space-around";
             weatherBox.innerHTML = p.Alertes.map(str => {
-                const [d, i, t] = str.split('|');
-                return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+                const parts = str.split('|');
+                return `<div class="w-col"><span class="w-day">${parts[0]}</span><span class="w-icon">${parts[1]}</span><span class="w-temp">${parts[2]}</span></div>`;
             }).join('');
         } else {
             weatherBox.innerHTML = `
                 <div style="text-align:center;">
-                    <p style="font-size:0.6rem; color:#888; margin-bottom:10px;">Activez la météo locale pour l'entretien</p>
+                    <p style="font-size:0.6rem; color:#888; margin-bottom:10px;">Activez la météo pour l'entretien</p>
                     <button class="geo-btn" onclick="askGeo()">📍 ACTIVER LA MÉTÉO</button>
                 </div>`;
         }
 
+        // --- ESPACE PROPRIÉTAIRE ---
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             
-            // On nettoie les "-" de Notion pour l'affichage
-            document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
-            document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
+            // Nettoyage et affichage des notes/dates
+            const noteField = document.getElementById('plant-note');
+            const dateField = document.getElementById('plant-date');
+            
+            noteField.value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
+            dateField.value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
 
+            // Historique d'arrosage
             const historyContainer = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
-                const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
+                const dates = p.Historique_Data.split(',').map(d => d.trim()).filter(d => d !== "");
                 if (dates.length > 0) {
                     document.getElementById('btn-undo-water').classList.remove('hidden');
                     historyContainer.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
                 }
             }
             
-            // Galerie Photos
+            // Galerie
             if (p.Galerie && p.Galerie !== "-") {
                 const galArea = document.getElementById('galerie-area');
-                p.Galerie.split(',').forEach(url => {
+                p.Galerie.split(',').reverse().forEach(url => {
                     if(url.trim() && url !== "-"){
                         const img = document.createElement('img');
                         img.className = 'galerie-img';
@@ -177,31 +213,110 @@
             }
         }
 
+        // --- GRILLE INFO ---
         const fields = [
             {l:"TYPE", v:p.Type, h:true}, {l:"FAMILLE", v:p.Famille, h:true},
-            {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition},
-            {l:"Taille", v:p.Taille}, {l:"Floraison", v:p.Floraison}, {l:"Rusticité", v:p.Rusticité}
+            {l:"ARROSAGE", v:p.Arrosage}, {l:"EXPOSITION", v:p.Exposition},
+            {l:"TAILLE", v:p.Taille}, {l:"FLORAISON", v:p.Floraison}, {l:"RUSTICITÉ", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fields.map(f => `
             <div class="info-box ${f.h?'highlight':''}">
                 <div class="label">${f.l}</div>
-                <div class="value">${f.v||"-"}</div>
+                <div class="value">${f.v || "-"}</div>
             </div>`).join('');
     }
 
+    // --- ACTIONS ---
+
     async function recordWatering() {
         const btn = document.getElementById('btn-water-main');
+        const originalText = btn.innerText;
+        btn.innerText = "⏳ ENREGISTREMENT...";
+        btn.disabled = true;
+
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, action: 'record_watering', plantId: rawPlantId }) 
+            });
+            location.reload();
+        } catch (e) {
+            alert("Erreur lors de l'arrosage");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    async function saveJournal() {
+        const btn = document.getElementById('btn-save-note');
         btn.innerText = "⏳...";
-        await fetch(API_URL, { 
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId: rawPlantId }) 
-        });
-        location.reload();
+        const date = document.getElementById('plant-date').value;
+        const note = document.getElementById('plant-note').value;
+
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, action: 'update_prive', plantId: rawPlantId, date, note }) 
+            });
+            btn.innerText = "✅ ENREGISTRÉ";
+            setTimeout(() => { btn.style.display = "none"; btn.innerText = "💾 ENREGISTRER"; }, 2000);
+        } catch (e) {
+            alert("Erreur de sauvegarde");
+        }
     }
 
     async function undoWatering() {
-        if(!confirm("Annuler le dernier arrosage ?")) return;
-        const res = await fetch(API_URL, { 
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId }) 
-        });
+        if(!confirm("Supprimer la dernière date d'arrosage ?")) return;
+        
+        // On récupère l'historique actuel pour enlever la fin
+        const res = await fetch(API_URL, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email: userEmail, plantId: rawPlantId}) });
+        const data = await res.json();
+        const p = data.find(i => i.id.replace(/-/g,"") === plantIdClean || i.ID_Plaque === rawPlantId);
+        
+        if (p && p.Historique_Data) {
+            let dates = p.Historique_Data.split(',').map(d => d.trim()).filter(d => d !== "");
+            dates.pop(); // Enlever le dernier
+            
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    email: userEmail, 
+                    action: 'update_history_direct', 
+                    plantId: rawPlantId, 
+                    newHistory: dates.join(',') 
+                }) 
+            });
+            location.reload();
+        }
+    }
+
+    function askGeo() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                localStorage.setItem('user_lat', pos.coords.latitude);
+                localStorage.setItem('user_lon', pos.coords.longitude);
+                location.reload();
+            }, () => alert("Permission refusée."));
+        }
+    }
+
+    function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
+
+    function addPhoto() {
+        const url = prompt("Collez l'URL de votre photo :");
+        if (url && url.startsWith('http')) {
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, action: 'add_photo', plantId: rawPlantId, photoUrl: url }) 
+            }).then(() => location.reload());
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
