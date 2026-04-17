@@ -12,8 +12,20 @@
         .hidden { display: none !important; }
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
-        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; margin-bottom: 25px; display: flex; justify-content: space-around; align-items: center; min-height: 80px; }
-        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        #weather-container { 
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; 
+            padding: 20px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 80px; 
+        }
+        .geo-btn { background: var(--accent); color: #000; border: none; padding: 10px 15px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
         .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
         .w-icon { font-size: 1.8rem; }
         .w-temp { font-size: 0.9rem; }
@@ -29,7 +41,7 @@
         
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .btn-water { background: var(--water); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        .history-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; min-height: 20px; }
+        .history-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; }
         .history-tag { font-size: 0.6rem; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; color: #888; border: 1px solid #333; }
 
         .galerie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
@@ -46,7 +58,9 @@
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
-        <div id="weather-container"></div> <img id="p-photo" class="hero-img">
+        <div id="weather-container"></div>
+        
+        <img id="p-photo" class="hero-img">
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
 
@@ -65,7 +79,6 @@
                 <div class="section-title">JOURNAL DE BORD</div>
                 <label style="font-size: 0.6rem; color: var(--accent);">DATE DE PLANTATION</label>
                 <input type="date" id="plant-date" oninput="showSave()">
-                
                 <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES PERSONNELLES</label>
                 <textarea id="plant-note" rows="3" placeholder="Notes de croissance..." oninput="showSave()"></textarea>
                 <button id="btn-save-note" class="btn-save" onclick="saveJournal()">💾 ENREGISTRER LES MODIFICATIONS</button>
@@ -93,13 +106,10 @@
     const plantId = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
-
-    // Météo par défaut si pas de coordonnées
-    const defaultWeather = [
-        {d: "AUJOURD'HUI", i: "☀️", t: "22°C"},
-        {d: "DEMAIN", i: "🌤️", t: "20°C"},
-        {d: "APRÈS-DEMAIN", i: "☁️", t: "18°C"}
-    ];
+    
+    // Récupération Géo
+    let lat = localStorage.getItem('user_lat');
+    let lon = localStorage.getItem('user_lon');
 
     async function init() {
         if (!plantId) return;
@@ -107,7 +117,7 @@
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId }) 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
             });
             const data = await res.json();
             const p = data.find(item => item.id.replace(/-/g, "") === plantId || item.ID_Plaque === rawPlantId);
@@ -121,31 +131,49 @@
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
-        // Météo (Toujours visible)
-        const weatherHtml = (p.Alertes || defaultWeather).map(w => {
-            const val = typeof w === 'string' ? {d: w.split('|')[0], i: w.split('|')[1], t: w.split('|')[2]} : w;
-            return `<div class="w-col"><span class="w-day">${val.d}</span><span class="w-icon">${val.i}</span><span class="w-temp">${val.t}</span></div>`;
-        }).join('');
-        document.getElementById('weather-container').innerHTML = weatherHtml;
+        // Gestion Météo Localisée
+        const weatherBox = document.getElementById('weather-container');
+        if (lat && lon && p.Alertes) {
+            weatherBox.style.justifyContent = "space-around";
+            weatherBox.innerHTML = p.Alertes.map(str => {
+                const [d, i, t] = str.split('|');
+                return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+            }).join('');
+        } else {
+            weatherBox.innerHTML = `
+                <div style="text-align:center;">
+                    <p style="font-size:0.6rem; color:#888; margin-bottom:10px;">Activez la météo locale pour l'entretien</p>
+                    <button class="geo-btn" onclick="askGeo()">📍 ACTIVER LA MÉTÉO</button>
+                </div>`;
+        }
 
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             
-            // Correction Notes et Dates (on enlève le "-" de Notion)
-            const cleanNote = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
-            const cleanDate = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
-            
-            document.getElementById('plant-note').value = cleanNote;
-            document.getElementById('plant-date').value = cleanDate;
+            // On nettoie les "-" de Notion pour l'affichage
+            document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
+            document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
 
-            // Historique
             const historyContainer = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
                 if (dates.length > 0) {
                     document.getElementById('btn-undo-water').classList.remove('hidden');
-                    historyContainer.innerHTML = dates.reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+                    historyContainer.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
                 }
+            }
+            
+            // Galerie Photos
+            if (p.Galerie && p.Galerie !== "-") {
+                const galArea = document.getElementById('galerie-area');
+                p.Galerie.split(',').forEach(url => {
+                    if(url.trim() && url !== "-"){
+                        const img = document.createElement('img');
+                        img.className = 'galerie-img';
+                        img.src = url.trim();
+                        galArea.prepend(img);
+                    }
+                });
             }
         }
 
@@ -163,7 +191,7 @@
 
     async function recordWatering() {
         const btn = document.getElementById('btn-water-main');
-        btn.innerText = "⏳ ENREGISTREMENT...";
+        btn.innerText = "⏳...";
         await fetch(API_URL, { 
             method: 'POST', headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId: rawPlantId }) 
@@ -171,24 +199,9 @@
         location.reload();
     }
 
-    async function saveJournal() {
-        const btn = document.getElementById('btn-save-note');
-        btn.innerText = "⏳ SAUVEGARDE...";
-        const date = document.getElementById('plant-date').value;
-        const note = document.getElementById('plant-note').value;
-        await fetch(API_URL, { 
+    async function undoWatering() {
+        if(!confirm("Annuler le dernier arrosage ?")) return;
+        const res = await fetch(API_URL, { 
             method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId: rawPlantId, date, note }) 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId }) 
         });
-        btn.innerText = "✅ ENREGISTRÉ";
-        setTimeout(() => location.reload(), 800);
-    }
-
-    function showSave() { 
-        document.getElementById('btn-save-note').style.display = "block"; 
-    }
-
-    init();
-</script>
-</body>
-</html>
