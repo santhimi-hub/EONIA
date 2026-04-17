@@ -303,12 +303,27 @@
         </button>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:0 5px;">
-        <p id="activation-help" style="margin:0;">
-            Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.
-        </p>
-        <a href="mailto:contact@eonia.com" class="pin-forgot-premium">PIN oublié ?</a>
+    <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:320px; margin: 20px auto;">
+    
+    <div style="position:relative; width:100%;">
+        <input type="password" id="pin" placeholder="CODE PIN" inputmode="numeric" 
+               pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" required 
+               style="width: 100%; height: 55px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 14px; color: #fff; font-size: 1.1rem; text-align: center; letter-spacing: 12px; font-weight: 600; outline: none; transition: 0.3s; padding-right: 50px;">
+        
+        <button type="button" onclick="togglePin()" id="toggleBtn"
+                style="position:absolute; right:15px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.2); font-size:1.4rem; transition:0.3s;">
+            <span id="eye-icon">⊖</span>
+        </button>
     </div>
+
+    <div style="display:flex; justify-content:flex-end; padding: 0 5px;">
+        <a href="mailto:contact@eonia.com" style="font-size: 0.6rem; color: rgba(255,255,255,0.3); text-decoration: none; text-transform: uppercase; letter-spacing: 1.5px;">PIN oublié ?</a>
+    </div>
+
+    <button onclick="validerConnexion()" 
+            style="width: 100%; height: 55px; background: #4ade80; color: #000; border: none; border-radius: 14px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; margin-top: 10px; transition: 0.3s;">
+        Se connecter
+    </button>
 </div>
 
     <nav class="bottom-nav">
