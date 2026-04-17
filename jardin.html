@@ -39,12 +39,11 @@
         .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
         .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
         
-        /* CTA COMMANDE */
         .order-cta { margin-top: 40px; padding: 40px 20px; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 24px; background: linear-gradient(180deg, rgba(74, 222, 128, 0.05) 0%, transparent 100%); margin-bottom: 30px;}
         .btn-order { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
 
         textarea, input[type="date"] { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 10px; box-sizing: border-box; font-family: inherit;}
-        .btn-save { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 10px;}
+        .btn-save { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -57,30 +56,16 @@
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
 
-       <div id="owner-area" class="hidden">
-    <div class="maintenance-card">
-        <div class="section-title">ENTRETIEN & HISTORIQUE</div>
-        <button class="btn-water" onclick="recordWatering()">💦 MARQUER COMME ARROSÉ</button>
-        
-        <button id="btn-undo-water" class="hidden" onclick="undoWatering()" 
-                style="background:none; border:none; color:#ff4444; font-size:0.6rem; text-decoration:underline; margin-top:10px; cursor:pointer; width:100%;">
-            Annuler le dernier arrosage (erreur)
-        </button>
-
-        <div id="watering-history" class="history-list"></div>
-    </div>
-
-    <div class="maintenance-card">
-        <div class="section-title">JOURNAL DE BORD</div>
-        <label style="font-size: 0.6rem; color: var(--accent);">DATE DE PLANTATION</label>
-        <input type="date" id="plant-date" onchange="showSave()">
-        
-        <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES PERSONNELLES</label>
-        <textarea id="plant-note" rows="3" placeholder="Notes de croissance..." oninput="showSave()"></textarea>
-        
-        <button id="btn-save-note" class="btn-save hidden" onclick="saveJournal()">💾 ENREGISTRER LES MODIFICATIONS</button>
-    </div>
-</div>
+        <div id="owner-area" class="hidden">
+            <div class="maintenance-card">
+                <div class="section-title">ENTRETIEN & HISTORIQUE</div>
+                <button class="btn-water" onclick="recordWatering()">💦 MARQUER COMME ARROSÉ</button>
+                <button id="btn-undo-water" class="hidden" onclick="undoWatering()" 
+                        style="background:none; border:none; color:#ff4444; font-size:0.6rem; text-decoration:underline; margin-top:10px; cursor:pointer; width:100%;">
+                    Annuler le dernier arrosage (erreur)
+                </button>
+                <div id="watering-history" class="history-list"></div>
+            </div>
 
             <div class="maintenance-card">
                 <div class="section-title">ÉVOLUTION (PHOTOS)</div>
@@ -93,9 +78,9 @@
                 <div class="section-title">JOURNAL DE BORD</div>
                 <label style="font-size: 0.6rem; color: var(--accent);">DATE DE PLANTATION</label>
                 <input type="date" id="plant-date" onchange="showSave()">
-                <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES</label>
+                <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES PERSONNELLES</label>
                 <textarea id="plant-note" rows="3" placeholder="Notes de croissance..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-save hidden" onclick="saveJournal()">ENREGISTRER LE JOURNAL</button>
+                <button id="btn-save-note" class="btn-save" onclick="saveJournal()">💾 ENREGISTRER LES MODIFICATIONS</button>
             </div>
         </div>
 
@@ -112,58 +97,40 @@
         </div>
     </div>
 
-   <script>
+<script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
-    
-    // On récupère l'ID et on le nettoie de ses tirets pour la comparaison
     const rawPlantId = new URLSearchParams(window.location.search).get('id');
     const plantId = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
-    
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
 
     async function init() {
         if (!plantId) return;
-
         const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
-        
         try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
             });
-            
             const data = await res.json();
-            
-            // RECHERCHE ROBUSTE : On compare sans les tirets
-            const p = data.find(item => {
-                const itemIdClean = item.id.replace(/-/g, "");
-                return itemIdClean === plantId || item.ID_Plaque === rawPlantId;
-            });
+            const p = data.find(item => item.id.replace(/-/g, "") === plantId || item.ID_Plaque === rawPlantId);
 
-            if (p) {
-                render(p);
-            } else {
-                console.error("Plante non trouvée dans le catalogue");
-            }
-        } catch (e) {
-            console.error("Erreur de connexion API", e);
-        }
+            if (p) render(p);
+        } catch (e) { console.error("Erreur API", e); }
     }
 
     function render(p) {
-        document.getElementById('p-photo').src = p.Photo || 'https://via.placeholder.com/400';
-        document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante inconnue";
-        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        document.getElementById('p-desc').innerText = p.Description || "Aucune description disponible.";
+        document.getElementById('p-photo').src = p.Photo || '';
+        document.getElementById('p-titre').innerText = p["Nom commun"];
+        document.getElementById('p-sci').innerText = p["Nom scientifique"];
+        document.getElementById('p-desc').innerText = p.Description;
 
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
-            document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+            document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
+            document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
             
-            // Affichage de la météo
             if (p.Alertes) {
                 document.getElementById('weather-container').classList.remove('hidden');
                 document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
@@ -172,20 +139,18 @@
                 }).join('');
             }
 
-            // Historique d'arrosage
             const historyContainer = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
-                const dates = p.Historique_Data.split(',').reverse();
-                historyContainer.innerHTML = dates.slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
-            } else {
-                historyContainer.innerHTML = "<span style='font-size:0.7rem; color:#444;'>Aucun historique</span>";
+                const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
+                if (dates.length > 0) {
+                    document.getElementById('btn-undo-water').classList.remove('hidden');
+                    historyContainer.innerHTML = dates.reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+                }
             }
 
-            // Galerie photos
             if (p.Galerie && p.Galerie !== "-") {
-                const photos = p.Galerie.split(',');
                 const galArea = document.getElementById('galerie-area');
-                photos.forEach(url => {
+                p.Galerie.split(',').forEach(url => {
                     if(url.trim() && url !== "-"){
                         const img = document.createElement('img');
                         img.className = 'galerie-img';
@@ -199,13 +164,9 @@
         }
 
         const fields = [
-            {l:"TYPE", v:p.Type, h:true},
-            {l:"FAMILLE", v:p.Famille, h:true},
-            {l:"Arrosage", v:p.Arrosage},
-            {l:"Exposition", v:p.Exposition},
-            {l:"Taille", v:p.Taille},
-            {l:"Floraison", v:p.Floraison},
-            {l:"Rusticité", v:p.Rusticité}
+            {l:"TYPE", v:p.Type, h:true}, {l:"FAMILLE", v:p.Famille, h:true},
+            {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition},
+            {l:"Taille", v:p.Taille}, {l:"Floraison", v:p.Floraison}, {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fields.map(f => `
             <div class="info-box ${f.h?'highlight':''}">
@@ -216,42 +177,57 @@
 
     async function recordWatering() {
         const btn = document.querySelector('.btn-water');
-        btn.innerText = "⏳ ENREGISTREMENT...";
+        btn.innerText = "⏳...";
         await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId: rawPlantId }) 
         });
         location.reload();
     }
 
-    async function saveJournal() {
-        const btn = document.getElementById('btn-save-note');
-        btn.innerText = "⏳ SAUVEGARDE...";
-        const date = document.getElementById('plant-date').value;
-        const note = document.getElementById('plant-note').value;
-        await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId: rawPlantId, date, note }) 
+    async function undoWatering() {
+        if(!confirm("Annuler le dernier arrosage ?")) return;
+        const res = await fetch(API_URL, { 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId }) 
         });
-        btn.innerText = "✅ ENREGISTRÉ";
-        setTimeout(() => location.reload(), 1000);
-    }
-
-    async function addPhoto() {
-        const url = prompt("Collez l'URL de votre photo :");
-        if (url) {
+        const data = await res.json();
+        const p = data.find(item => item.id.replace(/-/g, "") === plantId || item.ID_Plaque === rawPlantId);
+        if(p && p.Historique_Data) {
+            let dates = p.Historique_Data.split(',');
+            dates.pop();
             await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'add_photo', plantId: rawPlantId, photoUrl: url }) 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_history_direct', plantId: rawPlantId, newHistory: dates.join(',') }) 
             });
             location.reload();
         }
     }
 
-    function showSave() { document.getElementById('btn-save-note').classList.remove('hidden'); }
+    async function saveJournal() {
+        const btn = document.getElementById('btn-save-note');
+        btn.innerText = "SAUVEGARDE...";
+        const date = document.getElementById('plant-date').value;
+        const note = document.getElementById('plant-note').value;
+        await fetch(API_URL, { 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId: rawPlantId, date, note }) 
+        });
+        location.reload();
+    }
+
+    function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
+    
+    async function addPhoto() {
+        const url = prompt("URL de la photo :");
+        if (url) {
+            await fetch(API_URL, { 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'add_photo', plantId: rawPlantId, photoUrl: url }) 
+            });
+            location.reload();
+        }
+    }
 
     init();
 </script>
