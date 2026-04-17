@@ -90,8 +90,15 @@
 
 <script>
 const userEmail = localStorage.getItem('user_email');
-const userPin = sessionStorage.getItem('user_pin'); // 🔐 sécurisé
+const userPin = localStorage.getItem('user_pin'); // Changé de sessionStorage à localStorage
 const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+// Dans loadData(), ajoute l'email dans la clé de cache pour plus de sécurité
+async function loadData() {
+    const cacheKey = `eonia_cache_${userEmail}`;
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+    // ... reste du code utilisant cacheKey ...
 
 let currentView = 'catalogue';
 let allPlants = [];
