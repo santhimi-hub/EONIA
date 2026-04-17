@@ -292,20 +292,24 @@
     <div class="auth-container">
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
 
-        <div style="display:flex;flex-direction:column;gap:8px;">
-            <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" required>
-
-            <div class="auth-footer">
-                <p id="activation-help">
-                    Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.
-                </p>
-                <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
-            </div>
-        </div>
-
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
-        <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
+       <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+    <div style="position:relative; width:100%;">
+        <input type="password" id="pin" placeholder="CODE PIN" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" required 
+               style="padding-right: 45px; letter-spacing: 5px;">
+        
+        <button type="button" onclick="togglePin()" id="toggleBtn"
+                style="position:absolute; right:15px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.3); font-size:1.2rem; transition:0.3s; display:flex; align-items:center; justify-content:center;">
+            <span id="eye-icon">⊖</span>
+        </button>
     </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:0 5px;">
+        <p id="activation-help" style="margin:0;">
+            Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.
+        </p>
+        <a href="mailto:contact@eonia.com" class="pin-forgot-premium">PIN oublié ?</a>
+    </div>
+</div>
 
     <nav class="bottom-nav">
         <a href="#" onclick="accesInvite()">Accès Invité</a>
