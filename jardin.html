@@ -10,38 +10,62 @@
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
+        
+        /* Bouton Retour */
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
+        /* Météo */
         #weather-container { 
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); 
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); 
+            backdrop-filter: blur(20px); border: 1px solid var(--border); 
             border-radius: 24px; padding: 20px; margin-bottom: 25px; 
             display: flex; justify-content: center; align-items: center; min-height: 80px; 
         }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
-        .w-day { font-size: 0.65rem; color: #888; font-weight: bold; }
-        .w-icon { font-size: 1.8rem; }
-        .w-temp { font-size: 0.9rem; }
+        .w-day { font-size: 0.6rem; color: #666; font-weight: bold; }
+        .w-icon { font-size: 1.5rem; }
+        .w-temp { font-size: 0.8rem; }
         
+        /* Hero & Titres */
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
+        /* Grille d'infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
-        .info-box.highlight { border-left: 4px solid var(--accent); border-color: rgba(74, 222, 128, 0.2); }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
         
+        /* Cartes Maintenance & Journal */
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .btn-water { background: var(--water); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        .history-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; }
-        .history-tag { font-size: 0.6rem; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; color: #888; border: 1px solid #333; }
-
-        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; border-left: 2px solid var(--accent); padding-left: 10px; }
+        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         
-        .btn-save { background: #fff; color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 15px; display: none; }
-        textarea, input[type="date"] { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 10px; box-sizing: border-box; font-family: inherit;}
+        /* Nouveaux Boutons Thème ÉONIA */
+        .btn-eonia { 
+            background: none; 
+            border: 1px solid var(--border); 
+            color: #fff; 
+            padding: 14px; 
+            border-radius: 12px; 
+            width: 100%; 
+            font-weight: 500; 
+            font-size: 0.75rem; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-eonia:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
+        .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
+        .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
+
+        /* Historique & Inputs */
+        .history-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
+        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; }
+        
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
     </style>
 </head>
 <body>
@@ -55,18 +79,20 @@
 
         <div id="owner-area" class="hidden">
             <div class="maintenance-card">
-                <div class="section-title">ENTRETIEN & HISTORIQUE</div>
-                <button class="btn-water" id="btn-water-main" onclick="recordWatering()">💦 MARQUER COMME ARROSÉ</button>
+                <div class="section-title">ENTRETIEN</div>
+                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="recordWatering()">💦 Marquer comme arrosé</button>
                 <div id="watering-history" class="history-list"></div>
             </div>
 
             <div class="maintenance-card">
                 <div class="section-title">JOURNAL DE BORD</div>
-                <label style="font-size: 0.6rem; color: var(--accent);">DATE DE PLANTATION</label>
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
                 <input type="date" id="plant-date" oninput="showSave()">
-                <label style="font-size: 0.6rem; color: var(--accent); margin-top: 10px; display: block;">NOTES PERSONNELLES</label>
-                <textarea id="plant-note" rows="3" placeholder="Notes..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-save" onclick="saveJournal()">💾 ENREGISTRER</button>
+                
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Notes privées</label>
+                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                
+                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
             </div>
         </div>
 
@@ -88,7 +114,6 @@
     async function init() {
         if (!rawPlantId) return;
         
-        // Demande la géoloc dès le début
         navigator.geolocation.getCurrentPosition(
             (pos) => loadData(pos.coords.latitude, pos.coords.longitude),
             () => loadData(null, null),
