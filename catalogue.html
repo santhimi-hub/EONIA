@@ -4,167 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Collection & Jardin</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
+
         .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
         .logout-header-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; }
+
         header { text-align: center; padding: 30px 20px 20px 20px; }
+
         .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
+
         .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
+
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
+
         .client-nav { display: none; justify-content: center; gap: 15px; margin: 20px auto; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+
         .controls-area { max-width: 1000px; margin: 0 auto 10px auto; padding: 0 15px; text-align: center; }
+
         .search-input { width: 100%; max-width: 450px; padding: 14px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 15px; outline: none; }
+
         #plant-counter { font-size: 0.65rem; color: #4ade80; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
         .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
         .f-btn { background: none; border: 1px solid #1a1a1a; color: #777; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
+
         .f-btn.active { border-color: #4ade80; color: #4ade80; }
+
         .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+
         .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; margin: 20px 0 10px 0; letter-spacing: 8px; border-bottom: 1px solid rgba(74, 222, 128, 0.1); }
-        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; }
+
+        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; }
+
         .img-container { width: 100%; height: 160px; overflow: hidden; }
+
         .plant-img { width: 100%; height: 100%; object-fit: cover; }
+
         .plant-info { padding: 15px 10px; text-align: center; }
+
         .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; }
     </style>
 </head>
+
 <body>
-    <div class="top-bar"><button class="logout-header-btn" onclick="logout()">Quitter</button></div>
-    <header>
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
-        <h1 class="brand-title">ÉONIA</h1>
-        <p id="page-title">Notre Collection</p>
-    </header>
 
-    <div id="client-menu" class="client-nav">
-        <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
-        <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+<div class="top-bar">
+    <button class="logout-header-btn" onclick="logout()">Quitter</button>
+</div>
+
+<header>
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
+    <h1 class="brand-title">ÉONIA</h1>
+    <p id="page-title">Notre Collection</p>
+</header>
+
+<div id="client-menu" class="client-nav">
+    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+</div>
+
+<div class="controls-area">
+    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
+    <div id="plant-counter">0 PLANTE TROUVÉE</div>
+
+    <div class="filter-nav">
+        <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+        <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+        <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
     </div>
+</div>
 
-    <div class="controls-area">
-        <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
-        <div id="plant-counter">0 PLANTE TROUVÉE</div>
-        <div class="filter-nav">
-            <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-            <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-            <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-            <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-        </div>
-    </div>
+<div id="catalogue-grid" class="catalog-container"></div>
 
-    <div id="status-msg" style="text-align:center;color:#4ade80;font-size:0.8rem;"></div>
-    <div id="catalogue-grid" class="catalog-container"></div>
+<script>
+const userEmail = localStorage.getItem('user_email');
+const userPin = sessionStorage.getItem('user_pin'); // 🔐 sécurisé
+const API_URL = "https://eonia-api.santhimi.workers.dev";
 
-    <script>
-        const userEmail = localStorage.getItem('user_email');
-        const userPin = localStorage.getItem('user_pin');
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
-        let currentView = 'catalogue';
-        let allPlants = [];
-        let activeFilter = 'all';
+let currentView = 'catalogue';
+let allPlants = [];
+let activeFilter = 'all';
 
-        if (!userEmail) logout();
-        if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
+if (!userEmail) logout();
+if (userEmail !== 'invite@eonia.com') document.getElementById('client-menu').style.display = 'flex';
 
-        function switchView(view) {
-            currentView = view;
-            document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-            document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-            document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
-            renderGrid();
+function switchView(view) {
+    currentView = view;
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
+    renderGrid();
+}
+
+function renderGrid() {
+    const container = document.getElementById('catalogue-grid');
+    const searchVal = document.getElementById('searchBox').value.toLowerCase();
+    container.innerHTML = "";
+    let lastLetter = "";
+
+    let filtered = allPlants.filter(p => {
+        const nom = (p["Nom commun"] || "").toLowerCase();
+        const type = (p.Type || "").toLowerCase();
+
+        if (currentView === 'jardin' && !p.est_dans_jardin) return false;
+
+        return nom.includes(searchVal) && (activeFilter === 'all' || type.includes(activeFilter.toLowerCase()));
+    });
+
+    document.getElementById('plant-counter').textContent =
+        filtered.length === 0
+        ? "AUCUNE PLANTE TROUVÉE"
+        : `${filtered.length} PLANTE${filtered.length > 1 ? 'S' : ''} TROUVÉE${filtered.length > 1 ? 'S' : ''}`;
+
+    filtered.forEach(p => {
+        const nomAffiche = p["Nom commun"] || "Plante sans nom";
+        const currentLetter = nomAffiche[0].toUpperCase();
+
+        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter === 'all' && !searchVal) {
+            const div = document.createElement('div');
+            div.className = "letter-divider";
+            div.textContent = currentLetter;
+            container.appendChild(div);
+            lastLetter = currentLetter;
         }
 
-        function renderGrid() {
-            const container = document.getElementById('catalogue-grid');
-            const searchVal = document.getElementById('searchBox').value.toLowerCase();
-            container.innerHTML = "";
-            let lastLetter = "";
+        const card = document.createElement('div');
+        card.className = "plant-card";
+        card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
 
-            let filtered = allPlants.filter(p => {
-                const nom = (p["Nom commun"] || "").toLowerCase();
-                const type = (p.Type || "").toLowerCase();
-                // Vue Jardin : on ne montre que ce qui appartient au client
-                if (currentView === 'jardin' && !p.est_dans_jardin) return false;
-                // Filtre par texte et par bouton catégorie (Type)
-                return nom.includes(searchVal) && (activeFilter === 'all' || type.includes(activeFilter.toLowerCase()));
-            });
+        card.innerHTML = `
+            <div class="img-container">
+                <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
+            </div>
+            <div class="plant-info">
+                <div class="plant-name">${nomAffiche}</div>
+            </div>
+        `;
 
-            document.getElementById('plant-counter').textContent = `${filtered.length} PLANTE${filtered.length > 1 ? 'S' : ''} TROUVÉE${filtered.length > 1 ? 'S' : ''}`;
+        container.appendChild(card);
+    });
+}
 
-            filtered.forEach(p => {
-                const nomAffiche = p["Nom commun"] || "Plante sans nom";
-                const currentLetter = nomAffiche[0].toUpperCase();
+// ⚡ VERSION RAPIDE
+async function loadData() {
+    const cached = localStorage.getItem('eonia_cache');
+    const cacheTime = localStorage.getItem('eonia_cache_time');
 
-                // Ajout des lettres alphabétiques uniquement en mode catalogue complet
-                if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter === 'all' && !searchVal) {
-                    const div = document.createElement('div'); 
-                    div.className = "letter-divider"; 
-                    div.textContent = currentLetter;
-                    container.appendChild(div); 
-                    lastLetter = currentLetter;
-                }
+    if (cached && cacheTime && (Date.now() - cacheTime < 300000)) {
+        allPlants = JSON.parse(cached);
+        renderGrid();
+    }
 
-                const card = document.createElement('div'); 
-                card.className = "plant-card";
-                // On utilise l'ID pour ouvrir la page détails
-                card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
-                card.innerHTML = `
-                    <div class="img-container">
-                        <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
-                    </div>
-                    <div class="plant-info">
-                        <div class="plant-name">${nomAffiche}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail, pin: userPin })
+        });
 
-        async function loadData() {
-            // 1. Affichage immédiat du cache pour la fluidité
-            const cached = localStorage.getItem('eonia_cache');
-            if (cached) { 
-                allPlants = JSON.parse(cached); 
-                renderGrid(); 
-            }
+        const data = await res.json();
 
-            // 2. Mise à jour réelle depuis l'API
-            try {
-                const res = await fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ email: userEmail, pin: userPin }) 
-                });
-                const data = await res.json();
-                
-                // Tri alphabétique
-                allPlants = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-                
-                // Mise à jour du cache et de l'écran
-                localStorage.setItem('eonia_cache', JSON.stringify(allPlants));
-                renderGrid();
-            } catch (e) {
-                console.error("Erreur de chargement :", e);
-            }
-        }
+        allPlants = data.sort((a,b) =>
+            (a["Nom commun"] || "").localeCompare(b["Nom commun"] || "")
+        );
 
-        function setFilter(t, b) { 
-            activeFilter = t; 
-            document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active')); 
-            b.classList.add('active'); 
-            renderGrid(); 
-        }
+        localStorage.setItem('eonia_cache', JSON.stringify(allPlants));
+        localStorage.setItem('eonia_cache_time', Date.now());
 
-        function logout() { 
-            localStorage.clear(); 
-            window.location.href = "index.html"; 
-        }
+        renderGrid();
 
-        loadData();
-    </script>
+    } catch (e) {
+        console.error("Erreur :", e);
+    }
+}
+
+function setFilter(t, b) {
+    activeFilter = t;
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderGrid();
+}
+
+function logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "index.html";
+}
+
+loadData();
+</script>
+
 </body>
 </html>
