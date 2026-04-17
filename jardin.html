@@ -94,118 +94,148 @@
         </div>
     </div>
 
-    <script>
-        const API_URL = "https://eonia-api.santhimi.workers.dev";
-        const plantId = new URLSearchParams(window.location.search).get('id');
-        const userEmail = localStorage.getItem('user_email');
-        const userPin = localStorage.getItem('user_pin');
+   <script>
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    
+    // On récupère l'ID et on le nettoie de ses tirets pour la comparaison
+    const rawPlantId = new URLSearchParams(window.location.search).get('id');
+    const plantId = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
+    
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
 
-        async function init() {
-            const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
+    async function init() {
+        if (!plantId) return;
+
+        const lat = localStorage.getItem('user_lat'), lon = localStorage.getItem('user_lon');
+        
+        try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId, lat, lon }) 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
             });
+            
             const data = await res.json();
-            const p = data.find(item => String(item.id) === plantId || String(item.ID_Plaque) === plantId);
-            if (p) render(p);
-        }
+            
+            // RECHERCHE ROBUSTE : On compare sans les tirets
+            const p = data.find(item => {
+                const itemIdClean = item.id.replace(/-/g, "");
+                return itemIdClean === plantId || item.ID_Plaque === rawPlantId;
+            });
 
-        function render(p) {
-            document.getElementById('p-photo').src = p.Photo;
-            document.getElementById('p-titre').innerText = p["Nom commun"];
-            document.getElementById('p-sci').innerText = p["Nom scientifique"];
-            document.getElementById('p-desc').innerText = p.Description;
-
-            if (p.est_dans_jardin) {
-                document.getElementById('owner-area').classList.remove('hidden');
-                document.getElementById('plant-date').value = p.Date_Plantation || "";
-                document.getElementById('plant-note').value = p.Note_Privee || "";
-                
-                if (p.Alertes) {
-                    document.getElementById('weather-container').classList.remove('hidden');
-                    document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
-                        const [d, i, t] = str.split('|');
-                        return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
-                    }).join('');
-                }
-
-                // Historique
-                if (p.Historique_Data && p.Historique_Data !== "-") {
-                    const dates = p.Historique_Data.split(',').reverse();
-                    document.getElementById('watering-history').innerHTML = dates.slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
-                }
-
-                // Galerie
-                if (p.Galerie && p.Galerie !== "-") {
-                    const photos = p.Galerie.split(',');
-                    const galArea = document.getElementById('galerie-area');
-                    photos.forEach(url => {
-                        if(url.trim() && url !== "-"){
-                            const img = document.createElement('img');
-                            img.className = 'galerie-img';
-                            img.src = url;
-                            galArea.prepend(img);
-                        }
-                    });
-                }
+            if (p) {
+                render(p);
             } else {
-                document.getElementById('cta-invite').classList.remove('hidden');
+                console.error("Plante non trouvée dans le catalogue");
+            }
+        } catch (e) {
+            console.error("Erreur de connexion API", e);
+        }
+    }
+
+    function render(p) {
+        document.getElementById('p-photo').src = p.Photo || 'https://via.placeholder.com/400';
+        document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante inconnue";
+        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+        document.getElementById('p-desc').innerText = p.Description || "Aucune description disponible.";
+
+        if (p.est_dans_jardin) {
+            document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+            document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+            
+            // Affichage de la météo
+            if (p.Alertes) {
+                document.getElementById('weather-container').classList.remove('hidden');
+                document.getElementById('weather-container').innerHTML = p.Alertes.map(str => {
+                    const [d, i, t] = str.split('|');
+                    return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+                }).join('');
             }
 
-            const fields = [
-                {l:"TYPE", v:p.Type, h:true},
-                {l:"FAMILLE", v:p.Famille, h:true},
-                {l:"Arrosage", v:p.Arrosage},
-                {l:"Exposition", v:p.Exposition},
-                {l:"Taille", v:p.Taille},
-                {l:"Floraison", v:p.Floraison},
-                {l:"Rusticité", v:p.Rusticité}
-            ];
-            document.getElementById('p-grid').innerHTML = fields.map(f => `
-                <div class="info-box ${f.h?'highlight':''}">
-                    <div class="label">${f.l}</div>
-                    <div class="value">${f.v||"-"}</div>
-                </div>`).join('');
-        }
+            // Historique d'arrosage
+            const historyContainer = document.getElementById('watering-history');
+            if (p.Historique_Data && p.Historique_Data !== "-") {
+                const dates = p.Historique_Data.split(',').reverse();
+                historyContainer.innerHTML = dates.slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+            } else {
+                historyContainer.innerHTML = "<span style='font-size:0.7rem; color:#444;'>Aucun historique</span>";
+            }
 
-        async function recordWatering() {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId }) 
-            });
-            location.reload();
-        }
-
-        async function saveJournal() {
-            const date = document.getElementById('plant-date').value;
-            const note = document.getElementById('plant-note').value;
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId, date, note }) 
-            });
-            alert("Journal mis à jour !");
-            location.reload();
-        }
-
-        async function addPhoto() {
-            const url = prompt("Collez l'URL de votre photo (L'upload direct arrive bientôt) :");
-            if (url) {
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ email: userEmail, pin: userPin, action: 'add_photo', plantId, photoUrl: url }) 
+            // Galerie photos
+            if (p.Galerie && p.Galerie !== "-") {
+                const photos = p.Galerie.split(',');
+                const galArea = document.getElementById('galerie-area');
+                photos.forEach(url => {
+                    if(url.trim() && url !== "-"){
+                        const img = document.createElement('img');
+                        img.className = 'galerie-img';
+                        img.src = url.trim();
+                        galArea.prepend(img);
+                    }
                 });
-                location.reload();
             }
+        } else {
+            document.getElementById('cta-invite').classList.remove('hidden');
         }
 
-        function showSave() { document.getElementById('btn-save-note').classList.remove('hidden'); }
+        const fields = [
+            {l:"TYPE", v:p.Type, h:true},
+            {l:"FAMILLE", v:p.Famille, h:true},
+            {l:"Arrosage", v:p.Arrosage},
+            {l:"Exposition", v:p.Exposition},
+            {l:"Taille", v:p.Taille},
+            {l:"Floraison", v:p.Floraison},
+            {l:"Rusticité", v:p.Rusticité}
+        ];
+        document.getElementById('p-grid').innerHTML = fields.map(f => `
+            <div class="info-box ${f.h?'highlight':''}">
+                <div class="label">${f.l}</div>
+                <div class="value">${f.v||"-"}</div>
+            </div>`).join('');
+    }
 
-        init();
-    </script>
+    async function recordWatering() {
+        const btn = document.querySelector('.btn-water');
+        btn.innerText = "⏳ ENREGISTREMENT...";
+        await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'record_watering', plantId: rawPlantId }) 
+        });
+        location.reload();
+    }
+
+    async function saveJournal() {
+        const btn = document.getElementById('btn-save-note');
+        btn.innerText = "⏳ SAUVEGARDE...";
+        const date = document.getElementById('plant-date').value;
+        const note = document.getElementById('plant-note').value;
+        await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, action: 'update_prive', plantId: rawPlantId, date, note }) 
+        });
+        btn.innerText = "✅ ENREGISTRÉ";
+        setTimeout(() => location.reload(), 1000);
+    }
+
+    async function addPhoto() {
+        const url = prompt("Collez l'URL de votre photo :");
+        if (url) {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, action: 'add_photo', plantId: rawPlantId, photoUrl: url }) 
+            });
+            location.reload();
+        }
+    }
+
+    function showSave() { document.getElementById('btn-save-note').classList.remove('hidden'); }
+
+    init();
+</script>
 </body>
 </html>
