@@ -29,19 +29,20 @@
         /* Grille d'infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
-        /* Style spécial pour Famille et Type */
         .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
         
-        /* Dashboard & Maintenance */
+        /* Dashboard */
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         
         .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; margin-top: 10px; }
         .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; margin-bottom: 25px; }
+        
+        /* Bouton de commande placé en bas */
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px; box-shadow: 0 10px 20px rgba(74, 222, 128, 0.2); }
 
         .history-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
@@ -57,10 +58,6 @@
         <img id="p-photo" class="hero-img" src="">
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;">Chargement...</h1>
         <div id="p-sci" class="sci-name"></div>
-
-        <div id="catalog-area" class="hidden">
-            <button class="btn-order" onclick="window.location.href='https://eonia.fr/boutique'">🏷️ Commander ma plaque ÉONIA</button>
-        </div>
 
         <div id="owner-area" class="hidden">
             <div class="maintenance-card">
@@ -83,6 +80,10 @@
         <div class="desc-box">
             <div class="section-title">DESCRIPTION</div>
             <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+        </div>
+
+        <div id="catalog-area" class="hidden">
+            <button class="btn-order" onclick="window.location.href='https://eonia.fr/boutique'">🏷️ Commander ma plaque ÉONIA</button>
         </div>
     </div>
 
@@ -131,7 +132,7 @@
             }).join('');
         }
 
-        // Dashboard
+        // Dashboard VS Catalogue
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('catalog-area').classList.add('hidden');
@@ -144,9 +145,10 @@
             }
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('owner-area').classList.add('hidden');
         }
 
-        // GRILLE COMPLETE (Famille/Type en premier + Highlight)
+        // Grille complète avec tes 9 rubriques
         const fields = [
             {l:"Famille", v:p.Famille, h:true},
             {l:"Type", v:p.Type, h:true},
