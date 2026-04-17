@@ -14,7 +14,7 @@
         /* Bouton Retour */
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
-        /* Météo */
+        /* Météo (Seulement Jardin) */
         #weather-container { 
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); 
             backdrop-filter: blur(20px); border: 1px solid var(--border); 
@@ -40,7 +40,7 @@
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         
-        /* Nouveaux Boutons Thème ÉONIA */
+        /* Boutons Thème ÉONIA */
         .btn-eonia { 
             background: none; 
             border: 1px solid var(--border); 
@@ -59,6 +59,9 @@
         .btn-eonia:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
         .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
+        
+        /* Bouton Commander Ma Plaque (Catalogue) */
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; margin-bottom: 25px; }
 
         /* Historique & Inputs */
         .history-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
@@ -71,11 +74,18 @@
 <body>
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        
         <div id="weather-container" class="hidden"></div>
         
         <img id="p-photo" class="hero-img">
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;">Chargement...</h1>
         <div id="p-sci" class="sci-name"></div>
+
+        <div id="catalog-area" class="hidden">
+            <button class="btn-order" onclick="window.location.href='https://eonia.fr/boutique'">
+                🏷️ Commander ma plaque ÉONIA
+            </button>
+        </div>
 
         <div id="owner-area" class="hidden">
             <div class="maintenance-card">
@@ -114,9 +124,10 @@
     async function init() {
         if (!rawPlantId) return;
         
+        // Tentative de géolocalisation au chargement
         navigator.geolocation.getCurrentPosition(
             (pos) => loadData(pos.coords.latitude, pos.coords.longitude),
-            () => loadData(null, null),
+            () => loadData(null, null), // Refus ou indisponible
             { timeout: 5000 }
         );
     }
@@ -126,31 +137,48 @@
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, plantId: rawPlantId, lat, lon }) 
+                body: JSON.stringify({ email: userEmail, plantId: rawPlantId, lat: lat, lon: lon }) 
             });
             const data = await res.json();
-            const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId || item.ID_Plaque === rawPlantId);
+            
+            // On cherche la plante correspondante dans la réponse
+            const p = data.find(item => 
+                item.id.replace(/-/g, "") === plantIdClean || 
+                item.id === rawPlantId || 
+                item.ID_Plaque === rawPlantId
+            );
+
             if (p) render(p);
-        } catch (e) { document.getElementById('p-titre').innerText = "Erreur de connexion"; }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('p-titre').innerText = "Erreur de connexion"; 
+        }
     }
 
     function render(p) {
+        // Remplissage de base
         document.getElementById('p-photo').src = p.Photo || '';
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
-        if (p.Alertes) {
-            const weatherBox = document.getElementById('weather-container');
+        // Gestion de l'affichage Météo
+        const weatherBox = document.getElementById('weather-container');
+        if (p.Alertes && p.Alertes.length > 0) {
             weatherBox.classList.remove('hidden');
             weatherBox.innerHTML = p.Alertes.map(str => {
                 const [d, i, t] = str.split('|');
                 return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
             }).join('');
+        } else {
+            weatherBox.classList.add('hidden');
         }
 
+        // Switch Jardin (Owner) vs Catalogue (Order)
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('catalog-area').classList.add('hidden');
+            
             document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
             document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
             
@@ -159,8 +187,12 @@
                 const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
                 historyContainer.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
             }
+        } else {
+            document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('owner-area').classList.add('hidden');
         }
 
+        // Grille technique
         const fields = [
             {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition},
             {l:"Type", v:p.Type}, {l:"Famille", v:p.Famille},
@@ -191,7 +223,9 @@
         location.reload();
     }
 
-    function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
+    function showSave() { 
+        document.getElementById('btn-save-note').style.display = "block"; 
+    }
 
     init();
 </script>
