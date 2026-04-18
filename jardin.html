@@ -13,23 +13,23 @@
         
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
+        #weather-wrapper { margin-bottom: 25px; }
         #weather-container { 
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); 
-            backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 10px; 
+            backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px;
             display: flex; justify-content: center; align-items: center; min-height: 80px; 
         }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
-        .w-day { font-size: 0.6rem; color: #666; font-weight: bold; }
+        .w-day { font-size: 0.55rem; color: #666; font-weight: bold; letter-spacing: 1px; }
         .w-icon { font-size: 1.5rem; }
         .w-temp { font-size: 0.8rem; }
         
-        /* Bulle de conseil météo */
         #weather-advice {
             background: rgba(74, 222, 128, 0.05);
-            border: 1px solid rgba(74, 222, 128, 0.2);
-            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 24px 24px;
             padding: 12px;
-            margin-bottom: 25px;
             font-size: 0.75rem;
             color: var(--accent);
             text-align: center;
@@ -39,14 +39,12 @@
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
-        /* Grille d'infos */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
         
-        /* Dashboard */
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         
@@ -68,7 +66,7 @@
         
         <div id="weather-wrapper" class="hidden">
             <div id="weather-container"></div>
-            <div id="weather-advice">Analyse de l'environnement...</div>
+            <div id="weather-advice">Analyse des conditions...</div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
@@ -140,7 +138,6 @@
                 body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
             });
             const data = await res.json();
-            
             localStorage.setItem(cacheKey, JSON.stringify(data));
 
             const p = data.find(item => {
@@ -149,12 +146,7 @@
             });
 
             if (p) render(p);
-            else if (!document.getElementById('p-titre').innerText) {
-                document.getElementById('p-titre').innerText = "Plante introuvable";
-            }
-        } catch (e) { 
-            console.error("Erreur MAJ:", e);
-        }
+        } catch (e) { console.error("Erreur MAJ:", e); }
     }
 
     function render(p) {
@@ -163,33 +155,44 @@
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
         document.getElementById('p-desc').innerText = p.Description || "";
 
-        // MÉTÉO ET CONSEILS
+        // MÉTÉO DYNAMIQUE ET CONSEILS
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
             
-            container.innerHTML = p.Alertes.map(str => {
+            const joursSemaine = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+            const aujourdhui = new Date();
+
+            container.innerHTML = p.Alertes.map((str, index) => {
                 const parts = str.split('|');
                 if(parts.length < 3) return "";
-                const [d, i, t] = parts;
-                return `<div class="w-col"><span class="w-day">${d}</span><span class="w-icon">${i}</span><span class="w-temp">${t}</span></div>`;
+                const [oldDay, icon, temp] = parts;
+
+                let vraiJour;
+                if (index === 0) {
+                    vraiJour = "AUJOURD'HUI";
+                } else {
+                    const dateCible = new Date();
+                    dateCible.setDate(aujourdhui.getDate() + index);
+                    vraiJour = joursSemaine[dateCible.getDay()].toUpperCase();
+                }
+
+                return `<div class="w-col">
+                            <span class="w-day">${vraiJour}</span>
+                            <span class="w-icon">${icon}</span>
+                            <span class="w-temp">${temp}</span>
+                        </div>`;
             }).join('');
 
-            // LOGIQUE DE CONSEIL BASÉE SUR LES DONNÉES RÉELLES
-            const currentTempStr = p.Alertes[0].split('|')[2]; // Récupère le texte de température ex "12°C"
-            const currentTemp = parseInt(currentTempStr);
+            // LOGIQUE CONSEIL
+            const currentTemp = parseInt(p.Alertes[0].split('|')[2]);
             const isRainy = p.Alertes[0].includes('🌧️') || p.Alertes[0].includes('🌦️');
 
-            if (isRainy) {
-                adviceBox.innerText = "🌧️ Pluie en cours : inutile d'arroser aujourd'hui.";
-            } else if (currentTemp > 25) {
-                adviceBox.innerText = "☀️ Chaleur : arrosez généreusement au pied ce soir.";
-            } else if (currentTemp < 5) {
-                adviceBox.innerText = "❄️ Fraîcheur : surveillez les signes de gel sur les feuilles.";
-            } else {
-                adviceBox.innerText = "🌿 Conditions idéales : maintenez un sol frais.";
-            }
+            if (isRainy) adviceBox.innerText = "🌧️ Pluie prévue : la nature s'occupe de l'arrosage.";
+            else if (currentTemp > 25) adviceBox.innerText = "☀️ Chaleur : un arrosage au pied ce soir sera bénéfique.";
+            else if (currentTemp < 5) adviceBox.innerText = "❄️ Frais : surveillez les feuilles si vous craignez le gel.";
+            else adviceBox.innerText = "🌿 Conditions idéales : vérifiez simplement l'humidité du sol.";
         }
 
         if (p.est_dans_jardin) {
@@ -197,7 +200,6 @@
             document.getElementById('catalog-area').classList.add('hidden');
             document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
             document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
-            
             const h = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
@@ -209,17 +211,11 @@
         }
 
         const fields = [
-            {l:"Famille", v:p.Famille, h:true},
-            {l:"Type", v:p.Type, h:true},
-            {l:"Difficulté", v:p.Difficulté},
-            {l:"Arrosage", v:p.Arrosage}, 
-            {l:"Exposition", v:p.Exposition},
-            {l:"Taille", v:p.Taille}, 
-            {l:"Persistance", v:p.Persistance},
-            {l:"Floraison", v:p.Floraison},
-            {l:"Rusticité", v:p.Rusticité}
+            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, {l:"Taille", v:p.Taille}, 
+            {l:"Persistance", v:p.Persistance}, {l:"Floraison", v:p.Floraison}, {l:"Rusticité", v:p.Rusticité}
         ];
-
         document.getElementById('p-grid').innerHTML = fields.map(f => `
             <div class="info-box ${f.h ? 'highlight' : ''}">
                 <div class="label">${f.l}</div>
@@ -247,7 +243,6 @@
     }
 
     function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
-
     init();
 </script>
 </body>
