@@ -13,7 +13,13 @@
         
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
+        /* MÉTÉO STYLISE */
         #weather-wrapper { margin-bottom: 25px; }
+        .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
+        #display-city { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .location-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: #aaa; font-size: 0.6rem; padding: 5px 12px; border-radius: 20px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .location-btn:hover { background: rgba(74, 222, 128, 0.1); color: var(--accent); }
+
         #weather-container { 
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); 
             backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px;
@@ -25,15 +31,9 @@
         .w-temp { font-size: 0.8rem; }
         
         #weather-advice {
-            background: rgba(74, 222, 128, 0.05);
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 24px 24px;
-            padding: 12px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            text-align: center;
-            font-style: italic;
+            background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none;
+            border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent);
+            text-align: center; font-style: italic;
         }
 
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
@@ -52,11 +52,11 @@
         .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px; box-shadow: 0 10px 20px rgba(74, 222, 128, 0.2); }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px; }
 
         .history-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.85rem; }
+        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; font-size: 0.85rem; }
         .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
     </style>
 </head>
@@ -65,6 +65,10 @@
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
         
         <div id="weather-wrapper" class="hidden">
+            <div class="weather-header">
+                <span id="display-city">📍 Recherche...</span>
+                <button class="location-btn" onclick="changeLocation()">Changer de ville</button>
+            </div>
             <div id="weather-container"></div>
             <div id="weather-advice">Analyse des conditions...</div>
         </div>
@@ -115,37 +119,46 @@
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             const plants = JSON.parse(cachedData);
-            const p = plants.find(item => {
-                const cleanItemId = item.id.replace(/-/g, "");
-                return cleanItemId === plantIdClean || item.id === rawPlantId;
-            });
+            const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p); 
         }
 
-        navigator.geolocation.getCurrentPosition(
-            (pos) => fetchUpdate(pos.coords.latitude, pos.coords.longitude),
-            () => fetchUpdate(null, null),
-            { timeout: 3000 }
-        );
+        const manualCity = localStorage.getItem('user_city');
+        if (manualCity) {
+            fetchUpdate(null, null, manualCity);
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => fetchUpdate(pos.coords.latitude, pos.coords.longitude),
+                () => fetchUpdate(null, null),
+                { timeout: 3000 }
+            );
+        }
     }
 
-    async function fetchUpdate(lat, lon) {
+    function changeLocation() {
+        const newCity = prompt("Votre ville ou code postal :");
+        if (newCity) {
+            localStorage.setItem('user_city', newCity);
+            fetchUpdate(null, null, newCity);
+        }
+    }
+
+    async function fetchUpdate(lat, lon, city = null) {
         try {
             const userPin = localStorage.getItem('user_pin');
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon }) 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon, city }) 
             });
             const data = await res.json();
             localStorage.setItem(cacheKey, JSON.stringify(data));
 
-            const p = data.find(item => {
-                const cleanItemId = item.id.replace(/-/g, "");
-                return cleanItemId === plantIdClean || item.id === rawPlantId;
-            });
-
-            if (p) render(p);
+            const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
+            if (p) {
+                render(p);
+                document.getElementById('display-city').innerText = "📍 " + (city || "Position détectée");
+            }
         } catch (e) { console.error("Erreur MAJ:", e); }
     }
 
@@ -155,44 +168,28 @@
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
         document.getElementById('p-desc').innerText = p.Description || "";
 
-        // MÉTÉO DYNAMIQUE ET CONSEILS
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
-            
-            const joursSemaine = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+            const jours = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
             const aujourdhui = new Date();
 
-            container.innerHTML = p.Alertes.map((str, index) => {
+            container.innerHTML = p.Alertes.map((str, idx) => {
                 const parts = str.split('|');
                 if(parts.length < 3) return "";
-                const [oldDay, icon, temp] = parts;
-
-                let vraiJour;
-                if (index === 0) {
-                    vraiJour = "AUJOURD'HUI";
-                } else {
-                    const dateCible = new Date();
-                    dateCible.setDate(aujourdhui.getDate() + index);
-                    vraiJour = joursSemaine[dateCible.getDay()].toUpperCase();
-                }
-
-                return `<div class="w-col">
-                            <span class="w-day">${vraiJour}</span>
-                            <span class="w-icon">${icon}</span>
-                            <span class="w-temp">${temp}</span>
-                        </div>`;
+                const [old, icon, temp] = parts;
+                const d = new Date(); d.setDate(aujourdhui.getDate() + idx);
+                const name = idx === 0 ? "AUJOURD'HUI" : jours[d.getDay()].toUpperCase();
+                return `<div class="w-col"><span class="w-day">${name}</span><span class="w-icon">${icon}</span><span class="w-temp">${temp}</span></div>`;
             }).join('');
 
-            // LOGIQUE CONSEIL
-            const currentTemp = parseInt(p.Alertes[0].split('|')[2]);
-            const isRainy = p.Alertes[0].includes('🌧️') || p.Alertes[0].includes('🌦️');
-
-            if (isRainy) adviceBox.innerText = "🌧️ Pluie prévue : la nature s'occupe de l'arrosage.";
-            else if (currentTemp > 25) adviceBox.innerText = "☀️ Chaleur : un arrosage au pied ce soir sera bénéfique.";
-            else if (currentTemp < 5) adviceBox.innerText = "❄️ Frais : surveillez les feuilles si vous craignez le gel.";
-            else adviceBox.innerText = "🌿 Conditions idéales : vérifiez simplement l'humidité du sol.";
+            const cTemp = parseInt(p.Alertes[0].split('|')[2]);
+            const cRain = p.Alertes[0].includes('🌧️') || p.Alertes[0].includes('🌦️');
+            if (cRain) adviceBox.innerText = "🌧️ Pluie prévue : laissez la nature arroser.";
+            else if (cTemp > 25) adviceBox.innerText = "☀️ Chaleur : arrosez au pied ce soir.";
+            else if (cTemp < 5) adviceBox.innerText = "❄️ Frais : surveillez le risque de gel.";
+            else adviceBox.innerText = "🌿 Conditions stables : vérifiez l'humidité du sol.";
         }
 
         if (p.est_dans_jardin) {
@@ -210,13 +207,13 @@
             document.getElementById('owner-area').classList.add('hidden');
         }
 
-        const fields = [
+        const fds = [
             {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
             {l:"Exposition", v:p.Exposition}, {l:"Taille", v:p.Taille}, 
             {l:"Persistance", v:p.Persistance}, {l:"Floraison", v:p.Floraison}, {l:"Rusticité", v:p.Rusticité}
         ];
-        document.getElementById('p-grid').innerHTML = fields.map(f => `
+        document.getElementById('p-grid').innerHTML = fds.map(f => `
             <div class="info-box ${f.h ? 'highlight' : ''}">
                 <div class="label">${f.l}</div>
                 <div class="value">${f.v||"-"}</div>
@@ -225,7 +222,7 @@
 
     async function recordWatering() {
         const btn = document.getElementById('btn-water-main');
-        btn.innerText = "⏳ ENREGISTREMENT...";
+        btn.innerText = "⏳ ...";
         await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'record_watering', plantId: rawPlantId }) });
         fetchUpdate(); 
         btn.innerText = "💦 Marquer comme arrosé";
@@ -233,7 +230,7 @@
 
     async function saveJournal() {
         const btn = document.getElementById('btn-save-note');
-        btn.innerText = "⏳ SAUVEGARDE...";
+        btn.innerText = "⏳ ...";
         const date = document.getElementById('plant-date').value;
         const note = document.getElementById('plant-note').value;
         await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'update_prive', plantId: rawPlantId, date, note }) });
