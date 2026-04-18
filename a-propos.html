@@ -23,14 +23,23 @@
         h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; font-size: 2.5rem; margin-bottom: 10px; }
         .subtitle { color: #4ade80; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; }
 
-        .content-block { margin-bottom: 100px; opacity: 0; transform: translateY(30px); transition: 1s all ease; }
-        .content-block.visible { opacity: 1; transform: translateY(0); }
+        /* Animation des blocs et de l'image */
+        .content-block, .img-container-premium { 
+            margin-bottom: 100px; 
+            opacity: 0; 
+            transform: translateY(30px); 
+            transition: 1s all ease; 
+        }
+        
+        .content-block.visible, .img-container-premium.visible { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
 
         h2 { font-weight: 400; font-size: 1.5rem; margin-bottom: 25px; color: #4ade80; }
         p { color: #ccc; font-size: 1rem; margin-bottom: 20px; font-weight: 300; }
         
         .highlight { color: #fff; font-weight: 500; }
-        .main-quote { color: #fff; font-size: 1.1rem; font-weight: 400; border-bottom: 1px solid rgba(74, 222, 128, 0.3); padding-bottom: 20px; margin-bottom: 30px; display: block; }
 
         .manifesto {
             background: rgba(255,255,255,0.03);
@@ -38,6 +47,17 @@
             border-left: 2px solid #4ade80;
             border-radius: 0 15px 15px 0;
             font-style: italic;
+        }
+
+        /* STYLE DE TA PHOTO */
+        .img-container-premium { width: 100%; margin: 40px 0; text-align: center; }
+        .img-premium {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         .back-link {
@@ -54,22 +74,6 @@
             transition: 0.3s;
         }
         .back-link:hover { background: #4ade80; color: #000; }
-
-        .img-placeholder {
-            width: 100%;
-            height: 350px;
-            background: linear-gradient(45deg, #050505, #111);
-            border-radius: 15px;
-            margin: 30px 0;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.7rem;
-        }
     </style>
 </head>
 <body>
@@ -81,31 +85,28 @@
         <div class="subtitle">L'Éternité Végétale</div>
     </header>
 
-        <section class="content-block" id="vision">
+    <section class="content-block" id="vision">
         <h2>Notre Vision</h2>
-        <p>Un jardin n'est pas qu'une collection de plantes, c'est une <span class="highlight">galerie de souvenirs</span>. Derrière chaque arbre planté se cache une histoire : une naissance, un hommage, ou simplement le temps qui passe.</p>
-        
-        <p>ÉONIA transforme votre jardin en un héritage intelligent. Qu'il soit transmis à vos enfants ou aux futurs propriétaires de votre maison, votre patrimoine végétal garde son histoire et ses secrets de santé.</p>
-        
-        <p>ÉONIA est née de la volonté de relier ces deux mondes : la force brute de la nature et la précision du numérique. Nous créons un pont entre le sol et le ciel, entre vos racines et vos souvenirs. Nos plaques sont des capsules temporelles conçues pour que votre patrimoine vivant ne s'efface jamais.</p>
+        <p>Un jardin n'est pas qu'une collection de plantes, c'est une <span class="highlight">galerie de souvenirs</span>. Derrière chaque arbre planté se cache une histoire.</p>
+        <p>ÉONIA transforme votre jardin en un héritage intelligent. Qu'il soit transmis à vos enfants ou aux futurs propriétaires, votre patrimoine végétal garde son histoire.</p>
     </section>
 
-
-    <div class="img-placeholder">Image : Une plaque ÉONIA dans un jardin brumeux</div>
+    <div class="img-container-premium">
+        <img src="plaque-eonia.jpg" alt="Plaque ÉONIA" class="img-premium" loading="lazy">
+    </div>
 
     <section class="content-block">
         <h2>Le Concept</h2>
         <div class="manifesto">
             "Nous ne vendons pas des étiquettes botaniques. Nous créons des capsules temporelles pour votre patrimoine vivant."
         </div>
-        <p style="margin-top: 30px;">Chaque plaque ÉONIA est équipée d'une puce <span class="highlight">NFC</span> et d'un <span class="highlight">QR Code</span> unique. En un simple geste, sans application à installer, vous accédez instantanément à l'âme et aux besoins de votre plante.</p>
+        <p style="margin-top: 30px;">Chaque plaque ÉONIA est équipée d'une puce <span class="highlight">NFC</span> et d'un <span class="highlight">QR Code</span> unique.</p>
     </section>
 
     <section class="content-block">
         <h2>Pourquoi ÉONIA ?</h2>
-        <p><strong style="color: #fff;">Transmission & Valeur :</strong> Transmettez l'accès à votre jardin à vos proches ou aux futurs acquéreurs de votre bien. Le jardin devient un actif valorisé avec son propre carnet d'entretien numérique.</p>
-        <p><strong style="color: #fff;">Savoir-faire :</strong> Gagnez du temps au quotidien. Nos fiches botaniques sont conçues pour vous accompagner dans le soin de vos végétaux, avec l'aide de notre intelligence végétale intégrée. Ce n'est que le premier pas vers une gestion optimisée et intuitive de votre domaine.</p>
-        <p><strong style="color: #fff;">Esthétique :</strong> Un design minimaliste qui s'intègre avec respect dans chaque paysage, du jardin sauvage au parc millénaire.</p>
+        <p><strong style="color: #fff;">Transmission & Valeur :</strong> Le jardin devient un actif valorisé avec son propre carnet d'entretien numérique.</p>
+        <p><strong style="color: #fff;">Esthétique :</strong> Un design minimaliste qui s'intègre avec respect dans chaque paysage.</p>
     </section>
 
     <center>
@@ -114,6 +115,7 @@
 </div>
 
 <script>
+    // Ce script gère l'apparition fluide des textes ET de l'image
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -122,9 +124,14 @@
         });
     }, { threshold: 0.1 });
 
+    // On observe les blocs de texte
     document.querySelectorAll('.content-block').forEach(block => {
         observer.observe(block);
     });
+
+    // On observe aussi le conteneur de l'image
+    const imgBlock = document.querySelector('.img-container-premium');
+    if(imgBlock) observer.observe(imgBlock);
 </script>
 
 </body>
