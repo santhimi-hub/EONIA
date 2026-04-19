@@ -48,10 +48,6 @@
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
-
-        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .evo-box { min-width: 120px; height: 120px; background: #080808; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #333; position: relative; overflow: hidden; }
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; font-size: 0.85rem; }
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
     </style>
@@ -106,10 +102,12 @@
                 <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
                 <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
             </div>
+            
             <div id="expert-area" class="expert-card">
                 <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
                 <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
+
             <div class="maintenance-card" id="journal-card">
                 <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
                 <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
@@ -118,6 +116,7 @@
                 <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
                 <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
             </div>
+            
             <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" onclick="sharePlant()">✨ Partager ma plante</button>
         </div>
 
@@ -136,8 +135,13 @@
     const urlParams = new URLSearchParams(window.location.search);
     const rawPlantId = urlParams.get('id');
     const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
-    const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-    const cacheKey = `eonia_cache_${userEmail}`;
+    
+    // Identification utilisateur
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    const isOwner = (userEmail && userPin); // Vrai seulement si l'utilisateur est connecté
+    
+    const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
     let undoTimer = null;
 
     async function init() {
@@ -153,25 +157,15 @@
 
     async function fetchUpdate(lat, lon, city = null) {
         try {
-            const userPin = localStorage.getItem('user_pin');
             const res = await fetch(API_URL, { 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon, city }) 
+                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
             });
             const data = await res.json();
             localStorage.setItem(cacheKey, JSON.stringify(data));
             const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p);
         } catch (e) { console.error(e); }
-    }
-
-    function changeLocation() {
-        const city = prompt("Entrez votre ville (ex: Périgueux) :");
-        if (city) {
-            localStorage.setItem('user_city', city);
-            document.getElementById('display-city').innerText = "📍 " + city.toUpperCase();
-            fetchUpdate(null, null, city);
-        }
     }
 
     function render(p) {
@@ -182,22 +176,14 @@
         const savedCity = localStorage.getItem('user_city');
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
+        // Météo
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
-            const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
+            let cleanAdvice = p.Alertes[0].split('|')[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
+            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
             
-            let rawAdvice = p.Alertes[0].split('|')[0];
-            // Correction spécifique affichage conseil :
-            let cleanAdvice = rawAdvice.replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            
-            if (cleanAdvice) {
-                adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
-            } else {
-                adviceBox.innerText = "Conditions optimales pour votre plante.";
-            }
-
-            container.innerHTML = p.Alertes.map((str, idx) => {
+            document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
                 return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
@@ -205,51 +191,60 @@
         }
 
         if (p.est_dans_jardin) {
-            document.querySelectorAll('#owner-area, #owner-area-2').forEach(el => el.classList.remove('hidden'));
-            document.getElementById('catalog-area').classList.add('hidden');
-            document.getElementById('catalog-desc-area').classList.add('hidden');
+            // Affichage partiel si visiteur, complet si proprio
+            document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('owner-area-2').classList.remove('hidden');
+            
+            // Masquer journal et boutons d'action si pas le proprio
+            if (!isOwner) {
+                document.getElementById('journal-card').classList.add('hidden');
+                document.getElementById('watering-card').classList.add('hidden');
+                document.querySelector('.location-btn').classList.add('hidden'); // Cache bouton "Changer ville"
+            }
+
             document.getElementById('val-desc').innerText = p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
-            document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
-            document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            const h = document.getElementById('watering-history');
-            const btn = document.getElementById('btn-water-main');
-            const todayStr = new Date().toLocaleDateString('fr-FR');
-            let hasWateredToday = false;
-            if (p.Historique_Data && p.Historique_Data !== "-") {
-                const rawDates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
-                const uniqueDates = [...new Set(rawDates.map(d => d.trim()))];
-                if (uniqueDates.includes(todayStr)) hasWateredToday = true;
-                h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+            
+            if(isOwner) {
+                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
             }
-            if (hasWateredToday && !undoTimer) {
-                btn.innerText = "✅ Arrosé aujourd'hui";
-                btn.className = "btn-eonia btn-disabled";
-                btn.onclick = null;
-            } else if (!undoTimer) {
-                btn.innerText = "💦 Marquer comme arrosé";
-                btn.className = "btn-eonia btn-water-theme";
-                btn.onclick = handleWateringAction;
+
+            // Historique d'arrosage (visible par tous en lecture seule)
+            const h = document.getElementById('watering-history');
+            if (p.Historique_Data && p.Historique_Data !== "-") {
+                const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
+                h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+                
+                if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
+                    const btn = document.getElementById('btn-water-main');
+                    btn.innerText = "✅ Arrosé aujourd'hui"; btn.className = "btn-eonia btn-disabled"; btn.onclick = null;
+                }
             }
             updateExtraFeatures();
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
             document.getElementById('catalog-desc-area').classList.remove('hidden');
-            document.querySelectorAll('#owner-area, #owner-area-2').forEach(el => el.classList.add('hidden'));
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
         const fds = [
             {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
-            {l:"Taille maturité", v:p["Taille à maturité"] || p["Taille_maturite"]},
+            {l:"Taille maturité", v:p["Taille à maturité"]},
             {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
             {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+    }
+
+    function sharePlant() {
+        if (navigator.share) {
+            navigator.share({ title: document.getElementById('p-titre').innerText, url: window.location.href });
+        } else { alert("Lien à copier : " + window.location.href); }
     }
 
     function handleWateringAction() {
@@ -264,7 +259,6 @@
     }
 
     async function confirmWatering() {
-        const userPin = localStorage.getItem('user_pin');
         try {
             await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) });
             fetchUpdate();
@@ -273,8 +267,7 @@
 
     function toggleAcc(id) {
         const content = document.getElementById(id);
-        const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
-        content.style.maxHeight = isOpen ? "0px" : content.scrollHeight + "px";
+        content.style.maxHeight = (content.style.maxHeight && content.style.maxHeight !== "0px") ? "0px" : content.scrollHeight + "px";
     }
 
     function updateExtraFeatures() {
@@ -288,7 +281,7 @@
         document.getElementById('expert-text').innerText = tips[m];
     }
 
-    function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
+    function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
     init();
 </script>
 </body>
