@@ -51,14 +51,10 @@
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
-        /* Journal & Photo Design */
-        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
-        #plant-date::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
         .evo-scroll::-webkit-scrollbar { display: none; }
         .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
 
-        /* Toggle Public/Privé */
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -67,6 +63,8 @@
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
     </style>
 </head>
 <body>
@@ -129,8 +127,8 @@
                 <div class="section-title">PHOTOS D'ÉVOLUTION</div>
                 <div id="evo-gallery" class="evo-scroll"></div>
                 <div id="upload-zone" class="hidden">
-                  <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Prendre une photo en direct</button>
+                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo</button>
                 </div>
             </div>
 
@@ -241,22 +239,16 @@
                 document.getElementById('watering-card').classList.add('hidden');
                 document.querySelector('.location-btn').classList.add('hidden');
                 document.getElementById('upload-zone').classList.add('hidden');
-                
-                if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
-                    document.getElementById('journal-owner-view').classList.add('hidden');
-                    document.getElementById('journal-visitor-view').classList.remove('hidden');
-                    document.getElementById('visitor-journal-content').innerHTML = `
-                        <div style="font-size:0.8rem; color:#888; margin-bottom:8px;">Plantée le : <span style="color:#fff">${p.Date_Plantation || '-'}</span></div>
-                        <div style="font-size:0.85rem; color:#ddd; font-style:italic; line-height:1.6;">"${p.Note_Privee || 'Pas d\'observation.'}"</div>
-                    `;
-                } else {
-                    document.getElementById('journal-card').classList.add('hidden');
-                }
             }
 
             const gallery = document.getElementById('evo-gallery');
             if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
-                gallery.innerHTML = p.Photos_Evolution.map(img => `<img src="${img}">`).join('');
+                gallery.innerHTML = p.Photos_Evolution.map(imgUrl => `
+                    <div style="position:relative; flex-shrink:0;">
+                        <img src="${imgUrl}">
+                        ${isOwner ? `<div onclick="deletePhoto('${imgUrl}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; font-weight:bold;">×</div>` : ''}
+                    </div>
+                `).join('');
             } else {
                 gallery.innerHTML = `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
             }
@@ -293,41 +285,62 @@
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    // --- NOUVELLE FONCTION UPLOAD R2 ---
+    // COMPRESSION ET ENVOI
     async function uploadPhoto(input) {
         if (!input.files || !input.files[0]) return;
         const file = input.files[0];
-        const formData = new FormData();
-        
-        formData.append('file', file);
-        formData.append('action', 'upload_photo_binaire');
-        formData.append('plantId', rawPlantId);
-        formData.append('email', userEmail);
-        formData.append('pin', userPin);
-
         const btn = document.querySelector("#upload-zone button");
         const oldText = btn.innerText;
-        btn.innerText = "⏳ Envoi...";
+        btn.innerText = "⏳ Optimisation...";
         btn.disabled = true;
 
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: formData 
-            });
+            const compressedFile = await compressImage(file, 1200); 
+            btn.innerText = "🚀 Envoi...";
+            const formData = new FormData();
+            formData.append('file', compressedFile);
+            formData.append('action', 'upload_photo_binaire');
+            formData.append('plantId', rawPlantId);
+            formData.append('email', userEmail);
+            formData.append('pin', userPin);
 
-            if (response.ok) {
-                alert("Photo ajoutée !");
-                fetchUpdate();
-            } else {
-                alert("Erreur lors de l'envoi");
-            }
-        } catch (err) {
-            alert("Erreur réseau");
-        } finally {
+            const response = await fetch(API_URL, { method: 'POST', body: formData });
+            if (response.ok) { fetchUpdate(); } else { alert("Erreur d'envoi"); }
+        } catch (err) { alert("Erreur réseau"); } finally {
             btn.innerText = oldText;
             btn.disabled = false;
         }
+    }
+
+    function compressImage(file, maxWidth) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    if (width > maxWidth) { height = (maxWidth / width) * height; width = maxWidth; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => { resolve(new File([blob], file.name, { type: 'image/jpeg' })); }, 'image/jpeg', 0.8);
+                };
+            };
+        });
+    }
+
+    async function deletePhoto(photoUrl) {
+        if (!confirm("Supprimer cette photo ?")) return;
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl: photoUrl })
+            });
+            if (res.ok) fetchUpdate();
+        } catch (e) { alert("Erreur suppression"); }
     }
 
     async function saveJournal() {
