@@ -6,7 +6,7 @@
     <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; --error: #f87171; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
@@ -41,6 +41,8 @@
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; margin-top: 10px; }
         .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
+        .btn-undo-theme { border-color: var(--error); color: var(--error); }
+        .btn-disabled { border-color: #333; color: #555; cursor: not-allowed; opacity: 0.6; }
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
@@ -83,7 +85,7 @@
 
             <div class="maintenance-card" id="watering-card">
                 <div class="section-title">ENTRETIEN</div>
-                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="recordWatering()">💦 Marquer comme arrosé</button>
+                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
                 <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
             </div>
         </div>
@@ -146,6 +148,8 @@
     const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
     const cacheKey = `eonia_cache_${userEmail}`;
+    
+    let undoTimer = null;
 
     async function init() {
         if (!rawPlantId) return;
@@ -177,21 +181,13 @@
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
-        // GESTION MÉTÉO SANS "AUJOURD'HUI"
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
-            
             let rawAdvice = p.Alertes[0].split('|')[0];
             let cleanAdvice = rawAdvice.replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            
-            if (cleanAdvice.length < 2) {
-                adviceBox.innerText = "Conditions optimales pour votre plante.";
-            } else {
-                adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
-            }
-
+            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Analyse des conditions...";
             container.innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
@@ -209,35 +205,73 @@
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
-
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
             document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
             
+            // LOGIQUE HISTORIQUE NETTOYÉ (Sans doublons du même jour)
             const h = document.getElementById('watering-history');
+            const btn = document.getElementById('btn-water-main');
+            const todayStr = new Date().toLocaleDateString('fr-FR');
+            let hasWateredToday = false;
+
             if (p.Historique_Data && p.Historique_Data !== "-") {
-                const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
-                h.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+                const rawDates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
+                // Supprimer les doublons consécutifs du même jour pour l'affichage
+                const uniqueDates = [...new Set(rawDates.map(d => d.trim()))];
+                if (uniqueDates.includes(todayStr)) hasWateredToday = true;
+                h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+            }
+
+            // Bloquer le bouton si déjà fait aujourd'hui
+            if (hasWateredToday && !undoTimer) {
+                btn.innerText = "✅ Arrosé aujourd'hui";
+                btn.className = "btn-eonia btn-disabled";
+                btn.onclick = null;
+            } else if (!undoTimer) {
+                btn.innerText = "💦 Marquer comme arrosé";
+                btn.className = "btn-eonia btn-water-theme";
+                btn.onclick = handleWateringAction;
             }
             updateExtraFeatures();
-        } else {
-            document.getElementById('catalog-area').classList.remove('hidden');
-            document.querySelectorAll('#owner-area, #owner-area-2').forEach(el => el.classList.add('hidden'));
-            document.getElementById('catalog-desc-area').classList.remove('hidden');
-            document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
-        // GRILLE TECHNIQUE AVEC TRAITS VERTS (HIGHLIGHT)
         const fds = [
-            {l:"Famille", v:p.Famille, h:true}, 
-            {l:"Type", v:p.Type, h:true},
+            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
             {l:"Taille maturité", v:p["Taille à maturité"] || p["Taille_maturite"]},
-            {l:"Difficulté", v:p.Difficulté}, 
-            {l:"Arrosage", v:p.Arrosage}, 
-            {l:"Exposition", v:p.Exposition}, 
-            {l:"Rusticité", v:p.Rusticité}
+            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+    }
+
+    function handleWateringAction() {
+        const btn = document.getElementById('btn-water-main');
+        if (undoTimer) {
+            clearTimeout(undoTimer);
+            undoTimer = null;
+            btn.innerText = "💦 Marquer comme arrosé";
+            btn.className = "btn-eonia btn-water-theme";
+        } else {
+            btn.innerText = "↩️ Annuler l'arrosage";
+            btn.className = "btn-eonia btn-undo-theme";
+            undoTimer = setTimeout(() => {
+                confirmWatering();
+                undoTimer = null;
+            }, 5000);
+        }
+    }
+
+    async function confirmWatering() {
+        const userPin = localStorage.getItem('user_pin');
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })
+            });
+            fetchUpdate();
+        } catch (e) { console.error(e); }
     }
 
     function toggleAcc(id) {
