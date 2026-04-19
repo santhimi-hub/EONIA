@@ -48,15 +48,17 @@
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
-
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
-        /* Journal Design */
+        /* Journal & Photo Design */
         #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
         #plant-date::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
+        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        .evo-scroll::-webkit-scrollbar { display: none; }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
 
-        /* Toggle Switch Design */
+        /* Toggle Public/Privé */
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -65,8 +67,6 @@
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -127,8 +127,10 @@
 
             <div class="maintenance-card" id="gallery-area">
                 <div class="section-title">PHOTOS D'ÉVOLUTION</div>
-                <div id="evo-gallery" class="evo-scroll" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px;">
-                    <div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution pour le moment.</div>
+                <div id="evo-gallery" class="evo-scroll"></div>
+                <div id="upload-zone" class="hidden">
+                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo d'évolution</button>
                 </div>
             </div>
 
@@ -228,19 +230,21 @@
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
 
-            // GESTION VISITEUR VS PROPRIO
+            // GESTION PROPRIO VS VISITEUR
             if (isOwner) {
                 document.getElementById('journal-owner-view').classList.remove('hidden');
                 document.getElementById('journal-visitor-view').classList.add('hidden');
+                document.getElementById('upload-zone').classList.remove('hidden');
                 document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
                 document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-                document.getElementById('journal-public-toggle').checked = p.Journal_Public === true || p.Journal_Public === "TRUE";
+                document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
                 document.querySelector('.location-btn').classList.add('hidden');
-                document.getElementById('journal-owner-view').classList.add('hidden');
+                document.getElementById('upload-zone').classList.add('hidden');
                 
                 if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
+                    document.getElementById('journal-owner-view').classList.add('hidden');
                     document.getElementById('journal-visitor-view').classList.remove('hidden');
                     document.getElementById('visitor-journal-content').innerHTML = `
                         <div style="font-size:0.8rem; color:#888; margin-bottom:8px;">Plantée le : <span style="color:#fff">${p.Date_Plantation || '-'}</span></div>
@@ -255,6 +259,8 @@
             const gallery = document.getElementById('evo-gallery');
             if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
                 gallery.innerHTML = p.Photos_Evolution.map(img => `<img src="${img}">`).join('');
+            } else {
+                gallery.innerHTML = `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
             }
 
             document.getElementById('val-desc').innerText = p.Description || "-";
@@ -290,10 +296,27 @@
     }
 
     function sharePlant() {
-        const shareUrl = window.location.href.split('&')[0]; 
+        const url = new URL(window.location.href);
+        const cleanUrl = `${url.origin}${url.pathname}?id=${rawPlantId}`;
         if (navigator.share) {
-            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: shareUrl });
-        } else { window.prompt("Lien à copier :", shareUrl); }
+            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: cleanUrl });
+        } else { window.prompt("Lien à copier :", cleanUrl); }
+    }
+
+    async function uploadPhoto(input) {
+        if (!input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64 = e.target.result;
+            try {
+                await fetch(API_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'add_photo', photo_data: base64 })
+                });
+                fetchUpdate();
+            } catch (err) { alert("Erreur d'envoi"); }
+        };
+        reader.readAsDataURL(input.files[0]);
     }
 
     async function saveJournal() {
@@ -306,7 +329,25 @@
             });
             document.getElementById('btn-save-note').style.display = "none";
             fetchUpdate();
-        } catch (e) { alert("Erreur"); }
+        } catch (e) { alert("Erreur sauvegarde"); }
+    }
+
+    function handleWateringAction() {
+        const btn = document.getElementById('btn-water-main');
+        if (undoTimer) {
+            clearTimeout(undoTimer); undoTimer = null;
+            btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme";
+        } else {
+            btn.innerText = "↩️ Annuler l'arrosage"; btn.className = "btn-eonia btn-undo-theme";
+            undoTimer = setTimeout(() => { confirmWatering(); undoTimer = null; }, 5000);
+        }
+    }
+
+    async function confirmWatering() {
+        try {
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) });
+            fetchUpdate();
+        } catch (e) { console.error(e); }
     }
 
     function toggleAcc(id) {
