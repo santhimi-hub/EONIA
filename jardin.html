@@ -39,6 +39,15 @@
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
+        /* NOUVEAUX STYLES CYCLE & EXPERT */
+        .cycle-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .progress-bg { background: #1a1a1a; height: 6px; border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 1.5s ease-in-out; }
+        
+        .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+        
+        .share-section { text-align: center; margin-bottom: 40px; }
+
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
@@ -77,20 +86,26 @@
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
 
+        <div id="cycle-area" class="cycle-box hidden">
+            <div class="section-title">Cycle de Vie Annuel</div>
+            <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #666;">
+                <span id="cycle-label">Chargement...</span>
+                <span id="cycle-pct">0%</span>
+            </div>
+        </div>
+
         <div id="owner-area" class="hidden">
             <div class="maintenance-card">
                 <div class="section-title">ENTRETIEN</div>
                 <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="recordWatering()">💦 Marquer comme arrosé</button>
                 <div id="watering-history" class="history-list"></div>
             </div>
-            <div class="maintenance-card">
-                <div class="section-title">JOURNAL DE BORD</div>
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
-                <input type="date" id="plant-date" oninput="showSave()">
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Notes privées</label>
-                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
-            </div>
+        </div>
+
+        <div id="expert-area" class="expert-card hidden">
+            <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
+            <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
         </div>
 
         <div class="info-grid" id="p-grid"></div>
@@ -100,8 +115,23 @@
             <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
 
+        <div class="share-section">
+            <button class="location-btn" style="width:100%; padding: 15px;" onclick="sharePlant()">✨ Partager cette merveille</button>
+        </div>
+
         <div id="catalog-area" class="hidden">
             <button class="btn-order" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque ÉONIA</button>
+        </div>
+
+        <div id="journal-area" class="hidden">
+             <div class="maintenance-card">
+                <div class="section-title">JOURNAL DE BORD</div>
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
+                <input type="date" id="plant-date" oninput="showSave()">
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Notes privées</label>
+                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+            </div>
         </div>
     </div>
 
@@ -115,50 +145,36 @@
 
     async function init() {
         if (!rawPlantId) return;
-
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             const plants = JSON.parse(cachedData);
             const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p); 
         }
-
         const manualCity = localStorage.getItem('user_city');
-        if (manualCity) {
-            fetchUpdate(null, null, manualCity);
-        } else {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => fetchUpdate(pos.coords.latitude, pos.coords.longitude),
-                () => fetchUpdate(null, null),
-                { timeout: 3000 }
-            );
-        }
+        if (manualCity) fetchUpdate(null, null, manualCity);
+        else navigator.geolocation.getCurrentPosition(
+            (pos) => fetchUpdate(pos.coords.latitude, pos.coords.longitude),
+            () => fetchUpdate(null, null), { timeout: 3000 }
+        );
     }
 
     function changeLocation() {
         const newCity = prompt("Votre ville ou code postal :");
-        if (newCity) {
-            localStorage.setItem('user_city', newCity);
-            fetchUpdate(null, null, newCity);
-        }
+        if (newCity) { localStorage.setItem('user_city', newCity); fetchUpdate(null, null, newCity); }
     }
 
     async function fetchUpdate(lat, lon, city = null) {
         try {
             const userPin = localStorage.getItem('user_pin');
             const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon, city }) 
             });
             const data = await res.json();
             localStorage.setItem(cacheKey, JSON.stringify(data));
-
             const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
-            if (p) {
-                render(p);
-                document.getElementById('display-city').innerText = "📍 " + (city || "Position détectée");
-            }
+            if (p) { render(p); document.getElementById('display-city').innerText = "📍 " + (city || "Position détectée"); }
         } catch (e) { console.error("Erreur MAJ:", e); }
     }
 
@@ -186,14 +202,17 @@
 
             const cTemp = parseInt(p.Alertes[0].split('|')[2]);
             const cRain = p.Alertes[0].includes('🌧️') || p.Alertes[0].includes('🌦️');
-            if (cRain) adviceBox.innerText = "🌧️ Pluie prévue : laissez la nature arroser.";
+            if (cRain) adviceBox.innerText = "🌧️ Pluie prévue : la nature s'occupe de l'arrosage.";
             else if (cTemp > 25) adviceBox.innerText = "☀️ Chaleur : arrosez au pied ce soir.";
             else if (cTemp < 5) adviceBox.innerText = "❄️ Frais : surveillez le risque de gel.";
-            else adviceBox.innerText = "🌿 Conditions stables : vérifiez l'humidité du sol.";
+            else adviceBox.innerText = "🌿 Conditions idéales : vérifiez l'humidité du sol.";
         }
 
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('journal-area').classList.remove('hidden');
+            document.getElementById('cycle-area').classList.remove('hidden');
+            document.getElementById('expert-area').classList.remove('hidden');
             document.getElementById('catalog-area').classList.add('hidden');
             document.getElementById('plant-note').value = (p.Note_Privee && p.Note_Privee !== "-") ? p.Note_Privee : "";
             document.getElementById('plant-date').value = (p.Date_Plantation && p.Date_Plantation !== "-") ? p.Date_Plantation : "";
@@ -202,9 +221,13 @@
                 const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
                 h.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
             }
+            updateExtraFeatures(p);
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
             document.getElementById('owner-area').classList.add('hidden');
+            document.getElementById('journal-area').classList.add('hidden');
+            document.getElementById('cycle-area').classList.add('hidden');
+            document.getElementById('expert-area').classList.add('hidden');
         }
 
         const fds = [
@@ -220,23 +243,59 @@
             </div>`).join('');
     }
 
+    function updateExtraFeatures(p) {
+        const now = new Date();
+        const m = now.getMonth();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const day = Math.floor(diff / oneDay);
+        const pct = Math.round((day / 365) * 100);
+
+        document.getElementById('cycle-fill').style.width = pct + "%";
+        document.getElementById('cycle-pct').innerText = pct + "%";
+        
+        const labels = ["Repos hivernal ❄️", "Repos hivernal ❄️", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison & Force 🌸", "Stabilité estivale ☀️", "Maturation ☀️", "Préparation au repos 🍂", "Couleurs d'automne 🍂", "Entrée en dormance ❄️", "Repos hivernal ❄️"];
+        document.getElementById('cycle-label').innerText = labels[m];
+
+        const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        document.getElementById('expert-month').innerText = months[m];
+
+        const tips = [
+            "Protégez les racines avec un paillage épais si le gel persiste.",
+            "Inspectez les rameaux et supprimez le bois mort délicatement.",
+            "C'est le réveil ! Un apport d'engrais organique sera très apprécié.",
+            "Surveillez les pucerons qui adorent les jeunes pousses tendres.",
+            "Pensez à biner la terre pour casser la croûte et laisser respirer le sol.",
+            "Arrosez généreusement le soir si les températures grimpent vite.",
+            "Maintenez une humidité constante au pied, sans noyer les racines.",
+            "Récoltez les graines ou taillez les fleurs fanées pour stimuler la plante.",
+            "Ralentissez les apports en eau, la sève redescend doucement.",
+            "Installez les protections hivernales pour les plantes les plus fragiles.",
+            "Laissez les feuilles mortes au sol, elles forment un engrais naturel.",
+            "Évitez toute taille importante, la plante est maintenant en sommeil."
+        ];
+        document.getElementById('expert-text').innerText = tips[m];
+    }
+
+    function sharePlant() {
+        const t = document.getElementById('p-titre').innerText;
+        if (navigator.share) navigator.share({ title: 'ÉONIA', text: `Regarde mon ${t} !`, url: window.location.href });
+        else alert("Lien : " + window.location.href);
+    }
+
     async function recordWatering() {
-        const btn = document.getElementById('btn-water-main');
-        btn.innerText = "⏳ ...";
+        const btn = document.getElementById('btn-water-main'); btn.innerText = "⏳ ...";
         await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'record_watering', plantId: rawPlantId }) });
-        fetchUpdate(); 
-        btn.innerText = "💦 Marquer comme arrosé";
+        fetchUpdate(); btn.innerText = "💦 Marquer comme arrosé";
     }
 
     async function saveJournal() {
-        const btn = document.getElementById('btn-save-note');
-        btn.innerText = "⏳ ...";
+        const btn = document.getElementById('btn-save-note'); btn.innerText = "⏳ ...";
         const date = document.getElementById('plant-date').value;
         const note = document.getElementById('plant-note').value;
         await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'update_prive', plantId: rawPlantId, date, note }) });
-        fetchUpdate();
-        btn.style.display = "none";
-        btn.innerText = "💾 Enregistrer les notes";
+        fetchUpdate(); btn.style.display = "none"; btn.innerText = "💾 Enregistrer les notes";
     }
 
     function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
