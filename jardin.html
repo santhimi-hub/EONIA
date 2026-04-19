@@ -51,14 +51,11 @@
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
-        /* Journal & Photo Design */
         #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
         #plant-date::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .evo-scroll::-webkit-scrollbar { display: none; }
         .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
 
-        /* Toggle Public/Privé */
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
@@ -211,9 +208,17 @@
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
+        // Remplissage des accordéons (Guide Expert)
+        document.getElementById('val-desc').innerText = p.Description || "-";
+        document.getElementById('val-flore').innerText = p.Floraison || "-";
+        document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || p.Sol || "-";
+        document.getElementById('val-health').innerText = p["Protection et santé"] || p.Protection || "-";
+        document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || p.Associations || "-";
+
         const savedCity = localStorage.getItem('user_city');
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
+        // Météo
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
@@ -230,10 +235,8 @@
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
 
-            // GESTION PROPRIO VS VISITEUR
             if (isOwner) {
                 document.getElementById('journal-owner-view').classList.remove('hidden');
-                document.getElementById('journal-visitor-view').classList.add('hidden');
                 document.getElementById('upload-zone').classList.remove('hidden');
                 document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
                 document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
@@ -241,8 +244,6 @@
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
                 document.querySelector('.location-btn').classList.add('hidden');
-                document.getElementById('upload-zone').classList.add('hidden');
-                
                 if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
                     document.getElementById('journal-owner-view').classList.add('hidden');
                     document.getElementById('journal-visitor-view').classList.remove('hidden');
@@ -250,24 +251,13 @@
                         <div style="font-size:0.8rem; color:#888; margin-bottom:8px;">Plantée le : <span style="color:#fff">${p.Date_Plantation || '-'}</span></div>
                         <div style="font-size:0.85rem; color:#ddd; font-style:italic; line-height:1.6;">"${p.Note_Privee || 'Pas d\'observation.'}"</div>
                     `;
-                } else {
-                    document.getElementById('journal-card').classList.add('hidden');
-                }
+                } else { document.getElementById('journal-card').classList.add('hidden'); }
             }
 
-            // Galerie d'évolution
             const gallery = document.getElementById('evo-gallery');
             if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
                 gallery.innerHTML = p.Photos_Evolution.map(img => `<img src="${img}">`).join('');
-            } else {
-                gallery.innerHTML = `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
-            }
-
-            document.getElementById('val-desc').innerText = p.Description || "-";
-            document.getElementById('val-flore').innerText = p.Floraison || "-";
-            document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
-            document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
-            document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
+            } else { gallery.innerHTML = `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`; }
 
             const h = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
@@ -285,12 +275,16 @@
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
+        // Grille technique (Taille à maturité corrigée)
         const fds = [
-            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+            {l:"Famille", v:p.Famille, h:true}, 
+            {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
-            {l:"Taille maturité", v:p["Taille à maturité"]},
-            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
-            {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
+            {l:"Taille maturité", v:p["Taille à maturité"] || p["Taille maturité"]},
+            {l:"Difficulté", v:p.Difficulté}, 
+            {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, 
+            {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
