@@ -129,8 +129,8 @@
                 <div class="section-title">PHOTOS D'ÉVOLUTION</div>
                 <div id="evo-gallery" class="evo-scroll"></div>
                 <div id="upload-zone" class="hidden">
-                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo d'évolution</button>
+                    <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="uploadPhoto(this)">
+                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Prendre une photo en direct</button>
                 </div>
             </div>
 
@@ -230,7 +230,6 @@
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
 
-            // GESTION PROPRIO VS VISITEUR
             if (isOwner) {
                 document.getElementById('journal-owner-view').classList.remove('hidden');
                 document.getElementById('journal-visitor-view').classList.add('hidden');
@@ -255,7 +254,6 @@
                 }
             }
 
-            // Galerie d'évolution
             const gallery = document.getElementById('evo-gallery');
             if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
                 gallery.innerHTML = p.Photos_Evolution.map(img => `<img src="${img}">`).join('');
@@ -295,28 +293,41 @@
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    function sharePlant() {
-        const url = new URL(window.location.href);
-        const cleanUrl = `${url.origin}${url.pathname}?id=${rawPlantId}`;
-        if (navigator.share) {
-            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: cleanUrl });
-        } else { window.prompt("Lien à copier :", cleanUrl); }
-    }
-
+    // --- NOUVELLE FONCTION UPLOAD R2 ---
     async function uploadPhoto(input) {
         if (!input.files || !input.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const base64 = e.target.result;
-            try {
-                await fetch(API_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'add_photo', photo_data: base64 })
-                });
+        const file = input.files[0];
+        const formData = new FormData();
+        
+        formData.append('file', file);
+        formData.append('action', 'upload_photo_binaire');
+        formData.append('plantId', rawPlantId);
+        formData.append('email', userEmail);
+        formData.append('pin', userPin);
+
+        const btn = document.querySelector("#upload-zone button");
+        const oldText = btn.innerText;
+        btn.innerText = "⏳ Envoi...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: formData 
+            });
+
+            if (response.ok) {
+                alert("Photo ajoutée !");
                 fetchUpdate();
-            } catch (err) { alert("Erreur d'envoi"); }
-        };
-        reader.readAsDataURL(input.files[0]);
+            } else {
+                alert("Erreur lors de l'envoi");
+            }
+        } catch (err) {
+            alert("Erreur réseau");
+        } finally {
+            btn.innerText = oldText;
+            btn.disabled = false;
+        }
     }
 
     async function saveJournal() {
@@ -367,6 +378,13 @@
     }
 
     function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
+    function sharePlant() {
+        const url = new URL(window.location.href);
+        const cleanUrl = `${url.origin}${url.pathname}?id=${rawPlantId}`;
+        if (navigator.share) {
+            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: cleanUrl });
+        } else { window.prompt("Lien à copier :", cleanUrl); }
+    }
     init();
 </script>
 </body>
