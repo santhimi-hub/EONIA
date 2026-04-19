@@ -186,9 +186,17 @@
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
+            
             let rawAdvice = p.Alertes[0].split('|')[0];
+            // Correction spécifique affichage conseil :
             let cleanAdvice = rawAdvice.replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Analyse des conditions...";
+            
+            if (cleanAdvice) {
+                adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
+            } else {
+                adviceBox.innerText = "Conditions optimales pour votre plante.";
+            }
+
             container.innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
