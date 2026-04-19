@@ -10,39 +10,51 @@
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        
-        /* BOUTONS & ACCORDÉONS */
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
+        
+        #weather-wrapper { margin-bottom: 25px; }
+        .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
+        #display-city { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
         .location-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: #aaa; font-size: 0.6rem; padding: 5px 12px; border-radius: 20px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         
-        .accordion-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: rgba(255,255,255,0.01); }
-        .acc-inner { padding: 20px; line-height: 1.8; color: #aaa; font-size: 0.9rem; }
-        .arrow { transition: 0.3s; font-size: 0.6rem; }
-
-        /* MÉTÉO */
-        .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
-        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
-        #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.7rem; color: var(--accent); text-align: center; margin-bottom: 25px; }
-
-        /* GRILLE TECHNIQUE AVEC LA LIGNE VERTE À GAUCHE (HIGHLIGHT) */
+        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 80px; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+        .w-day { font-size: 0.55rem; color: #666; font-weight: bold; letter-spacing: 1px; }
+        .w-icon { font-size: 1.5rem; }
+        .w-temp { font-size: 0.8rem; }
+        
+        #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
+        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        
+        .cycle-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .progress-bg { background: #1a1a1a; height: 6px; border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 1.5s ease-in-out; }
+        .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+        
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
+        .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
+        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .info-box .value { font-size: 0.85rem; color: #fff; }
         
-        /* C'EST ICI : La ligne verte sur le côté gauche */
-        .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); padding-left: 12px; }
-        
-        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; }
-        .value { font-size: 0.85rem; margin-top: 5px; color: #fff; }
-
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
-        
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; }
-        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .progress-bg { background: #1a1a1a; height: 6px; border-radius: 10px; margin: 12px 0; overflow: hidden; }
-        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: 1.5s; }
+        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; margin-top: 10px; }
+        .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
+        .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px; }
+        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
+        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; font-size: 0.85rem; }
+        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
+
+        /* STYLES ACCORDÉONS EXPERTS */
+        .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
+        .acc-inner { padding: 10px 0 20px 0; }
+
+        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .evo-box { min-width: 120px; height: 120px; background: #080808; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #333; position: relative; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -51,92 +63,119 @@
         
         <div id="weather-wrapper" class="hidden">
             <div class="weather-header">
-                <span id="display-city" style="font-size: 0.6rem; color: #666; text-transform: uppercase;">📍 Recherche...</span>
+                <span id="display-city">📍 Recherche...</span>
                 <button class="location-btn" onclick="changeLocation()">Changer de ville</button>
             </div>
             <div id="weather-container"></div>
-            <div id="weather-advice">Analyse...</div>
+            <div id="weather-advice">Analyse des conditions...</div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
         <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
-        <div id="p-sci" style="color:var(--accent); font-style:italic; margin-bottom:20px; opacity:0.7;"></div>
-
-        <div class="info-grid" id="p-grid"></div>
+        <div id="p-sci" class="sci-name"></div>
 
         <div id="owner-area" class="hidden">
-            <div class="maintenance-card" style="padding:0; overflow:hidden; margin-bottom:40px;">
-                <button class="accordion-btn" onclick="toggleAccordion('acc-desc')"><span>📖 Description & Histoire</span><span class="arrow">▼</span></button>
-                <div id="acc-desc" class="accordion-content"><div id="p-desc" class="acc-inner"></div></div>
-
-                <button class="accordion-btn" onclick="toggleAccordion('acc-flore')"><span>🌸 Floraison</span><span class="arrow">▼</span></button>
-                <div id="acc-flore" class="accordion-content"><div id="p-flore" class="acc-inner"></div></div>
-
-                <button class="accordion-btn" onclick="toggleAccordion('acc-sol')"><span>🌱 Sol & Fertilisation</span><span class="arrow">▼</span></button>
-                <div id="acc-sol" class="accordion-content"><div id="p-sol" class="acc-inner"></div></div>
-
-                <button class="accordion-btn" onclick="toggleAccordion('acc-health')"><span>🛡️ Protection & Santé</span><span class="arrow">▼</span></button>
-                <div id="acc-health" class="accordion-content"><div id="p-health" class="acc-inner"></div></div>
-
-                <button class="accordion-btn" onclick="toggleAccordion('acc-asso')"><span>🤝 Plantes associées</span><span class="arrow">▼</span></button>
-                <div id="acc-asso" class="accordion-content"><div id="p-asso" class="acc-inner"></div></div>
-            </div>
-
-            <div class="section-title" style="text-align: center; margin-bottom: 20px;">— VOTRE ESPACE PERSONNEL —</div>
-            
-            <div class="maintenance-card">
+            <div id="cycle-area" class="cycle-box">
                 <div class="section-title">Cycle de Vie Annuel</div>
                 <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
                 <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #666;">
-                    <span id="cycle-label">Chargement...</span><span id="cycle-pct">0%</span>
+                    <span id="cycle-label">Chargement...</span>
+                    <span id="cycle-pct">0%</span>
                 </div>
             </div>
 
-            <div class="maintenance-card">
+            <div class="maintenance-card" id="watering-card">
                 <div class="section-title">ENTRETIEN</div>
-                <button class="btn-eonia" style="color:var(--water); border-color:var(--water);" id="btn-water-main" onclick="recordWatering()">💦 Marquer comme arrosé</button>
+                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="recordWatering()">💦 Marquer comme arrosé</button>
                 <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
             </div>
 
+            <div class="maintenance-card" id="expert-menus">
+                <div class="section-title">GUIDE EXPERT</div>
+                
+                <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>Floraison</span><span>+</span></button>
+                <div id="acc-flore" class="acc-content"><div class="acc-inner" id="val-flore"></div></div>
+
+                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Fertilisation</span><span>+</span></button>
+                <div id="acc-sol" class="acc-content"><div class="acc-inner" id="val-sol"></div></div>
+
+                <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>Protection & Santé</span><span>+</span></button>
+                <div id="acc-health" class="acc-content"><div class="acc-inner" id="val-health"></div></div>
+
+                <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
+                <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
+            </div>
+
             <div class="maintenance-card">
+                <div class="section-title">Album Évolution</div>
+                <div class="evo-scroll" id="evo-gallery">
+                    <div class="evo-box" id="add-photo-btn">+</div>
+                </div>
+            </div>
+
+            <div id="expert-area" class="expert-card">
+                <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
+                <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
+            </div>
+
+            <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" id="share-btn" onclick="sharePlant()">✨ Partager ma plante</button>
+
+            <div class="maintenance-card" id="journal-card">
                 <div class="section-title">JOURNAL DE BORD</div>
-                <label style="font-size: 0.55rem; color: #555;">DATE DE PLANTATION</label>
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
                 <input type="date" id="plant-date" oninput="showSave()">
-                <label style="font-size: 0.55rem; color: #555; margin-top: 15px; display: block;">OBSERVATIONS</label>
-                <textarea id="plant-note" rows="3" oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-eonia" style="display:none; color:var(--accent); border-color:var(--accent);" onclick="saveJournal()">💾 Enregistrer</button>
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
+                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;" id="privacy-toggle">
+                    <input type="checkbox" id="is-public-note" onchange="showSave()">
+                    <label for="is-public-note" style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Rendre ce journal public</label>
+                </div>
+                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
             </div>
         </div>
 
+        <div class="info-grid" id="p-grid"></div>
+
+        <div class="desc-box">
+            <div class="section-title">DESCRIPTION</div>
+            <div id="p-desc" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+        </div>
+
         <div id="catalog-area" class="hidden">
-            <div class="maintenance-card">
-                <div class="section-title">À PROPOS</div>
-                <div id="p-desc-simple" style="line-height:1.8; color:#aaa; font-size:0.9rem;"></div>
-            </div>
-            <button onclick="window.location.href='commander.html'" style="background:var(--accent); color:#000; border:none; padding:18px; border-radius:15px; width:100%; font-weight:800; text-transform:uppercase;">🏷️ Commander ma plaque ÉONIA</button>
+            <button class="btn-order" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque ÉONIA</button>
         </div>
     </div>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const urlParams = new URLSearchParams(window.location.search);
-    const rawId = urlParams.get('id');
-    const plantIdClean = rawId ? rawId.replace(/-/g, "") : null;
+    const rawPlantId = urlParams.get('id');
+    const isGuest = urlParams.get('view') === 'guest';
+    const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
+    const cacheKey = `eonia_cache_${userEmail}`;
 
     async function init() {
-        if (!rawId) return;
-        fetchUpdate();
+        if (!rawPlantId) return;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            const plants = JSON.parse(cachedData);
+            const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
+            if (p) render(p); 
+        }
+        fetchUpdate(null, null, localStorage.getItem('user_city'));
     }
 
-    async function fetchUpdate() {
+    async function fetchUpdate(lat, lon, city = null) {
         try {
+            const userPin = localStorage.getItem('user_pin');
             const res = await fetch(API_URL, { 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: localStorage.getItem('user_pin'), plantId: rawId }) 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, lat, lon, city }) 
             });
             const data = await res.json();
-            const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawId);
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p);
         } catch (e) { console.error(e); }
     }
@@ -145,54 +184,47 @@
         document.getElementById('p-photo').src = p.Photo || '';
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        
-        // Grille technique avec highlight (la ligne verte) sur Famille et Type
-        const fields = [
-            {l:"Famille", v:p.Famille, h:true}, 
-            {l:"Type", v:p.Type, h:true}, 
-            {l:"Exposition", v:p.Exposition, h:false}, 
-            {l:"Rusticité", v:p.Rusticité, h:false}
-        ];
-        document.getElementById('p-grid').innerHTML = fields.map(f => `
-            <div class="info-box ${f.h ? 'highlight' : ''}">
-                <div class="label">${f.l}</div>
-                <div class="value">${f.v||"-"}</div>
-            </div>`).join('');
+        document.getElementById('p-desc').innerText = p.Description || "";
+
+        if (p.Alertes && p.Alertes.length > 0) {
+            document.getElementById('weather-wrapper').classList.remove('hidden');
+            const container = document.getElementById('weather-container');
+            container.innerHTML = p.Alertes.map((str, idx) => {
+                const parts = str.split('|');
+                const d = new Date(); d.setDate(new Date().getDate() + idx);
+                return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${parts[1]}</span><span class="w-temp">${parts[2]}</span></div>`;
+            }).join('');
+        }
 
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('catalog-area').classList.add('hidden');
             
-            // Données Client Expert
-            document.getElementById('p-desc').innerText = p.Description || "";
-            document.getElementById('p-flore').innerText = p.Floraison || "";
-            document.getElementById('p-sol').innerText = p["Sol et fertilisation"] || "";
-            document.getElementById('p-health').innerText = p["Protection et santé"] || "";
-            document.getElementById('p-asso').innerText = p["Campagnonnage/ Plantes associées"] || "";
-            
+            // Remplissage des menus experts
+            document.getElementById('val-flore').innerText = p.Floraison || "Information bientôt disponible.";
+            document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "Information bientôt disponible.";
+            document.getElementById('val-health').innerText = p["Protection et santé"] || "Information bientôt disponible.";
+            document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "Information bientôt disponible.";
+
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
             document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            updateCycle();
+            updateExtraFeatures();
         } else {
-            document.getElementById('owner-area').classList.add('hidden');
             document.getElementById('catalog-area').classList.remove('hidden');
-            document.getElementById('p-desc-simple').innerText = p.Description || "";
+            document.getElementById('owner-area').classList.add('hidden');
         }
+
+        const fds = [{l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},{l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}];
+        document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    function toggleAccordion(id) {
+    function toggleAcc(id) {
         const content = document.getElementById(id);
-        const arrow = event.currentTarget.querySelector('.arrow');
-        if (content.style.maxHeight && content.style.maxHeight !== "0px") {
-            content.style.maxHeight = "0px";
-            arrow.style.transform = "rotate(0deg)";
-        } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-            arrow.style.transform = "rotate(180deg)";
-        }
+        const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
+        content.style.maxHeight = isOpen ? "0px" : content.scrollHeight + "px";
     }
 
-    function updateCycle() {
+    function updateExtraFeatures() {
         const now = new Date();
         const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
         document.getElementById('cycle-fill').style.width = pct + "%";
@@ -200,7 +232,7 @@
         document.getElementById('cycle-label').innerText = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos hivernal"][now.getMonth()];
     }
 
-    function showSave() { document.getElementById('btn-save-note').style.display = "block"; }
+    function showSave() { if(!isGuest) document.getElementById('btn-save-note').style.display = "block"; }
     init();
 </script>
 </body>
