@@ -23,7 +23,7 @@
         .w-icon { font-size: 1.5rem; }
         .w-temp { font-size: 0.8rem; }
         
-        #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; }
+        #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; min-height: 20px; }
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
@@ -66,7 +66,7 @@
                 <button class="location-btn" onclick="changeLocation()">Changer de ville</button>
             </div>
             <div id="weather-container"></div>
-            <div id="weather-advice"></div>
+            <div id="weather-advice">Analyse des conditions...</div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
@@ -106,12 +106,10 @@
                 <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
                 <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
             </div>
-
             <div id="expert-area" class="expert-card">
                 <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
                 <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
-
             <div class="maintenance-card" id="journal-card">
                 <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
                 <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
@@ -120,18 +118,10 @@
                 <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
                 <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
             </div>
-
-            <div class="maintenance-card">
-                <div class="section-title">TABLEAU DE BORD - ÉVOLUTION</div>
-                <div class="evo-scroll" id="evo-gallery">
-                    <div class="evo-box" id="add-photo-btn">+</div>
-                </div>
-            </div>
-
             <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" onclick="sharePlant()">✨ Partager ma plante</button>
         </div>
 
-        <div class="maintenance-card" id="catalog-desc-area">
+        <div class="maintenance-card hidden" id="catalog-desc-area">
             <div class="section-title">DESCRIPTION</div>
             <div id="p-desc-catalog" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
@@ -148,7 +138,6 @@
     const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
     const cacheKey = `eonia_cache_${userEmail}`;
-    
     let undoTimer = null;
 
     async function init() {
@@ -197,16 +186,9 @@
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
-            
             let rawAdvice = p.Alertes[0].split('|')[0];
             let cleanAdvice = rawAdvice.replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            
-            if (cleanAdvice) {
-                adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
-            } else {
-                adviceBox.innerText = "";
-            }
-
+            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Analyse des conditions...";
             container.innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
@@ -218,7 +200,6 @@
             document.querySelectorAll('#owner-area, #owner-area-2').forEach(el => el.classList.remove('hidden'));
             document.getElementById('catalog-area').classList.add('hidden');
             document.getElementById('catalog-desc-area').classList.add('hidden');
-            
             document.getElementById('val-desc').innerText = p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
@@ -226,19 +207,16 @@
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
             document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            
             const h = document.getElementById('watering-history');
             const btn = document.getElementById('btn-water-main');
             const todayStr = new Date().toLocaleDateString('fr-FR');
             let hasWateredToday = false;
-
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const rawDates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
                 const uniqueDates = [...new Set(rawDates.map(d => d.trim()))];
                 if (uniqueDates.includes(todayStr)) hasWateredToday = true;
                 h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
             }
-
             if (hasWateredToday && !undoTimer) {
                 btn.innerText = "✅ Arrosé aujourd'hui";
                 btn.className = "btn-eonia btn-disabled";
@@ -249,6 +227,11 @@
                 btn.onclick = handleWateringAction;
             }
             updateExtraFeatures();
+        } else {
+            document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('catalog-desc-area').classList.remove('hidden');
+            document.querySelectorAll('#owner-area, #owner-area-2').forEach(el => el.classList.add('hidden'));
+            document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
         const fds = [
@@ -264,28 +247,18 @@
     function handleWateringAction() {
         const btn = document.getElementById('btn-water-main');
         if (undoTimer) {
-            clearTimeout(undoTimer);
-            undoTimer = null;
-            btn.innerText = "💦 Marquer comme arrosé";
-            btn.className = "btn-eonia btn-water-theme";
+            clearTimeout(undoTimer); undoTimer = null;
+            btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme";
         } else {
-            btn.innerText = "↩️ Annuler l'arrosage";
-            btn.className = "btn-eonia btn-undo-theme";
-            undoTimer = setTimeout(() => {
-                confirmWatering();
-                undoTimer = null;
-            }, 5000);
+            btn.innerText = "↩️ Annuler l'arrosage"; btn.className = "btn-eonia btn-undo-theme";
+            undoTimer = setTimeout(() => { confirmWatering(); undoTimer = null; }, 5000);
         }
     }
 
     async function confirmWatering() {
         const userPin = localStorage.getItem('user_pin');
         try {
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })
-            });
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) });
             fetchUpdate();
         } catch (e) { console.error(e); }
     }
@@ -297,8 +270,7 @@
     }
 
     function updateExtraFeatures() {
-        const now = new Date();
-        const m = now.getMonth();
+        const now = new Date(); const m = now.getMonth();
         const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
         document.getElementById('cycle-fill').style.width = pct + "%";
         document.getElementById('cycle-pct').innerText = pct + "%";
@@ -313,4 +285,3 @@
 </script>
 </body>
 </html>
-
