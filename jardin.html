@@ -48,8 +48,25 @@
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
+
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #666; border: 1px solid var(--border); }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+
+        /* Journal Design */
+        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
+        #plant-date::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
+
+        /* Toggle Switch Design */
+        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
+        .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -108,13 +125,33 @@
                 <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
 
+            <div class="maintenance-card" id="gallery-area">
+                <div class="section-title">PHOTOS D'ÉVOLUTION</div>
+                <div id="evo-gallery" class="evo-scroll" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px;">
+                    <div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution pour le moment.</div>
+                </div>
+            </div>
+
             <div class="maintenance-card" id="journal-card">
-                <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
-                <input type="date" id="plant-date" oninput="showSave()">
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
-                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+                <div id="journal-owner-view">
+                    <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
+                    <div class="toggle-container">
+                        <span class="toggle-label">Partager le journal (Public)</span>
+                        <label class="switch">
+                            <input type="checkbox" id="journal-public-toggle" onchange="showSave()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
+                    <input type="date" id="plant-date" oninput="showSave()">
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
+                    <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                    <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+                </div>
+                <div id="journal-visitor-view" class="hidden">
+                    <div class="section-title">HISTORIQUE DE LA PLANTE</div>
+                    <div id="visitor-journal-content"></div>
+                </div>
             </div>
             
             <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" onclick="sharePlant()">✨ Partager ma plante</button>
@@ -136,10 +173,9 @@
     const rawPlantId = urlParams.get('id');
     const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     
-    // Identification utilisateur
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
-    const isOwner = (userEmail && userPin); // Vrai seulement si l'utilisateur est connecté
+    const isOwner = (userEmail && userPin); 
     
     const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
     let undoTimer = null;
@@ -176,13 +212,11 @@
         const savedCity = localStorage.getItem('user_city');
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
-        // Météo
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
             let cleanAdvice = p.Alertes[0].split('|')[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
             adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
-            
             document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
@@ -191,15 +225,36 @@
         }
 
         if (p.est_dans_jardin) {
-            // Affichage partiel si visiteur, complet si proprio
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
-            
-            // Masquer journal et boutons d'action si pas le proprio
-            if (!isOwner) {
-                document.getElementById('journal-card').classList.add('hidden');
+
+            // GESTION VISITEUR VS PROPRIO
+            if (isOwner) {
+                document.getElementById('journal-owner-view').classList.remove('hidden');
+                document.getElementById('journal-visitor-view').classList.add('hidden');
+                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+                document.getElementById('journal-public-toggle').checked = p.Journal_Public === true || p.Journal_Public === "TRUE";
+            } else {
                 document.getElementById('watering-card').classList.add('hidden');
-                document.querySelector('.location-btn').classList.add('hidden'); // Cache bouton "Changer ville"
+                document.querySelector('.location-btn').classList.add('hidden');
+                document.getElementById('journal-owner-view').classList.add('hidden');
+                
+                if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
+                    document.getElementById('journal-visitor-view').classList.remove('hidden');
+                    document.getElementById('visitor-journal-content').innerHTML = `
+                        <div style="font-size:0.8rem; color:#888; margin-bottom:8px;">Plantée le : <span style="color:#fff">${p.Date_Plantation || '-'}</span></div>
+                        <div style="font-size:0.85rem; color:#ddd; font-style:italic; line-height:1.6;">"${p.Note_Privee || 'Pas d\'observation.'}"</div>
+                    `;
+                } else {
+                    document.getElementById('journal-card').classList.add('hidden');
+                }
+            }
+
+            // Galerie d'évolution
+            const gallery = document.getElementById('evo-gallery');
+            if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
+                gallery.innerHTML = p.Photos_Evolution.map(img => `<img src="${img}">`).join('');
             }
 
             document.getElementById('val-desc').innerText = p.Description || "-";
@@ -207,18 +262,11 @@
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
-            
-            if(isOwner) {
-                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
-                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            }
 
-            // Historique d'arrosage (visible par tous en lecture seule)
             const h = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
                 h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
-                
                 if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
                     const btn = document.getElementById('btn-water-main');
                     btn.innerText = "✅ Arrosé aujourd'hui"; btn.className = "btn-eonia btn-disabled"; btn.onclick = null;
@@ -242,27 +290,23 @@
     }
 
     function sharePlant() {
+        const shareUrl = window.location.href.split('&')[0]; 
         if (navigator.share) {
-            navigator.share({ title: document.getElementById('p-titre').innerText, url: window.location.href });
-        } else { alert("Lien à copier : " + window.location.href); }
+            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: shareUrl });
+        } else { window.prompt("Lien à copier :", shareUrl); }
     }
 
-    function handleWateringAction() {
-        const btn = document.getElementById('btn-water-main');
-        if (undoTimer) {
-            clearTimeout(undoTimer); undoTimer = null;
-            btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme";
-        } else {
-            btn.innerText = "↩️ Annuler l'arrosage"; btn.className = "btn-eonia btn-undo-theme";
-            undoTimer = setTimeout(() => { confirmWatering(); undoTimer = null; }, 5000);
-        }
-    }
-
-    async function confirmWatering() {
+    async function saveJournal() {
+        const note = document.getElementById('plant-note').value;
+        const date = document.getElementById('plant-date').value;
+        const isPublic = document.getElementById('journal-public-toggle').checked;
         try {
-            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) });
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic }) 
+            });
+            document.getElementById('btn-save-note').style.display = "none";
             fetchUpdate();
-        } catch (e) { console.error(e); }
+        } catch (e) { alert("Erreur"); }
     }
 
     function toggleAcc(id) {
