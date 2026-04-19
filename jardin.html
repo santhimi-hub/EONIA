@@ -66,7 +66,7 @@
                 <button class="location-btn" onclick="changeLocation()">Changer de ville</button>
             </div>
             <div id="weather-container"></div>
-            <div id="weather-advice">Analyse des conditions...</div>
+            <div id="weather-advice"></div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
@@ -176,18 +176,37 @@
         } catch (e) { console.error(e); }
     }
 
+    function changeLocation() {
+        const city = prompt("Entrez votre ville (ex: Périgueux) :");
+        if (city) {
+            localStorage.setItem('user_city', city);
+            document.getElementById('display-city').innerText = "📍 " + city.toUpperCase();
+            fetchUpdate(null, null, city);
+        }
+    }
+
     function render(p) {
         document.getElementById('p-photo').src = p.Photo || '';
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
+        const savedCity = localStorage.getItem('user_city');
+        if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
+
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
+            
             let rawAdvice = p.Alertes[0].split('|')[0];
             let cleanAdvice = rawAdvice.replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Analyse des conditions...";
+            
+            if (cleanAdvice) {
+                adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
+            } else {
+                adviceBox.innerText = "";
+            }
+
             container.innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
                 const d = new Date(); d.setDate(new Date().getDate() + idx);
@@ -208,7 +227,6 @@
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
             document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
             
-            // LOGIQUE HISTORIQUE NETTOYÉ (Sans doublons du même jour)
             const h = document.getElementById('watering-history');
             const btn = document.getElementById('btn-water-main');
             const todayStr = new Date().toLocaleDateString('fr-FR');
@@ -216,13 +234,11 @@
 
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const rawDates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
-                // Supprimer les doublons consécutifs du même jour pour l'affichage
                 const uniqueDates = [...new Set(rawDates.map(d => d.trim()))];
                 if (uniqueDates.includes(todayStr)) hasWateredToday = true;
                 h.innerHTML = uniqueDates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
             }
 
-            // Bloquer le bouton si déjà fait aujourd'hui
             if (hasWateredToday && !undoTimer) {
                 btn.innerText = "✅ Arrosé aujourd'hui";
                 btn.className = "btn-eonia btn-disabled";
@@ -297,3 +313,4 @@
 </script>
 </body>
 </html>
+
