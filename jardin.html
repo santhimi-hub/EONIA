@@ -176,13 +176,16 @@
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
-        // MÉTÉO FIX
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const container = document.getElementById('weather-container');
             const adviceBox = document.getElementById('weather-advice');
-            const parts = p.Alertes[0].split('|');
-            adviceBox.innerText = parts[0]; // "Aujourd'hui, les conditions sont bonnes"
+            
+            // Nettoyage de la phrase conseil (retrait de "Aujourd'hui,")
+            let cleanAdvice = p.Alertes[0].split('|')[0];
+            cleanAdvice = cleanAdvice.replace(/^Aujourd'hui,\s*/i, "");
+            // Mise en majuscule de la première lettre après le retrait
+            adviceBox.innerText = cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1);
 
             container.innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
@@ -218,7 +221,6 @@
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
-        // GRILLE TECHNIQUE
         const fds = [
             {l:"Famille", v:p.Famille}, {l:"Type", v:p.Type},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
