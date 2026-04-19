@@ -45,7 +45,6 @@
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px; }
         
-        /* ACCORDÉONS JARDIN */
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
@@ -90,9 +89,28 @@
                 <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
             </div>
 
+            <div class="maintenance-card" id="journal-card">
+                <div class="section-title">JOURNAL DE BORD</div>
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
+                <input type="date" id="plant-date" oninput="showSave()">
+                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
+                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;" id="privacy-toggle">
+                    <input type="checkbox" id="is-public-note" onchange="showSave()">
+                    <label for="is-public-note" style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Rendre ce journal public</label>
+                </div>
+                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+            </div>
+
+            <div class="maintenance-card">
+                <div class="section-title">Album Évolution</div>
+                <div class="evo-scroll" id="evo-gallery">
+                    <div class="evo-box" id="add-photo-btn">+</div>
+                </div>
+            </div>
+
             <div class="maintenance-card" id="expert-menus">
                 <div class="section-title">GUIDE EXPERT</div>
-                
                 <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
                 <div id="acc-desc" class="acc-content"><div class="acc-inner" id="val-desc"></div></div>
 
@@ -109,32 +127,12 @@
                 <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
             </div>
 
-            <div class="maintenance-card">
-                <div class="section-title">Album Évolution</div>
-                <div class="evo-scroll" id="evo-gallery">
-                    <div class="evo-box" id="add-photo-btn">+</div>
-                </div>
-            </div>
-
             <div id="expert-area" class="expert-card">
                 <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
                 <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
 
             <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" id="share-btn" onclick="sharePlant()">✨ Partager ma plante</button>
-
-            <div class="maintenance-card" id="journal-card">
-                <div class="section-title">JOURNAL DE BORD</div>
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
-                <input type="date" id="plant-date" oninput="showSave()">
-                <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
-                <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
-                <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;" id="privacy-toggle">
-                    <input type="checkbox" id="is-public-note" onchange="showSave()">
-                    <label for="is-public-note" style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Rendre ce journal public</label>
-                </div>
-                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
-            </div>
         </div>
 
         <div class="info-grid" id="p-grid"></div>
@@ -201,9 +199,8 @@
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('catalog-area').classList.add('hidden');
-            document.getElementById('catalog-desc-area').classList.add('hidden'); // Cache la description simple
+            document.getElementById('catalog-desc-area').classList.add('hidden');
             
-            // Remplit les menus déroulants
             document.getElementById('val-desc').innerText = p.Description || "Info à venir.";
             document.getElementById('val-flore').innerText = p.Floraison || "Info à venir.";
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "Info à venir.";
@@ -212,11 +209,17 @@
 
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
             document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+            
+            const h = document.getElementById('watering-history');
+            if (p.Historique_Data && p.Historique_Data !== "-") {
+                const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
+                h.innerHTML = dates.slice().reverse().slice(0, 8).map(d => `<span class="history-tag">${d}</span>`).join('');
+            }
             updateExtraFeatures();
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
             document.getElementById('owner-area').classList.add('hidden');
-            document.getElementById('catalog-desc-area').classList.remove('hidden'); // Affiche la description simple
+            document.getElementById('catalog-desc-area').classList.remove('hidden');
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
@@ -244,6 +247,27 @@
         document.getElementById('expert-month').innerText = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][now.getMonth()];
         const tips = ["Paillage épais recommandé.", "Supprimez le bois mort.", "Apport d'engrais organique.", "Surveillez les jeunes pousses.", "Binez le sol pour aérer.", "Arrosez généreusement le soir.", "Maintenez le pied humide.", "Taillez les fleurs fanées.", "Réduisez l'eau doucement.", "Installez les voiles d'hivernage.", "Laissez les feuilles au sol.", "La plante dort, ne taillez pas."];
         document.getElementById('expert-text').innerText = tips[now.getMonth()];
+    }
+
+    function sharePlant() {
+        const url = window.location.href + "&view=guest";
+        if (navigator.share) navigator.share({ title: 'ÉONIA', text: `Découvrez mon ${document.getElementById('p-titre').innerText} !`, url });
+        else alert("Lien : " + url);
+    }
+
+    async function recordWatering() {
+        const btn = document.getElementById('btn-water-main'); btn.innerText = "⏳ ...";
+        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'record_watering', plantId: rawPlantId }) });
+        fetchUpdate(); btn.innerText = "💦 Marquer comme arrosé";
+    }
+
+    async function saveJournal() {
+        const btn = document.getElementById('btn-save-note'); btn.innerText = "⏳ ...";
+        const date = document.getElementById('plant-date').value;
+        const note = document.getElementById('plant-note').value;
+        const isPublic = document.getElementById('is-public-note').checked;
+        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'update_prive', plantId: rawPlantId, date, note, public: isPublic }) });
+        fetchUpdate(); btn.style.display = "none"; btn.innerText = "💾 Enregistrer les notes";
     }
 
     function showSave() { if(!isGuest) document.getElementById('btn-save-note').style.display = "block"; }
