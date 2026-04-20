@@ -6,36 +6,64 @@
     <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; --error: #f87171; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
-        /* Météo */
         #weather-wrapper { margin-bottom: 25px; }
-        #weather-container { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; justify-content: space-around; align-items: center; }
-        .w-col { text-align: center; }
-        .w-day { font-size: 0.6rem; color: #666; display: block; margin-bottom: 5px; }
-        .w-icon { font-size: 1.2rem; display: block; }
-        .w-temp { font-size: 0.75rem; }
-
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
+        #display-city { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .location-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: #aaa; font-size: 0.6rem; padding: 5px 12px; border-radius: 20px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        
+        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 80px; }
+        .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+        .w-day { font-size: 0.55rem; color: #666; font-weight: bold; letter-spacing: 1px; }
+        .w-icon { font-size: 1.5rem; }
+        .w-temp { font-size: 0.8rem; }
+        
+        #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; min-height: 20px; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        
+        .cycle-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .progress-bg { background: #1a1a1a; height: 6px; border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 1.5s ease-in-out; }
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
-        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; }
-
+        .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
+        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .info-box .value { font-size: 0.85rem; color: #fff; }
+        
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
+        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; margin-top: 10px; }
+        .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
+        .btn-disabled { border-color: #333; color: #555; cursor: not-allowed; opacity: 0.6; }
+        .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         
-        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .btn-buy { background: var(--accent); color: #000; font-weight: bold; border: none; margin-top: 30px; }
-        
-        .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 12px 0; display: flex; justify-content: space-between; border-top: 1px solid var(--border); cursor: pointer; font-size: 0.7rem; }
-        .acc-content { max-height: 0; overflow: hidden; transition: 0.3s; font-size: 0.85rem; color: #aaa; }
+        .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
+        .acc-inner { padding: 10px 0 20px 0; }
+        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #888; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
+        .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+
+        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        .evo-scroll::-webkit-scrollbar { display: none; }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
+
+        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
+        .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
     </style>
 </head>
 <body>
@@ -43,124 +71,347 @@
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
         
         <div id="weather-wrapper" class="hidden">
+            <div class="weather-header">
+                <span id="display-city">📍 Recherche...</span>
+                <button class="location-btn" onclick="changeLocation()">Changer de ville</button>
+            </div>
             <div id="weather-container"></div>
+            <div id="weather-advice">Analyse des conditions...</div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
-        <h1 id="p-titre" style="font-size:2rem; margin:0;"></h1>
+        <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;"></h1>
         <div id="p-sci" class="sci-name"></div>
 
-        <div class="info-grid" id="p-grid"></div>
-
-        <div class="maintenance-card">
-            <div class="section-title">Informations détaillées</div>
-            <div id="p-desc-base" style="font-size:0.9rem; color:#ccc; line-height:1.6; margin-bottom:15px;"></div>
-            
-            <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Entretien</span><span>+</span></button>
-            <div id="acc-sol" class="acc-content"><div style="padding:10px 0;" id="val-sol"></div></div>
-            
-            <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
-            <div id="acc-asso" class="acc-content"><div style="padding:10px 0;" id="val-asso"></div></div>
-        </div>
-
         <div id="owner-area" class="hidden">
-            <div class="maintenance-card">
-                <div class="section-title">Mon Journal</div>
-                <p id="display-note" style="font-style:italic; font-size:0.85rem;"></p>
-                <button class="btn-eonia" onclick="alert('Fonction d\'édition bientôt disponible')">Modifier mes notes</button>
+            <div id="cycle-area" class="cycle-box">
+                <div class="section-title">Cycle de Vie Annuel</div>
+                <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #666;">
+                    <span id="cycle-label">Chargement...</span>
+                    <span id="cycle-pct">0%</span>
+                </div>
+            </div>
+
+            <div class="maintenance-card" id="watering-card">
+                <div class="section-title">ENTRETIEN</div>
+                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
+                <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
             </div>
         </div>
 
+        <div class="info-grid" id="p-grid"></div>
+
+        <div id="owner-area-2" class="hidden">
+            <div class="maintenance-card">
+                <div class="section-title">GUIDE EXPERT</div>
+                <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
+                <div id="acc-desc" class="acc-content"><div class="acc-inner" id="val-desc"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>Floraison</span><span>+</span></button>
+                <div id="acc-flore" class="acc-content"><div class="acc-inner" id="val-flore"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Fertilisation</span><span>+</span></button>
+                <div id="acc-sol" class="acc-content"><div class="acc-inner" id="val-sol"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>Protection & Santé</span><span>+</span></button>
+                <div id="acc-health" class="acc-content"><div class="acc-inner" id="val-health"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
+                <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
+            </div>
+            
+            <div id="expert-area" class="expert-card">
+                <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
+                <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
+            </div>
+
+            <div class="maintenance-card" id="gallery-area">
+                <div class="section-title">PHOTOS D'ÉVOLUTION</div>
+                <div id="evo-gallery" class="evo-scroll"></div>
+                <div id="upload-zone" class="hidden">
+                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo</button>
+                </div>
+            </div>
+
+            <div class="maintenance-card" id="journal-card">
+                <div id="journal-owner-view">
+                    <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
+                    <div class="toggle-container">
+                        <span class="toggle-label">Partager le journal (Public)</span>
+                        <label class="switch">
+                            <input type="checkbox" id="journal-public-toggle" onchange="showSave()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
+                    <input type="date" id="plant-date" oninput="showSave()">
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
+                    <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
+                    <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+                </div>
+                <div id="journal-visitor-view" class="hidden">
+                    <div class="section-title">HISTORIQUE DE LA PLANTE</div>
+                    <div id="visitor-journal-content"></div>
+                </div>
+            </div>
+            
+            <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" onclick="sharePlant()">✨ Partager ma plante</button>
+        </div>
+
+        <div class="maintenance-card hidden" id="catalog-desc-area">
+            <div class="section-title">DESCRIPTION</div>
+            <div id="p-desc-catalog" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
+        </div>
+
         <div id="catalog-area" class="hidden">
-            <button class="btn-eonia btn-buy" onclick="window.location.href='commander.html'">🏷️ Commander cette plante</button>
+            <button style="background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px;" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque ÉONIA</button>
         </div>
     </div>
 
 <script>
-    // Config
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const urlParams = new URLSearchParams(window.location.search);
-    const plantId = urlParams.get('id');
+    const rawPlantId = urlParams.get('id');
+    const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
+    
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    const isOwner = (userEmail && userPin); 
+    
+    const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
-    // Identité
-    const userEmail = localStorage.getItem('user_email') || "visitor@eonia.com";
-    const userPin = localStorage.getItem('user_pin') || "0000";
-    const isRealOwner = (userEmail !== "visitor@eonia.com" && userEmail !== "invite@eonia.com");
+    async function init() {
+        if (!rawPlantId) return;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            const plants = JSON.parse(cachedData);
+            const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
+            if (p) render(p); 
+        }
+        fetchUpdate(null, null, localStorage.getItem('user_city'));
+    }
 
-    async function loadPlant() {
-        if (!plantId) return;
-
+    async function fetchUpdate(lat, lon, city = null) {
         try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: userEmail,
-                    pin: userPin,
-                    plantId: plantId
-                })
+            const res = await fetch(API_URL, { 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
             });
             const data = await res.json();
-            
-            // On cherche la plante dans les données reçues
-            const p = data.find(item => item.id === plantId || item.id.replace(/-/g,"") === plantId.replace(/-/g,""));
-            
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p);
-            else document.body.innerHTML = "<div class='container'>Plante introuvable.</div>";
-
-        } catch (e) {
-            console.error("Erreur chargement:", e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function render(p) {
-        // Remplissage de base
         document.getElementById('p-photo').src = p.Photo || '';
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        document.getElementById('p-desc-base').innerText = p.Description || "";
-        document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
-        document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
 
-        // Grille d'infos
-        const specs = [
-            {l:"Famille", v:p.Famille},
-            {l:"Type", v:p.Type},
-            {l:"Arrosage", v:p.Arrosage},
-            {l:"Exposition", v:p.Exposition}
-        ];
-        document.getElementById('p-grid').innerHTML = specs.map(s => `
-            <div class="info-box">
-                <div class="label">${s.l}</div>
-                <div class="value">${s.v || "-"}</div>
-            </div>
-        `).join('');
+        const savedCity = localStorage.getItem('user_city');
+        if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
-        // Logique Propriétaire vs Catalogue
-        if (p.est_dans_jardin && isRealOwner) {
+        if (p.Alertes && p.Alertes.length > 0) {
+            document.getElementById('weather-wrapper').classList.remove('hidden');
+            const adviceBox = document.getElementById('weather-advice');
+            let cleanAdvice = p.Alertes[0].split('|')[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
+            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
+            document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
+                const s = str.split('|');
+                const d = new Date(); d.setDate(new Date().getDate() + idx);
+                return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
+            }).join('');
+        }
+
+        if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
-            document.getElementById('display-note').innerText = p.Note_Privee && p.Note_Privee !== "-" ? p.Note_Privee : "Aucune observation notée.";
-            
-            // Afficher météo si dispo
-            if (p.Alertes && p.Alertes.length > 0) {
-                document.getElementById('weather-wrapper').classList.remove('hidden');
-                document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
-                    const s = str.split('|');
-                    return `<div class="w-col"><span class="w-day">J+${idx}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
-                }).join('');
+            document.getElementById('owner-area-2').classList.remove('hidden');
+
+            if (isOwner) {
+                document.getElementById('journal-owner-view').classList.remove('hidden');
+                document.getElementById('journal-visitor-view').classList.add('hidden');
+                document.getElementById('upload-zone').classList.remove('hidden');
+                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+                document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
+            } else {
+                document.getElementById('watering-card').classList.add('hidden');
+                document.querySelector('.location-btn').classList.add('hidden');
+                document.getElementById('upload-zone').classList.add('hidden');
             }
+
+            const gallery = document.getElementById('evo-gallery');
+            if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
+                gallery.innerHTML = p.Photos_Evolution.map(imgUrl => `
+                    <div style="position:relative; flex-shrink:0;">
+                        <img src="${imgUrl}">
+                        ${isOwner ? `<div onclick="deletePhoto('${imgUrl}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; font-weight:bold;">×</div>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                gallery.innerHTML = `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
+            }
+
+            document.getElementById('val-desc').innerText = p.Description || "-";
+            document.getElementById('val-flore').innerText = p.Floraison || "-";
+            document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
+            document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
+            document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
+
+            const h = document.getElementById('watering-history');
+            if (p.Historique_Data && p.Historique_Data !== "-") {
+                const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
+                h.innerHTML = uniqueDates.slice().reverse().map(date => `
+                    <span class="history-tag">
+                        ${date}
+                        ${isOwner ? `<b onclick="deleteWatering('${date}')" style="color:var(--error); cursor:pointer; padding-left:5px;">×</b>` : ''}
+                    </span>
+                `).join('');
+                
+                if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
+                    const btn = document.getElementById('btn-water-main');
+                    btn.innerText = "✅ Arrosé aujourd'hui"; 
+                    btn.className = "btn-eonia btn-disabled"; 
+                    btn.onclick = null;
+                } else if (isOwner) {
+                    const btn = document.getElementById('btn-water-main');
+                    btn.innerText = "💦 Marquer comme arrosé";
+                    btn.className = "btn-eonia btn-water-theme";
+                    btn.onclick = handleWateringAction;
+                }
+            }
+            updateExtraFeatures();
         } else {
-            // C'est un invité ou une plante du catalogue pas encore achetée
             document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('catalog-desc-area').classList.remove('hidden');
+            document.getElementById('p-desc-catalog').innerText = p.Description || "";
+        }
+
+        const fds = [
+            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+            {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
+            {l:"Taille maturité", v:p["Taille à maturité"]},
+            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
+        ];
+        document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+    }
+
+    async function handleWateringAction() {
+        const btn = document.getElementById('btn-water-main');
+        btn.innerText = "⏳..."; btn.disabled = true;
+        await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) 
+        });
+        fetchUpdate();
+    }
+
+    async function deleteWatering(date) {
+        if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return;
+        await fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date }) 
+        });
+        fetchUpdate();
+    }
+
+    async function uploadPhoto(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const btn = document.querySelector("#upload-zone button");
+        const oldText = btn.innerText;
+        btn.innerText = "⏳ Optimisation...";
+        btn.disabled = true;
+
+        try {
+            const compressedFile = await compressImage(file, 1200); 
+            btn.innerText = "🚀 Envoi...";
+            const formData = new FormData();
+            formData.append('file', compressedFile);
+            formData.append('action', 'upload_photo_binaire');
+            formData.append('plantId', rawPlantId);
+            formData.append('email', userEmail);
+            formData.append('pin', userPin);
+
+            const response = await fetch(API_URL, { method: 'POST', body: formData });
+            if (response.ok) { fetchUpdate(); } else { alert("Erreur d'envoi"); }
+        } catch (err) { alert("Erreur réseau"); } finally {
+            btn.innerText = oldText;
+            btn.disabled = false;
         }
     }
 
-    function toggleAcc(id) {
-        const c = document.getElementById(id);
-        c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px";
+    function compressImage(file, maxWidth) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    if (width > maxWidth) { height = (maxWidth / width) * height; width = maxWidth; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => { resolve(new File([blob], file.name, { type: 'image/jpeg' })); }, 'image/jpeg', 0.8);
+                };
+            };
+        });
     }
 
-    loadPlant();
+    async function deletePhoto(photoUrl) {
+        if (!confirm("Supprimer cette photo ?")) return;
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl: photoUrl })
+            });
+            if (res.ok) fetchUpdate();
+        } catch (e) { alert("Erreur suppression"); }
+    }
+
+    async function saveJournal() {
+        const note = document.getElementById('plant-note').value;
+        const date = document.getElementById('plant-date').value;
+        const isPublic = document.getElementById('journal-public-toggle').checked;
+        try {
+            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic }) 
+            });
+            document.getElementById('btn-save-note').style.display = "none";
+            fetchUpdate();
+        } catch (e) { alert("Erreur sauvegarde"); }
+    }
+
+    function toggleAcc(id) {
+        const content = document.getElementById(id);
+        content.style.maxHeight = (content.style.maxHeight && content.style.maxHeight !== "0px") ? "0px" : content.scrollHeight + "px";
+    }
+
+    function updateExtraFeatures() {
+        const now = new Date(); const m = now.getMonth();
+        const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
+        document.getElementById('cycle-fill').style.width = pct + "%";
+        document.getElementById('cycle-pct').innerText = pct + "%";
+        document.getElementById('cycle-label').innerText = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos hivernal"][m];
+        document.getElementById('expert-month').innerText = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][m];
+        const tips = ["Paillage épais recommandé.", "Supprimez le bois mort.", "Apport d'engrais organique.", "Surveillez les jeunes pousses.", "Binez le sol pour aérer.", "Arrosez généreusement le soir.", "Maintenez le pied humide.", "Taillez les fleurs fanées.", "Réduisez l'eau doucement.", "Installez les voiles d'hivernage.", "Laissez les feuilles au sol.", "La plante dort, ne taillez pas."];
+        document.getElementById('expert-text').innerText = tips[m];
+    }
+
+    function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
+    function sharePlant() {
+        const url = new URL(window.location.href);
+        const cleanUrl = `${url.origin}${url.pathname}?id=${rawPlantId}`;
+        if (navigator.share) {
+            navigator.share({ title: 'Mon ' + document.getElementById('p-titre').innerText, url: cleanUrl });
+        } else { window.prompt("Lien à copier :", cleanUrl); }
+    }
+    init();
 </script>
 </body>
 </html>
