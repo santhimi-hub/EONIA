@@ -178,6 +178,28 @@
     
     const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
+    // FONCTION TRADUCTRICE DES PICTOGRAMMES
+    function fixNotionValues(key, val) {
+        if (!val || val === "-" || val === "") return "-";
+        const v = String(val).trim();
+        if (key === "Difficulté") {
+            if (v === "1") return "💪 Débutant";
+            if (v === "2") return "💪💪 Intermédiaire";
+            if (v === "3") return "💪💪💪 Expert";
+        }
+        if (key === "Exposition") {
+            if (v === "1") return "☀️ Plein soleil";
+            if (v === "2") return "⛅ Mi-ombre";
+            if (v === "3") return "☁️ Ombre";
+        }
+        if (key === "Arrosage") {
+            if (v.includes("3")) return "💧💧💧";
+            if (v.includes("2")) return "💧💧";
+            if (v.includes("1")) return "💧";
+        }
+        return v;
+    }
+
     async function init() {
         if (!rawPlantId) return;
         const cachedData = localStorage.getItem(cacheKey);
@@ -307,9 +329,9 @@
             {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
             {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille a maturite"] || p["Taille maturité"]}, 
-            {l:"Difficulté", v:p.Difficulté}, 
-            {l:"Arrosage", v:p.Arrosage}, 
-            {l:"Exposition", v:p.Exposition}, 
+            {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}, 
+            {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)}, 
+            {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)}, 
             {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
