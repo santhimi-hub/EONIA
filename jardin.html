@@ -181,11 +181,11 @@
     async function init() {
         if (!rawPlantId) return;
 
-        let lat = localStorage.getItem('user_lat');
-        let lon = localStorage.getItem('user_lon');
-        let city = localStorage.getItem('user_city');
+        let lat = isOwner ? localStorage.getItem('user_lat') : null;
+        let lon = isOwner ? localStorage.getItem('user_lon') : null;
+        let city = isOwner ? localStorage.getItem('user_city') : null;
 
-        // --- CORRECTION : ON NE DEMANDE LA GEOLOC QUE SI C'EST LE PROPRIO ET QU'ON NE L'A PAS ---
+        // Demande de geoloc UNIQUEMENT pour le proprio
         if (isOwner && !lat && !lon && !city) {
             askGeo();
         }
@@ -212,7 +212,6 @@
                 localStorage.setItem('user_lat', lat);
                 localStorage.setItem('user_lon', lon);
                 
-                // Sauvegarde côté API si possible
                 try {
                     await fetch(API_URL, {
                         method: 'POST',
@@ -233,9 +232,10 @@
 
     async function fetchUpdate(lat = null, lon = null, city = null) {
         try {
-            const finalLat = lat || localStorage.getItem('user_lat');
-            const finalLon = lon || localStorage.getItem('user_lon');
-            const finalCity = city || localStorage.getItem('user_city');
+            // Force null pour les invités pour éviter les fuites de geoloc du navigateur
+            const finalLat = isOwner ? (lat || localStorage.getItem('user_lat')) : null;
+            const finalLon = isOwner ? (lon || localStorage.getItem('user_lon')) : null;
+            const finalCity = isOwner ? (city || localStorage.getItem('user_city')) : null;
 
             const res = await fetch(API_URL, { 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, 
@@ -256,6 +256,7 @@
     }
 
     function changeLocation() {
+        if (!isOwner) return; // Sécurité supplémentaire
         const city = prompt("Entrez le nom de votre ville :");
         if (city) {
             localStorage.setItem('user_city', city);
@@ -270,7 +271,7 @@
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
 
-        const savedCity = localStorage.getItem('user_city');
+        const savedCity = isOwner ? localStorage.getItem('user_city') : null;
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
         // --- MÉTÉO UNIQUEMENT SI DANS LE JARDIN ---
@@ -314,6 +315,15 @@
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
                 document.getElementById('upload-zone').classList.add('hidden');
+                
+                // Affichage du journal pour visiteur si public
+                if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
+                   document.getElementById('journal-visitor-view').classList.remove('hidden');
+                   document.getElementById('visitor-journal-content').innerHTML = `
+                    <p style="font-size:0.75rem;">Plantée le : ${p.Date_Plantation || 'Non précisé'}</p>
+                    <p style="font-style:italic; font-size:0.8rem;">"${p.Note_Privee || ''}"</p>
+                   `;
+                }
             }
 
             const gallery = document.getElementById('evo-gallery');
