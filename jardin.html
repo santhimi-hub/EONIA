@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Détails</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; --error: #f87171; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
@@ -35,7 +36,7 @@
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; color: #fff; font-weight: 400; }
+        .info-box .value { font-size: 0.85rem; color: #fff; }
         
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
@@ -45,13 +46,14 @@
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
-        .acc-content { font-size: 0.85rem; color: #eee; line-height: 1.6; overflow: hidden; max-height: 0; transition: max-height 0.3s ease-out; }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
-        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #eee; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
+        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #888; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
+        .evo-scroll::-webkit-scrollbar { display: none; }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; }
 
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
@@ -63,9 +65,15 @@
         input:checked + .slider:before { transform: translateX(20px); }
 
         #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
+
+        /* Style Lightbox pour agrandissement */
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        #lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; }
     </style>
 </head>
 <body>
+    <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
+
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
         
@@ -86,15 +94,20 @@
             <div id="cycle-area" class="cycle-box">
                 <div class="section-title">Cycle de Vie Annuel</div>
                 <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #eee;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #666;">
                     <span id="cycle-label">Chargement...</span>
                     <span id="cycle-pct">0%</span>
                 </div>
             </div>
 
             <div class="maintenance-card" id="watering-card">
-                <div class="section-title">ENTRETIEN</div>
+                <div class="section-title">ENTRETIEN & SUIVI</div>
                 <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
+                
+                <div style="height: 120px; margin-top: 15px; position: relative;">
+                    <canvas id="wateringChart"></canvas>
+                </div>
+
                 <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
             </div>
         </div>
@@ -106,23 +119,19 @@
                 <div class="section-title">GUIDE EXPERT</div>
                 <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
                 <div id="acc-desc" class="acc-content"><div class="acc-inner" id="val-desc"></div></div>
-                
                 <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>Floraison</span><span>+</span></button>
                 <div id="acc-flore" class="acc-content"><div class="acc-inner" id="val-flore"></div></div>
-                
                 <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Fertilisation</span><span>+</span></button>
                 <div id="acc-sol" class="acc-content"><div class="acc-inner" id="val-sol"></div></div>
-                
                 <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>Protection & Santé</span><span>+</span></button>
                 <div id="acc-health" class="acc-content"><div class="acc-inner" id="val-health"></div></div>
-                
                 <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
                 <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
             </div>
             
             <div id="expert-area" class="expert-card">
                 <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
-                <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #eee; font-style: italic;"></div>
+                <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
 
             <div class="maintenance-card" id="gallery-area">
@@ -144,9 +153,9 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <label style="font-size: 0.55rem; color: #eee; text-transform: uppercase;">Date de plantation</label>
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
                     <input type="date" id="plant-date" oninput="showSave()">
-                    <label style="font-size: 0.55rem; color: #eee; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
+                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
                     <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
                     <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
                 </div>
@@ -161,7 +170,7 @@
 
         <div class="maintenance-card hidden" id="catalog-desc-area">
             <div class="section-title">DESCRIPTION</div>
-            <div id="p-desc-catalog" style="line-height:1.8; color:#eee; font-size:0.95rem;"></div>
+            <div id="p-desc-catalog" style="line-height:1.8; color:#aaa; font-size:0.95rem;"></div>
         </div>
 
         <div id="catalog-area" class="hidden">
@@ -180,27 +189,6 @@
     const isOwner = (userEmail && userPin); 
     
     const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
-
-    function fixNotionValues(key, val) {
-        if (!val || val === "-" || val === "") return "-";
-        const v = String(val).trim();
-        if (key === "Difficulté") {
-            if (v === "1") return "💪 Débutant";
-            if (v === "2") return "💪💪 Intermédiaire";
-            if (v === "3") return "💪💪💪 Expert";
-        }
-        if (key === "Exposition") {
-            if (v === "1") return "☀️ Plein soleil";
-            if (v === "2") return "⛅ Mi-ombre";
-            if (v === "3") return "☁️ Ombre";
-        }
-        if (key === "Arrosage") {
-            if (v.includes("3")) return "💧💧💧";
-            if (v.includes("2")) return "💧💧";
-            if (v.includes("1")) return "💧";
-        }
-        return v;
-    }
 
     async function init() {
         if (!rawPlantId) return;
@@ -282,17 +270,19 @@
                 document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
+                document.querySelector('.location-btn').classList.add('hidden');
                 document.getElementById('upload-zone').classList.add('hidden');
             }
 
+            // Galerie avec Agrandissement
             const gallery = document.getElementById('evo-gallery');
             gallery.innerHTML = (p.Photos_Evolution && p.Photos_Evolution.length > 0) 
                 ? p.Photos_Evolution.map(imgUrl => `
                     <div style="position:relative; flex-shrink:0;">
-                        <img src="${imgUrl}">
+                        <img src="${imgUrl}" onclick="document.getElementById('lightbox-img').src='${imgUrl}'; document.getElementById('lightbox').style.display='flex';">
                         ${isOwner ? `<div onclick="deletePhoto('${imgUrl}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; font-weight:bold;">×</div>` : ''}
                     </div>`).join('')
-                : `<div style="color:#eee; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
+                : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
 
             document.getElementById('val-desc').innerText = p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
@@ -315,7 +305,11 @@
                     btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme"; btn.onclick = handleWateringAction;
                 }
             }
+            
+            // Mise à jour du graphique et des cycles
+            updateWateringChart(p.Historique_Data);
             updateExtraFeatures();
+
         } else {
             weatherWrapper.classList.add('hidden');
             document.getElementById('owner-area').classList.add('hidden');
@@ -330,12 +324,52 @@
             {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
             {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille a maturite"] || p["Taille maturité"]}, 
-            {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}, 
-            {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)}, 
-            {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)}, 
+            {l:"Difficulté", v:p.Difficulté}, 
+            {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, 
             {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+    }
+
+    // FONCTION GRAPHIQUE (Hebdomadaire)
+    function updateWateringChart(historyData) {
+        const ctx = document.getElementById('wateringChart').getContext('2d');
+        const dates = historyData && historyData !== "-" ? historyData.split(',').map(d => d.trim()) : [];
+        
+        const labels = [];
+        const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const format = d.toLocaleDateString('fr-FR');
+            labels.push(format.split('/')[0] + '/' + format.split('/')[1]);
+            data.push(dates.includes(format) ? 1 : 0);
+        }
+
+        if (window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: data.map(v => v === 1 ? '#38bdf8' : '#1a1a1a'),
+                    borderRadius: 4,
+                    borderWidth: 1,
+                    borderColor: '#333'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: {
+                    y: { display: false, max: 1.1, min: 0 },
+                    x: { grid: { display: false }, ticks: { color: '#666', font: { size: 9 } } }
+                }
+            }
+        });
     }
 
     async function handleWateringAction() {
@@ -421,30 +455,16 @@
 
     function toggleAcc(id) {
         const content = document.getElementById(id);
-        if (content.style.maxHeight && content.style.maxHeight !== "0px") {
-            content.style.maxHeight = "0px";
-        } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-        }
+        content.style.maxHeight = (content.style.maxHeight && content.style.maxHeight !== "0px") ? "0px" : content.scrollHeight + "px";
     }
 
     function updateExtraFeatures() {
         const now = new Date(); const m = now.getMonth();
-        const start = new Date(now.getFullYear(), 0, 0);
-        const diff = now - start;
-        const oneDay = 1000 * 60 * 60 * 24;
-        const dayOfYear = Math.floor(diff / oneDay);
-        const pct = Math.round((dayOfYear / 365) * 100);
-
+        const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
         if(document.getElementById('cycle-fill')) document.getElementById('cycle-fill').style.width = pct + "%";
         if(document.getElementById('cycle-pct')) document.getElementById('cycle-pct').innerText = pct + "%";
-        
-        const labels = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos hivernal"];
-        if(document.getElementById('cycle-label')) document.getElementById('cycle-label').innerText = labels[m];
-        
-        const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-        if(document.getElementById('expert-month')) document.getElementById('expert-month').innerText = months[m];
-        
+        if(document.getElementById('cycle-label')) document.getElementById('cycle-label').innerText = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos hivernal"][m];
+        if(document.getElementById('expert-month')) document.getElementById('expert-month').innerText = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][m];
         const tips = ["Paillage épais recommandé.", "Supprimez le bois mort.", "Apport d'engrais organique.", "Surveillez les jeunes pousses.", "Binez le sol pour aérer.", "Arrosez généreusement le soir.", "Maintenez le pied humide.", "Taillez les fleurs fanées.", "Réduisez l'eau doucement.", "Installez les voiles d'hivernage.", "Laissez les feuilles au sol.", "La plante dort, ne taillez pas."];
         if(document.getElementById('expert-text')) document.getElementById('expert-text').innerText = tips[m];
     }
