@@ -6,296 +6,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA | Mémoire Végétale</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body, html { height:100%; font-family:'Raleway', sans-serif; background:#000; color:#fff; scroll-behavior:smooth; }
-
         .hero {
             height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
             background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)), url('background.jpg') center/cover no-repeat;
             animation: fadeIn 1.2s ease;
         }
-
         .logo-main { width:120px; margin-bottom:25px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.2s; transition: 0.4s; }
         .logo-main:hover { transform: scale(1.05); }
-
         .brand-title { font-size:4rem; font-weight:300; letter-spacing:6px; text-transform:uppercase; color:#ffffff; line-height:1; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.4s; }
-
         .tagline { font-style:italic; font-weight:400; font-size:0.9rem; color:rgba(255,255,255,0.8); margin-top:35px; margin-bottom:45px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.6s; }
-
         .auth-container { display:flex; flex-direction:column; gap:12px; width:280px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.8s; }
-
-        input {
-            width:100%; padding:14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);
-            background:rgba(255,255,255,0.1); backdrop-filter: blur(5px);
-            color:white; outline:none; font-family:'Raleway', sans-serif;
-            text-align:center; transition:0.3s;
-        }
-
-        input:focus {
-            background:rgba(255,255,255,0.18);
-            border-color:#4ade80;
-            box-shadow:0 0 15px rgba(74,222,128,0.15);
-        }
-
-        .auth-footer {
-            display:flex; justify-content:space-between; align-items:flex-start;
-            padding:0 4px; margin-top:-4px; min-height:25px;
-        }
-
-        #activation-help {
-            display:none; font-size:0.58rem; color:#4ade80;
-            font-style:italic; text-align:left; max-width:190px; line-height:1.2;
-        }
-
-        .pin-forgot {
-            font-size:0.6rem; color:rgba(255,255,255,0.5);
-            text-decoration:none; transition:0.3s;
-            white-space:nowrap; margin-left:auto;
-        }
-
-        .btn-main {
-            width:100%; padding:14px; background:#fff; color:#000;
-            border:none; border-radius:50px; cursor:pointer;
-            font-weight:700; text-transform:uppercase;
-            letter-spacing:3px; transition:0.3s; margin-top:5px;
-        }
-
-        .btn-main:hover {
-            background:#4ade80;
-            transform:translateY(-2px);
-            box-shadow:0 5px 15px rgba(74,222,128,0.3);
-        }
-
-        .btn-main:disabled {
-            background:#333; color:#777; cursor:not-allowed; transform:none;
-        }
-
-        .link-order {
-            font-size:0.7rem; color:rgba(255,255,255,0.5);
-            text-decoration:none; margin-top:10px;
-            font-weight:400; letter-spacing:1px;
-            text-transform:uppercase; transition:0.3s;
-            text-align:center;
-        }
-
+        input { width:100%; padding:14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.1); backdrop-filter: blur(5px); color:white; outline:none; font-family:'Raleway', sans-serif; text-align:center; transition:0.3s; }
+        input:focus { background:rgba(255,255,255,0.18); border-color:#4ade80; box-shadow:0 0 15px rgba(74,222,128,0.15); }
+        .auth-footer { display:flex; justify-content:space-between; align-items:flex-start; padding:0 4px; margin-top:-4px; min-height:25px; }
+        #activation-help { display:none; font-size:0.58rem; color:#4ade80; font-style:italic; text-align:left; max-width:190px; line-height:1.2; }
+        .pin-forgot { font-size:0.6rem; color:rgba(255,255,255,0.5); text-decoration:none; transition:0.3s; white-space:nowrap; margin-left:auto; }
+        .btn-main { width:100%; padding:14px; background:#fff; color:#000; border:none; border-radius:50px; cursor:pointer; font-weight:700; text-transform:uppercase; letter-spacing:3px; transition:0.3s; margin-top:5px; }
+        .btn-main:hover { background:#4ade80; transform:translateY(-2px); box-shadow:0 5px 15px rgba(74,222,128,0.3); }
+        .btn-main:disabled { background: #333; color: #777; cursor: not-allowed; transform: none; }
+        .link-order { font-size:0.7rem; color:rgba(255,255,255,0.5); text-decoration:none; margin-top:10px; font-weight:400; letter-spacing:1px; text-transform:uppercase; transition:0.3s; text-align: center; }
+        
+        /* MODIFICATION : POSITIONNEMENT ET ESPACEMENT ENTRE LES MOTS */
         .bottom-nav {
-            margin-top:35px;
+            margin-top: 35px; /* Retour à la position d'origine par rapport au formulaire */
             opacity:0;
             animation: fadeUp 1s ease forwards;
-            animation-delay:1s;
-            display:flex;
-            gap:60px;
+            animation-delay: 1s;
+            display: flex;
+            gap: 60px; /* ESPACEMENT HORIZONTAL AUGMENTÉ ENTRE LES DEUX LIENS */
         }
 
-        .bottom-nav a {
-            color:#4ade80; text-decoration:none;
-            font-size:0.65rem; text-transform:uppercase;
-            letter-spacing:2.5px; transition:0.3s;
-            font-weight:500; cursor:pointer;
-        }
-
+        .bottom-nav a { color:#4ade80; text-decoration:none; font-size:0.65rem; text-transform:uppercase; letter-spacing:2.5px; transition:0.3s; font-weight:500; cursor: pointer; }
         .bottom-nav a:hover { color:#fff; }
-
-        .content-section {
-            padding:100px 30px; text-align:center;
-            background:#050505; border-top:1px solid #1a1a1a;
-        }
-
-        .content-section h2 {
-            color:#4ade80; font-weight:300;
-            text-transform:uppercase; letter-spacing:4px;
-            margin-bottom:25px; font-size:1.5rem;
-        }
-
-        .content-section p {
-            max-width:700px; margin:0 auto 20px auto;
-            line-height:1.8; color:#bbb;
-        }
-
+        .content-section { padding:100px 30px; text-align:center; background:#050505; border-top: 1px solid #1a1a1a; }
+        .content-section h2 { color:#4ade80; font-weight:300; text-transform:uppercase; letter-spacing:4px; margin-bottom:25px; font-size:1.5rem; }
+        .content-section p { max-width:700px; margin:0 auto 20px auto; line-height:1.8; color:#bbb; }
         .highlight { color:#fff; font-weight:500; }
-
-        .pillar-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-            gap:40px; max-width:1000px;
-            margin:60px auto 0 auto;
-        }
-
-        .pillar-item span { font-size:2rem; display:block; margin-bottom:15px; }
-
-        .pillar-item h3 {
-            font-size:0.75rem; color:#4ade80;
-            letter-spacing:2px; text-transform:uppercase;
-            margin-bottom:10px;
-        }
-
-        .pillar-item p {
-            font-size:0.85rem; color:#888; line-height:1.5;
-        }
-
-        .manifesto-box {
-            max-width:700px; margin:80px auto 0 auto;
-            text-align:center; display:flex;
-            flex-direction:column; align-items:center;
-        }
-
-        .link-philosophy {
-            display:inline-block; margin-top:30px;
-            color:#4ade80 !important; text-decoration:none;
-            font-size:0.65rem; letter-spacing:2px;
-            border-bottom:1px solid #4ade80;
-            padding-bottom:5px; text-transform:uppercase;
-            font-weight:500; transition:0.3s ease;
-        }
-
-        @keyframes fadeUp {
-            from { opacity:0; transform:translateY(20px); }
-            to { opacity:1; transform:translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity:0; } to { opacity:1; }
-        }
+        .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 1000px; margin: 60px auto 0 auto; }
+        .pillar-item span { font-size: 2rem; display: block; margin-bottom: 15px; }
+        .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
+        .manifesto-box { max-width: 700px; margin: 80px auto 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .link-philosophy { display: inline-block; margin-top: 30px; color: #4ade80 !important; text-decoration: none; font-size: 0.65rem; letter-spacing: 2px; border-bottom: 1px solid #4ade80; padding-bottom: 5px; text-transform: uppercase; font-weight: 500; transition: 0.3s ease; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @media (max-width:600px) { .brand-title { font-size:2.5rem; } .tagline { margin-top:20px; margin-bottom:30px; } }
     </style>
 </head>
-
 <body>
-
 <main class="hero">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Éonia Logo">
-
     <h1 class="brand-title">ÉONIA</h1>
     <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
-
     <div class="auth-container">
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
-
         <div style="display:flex;flex-direction:column;gap:8px;position:relative;">
             <input type="password" id="pin" placeholder="Code PIN" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" required>
-
-            <div id="toggle-pin" onclick="togglePinVisibility()" style="position:absolute; right:15px; top:12px; cursor:pointer; opacity:0.5;">
-                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
+            <div id="toggle-pin" onclick="togglePinVisibility()" style="position:absolute; right:15px; top:12px; cursor:pointer; opacity:0.5; transition:0.3s;">
+                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </div>
-
             <div class="auth-footer">
                 <p id="activation-help">Saisissez votre PIN habituel ou choisissez-en un pour cette première plaque.</p>
                 <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
             </div>
         </div>
-
         <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
     </div>
-
     <nav class="bottom-nav">
         <a href="#" onclick="accesInvite()">Accès Invité</a>
         <a href="#concept">Le Concept</a>
     </nav>
 </main>
-
 <section class="content-section" id="concept">
     <h2>Notre Concept</h2>
     <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <br><span class="highlight">Scanner, Cultiver, Raconter.</span></p>
-
     <div class="pillar-grid">
         <div class="pillar-item"><span>🌿</span><h3>Scanner</h3><p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p></div>
         <div class="pillar-item"><span>📖</span><h3>Raconter</h3><p>Créez un journal de bord vivant pour documenter sa croissance.</p></div>
         <div class="pillar-item"><span>♾️</span><h3>Transmettre</h3><p>Faites vivre la mémoire de votre jardin pour les générations futures.</p></div>
     </div>
-
     <div class="manifesto-box">
         <h2>L'âme d'Éonia</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité.</p>
+        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
         <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
     </div>
 </section>
-
 <script>
+    const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
+    const urlParams = new URLSearchParams(window.location.search);
+    const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
 
-const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
-const urlParams = new URLSearchParams(window.location.search);
-const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
-
-window.onload = () => {
-    if (plaqueEnAttente) {
-        document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-        document.getElementById('activation-help').style.display = "block";
-    }
-};
-
-document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') validerConnexion();
-});
-
-async function validerConnexion() {
-
-    const btn = document.getElementById('btn-entrer');
-    const mail = document.getElementById('email').value.toLowerCase().trim();
-    const pin = document.getElementById('pin').value.trim();
-
-    if (!mail || pin.length < 4) {
-        alert("Veuillez remplir correctement les champs.");
-        return;
-    }
-
-    btn.innerText = "VÉRIFICATION...";
-    btn.disabled = true;
-
-    try {
-        const response = await fetch(WORKER_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: mail, pin: pin })
-        });
-
-        if (response.ok) {
-            localStorage.setItem('user_email', mail);
-            localStorage.setItem('user_pin', pin);
-
-            if (plaqueEnAttente) {
-                window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente;
-            } else {
-                window.location.href = "catalogue.html";
-            }
-        } else {
-            alert("Email ou PIN incorrect.");
-            btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER";
-            btn.disabled = false;
+    window.onload = () => {
+        if (plaqueEnAttente) {
+            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+            document.getElementById('activation-help').style.display = "block";
         }
+    };
 
-    } catch (e) {
-        alert("Erreur réseau.");
-        btn.disabled = false;
-        btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER";
+    // GESTION DE LA TOUCHE ENTRÉE
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') { validerConnexion(); }
+    });
+
+    async function validerConnexion() {
+        const btn = document.getElementById('btn-entrer');
+        const mail = document.getElementById('email').value.toLowerCase().trim();
+        const pin = document.getElementById('pin').value.trim();
+        if(!mail || pin.length < 4) { alert("Veuillez remplir correctement les champs."); return; }
+        btn.innerText = "VÉRIFICATION..."; btn.disabled = true;
+        try {
+            const response = await fetch(WORKER_URL, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: mail, pin: pin })
+            });
+            if (response.ok) {
+                localStorage.setItem('user_email', mail);
+                localStorage.setItem('user_pin', pin);
+                if (plaqueEnAttente) { window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; }
+                else { window.location.href = "catalogue.html"; }
+            } else {
+                alert("Email ou PIN incorrect.");
+                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; btn.disabled = false;
+            }
+        } catch (e) { alert("Erreur réseau."); btn.disabled = false; }
     }
-}
-
-function accesInvite() {
-    localStorage.clear();
-    localStorage.setItem('user_email', 'invite@eonia.com');
-    localStorage.setItem('user_pin', '0000');
-    window.location.href = "catalogue.html";
-}
-
-function togglePinVisibility() {
-    const pinInput = document.getElementById('pin');
-    const eyeIcon = document.getElementById('eye-icon');
-
-    if (pinInput.type === 'password') {
-        pinInput.type = 'text';
-        eyeIcon.style.color = "#4ade80";
-    } else {
-        pinInput.type = 'password';
-        eyeIcon.style.color = "#fff";
+    function accesInvite() {
+        localStorage.clear();
+        localStorage.setItem('user_email', 'invite@eonia.com');
+        localStorage.setItem('user_pin', '0000');
+        window.location.href = "catalogue.html";
     }
-}
-
+    function togglePinVisibility() {
+        const pinInput = document.getElementById('pin');
+        const eyeIcon = document.getElementById('eye-icon');
+        if (pinInput.type === 'password') { pinInput.type = 'text'; eyeIcon.style.color = "#4ade80"; }
+        else { pinInput.type = 'password'; eyeIcon.style.color = "#fff"; }
+    }
 </script>
-
 </body>
 </html>
