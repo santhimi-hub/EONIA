@@ -11,12 +11,10 @@
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
-        
-        /* BOUTON RETOUR */
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
         /* METEO */
-        #weather-wrapper { margin-bottom: 25px; display: block; } /* Forcé en block */
+        #weather-wrapper { margin-bottom: 25px; }
         .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
         #display-city { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
         .location-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: #aaa; font-size: 0.6rem; padding: 5px 12px; border-radius: 20px; cursor: pointer; text-transform: uppercase; }
@@ -27,107 +25,105 @@
         .w-temp { font-size: 0.8rem; }
         #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; }
 
-        /* HERO & TITRES */
         .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; cursor: pointer; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
-        /* GRILLE INFOS */
+        /* CYCLE DE VIE */
+        .cycle-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
+        .progress-bg { background: #1a1a1a; height: 6px; border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 1.5s ease; }
+        
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
-        .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
         
-        /* CARDS */
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
+        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         
-        /* BOUTONS ACTIONS */
-        .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-weight: 500; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 10px; }
-        .btn-water-theme { border-color: rgba(56, 189, 248, 0.4); color: var(--water); }
-        .btn-save-theme { border-color: var(--accent); color: var(--accent); display: none; }
-        
-        /* JOURNAL & INPUTS (RESET STYLE SOMBRE) */
-        input, textarea { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; box-sizing: border-box; outline: none; margin-top: 5px; }
-        label { font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block; }
-        
-        /* LIGHTBOX */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; }
-        #lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; }
-        .close-lightbox { position: absolute; top: 20px; right: 20px; color: white; font-size: 35px; line-height: 1; background: rgba(255,255,255,0.1); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
         /* ACCORDEONS */
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; border-top: 1px solid var(--border); }
-        .acc-content { max-height: 0; overflow: hidden; transition: 0.3s; font-size: 0.85rem; color: #aaa; }
-        
-        /* SWITCH */
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(16px); }
+        .acc-content { max-height: 0; overflow: hidden; transition: 0.3s; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
+
+        /* GALERIE */
+        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; flex-shrink: 0; cursor: pointer; }
+
+        /* LIGHTBOX */
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .close-lightbox { position: absolute; top: 20px; right: 20px; color: white; font-size: 35px; cursor: pointer; background: rgba(255,255,255,0.1); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        input, textarea { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 5px; outline: none; }
     </style>
 </head>
 <body>
     <div id="lightbox" onclick="this.style.display='none'">
         <span class="close-lightbox">×</span>
-        <img id="lightbox-img" src="">
+        <img id="lightbox-img" style="max-width:90%; max-height:80vh; border-radius:10px;">
     </div>
 
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
         
-        <div id="weather-wrapper">
+        <div id="weather-wrapper" class="hidden">
             <div class="weather-header">
-                <span id="display-city">📍 CHARGEMENT...</span>
-                <button class="location-btn" onclick="changeLocation()">Ville</button>
+                <span id="display-city">📍 RECHERCHE...</span>
+                <button class="location-btn" onclick="getLocation()">📍 GÉO</button>
             </div>
             <div id="weather-container"></div>
-            <div id="weather-advice">Récupération des données météo...</div>
+            <div id="weather-advice">Analyse des risques...</div>
         </div>
         
+        <div id="cycle-area" class="cycle-box hidden">
+            <div class="section-title">Cycle de Vie Annuel</div>
+            <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: #666;">
+                <span id="cycle-label">Chargement...</span>
+                <span id="cycle-pct">0%</span>
+            </div>
+        </div>
+
         <img id="p-photo" class="hero-img" src="" onclick="openLightbox(this.src)">
-        <h1 id="p-titre" style="font-size:2rem; font-weight:200; margin:0 0 5px 0;"></h1>
+        <h1 id="p-titre" style="font-size:2rem; font-weight:200; margin:0;"></h1>
         <div id="p-sci" class="sci-name"></div>
+
+        <div id="p-grid" class="info-grid"></div>
 
         <div id="owner-area" class="hidden">
             <div class="maintenance-card">
-                <div class="section-title">ENTRETIEN</div>
-                <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
+                <div class="section-title">ARROSAGE</div>
+                <button class="btn-eonia" style="color:var(--water); border-color:var(--water);" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
                 <div style="height: 120px; margin-top: 15px;"><canvas id="wateringChart"></canvas></div>
             </div>
-
-            <div class="info-grid" id="p-grid"></div>
 
             <div class="maintenance-card">
                 <div class="section-title">GUIDE EXPERT</div>
                 <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
                 <div id="acc-desc" class="acc-content"><div style="padding:15px 0;" id="val-desc"></div></div>
-                <div id="acc-details"></div> 
+                <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>Floraison</span><span>+</span></button>
+                <div id="acc-flore" class="acc-content"><div style="padding:15px 0;" id="val-flore"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Fertilisation</span><span>+</span></button>
+                <div id="acc-sol" class="acc-content"><div style="padding:15px 0;" id="val-sol"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>Santé & Protection</span><span>+</span></button>
+                <div id="acc-health" class="acc-content"><div style="padding:15px 0;" id="val-health"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-asso')"><span>Plantes associées</span><span>+</span></button>
+                <div id="acc-asso" class="acc-content"><div style="padding:15px 0;" id="val-asso"></div></div>
             </div>
 
             <div class="maintenance-card">
-                <div class="section-title">TABLEAU DE BORD</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; color:#888;">PARTAGER LE JOURNAL</span>
-                    <label class="switch"><input type="checkbox" id="journal-public-toggle" onchange="showSave()"><span class="slider"></span></label>
-                </div>
-                <label>Date de plantation</label>
-                <input type="date" id="plant-date" oninput="showSave()">
-                <label>Observations</label>
-                <textarea id="plant-note" rows="3" placeholder="Notes privées..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer</button>
+                <div class="section-title">PHOTOS D'ÉVOLUTION</div>
+                <div id="evo-gallery" class="evo-scroll"></div>
+                <input type="file" id="file-input" class="hidden" onchange="uploadPhoto(this)">
+                <button class="btn-eonia" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo</button>
             </div>
-        </div>
 
-        <div id="catalog-area" class="hidden">
-            <div class="info-grid" id="p-grid-catalog"></div>
             <div class="maintenance-card">
-                <div class="section-title">DESCRIPTION</div>
-                <div id="p-desc-catalog" style="color:#aaa; font-size:0.9rem; line-height:1.6;"></div>
+                <div class="section-title">JOURNAL DE BORD</div>
+                <label style="font-size:0.6rem; color:#555;">Observations</label>
+                <textarea id="plant-note" rows="3" oninput="showSave()"></textarea>
+                <button id="btn-save-note" class="btn-eonia hidden" style="color:var(--accent); border-color:var(--accent);" onclick="saveJournal()">💾 Enregistrer</button>
             </div>
-            <button class="btn-eonia" style="background:var(--accent); color:#000; border:none; font-weight:bold;" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque</button>
         </div>
     </div>
 
@@ -137,74 +133,93 @@
     const rawPlantId = urlParams.get('id');
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
-    const isOwner = (userEmail && userPin);
 
     async function init() {
         if (!rawPlantId) return;
-        fetchUpdate(null, null, localStorage.getItem('user_city'));
+        fetchUpdate();
     }
 
-    async function fetchUpdate(lat, lon, city = null) {
-        try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
-            });
-            const data = await res.json();
-            const p = data.find(item => item.id.replace(/-/g, "") === rawPlantId.replace(/-/g, "") || item.id === rawPlantId);
-            if (p) render(p);
-        } catch (e) { console.error(e); }
-    }
-
-    function getIcons(type, value) {
-        if (!value || value === "-") return "-";
-        if (type === 'expo') {
-            const v = value.toLowerCase();
-            if (v.includes("mi")) return "⛅ Mi-ombre";
-            if (v.includes("soleil")) return "☀️ Plein soleil";
-            if (v.includes("ombre")) return "☁️ Ombre";
-            return value;
-        }
-        if (type === 'diff') return "🌱".repeat(parseInt(value)) || value;
-        return value;
+    async function fetchUpdate(lat, lon) {
+        const res = await fetch(API_URL, { 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city: localStorage.getItem('user_city') }) 
+        });
+        const data = await res.json();
+        const p = data.find(item => item.id.replace(/-/g, "") === rawPlantId.replace(/-/g, "") || item.id === rawPlantId);
+        if (p) render(p);
     }
 
     function render(p) {
-        document.getElementById('p-photo').src = p.Photo || '';
-        document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
-        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        document.getElementById('display-city').innerText = "📍 " + (localStorage.getItem('user_city') || "VILLE ?").toUpperCase();
-
-        // FORÇAGE METEO
-        if (p.Alertes && p.Alertes.length > 0) {
-            document.getElementById('weather-advice').innerText = p.Alertes[0].split('|')[0];
-            document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
-                const s = str.split('|');
-                const d = new Date(); d.setDate(d.getDate() + idx);
-                return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
-            }).join('');
-        }
-
-        const fields = [
-            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
-            {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:getIcons('expo', p.Exposition)},
-            {l:"Difficulté", v:getIcons('diff', p.Difficulté)}, {l:"Rusticité", v:p.Rusticité},
-            {l:"Taille Maturité", v:p["Taille maturité"] || p["Taille à maturité"]}, {l:"Feuillage", v:p.Persistance}
-        ];
+        document.getElementById('p-photo').src = p.Photo;
+        document.getElementById('p-titre').innerText = p["Nom commun"];
+        document.getElementById('p-sci').innerText = p["Nom scientifique"];
 
         if (p.est_dans_jardin) {
+            document.getElementById('weather-wrapper').classList.remove('hidden');
+            document.getElementById('cycle-area').classList.remove('hidden');
             document.getElementById('owner-area').classList.remove('hidden');
-            document.getElementById('p-grid').innerHTML = fields.map(f => `<div class="info-box ${f.h?'highlight':''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
-            document.getElementById('val-desc').innerText = p.Description || "-";
+            
+            if (p.Alertes) {
+                document.getElementById('weather-advice').innerText = p.Alertes[0].split('|')[0];
+                document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
+                    const s = str.split('|');
+                    return `<div class="w-col"><span class="w-day">${idx===0?'AUJOURD\'HUI':'J+'+idx}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
+                }).join('');
+            }
+
+            document.getElementById('val-desc').innerText = p.Description;
+            document.getElementById('val-flore').innerText = p.Floraison;
+            document.getElementById('val-sol').innerText = p["Sol et fertilisation"];
+            document.getElementById('val-health').innerText = p["Protection et santé"];
+            document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"];
             document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
-            document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
+
+            const gallery = document.getElementById('evo-gallery');
+            gallery.innerHTML = (p.Photos_Evolution || []).map(url => `<img src="${url}" onclick="openLightbox('${url}')">`).join('');
+            
+            updateCycle();
             updateWateringChart(p.Historique_Data);
-        } else {
-            document.getElementById('catalog-area').classList.remove('hidden');
-            document.getElementById('p-grid-catalog').innerHTML = fields.map(f => `<div class="info-box"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
-            document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
+
+        const grid = [
+            {l:"Exposition", v: p.Exposition.includes("Soleil") ? "☀️ Soleil" : "⛅ Mi-ombre"},
+            {l:"Difficulté", v: "🌱".repeat(parseInt(p.Difficulté))},
+            {l:"Taille", v: p["Taille maturité"]},
+            {l:"Rusticité", v: p.Rusticité}
+        ];
+        document.getElementById('p-grid').innerHTML = grid.map(f => `<div class="info-box"><div class="label">${f.l}</div><div class="value">${f.v}</div></div>`).join('');
+    }
+
+    function updateCycle() {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const pct = Math.round((day / 365) * 100);
+        document.getElementById('cycle-fill').style.width = pct + "%";
+        document.getElementById('cycle-pct').innerText = pct + "%";
+        document.getElementById('cycle-label').innerText = "Stade saisonnier actuel";
+    }
+
+    function updateWateringChart(history) {
+        const ctx = document.getElementById('wateringChart').getContext('2d');
+        const dates = history ? history.split(',') : [];
+        const labels = []; const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            labels.push(d.toLocaleDateString('fr-FR').slice(0, 5));
+            data.push(dates.includes(d.toLocaleDateString('fr-FR')) ? 1 : 0);
+        }
+        if (window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx, { 
+            type: 'bar', 
+            data: { labels, datasets: [{ data, backgroundColor: '#38bdf8', barPercentage: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444', font: { size: 9 } } } } }
+        });
+    }
+
+    function getLocation() {
+        navigator.geolocation.getCurrentPosition(pos => fetchUpdate(pos.coords.latitude, pos.coords.longitude));
     }
 
     function openLightbox(url) {
@@ -214,36 +229,14 @@
 
     function toggleAcc(id) {
         const c = document.getElementById(id);
-        c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px";
+        c.style.maxHeight = c.style.maxHeight === "0px" || !c.style.maxHeight ? c.scrollHeight + "px" : "0px";
     }
 
-    function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
-
+    function showSave() { document.getElementById('btn-save-note').classList.remove('hidden'); }
+    
     async function saveJournal() {
-        const note = document.getElementById('plant-note').value;
-        const date = document.getElementById('plant-date').value;
-        const isPublic = document.getElementById('journal-public-toggle').checked;
-        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic }) });
-        document.getElementById('btn-save-note').style.display = "none";
-        fetchUpdate();
-    }
-
-    function changeLocation() {
-        const city = prompt("Ville :");
-        if (city) { localStorage.setItem('user_city', city); fetchUpdate(null, null, city); }
-    }
-
-    function updateWateringChart(history) {
-        const ctx = document.getElementById('wateringChart').getContext('2d');
-        const dates = history && history !== "-" ? history.split(',').map(d => d.trim()) : [];
-        const labels = []; const data = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            const fmt = d.toLocaleDateString('fr-FR').slice(0, 5);
-            labels.push(fmt); data.push(dates.includes(d.toLocaleDateString('fr-FR')) ? 1 : 0);
-        }
-        if (window.myChart) window.myChart.destroy();
-        window.myChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ data, backgroundColor: data.map(v => v?'#38bdf8':'#1a1a1a'), borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444', font: { size: 9 } } } } } });
+        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note: document.getElementById('plant-note').value }) });
+        document.getElementById('btn-save-note').classList.add('hidden');
     }
 
     init();
