@@ -185,7 +185,8 @@
         let lon = localStorage.getItem('user_lon');
         let city = localStorage.getItem('user_city');
 
-        if (!lat && !lon && !city) {
+        // --- CORRECTION : ON NE DEMANDE LA GEOLOC QUE SI C'EST LE PROPRIO ET QU'ON NE L'A PAS ---
+        if (isOwner && !lat && !lon && !city) {
             askGeo();
         }
 
@@ -211,18 +212,18 @@
                 localStorage.setItem('user_lat', lat);
                 localStorage.setItem('user_lon', lon);
                 
-                if (isOwner) {
-                    try {
-                        await fetch(API_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                email: userEmail, pin: userPin, plantId: rawPlantId, 
-                                action: 'save_geo', lat: lat, lon: lon 
-                            })
-                        });
-                    } catch (e) { console.error("Erreur save_geo", e); }
-                }
+                // Sauvegarde côté API si possible
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            email: userEmail, pin: userPin, plantId: rawPlantId, 
+                            action: 'save_geo', lat: lat, lon: lon 
+                        })
+                    });
+                } catch (e) { console.error("Erreur save_geo", e); }
+                
                 fetchUpdate(lat, lon);
             }, (error) => {
                 console.warn("Géolocalisation refusée.");
