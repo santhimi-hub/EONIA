@@ -181,37 +181,89 @@
     async function init() {
         if (!rawPlantId) return;
 
-        // 1. Chercher dans le cache
-        const cachedData = localStorage.getItem(cacheKey);
-        let foundInCache = false;
+        let lat = localStorage.getItem('user_lat');
+        let lon = localStorage.getItem('user_lon');
+        let city = localStorage.getItem('user_city');
 
+        // Demande Géo si rien n'est stocké
+        if (!lat && !lon && !city) {
+            askGeo();
+        }
+
+        // Cache local pour rapidité
+        const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             const plants = JSON.parse(cachedData);
             const p = plants.find(item => 
                 (item.id && item.id.replace(/-/g, "") === plantIdClean) || 
                 item.id === rawPlantId
             );
-            if (p) {
-                render(p); 
-                foundInCache = true;
-            }
+            if (p) render(p);
         }
 
-        // 2. Toujours appeler l'API (pour activation fraîche ou alertes météo)
-        fetchUpdate(null, null, localStorage.getItem('user_city'));
+        fetchUpdate(lat, lon, city);
     }
 
-    async function fetchUpdate(lat, lon, city = null) {
+    function askGeo() {
+        if (confirm("🌿 Pour vous donner des conseils d'arrosage et de gel précis, ÉONIA a besoin de votre position. Autorisez-vous la géolocalisation ?")) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                localStorage.setItem('user_lat', lat);
+                localStorage.setItem('user_lon', lon);
+                
+                if (isOwner) {
+                    try {
+                        await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                email: userEmail, pin: userPin, plantId: rawPlantId, 
+                                action: 'save_geo', lat: lat, lon: lon 
+                            })
+                        });
+                    } catch (e) { console.error("Erreur save_geo", e); }
+                }
+                fetchUpdate(lat, lon);
+            }, (error) => {
+                console.warn("Géolocalisation refusée.");
+            });
+        }
+    }
+
+    async function fetchUpdate(lat = null, lon = null, city = null) {
         try {
+            const finalLat = lat || localStorage.getItem('user_lat');
+            const finalLon = lon || localStorage.getItem('user_lon');
+            const finalCity = city || localStorage.getItem('user_city');
+
             const res = await fetch(API_URL, { 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
+                body: JSON.stringify({ 
+                    email: userEmail || "visitor@eonia.com", 
+                    pin: userPin || "0000", 
+                    plantId: rawPlantId, 
+                    lat: finalLat, 
+                    lon: finalLon, 
+                    city: finalCity 
+                }) 
             });
             const data = await res.json();
             localStorage.setItem(cacheKey, JSON.stringify(data));
             const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p);
         } catch (e) { console.error(e); }
+    }
+
+    function changeLocation() {
+        const city = prompt("Entrez le nom de votre ville :");
+        if (city) {
+            localStorage.setItem('user_city', city);
+            localStorage.removeItem('user_lat');
+            localStorage.removeItem('user_lon');
+            fetchUpdate(null, null, city);
+        }
     }
 
     function render(p) {
@@ -242,12 +294,11 @@
                 document.getElementById('journal-owner-view').classList.remove('hidden');
                 document.getElementById('journal-visitor-view').classList.add('hidden');
                 document.getElementById('upload-zone').classList.remove('hidden');
-                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
-                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+                document.getElementById('plant-note').value = p.Note_Privee && p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation && p.Date_Plantation !== "-" ? p.Date_Plantation : "";
                 document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
-                document.querySelector('.location-btn').classList.add('hidden');
                 document.getElementById('upload-zone').classList.add('hidden');
             }
 
@@ -269,7 +320,6 @@
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
 
-            // LOGIQUE ARROSAGE MISE À JOUR
             const h = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
@@ -315,7 +365,7 @@
         await fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' }) 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'record_watering' }) 
         });
         fetchUpdate();
     }
@@ -393,7 +443,7 @@
         const isPublic = document.getElementById('journal-public-toggle').checked;
         try {
             await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic }) 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'update_prive', note, date, journal_public: isPublic }) 
             });
             document.getElementById('btn-save-note').style.display = "none";
             fetchUpdate();
