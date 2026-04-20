@@ -302,12 +302,15 @@
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
 
-        const fds = [
-            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+       const fds = [
+            {l:"Famille", v:p.Famille, h:true}, 
+            {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
-            {l:"Taille Adulte", v:p["Taille à maturité"]}, // MODIFIÉ ICI
-            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
-            {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
+            {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille a maturite"] || p["Taille maturité"]}, 
+            {l:"Difficulté", v:p.Difficulté}, 
+            {l:"Arrosage", v:p.Arrosage}, 
+            {l:"Exposition", v:p.Exposition}, 
+            {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
