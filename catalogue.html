@@ -86,6 +86,10 @@ const userPin = localStorage.getItem('user_pin');
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const cacheKey = `eonia_cache_${userEmail}`;
 
+// AJOUT : Récupérer l'ID de la plaque à activer
+const urlParams = new URLSearchParams(window.location.search);
+const plaqueAAssigner = urlParams.get('assign_to');
+
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
@@ -139,8 +143,40 @@ function renderGrid() {
 
         const card = document.createElement('div');
         card.className = "plant-card";
-        // On redirige vers jardin.html (ta page de détails)
-        card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
+        
+        // MODIFICATION : Gestion du clic selon si on active une plaque ou non
+        card.onclick = async () => {
+            if (plaqueAAssigner) {
+                const confirmation = confirm(`Associer cette plaque à : ${nomAffiche} ?`);
+                if (!confirmation) return;
+
+                try {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: "assign_plant",
+                            email: userEmail,
+                            pin: userPin,
+                            plaqueId: plaqueAAssigner,
+                            catalogueId: p.id,
+                            nomPlante: nomAffiche
+                        })
+                    });
+
+                    if (res.ok) {
+                        window.location.href = `jardin.html?id=${plaqueAAssigner}`;
+                    } else {
+                        alert("Erreur lors de l'association.");
+                    }
+                } catch (e) {
+                    alert("Erreur réseau.");
+                }
+            } else {
+                window.location.href = `jardin.html?id=${p.id}`;
+            }
+        };
+
         card.innerHTML = `
             <div class="img-container">
                 <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
