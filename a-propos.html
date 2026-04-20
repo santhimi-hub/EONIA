@@ -1,137 +1,274 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta property="og:description" content="Découvrez l'âme d'ÉONIA : transformer votre jardin en un héritage intelligent et éternel.">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA | Notre Philosophie</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: #000;
-            color: #fff;
-            font-family: 'Raleway', sans-serif;
-            line-height: 1.8;
-            overflow-x: hidden;
-        }
+<meta property="og:description" content="Découvrez l'âme d'ÉONIA : transformer votre jardin en un héritage intelligent et éternel.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .container { max-width: 900px; margin: 0 auto; padding: 60px 25px; }
+<title>ÉONIA | Notre Philosophie</title>
 
-        header { text-align: center; margin-bottom: 80px; }
-        .logo-small { width: 60px; margin-bottom: 20px; opacity: 0.8; }
-        h1 { font-weight: 200; letter-spacing: 10px; text-transform: uppercase; font-size: 2.5rem; margin-bottom: 10px; }
-        .subtitle { color: #4ade80; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; }
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
 
-        /* Animation des blocs et de l'image */
-        .content-block, .img-container-premium { 
-            margin-bottom: 100px; 
-            opacity: 0; 
-            transform: translateY(30px); 
-            transition: 1s all ease; 
-        }
-        
-        .content-block.visible, .img-container-premium.visible { 
-            opacity: 1; 
-            transform: translateY(0); 
-        }
+<style>
 
-        h2 { font-weight: 400; font-size: 1.5rem; margin-bottom: 25px; color: #4ade80; }
-        p { color: #ccc; font-size: 1rem; margin-bottom: 20px; font-weight: 300; }
-        
-        .highlight { color: #fff; font-weight: 500; }
+* {
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-        .manifesto {
-            background: rgba(255,255,255,0.03);
-            padding: 40px;
-            border-left: 2px solid #4ade80;
-            border-radius: 0 15px 15px 0;
-            font-style: italic;
-        }
+body {
+background: #000;
+color: #fff;
+font-family: 'Raleway', sans-serif;
+line-height: 1.8;
+overflow-x: hidden;
+}
 
-        /* STYLE DE TA PHOTO */
-        .img-container-premium { width: 100%; margin: 40px 0; text-align: center; }
-        .img-premium {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
+.container {
+max-width: 900px;
+margin: 0 auto;
+padding: 60px 25px;
+}
 
-        .back-link {
-            display: inline-block;
-            margin-top: 40px;
-            color: #4ade80;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            border: 1px solid #4ade80;
-            padding: 12px 25px;
-            border-radius: 50px;
-            transition: 0.3s;
-        }
-        .back-link:hover { background: #4ade80; color: #000; }
-    </style>
+/* HEADER */
+
+header {
+text-align: center;
+margin-bottom: 80px;
+}
+
+.logo-small {
+width: 60px;
+margin-bottom: 20px;
+opacity: 0.8;
+}
+
+h1 {
+font-weight: 200;
+letter-spacing: 10px;
+text-transform: uppercase;
+font-size: 2.5rem;
+margin-bottom: 10px;
+}
+
+.subtitle {
+color: #4ade80;
+font-size: 0.8rem;
+letter-spacing: 4px;
+text-transform: uppercase;
+}
+
+/* ANIMATION */
+
+.content-block,
+.img-container-premium {
+margin-bottom: 100px;
+opacity: 0;
+transform: translateY(40px);
+transition: 1.2s cubic-bezier(.16,1,.3,1);
+}
+
+.content-block.visible,
+.img-container-premium.visible {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* TEXT */
+
+h2 {
+font-weight: 400;
+font-size: 1.5rem;
+margin-bottom: 25px;
+color: #4ade80;
+}
+
+p {
+color: #ccc;
+font-size: 1rem;
+margin-bottom: 20px;
+font-weight: 300;
+}
+
+.highlight {
+color: #fff;
+font-weight: 500;
+}
+
+/* MANIFESTO */
+
+.manifesto {
+background: rgba(255,255,255,0.03);
+padding: 40px;
+border-left: 2px solid #4ade80;
+border-radius: 0 15px 15px 0;
+font-style: italic;
+backdrop-filter: blur(8px);
+}
+
+/* IMAGE PREMIUM */
+
+.img-container-premium {
+width: 100%;
+margin: 40px 0;
+overflow: hidden;
+border-radius: 15px;
+}
+
+.img-premium {
+width: 100%;
+max-height: 500px;
+object-fit: cover;
+border-radius: 15px;
+border: 1px solid rgba(255,255,255,0.1);
+box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+transition: transform 6s ease;
+}
+
+.img-container-premium.visible .img-premium {
+transform: scale(1.05);
+}
+
+/* BUTTON */
+
+.back-link {
+display: inline-block;
+margin-top: 40px;
+color: #4ade80;
+text-decoration: none;
+text-transform: uppercase;
+font-size: 0.7rem;
+letter-spacing: 2px;
+border: 1px solid #4ade80;
+padding: 12px 25px;
+border-radius: 50px;
+transition: 0.3s;
+}
+
+.back-link:hover {
+background: #4ade80;
+color: #000;
+transform: translateY(-2px);
+}
+
+/* LIGHT EFFECT */
+
+body:before {
+content:"";
+position: fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background: radial-gradient(circle at 50% 20%, rgba(74,222,128,0.08), transparent 60%);
+pointer-events:none;
+z-index:-1;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <header>
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-small" alt="Logo">
-        <h1>ÉONIA</h1>
-        <div class="subtitle">L'Éternité Végétale</div>
-    </header>
 
-    <section class="content-block" id="vision">
-        <h2>Notre Vision</h2>
-        <p>Un jardin n'est pas qu'une collection de plantes, c'est une <span class="highlight">galerie de souvenirs</span>. Derrière chaque arbre planté se cache une histoire.</p>
-        <p>ÉONIA transforme votre jardin en un héritage intelligent. Qu'il soit transmis à vos enfants ou aux futurs propriétaires, votre patrimoine végétal garde son histoire.</p>
-    </section>
+<header>
 
-    <div class="img-container-premium">
-        <img src="plaque.png" alt="Plaque ÉONIA" class="img-premium" loading="lazy">
-    </div>
+<img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png"
+class="logo-small"
+alt="Logo">
 
-    <section class="content-block">
-        <h2>Le Concept</h2>
-        <div class="manifesto">
-            "Nous ne vendons pas des étiquettes botaniques. Nous créons des capsules temporelles pour votre patrimoine vivant."
-        </div>
-        <p style="margin-top: 30px;">Chaque plaque ÉONIA est équipée d'une puce <span class="highlight">NFC</span> et d'un <span class="highlight">QR Code</span> unique.</p>
-    </section>
+<h1>ÉONIA</h1>
+<div class="subtitle">L'Éternité Végétale</div>
 
-    <section class="content-block">
-        <h2>Pourquoi ÉONIA ?</h2>
-        <p><strong style="color: #fff;">Transmission & Valeur :</strong> Le jardin devient un actif valorisé avec son propre carnet d'entretien numérique.</p>
-        <p><strong style="color: #fff;">Esthétique :</strong> Un design minimaliste qui s'intègre avec respect dans chaque paysage.</p>
-    </section>
+</header>
 
-    <center>
-        <a href="index.html" class="back-link">Retour à l'accueil</a>
-    </center>
+<section class="content-block">
+
+<h2>Notre Vision</h2>
+
+<p>
+Un jardin n'est pas qu'une collection de plantes,
+c'est une <span class="highlight">galerie de souvenirs</span>.
+Derrière chaque arbre planté se cache une histoire.
+</p>
+
+<p>
+ÉONIA transforme votre jardin en un héritage intelligent.
+Qu'il soit transmis à vos enfants ou aux futurs propriétaires,
+votre patrimoine végétal garde son histoire.
+</p>
+
+</section>
+
+<div class="img-container-premium">
+<img src="plaque.png"
+alt="Plaque ÉONIA"
+class="img-premium"
+loading="lazy">
+</div>
+
+<section class="content-block">
+
+<h2>Le Concept</h2>
+
+<div class="manifesto">
+"Nous ne vendons pas des étiquettes botaniques.
+Nous créons des capsules temporelles pour votre patrimoine vivant."
+</div>
+
+<p style="margin-top:30px;">
+Chaque plaque ÉONIA est équipée d'une
+<span class="highlight">puce NFC</span>
+et d'un
+<span class="highlight">QR Code</span>
+unique.
+</p>
+
+</section>
+
+<section class="content-block">
+
+<h2>Pourquoi ÉONIA ?</h2>
+
+<p>
+<strong style="color:#fff;">Transmission & Valeur :</strong>
+Le jardin devient un actif valorisé avec son propre carnet d'entretien numérique.
+</p>
+
+<p>
+<strong style="color:#fff;">Esthétique :</strong>
+Un design minimaliste qui s'intègre avec respect dans chaque paysage.
+</p>
+
+</section>
+
+<center>
+<a href="index.html" class="back-link">
+Retour à l'accueil
+</a>
+</center>
+
 </div>
 
 <script>
-    // Ce script gère l'apparition fluide des textes ET de l'image
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
 
-    // On observe les blocs de texte
-    document.querySelectorAll('.content-block').forEach(block => {
-        observer.observe(block);
-    });
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.classList.add('visible');
+}
+});
+}, { threshold: 0.15 });
 
-    // On observe aussi le conteneur de l'image
-    const imgBlock = document.querySelector('.img-container-premium');
-    if(imgBlock) observer.observe(imgBlock);
+document.querySelectorAll('.content-block').forEach(block => {
+observer.observe(block);
+});
+
+const imgBlock = document.querySelector('.img-container-premium');
+if(imgBlock) observer.observe(imgBlock);
+
 </script>
 
 </body>
