@@ -185,12 +185,10 @@
         let lon = localStorage.getItem('user_lon');
         let city = localStorage.getItem('user_city');
 
-        // Demande Géo si rien n'est stocké
         if (!lat && !lon && !city) {
             askGeo();
         }
 
-        // Cache local pour rapidité
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             const plants = JSON.parse(cachedData);
@@ -277,12 +275,27 @@
         if (p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
-            let cleanAdvice = p.Alertes[0].split('|')[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
+            
+            let firstAlerte = p.Alertes[0].split('|');
+            let cleanAdvice = firstAlerte[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
             adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
+
             document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
-                const d = new Date(); d.setDate(new Date().getDate() + idx);
-                return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
+                const d = new Date(); 
+                d.setDate(new Date().getDate() + idx);
+                
+                let dayLabel = "";
+                if (idx === 0) dayLabel = "AUJOURD'HUI";
+                else if (idx === 1) dayLabel = "DEMAIN";
+                else dayLabel = d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
+
+                return `
+                    <div class="w-col">
+                        <span class="w-day">${dayLabel}</span>
+                        <span class="w-icon">${s[1] || "☀️"}</span>
+                        <span class="w-temp">${s[2] || "-- / --"}</span>
+                    </div>`;
             }).join('');
         }
 
