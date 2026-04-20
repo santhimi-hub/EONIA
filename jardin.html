@@ -47,15 +47,11 @@
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
-        .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #888; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
-        .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
-
+        
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .evo-scroll::-webkit-scrollbar { display: none; }
         .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; }
 
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
-        .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
@@ -63,7 +59,7 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; outline: none; }
+        #plant-date, #plant-note { width: 100%; background: #080808 !important; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -117,43 +113,40 @@
                 <div id="acc-asso" class="acc-content"><div class="acc-inner" id="val-asso"></div></div>
             </div>
             
-            <div id="expert-area" class="expert-card">
+            <div id="expert-area" style="background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px;">
                 <div class="section-title">Le Geste de l'Artisan — <span id="expert-month"></span></div>
                 <div id="expert-text" style="font-size: 0.85rem; line-height: 1.6; color: #ddd; font-style: italic;"></div>
             </div>
 
-            <div class="maintenance-card" id="gallery-area">
+            <div class="maintenance-card">
                 <div class="section-title">PHOTOS D'ÉVOLUTION</div>
                 <div id="evo-gallery" class="evo-scroll"></div>
                 <div id="upload-zone" class="hidden">
                     <input type="file" id="file-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent); margin-top:10px;" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo</button>
+                    <button class="btn-eonia" style="border-color:var(--accent); color:var(--accent);" onclick="document.getElementById('file-input').click()">📸 Ajouter une photo</button>
                 </div>
             </div>
 
-            <div class="maintenance-card" id="journal-card">
+            <div class="maintenance-card">
                 <div id="journal-owner-view">
                     <div class="section-title">TABLEAU DE BORD - JOURNAL</div>
                     <div class="toggle-container">
-                        <span class="toggle-label">Partager le journal (Public)</span>
+                        <span style="font-size:0.65rem; color:#888;">Partager le journal (Public)</span>
                         <label class="switch">
                             <input type="checkbox" id="journal-public-toggle" onchange="showSave()">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase;">Date de plantation</label>
                     <input type="date" id="plant-date" oninput="showSave()">
-                    <label style="font-size: 0.55rem; color: #555; text-transform: uppercase; margin-top: 15px; display: block;">Observations</label>
-                    <textarea id="plant-note" rows="3" placeholder="Ajouter une observation..." oninput="showSave()"></textarea>
-                    <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer les notes</button>
+                    <textarea id="plant-note" rows="3" placeholder="Observations..." oninput="showSave()"></textarea>
+                    <button id="btn-save-note" class="btn-eonia btn-save-theme" onclick="saveJournal()">💾 Enregistrer</button>
                 </div>
                 <div id="journal-visitor-view" class="hidden">
                     <div class="section-title">HISTORIQUE DE LA PLANTE</div>
                     <div id="visitor-journal-content"></div>
                 </div>
             </div>
-            
-            <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 25px; justify-content: center;" onclick="sharePlant()">✨ Partager ma plante</button>
+            <button class="location-btn" style="width:100%; padding: 15px; margin-bottom: 40px;" onclick="sharePlant()">✨ Partager ma plante</button>
         </div>
 
         <div class="maintenance-card hidden" id="catalog-desc-area">
@@ -162,26 +155,22 @@
         </div>
 
         <div id="catalog-area" class="hidden">
-            <button style="background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-top: 30px; margin-bottom: 40px;" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque ÉONIA</button>
+            <button style="background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin-bottom: 40px;" onclick="window.location.href='commander.html'">🏷️ Commander ma plaque ÉONIA</button>
         </div>
     </div>
 
 <script>
-    // --- 1. NEUTRALISATION RADICALE DU GPS POUR INVITES ---
+    // 1. SÉCURITÉ GPS & IDENTITÉ
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
     const isOwner = (userEmail && userEmail !== "" && userEmail !== "invite@eonia.com" && userPin);
 
     if (!isOwner) {
-        // On remplace les fonctions de géoloc par des fonctions qui ne font rien
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition = (s, e) => { if(e) e({code:1}); };
             navigator.geolocation.watchPosition = () => 0;
         }
-        // Nettoyage cache
-        localStorage.removeItem('user_lat');
-        localStorage.removeItem('user_lon');
-        localStorage.removeItem('user_city');
+        localStorage.removeItem('user_lat'); localStorage.removeItem('user_lon'); localStorage.removeItem('user_city');
     }
 
     const API_URL = "https://eonia-api.santhimi.workers.dev";
@@ -192,22 +181,16 @@
 
     async function init() {
         if (!rawPlantId) return;
-
         const lat = isOwner ? localStorage.getItem('user_lat') : null;
         const lon = isOwner ? localStorage.getItem('user_lon') : null;
         const city = isOwner ? localStorage.getItem('user_city') : null;
 
-        if (isOwner && !lat && !lon && !city) {
-            askGeo();
-        }
+        if (isOwner && !lat && !lon && !city) askGeo();
 
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             const plants = JSON.parse(cachedData);
-            const p = plants.find(item => 
-                (item.id && item.id.replace(/-/g, "") === plantIdClean) || 
-                item.id === rawPlantId
-            );
+            const p = plants.find(item => (item.id && item.id.replace(/-/g, "") === plantIdClean) || item.id === rawPlantId);
             if (p) render(p);
         }
         fetchUpdate(lat, lon, city);
@@ -215,23 +198,11 @@
 
     function askGeo() {
         if (!isOwner) return;
-        if (confirm("🌿 Pour vous donner des conseils d'arrosage et de gel précis, ÉONIA a besoin de votre position. Autorisez-vous la géolocalisation ?")) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                localStorage.setItem('user_lat', lat);
-                localStorage.setItem('user_lon', lon);
-                try {
-                    await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            email: userEmail, pin: userPin, plantId: rawPlantId, 
-                            action: 'save_geo', lat: lat, lon: lon 
-                        })
-                    });
-                } catch (e) {}
-                fetchUpdate(lat, lon);
+        if (confirm("🌿 Autorisez-vous la géolocalisation pour la météo ?")) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                localStorage.setItem('user_lat', pos.coords.latitude);
+                localStorage.setItem('user_lon', pos.coords.longitude);
+                fetchUpdate(pos.coords.latitude, pos.coords.longitude);
             });
         }
     }
@@ -245,16 +216,14 @@
                     email: isOwner ? userEmail : "visitor@eonia.com", 
                     pin: isOwner ? userPin : "0000", 
                     plantId: rawPlantId, 
-                    lat: isOwner ? lat : null, 
-                    lon: isOwner ? lon : null, 
-                    city: isOwner ? city : null 
+                    lat: isOwner ? lat : null, lon: isOwner ? lon : null, city: isOwner ? city : null 
                 }) 
             });
             const data = await res.json();
             localStorage.setItem(cacheKey, JSON.stringify(data));
             const p = data.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p);
-        } catch (e) {}
+        } catch (e) { console.error(e); }
     }
 
     function render(p) {
@@ -270,43 +239,30 @@
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
             let firstAlerte = p.Alertes[0].split('|');
-            let cleanAdvice = firstAlerte[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
-            adviceBox.innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
+            adviceBox.innerText = firstAlerte[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
 
             document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                 const s = str.split('|');
-                const d = new Date(); 
-                d.setDate(new Date().getDate() + idx);
-                let dayLabel = (idx === 0) ? "AUJOURD'HUI" : (idx === 1) ? "DEMAIN" : d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
-                return `<div class="w-col"><span class="w-day">${dayLabel}</span><span class="w-icon">${s[1]||"☀️"}</span><span class="w-temp">${s[2]||"--/--"}</span></div>`;
+                const d = new Date(); d.setDate(d.getDate() + idx);
+                let day = (idx === 0) ? "AUJOURD'HUI" : (idx === 1) ? "DEMAIN" : d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
+                return `<div class="w-col"><span class="w-day">${day}</span><span class="w-icon">${s[1]||"☀️"}</span><span class="w-temp">${s[2]||"--"}</span></div>`;
             }).join('');
-        } else {
-            document.getElementById('weather-wrapper').classList.add('hidden');
         }
 
         if (p.est_dans_jardin) {
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
             if (isOwner) {
-                document.getElementById('journal-owner-view').classList.remove('hidden');
                 document.getElementById('upload-zone').classList.remove('hidden');
-                document.getElementById('plant-note').value = p.Note_Privee && p.Note_Privee !== "-" ? p.Note_Privee : "";
-                document.getElementById('plant-date').value = p.Date_Plantation && p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
                 document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
                 if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
-                   document.getElementById('journal-visitor-view').classList.remove('hidden');
-                   document.getElementById('visitor-journal-content').innerHTML = `<p style="font-size:0.75rem;">Plantée le : ${p.Date_Plantation||'Non précisé'}</p><p style="font-style:italic; font-size:0.8rem;">"${p.Note_Privee||''}"</p>`;
+                    document.getElementById('journal-visitor-view').classList.remove('hidden');
+                    document.getElementById('visitor-journal-content').innerHTML = `<p>${p.Date_Plantation}</p><p><i>${p.Note_Privee}</i></p>`;
                 }
-            }
-            const gallery = document.getElementById('evo-gallery');
-            if (p.Photos_Evolution && p.Photos_Evolution.length > 0) {
-                gallery.innerHTML = p.Photos_Evolution.map(imgUrl => `
-                    <div style="position:relative; flex-shrink:0;">
-                        <img src="${imgUrl}">
-                        ${isOwner ? `<div onclick="deletePhoto('${imgUrl}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;">×</div>` : ''}
-                    </div>`).join('');
             }
             document.getElementById('val-desc').innerText = p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
@@ -319,49 +275,13 @@
             document.getElementById('catalog-desc-area').classList.remove('hidden');
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
-        const fds = [{l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true}, {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, {l:"Taille maturité", v:p["Taille à maturité"]}, {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}];
+        const fds = [{l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true}, {l:"Persistance", v:p.Persistance}, {l:"Taille maturité", v:p["Taille à maturité"]}, {l:"Arrosage", v:p.Arrosage}, {l:"Exposition", v:p.Exposition}];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    async function handleWateringAction() {
-        if (!isOwner) return;
-        const btn = document.getElementById('btn-water-main');
-        btn.innerText = "⏳..."; btn.disabled = true;
-        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'record_watering' }) });
-        fetchUpdate();
-    }
-
-    async function uploadPhoto(input) {
-        if (!isOwner || !input.files[0]) return;
-        const formData = new FormData();
-        formData.append('file', input.files[0]);
-        formData.append('action', 'upload_photo_binaire');
-        formData.append('plantId', rawPlantId);
-        formData.append('email', userEmail);
-        formData.append('pin', userPin);
-        await fetch(API_URL, { method: 'POST', body: formData });
-        fetchUpdate();
-    }
-
-    async function deletePhoto(photoUrl) {
-        if (!isOwner || !confirm("Supprimer cette photo ?")) return;
-        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl: photoUrl }) });
-        fetchUpdate();
-    }
-
-    async function saveJournal() {
-        if (!isOwner) return;
-        const note = document.getElementById('plant-note').value;
-        const date = document.getElementById('plant-date').value;
-        const isPublic = document.getElementById('journal-public-toggle').checked;
-        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'update_prive', note, date, journal_public: isPublic }) });
-        document.getElementById('btn-save-note').style.display = "none";
-        fetchUpdate();
-    }
-
     function toggleAcc(id) {
-        const content = document.getElementById(id);
-        content.style.maxHeight = (content.style.maxHeight && content.style.maxHeight !== "0px") ? "0px" : content.scrollHeight + "px";
+        const c = document.getElementById(id);
+        c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px";
     }
 
     function updateExtraFeatures() {
@@ -376,19 +296,23 @@
     }
 
     function changeLocation() {
-        if (!isOwner) return;
         const city = prompt("Ville :");
-        if (city) {
-            localStorage.setItem('user_city', city);
-            localStorage.removeItem('user_lat'); localStorage.removeItem('user_lon');
-            fetchUpdate(null, null, city);
-        }
+        if (city) { localStorage.setItem('user_city', city); fetchUpdate(null, null, city); }
     }
 
     function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
+    
+    async function saveJournal() {
+        const note = document.getElementById('plant-note').value;
+        const date = document.getElementById('plant-date').value;
+        const isPublic = document.getElementById('journal-public-toggle').checked;
+        await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:userEmail, pin:userPin, plantId:rawPlantId, action:'update_prive', note, date, journal_public:isPublic})});
+        document.getElementById('btn-save-note').style.display = "none";
+        fetchUpdate();
+    }
+
     function sharePlant() {
-        const url = new URL(window.location.href);
-        const cleanUrl = `${url.origin}${url.pathname}?id=${rawPlantId}`;
+        const cleanUrl = window.location.origin + window.location.pathname + "?id=" + rawPlantId;
         if (navigator.share) navigator.share({ title: 'ÉONIA', url: cleanUrl });
         else window.prompt("Lien :", cleanUrl);
     }
