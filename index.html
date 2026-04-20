@@ -406,11 +406,11 @@
                 localStorage.setItem('user_pin', pin);
                 localStorage.setItem('eonia_access', 'client');
 
-                // Redirection
+                // Redirection logic
                 if (plaqueEnAttente) {
-                    window.location.href = "jardin.html?id=" + plaqueEnAttente;
+                    window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente;
                 } else {
-                    window.location.href = "catalogue.html";
+                    window.location.href = "jardin.html";
                 }
             } else {
                 alert("Email ou PIN incorrect pour ce jardin.");
@@ -432,7 +432,7 @@
         window.location.href = "catalogue.html";
     }
 
-    // --- NOUVELLE FONCTION VISIBILITÉ PIN ---
+    // --- VISIBILITÉ PIN ---
     function togglePinVisibility() {
         const pinInput = document.getElementById('pin');
         const eyeIcon = document.getElementById('eye-icon');
