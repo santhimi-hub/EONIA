@@ -272,7 +272,8 @@
         const savedCity = localStorage.getItem('user_city');
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
-        if (p.Alertes && p.Alertes.length > 0) {
+        // --- MÉTÉO UNIQUEMENT SI DANS LE JARDIN ---
+        if (p.est_dans_jardin && p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
             
@@ -285,10 +286,7 @@
                 const d = new Date(); 
                 d.setDate(new Date().getDate() + idx);
                 
-                let dayLabel = "";
-                if (idx === 0) dayLabel = "AUJOURD'HUI";
-                else if (idx === 1) dayLabel = "DEMAIN";
-                else dayLabel = d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
+                let dayLabel = (idx === 0) ? "AUJOURD'HUI" : (idx === 1) ? "DEMAIN" : d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
 
                 return `
                     <div class="w-col">
@@ -297,6 +295,8 @@
                         <span class="w-temp">${s[2] || "-- / --"}</span>
                     </div>`;
             }).join('');
+        } else {
+            document.getElementById('weather-wrapper').classList.add('hidden');
         }
 
         if (p.est_dans_jardin) {
