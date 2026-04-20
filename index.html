@@ -174,8 +174,9 @@
 
         .link-order:hover { color:#fff; }
 
+        /* MODIFICATION : ESPACEMENT PLUS IMPORTANT ICI */
         .bottom-nav {
-            margin-top:35px;
+            margin-top:70px; /* Augmenté de 35px à 70px pour plus d'esthétique */
             opacity:0;
             animation: fadeUp 1s ease forwards;
             animation-delay: 1s;
@@ -370,6 +371,13 @@
         }
     };
 
+    // --- NOUVEAUTÉ : GESTION DE LA TOUCHE ENTRÉE ---
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            validerConnexion();
+        }
+    });
+
     async function validerConnexion() {
         const btn = document.getElementById('btn-entrer');
         const mail = document.getElementById('email').value.toLowerCase().trim();
@@ -394,11 +402,9 @@
                 localStorage.setItem('user_email', mail);
                 localStorage.setItem('user_pin', pin);
                 
-                // REDIRECTION : Si plaque scannée -> Catalogue, sinon -> Jardin
                 if (plaqueEnAttente) {
                     window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente;
                 } else {
-                    // On peut forcer le catalogue si on veut que l'utilisateur voit tout
                     window.location.href = "catalogue.html"; 
                 }
             } else {
