@@ -186,7 +186,6 @@
             const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
             if (p) render(p); 
         }
-        // Ici, on ne fetch pas tout de suite avec la ville pour laisser la fonction render décider du besoin
         fetchUpdate(null, null, localStorage.getItem('user_city'));
     }
 
@@ -203,7 +202,6 @@
         } catch (e) { console.error(e); }
     }
 
-    // NOUVELLE FONCTION : Demande la géoloc uniquement si nécessaire
     function askLocationIfInGarden() {
         const savedCity = localStorage.getItem('user_city');
         if (!savedCity && navigator.geolocation) {
@@ -233,12 +231,8 @@
 
         const weatherWrapper = document.getElementById('weather-wrapper');
         
-        // CONDITION : On ne gère la météo (et la demande de géoloc) que si c'est "Ma Plante"
         if (p.est_dans_jardin) {
-            
-            // On demande la position si ce n'est pas encore fait
             askLocationIfInGarden();
-
             if (p.Alertes && p.Alertes.length > 0) {
                 weatherWrapper.classList.remove('hidden');
                 const adviceBox = document.getElementById('weather-advice');
@@ -250,7 +244,6 @@
                     return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
                 }).join('');
             }
-
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
             document.getElementById('catalog-area').classList.add('hidden');
@@ -301,7 +294,6 @@
             }
             updateExtraFeatures();
         } else {
-            // PARTIE CATALOGUE : On cache tout ce qui est personnel
             weatherWrapper.classList.add('hidden');
             document.getElementById('owner-area').classList.add('hidden');
             document.getElementById('owner-area-2').classList.add('hidden');
@@ -313,7 +305,7 @@
         const fds = [
             {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance || p["Persistance du feuillage"]}, 
-            {l:"Taille maturité", v:p["Taille à maturité"]},
+            {l:"Taille Adulte", v:p["Taille à maturité"]}, // MODIFIÉ ICI
             {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage}, 
             {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
         ];
