@@ -223,7 +223,12 @@
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                     const s = str.split('|');
                     const d = new Date(); d.setDate(new Date().getDate() + idx);
-                    return `<div class="w-col"><span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span><span class="w-icon">${s[1]}</span><span class="w-temp">${s[2]}</span></div>`;
+                    const tempDisplay = s[2] || "--"; // Récupère le texte de température (ex: "22°/12°")
+                    return `<div class="w-col">
+                        <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
+                        <span class="w-icon">${s[1]}</span>
+                        <span class="w-temp" style="font-weight:bold; font-size:0.7rem;">${tempDisplay}</span>
+                    </div>`;
                 }).join('');
             }
             document.getElementById('owner-area').classList.remove('hidden');
@@ -288,7 +293,19 @@
 
     async function handleWateringAction() { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })}); fetchUpdate(); }
     async function deleteWatering(date) { if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date })}); fetchUpdate(); }
-    async function deletePhoto(photoUrl) { if (!confirm("Supprimer cette photo ?")) return; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl })}); fetchUpdate(); }
+    
+    async function deletePhoto(photoUrl) { 
+        if (!confirm("Supprimer cette photo ?")) return; 
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl })
+            }); 
+            fetchUpdate(); // Rafraîchit l'affichage immédiatement
+        } catch(e) { alert("Erreur de suppression."); }
+    }
+
     async function uploadPhoto(input) { const formData = new FormData(); formData.append('file', input.files[0]); formData.append('action', 'upload_photo_binaire'); formData.append('plantId', rawPlantId); formData.append('email', userEmail); formData.append('pin', userPin); await fetch(API_URL, { method: 'POST', body: formData }); fetchUpdate(); }
     async function saveJournal() { const note = document.getElementById('plant-note').value; const date = document.getElementById('plant-date').value; const isPublic = document.getElementById('journal-public-toggle').checked; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic })}); document.getElementById('btn-save-note').style.display = "none"; fetchUpdate(); }
     function toggleAcc(id) { const c = document.getElementById(id); c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px"; }
