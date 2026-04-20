@@ -176,6 +176,27 @@
     const isOwner = (userEmail && userPin); 
     const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
+    function fixNotionValues(key, val) {
+        if (!val || val === "-" || val === "") return "-";
+        const v = String(val).trim();
+        if (key === "Difficulté") {
+            if (v === "1") return "💪 Débutant";
+            if (v === "2") return "💪💪 Intermédiaire";
+            if (v === "3") return "💪💪💪 Expert";
+        }
+        if (key === "Exposition") {
+            if (v === "1") return "☀️ Plein soleil";
+            if (v === "2") return "⛅ Mi-ombre";
+            if (v === "3") return "☁️ Ombre";
+        }
+        if (key === "Arrosage") {
+            if (v.includes("3")) return "💧💧💧";
+            if (v.includes("2")) return "💧💧";
+            if (v.includes("1")) return "💧";
+        }
+        return v;
+    }
+
     async function init() {
         if (!rawPlantId) return;
         const cachedData = localStorage.getItem(cacheKey);
@@ -219,11 +240,13 @@
             if (!city) askLocationIfInGarden();
             if (p.Alertes && p.Alertes.length > 0) {
                 document.getElementById('weather-wrapper').classList.remove('hidden');
-                document.getElementById('weather-advice').innerText = p.Alertes[0].split('|')[0];
+                let cleanAdvice = p.Alertes[0].split('|')[0].replace(/^aujourd'hui[,\s:]*/i, "").trim();
+                document.getElementById('weather-advice').innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
+                
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
-                    const s = str.split('|');
+                    const s = str.split('|'); 
                     const d = new Date(); d.setDate(new Date().getDate() + idx);
-                    const tempDisplay = s[2] || "--"; // Récupère le texte de température (ex: "22°/12°")
+                    const tempDisplay = s[2] || "--";
                     return `<div class="w-col">
                         <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
                         <span class="w-icon">${s[1]}</span>
@@ -246,11 +269,13 @@
                         <img src="${url}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">
                         ${isOwner ? `<div onclick="deletePhoto('${url}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;">×</div>` : ''}
                     </div>`).join('') : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
+            
             document.getElementById('val-desc').innerText = p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
+            
             const h = document.getElementById('watering-history');
             if (p.Historique_Data && p.Historique_Data !== "-") {
                 const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
@@ -271,8 +296,10 @@
         const fds = [
             {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance}, {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille maturité"]},
-            {l:"Difficulté", v:p.Difficulté}, {l:"Arrosage", v:p.Arrosage},
-            {l:"Exposition", v:p.Exposition}, {l:"Rusticité", v:p.Rusticité}
+            {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}, 
+            {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)},
+            {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)}, 
+            {l:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
@@ -292,22 +319,28 @@
     }
 
     async function handleWateringAction() { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })}); fetchUpdate(); }
-    async function deleteWatering(date) { if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date })}); fetchUpdate(); }
+    
+    async function deleteWatering(date) { 
+        if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return; 
+        const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date })}); 
+        if(res.ok) fetchUpdate();
+    }
     
     async function deletePhoto(photoUrl) { 
         if (!confirm("Supprimer cette photo ?")) return; 
         try {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl })
+            const res = await fetch(API_URL, { 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl }) 
             }); 
-            fetchUpdate(); // Rafraîchit l'affichage immédiatement
-        } catch(e) { alert("Erreur de suppression."); }
+            if(res.ok) fetchUpdate(); 
+        } catch(e) { alert("Erreur suppression"); }
     }
 
     async function uploadPhoto(input) { const formData = new FormData(); formData.append('file', input.files[0]); formData.append('action', 'upload_photo_binaire'); formData.append('plantId', rawPlantId); formData.append('email', userEmail); formData.append('pin', userPin); await fetch(API_URL, { method: 'POST', body: formData }); fetchUpdate(); }
+    
     async function saveJournal() { const note = document.getElementById('plant-note').value; const date = document.getElementById('plant-date').value; const isPublic = document.getElementById('journal-public-toggle').checked; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic })}); document.getElementById('btn-save-note').style.display = "none"; fetchUpdate(); }
+    
     function toggleAcc(id) { const c = document.getElementById(id); c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px"; }
 
     function updateExtraFeatures() {
@@ -317,20 +350,7 @@
         document.getElementById('cycle-pct').innerText = pct + "%";
         const labels = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos"];
         document.getElementById('cycle-label').innerText = labels[m];
-        const tips = [
-            "Protection : Vérifiez le paillage au pied pour protéger les racines du gel profond.",
-            "Taille de formation : Supprimez le bois mort et les branches croisées pour aérer le cœur.",
-            "Apport organique : Griffez un peu de compost décomposé au pied avant la reprise de sève.",
-            "Surveillance : Guettez les pucerons sur les jeunes pousses tendres. Douchez à l'eau savonneuse.",
-            "Mulching : Installez un paillis organique (tonte, écorces) pour garder le sol frais.",
-            "Hydratation : Arrosez copieusement au pied, de préférence le soir, sans mouiller le feuillage.",
-            "Entretien : Coupez les fleurs fanées pour stimuler une éventuelle remontée de floraison.",
-            "Nutrition : Un dernier apport de potasse peut aider à l'aoûtement (durcissement du bois).",
-            "Nettoyage : Supprimez les parties sèches et commencez à réduire les arrosages.",
-            "Plantation : C'est le moment idéal pour diviser les touffes ou replanter si besoin.",
-            "Dormance : Laissez les feuilles mortes au sol, elles servent d'abri aux insectes utiles.",
-            "Hivernage : Si de fortes gelées sont annoncées, installez un voile sur les parties aériennes."
-        ];
+        const tips = ["Paillage épais recommandé.", "Supprimez le bois mort.", "Apport d'engrais organique.", "Surveillez les jeunes pousses.", "Binez le sol pour aérer.", "Arrosez généreusement le soir.", "Maintenez le pied humide.", "Taillez les fleurs fanées.", "Réduisez l'eau doucement.", "Installez les voiles d'hivernage.", "Laissez les feuilles au sol.", "La plante dort, ne taillez pas."];
         document.getElementById('expert-month').innerText = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][m];
         document.getElementById('expert-text').innerText = tips[m];
     }
