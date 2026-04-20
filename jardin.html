@@ -180,12 +180,24 @@
 
     async function init() {
         if (!rawPlantId) return;
+
+        // 1. Chercher dans le cache
         const cachedData = localStorage.getItem(cacheKey);
+        let foundInCache = false;
+
         if (cachedData) {
             const plants = JSON.parse(cachedData);
-            const p = plants.find(item => item.id.replace(/-/g, "") === plantIdClean || item.id === rawPlantId);
-            if (p) render(p); 
+            const p = plants.find(item => 
+                (item.id && item.id.replace(/-/g, "") === plantIdClean) || 
+                item.id === rawPlantId
+            );
+            if (p) {
+                render(p); 
+                foundInCache = true;
+            }
         }
+
+        // 2. Toujours appeler l'API (pour activation fraîche ou alertes météo)
         fetchUpdate(null, null, localStorage.getItem('user_city'));
     }
 
