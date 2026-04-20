@@ -172,20 +172,28 @@
     const rawPlantId = urlParams.get('id');
     const plantIdClean = rawPlantId ? rawPlantId.replace(/-/g, "") : null;
     
+    // VERIFICATION STRICTE DE L'IDENTITÉ
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
-    const isOwner = (userEmail && userPin); 
+    const isOwner = (userEmail && userEmail !== "" && userPin && userPin !== ""); 
     
-    const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
+    const cacheKey = `eonia_cache_${isOwner ? userEmail : 'visitor'}`;
 
     async function init() {
         if (!rawPlantId) return;
 
-        let lat = isOwner ? localStorage.getItem('user_lat') : null;
-        let lon = isOwner ? localStorage.getItem('user_lon') : null;
-        let city = isOwner ? localStorage.getItem('user_city') : null;
+        // Nettoyage immédiat si visiteur pour éviter tout déclenchement résiduel
+        if (!isOwner) {
+            localStorage.removeItem('user_lat');
+            localStorage.removeItem('user_lon');
+            localStorage.removeItem('user_city');
+        }
 
-        // Demande de geoloc UNIQUEMENT pour le proprio
+        const lat = isOwner ? localStorage.getItem('user_lat') : null;
+        const lon = isOwner ? localStorage.getItem('user_lon') : null;
+        const city = isOwner ? localStorage.getItem('user_city') : null;
+
+        // On ne demande la géoloc QUE si on est propriétaire IDENTIFIÉ
         if (isOwner && !lat && !lon && !city) {
             askGeo();
         }
@@ -204,6 +212,9 @@
     }
 
     function askGeo() {
+        // Double sécurité : si on n'est pas propriétaire, on sort immédiatement
+        if (!isOwner) return;
+
         if (confirm("🌿 Pour vous donner des conseils d'arrosage et de gel précis, ÉONIA a besoin de votre position. Autorisez-vous la géolocalisation ?")) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -232,7 +243,7 @@
 
     async function fetchUpdate(lat = null, lon = null, city = null) {
         try {
-            // Force null pour les invités pour éviter les fuites de geoloc du navigateur
+            // Un invité n'envoie JAMAIS de coordonnées
             const finalLat = isOwner ? (lat || localStorage.getItem('user_lat')) : null;
             const finalLon = isOwner ? (lon || localStorage.getItem('user_lon')) : null;
             const finalCity = isOwner ? (city || localStorage.getItem('user_city')) : null;
@@ -240,8 +251,8 @@
             const res = await fetch(API_URL, { 
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify({ 
-                    email: userEmail || "visitor@eonia.com", 
-                    pin: userPin || "0000", 
+                    email: isOwner ? userEmail : "visitor@eonia.com", 
+                    pin: isOwner ? userPin : "0000", 
                     plantId: rawPlantId, 
                     lat: finalLat, 
                     lon: finalLon, 
@@ -256,7 +267,7 @@
     }
 
     function changeLocation() {
-        if (!isOwner) return; // Sécurité supplémentaire
+        if (!isOwner) return;
         const city = prompt("Entrez le nom de votre ville :");
         if (city) {
             localStorage.setItem('user_city', city);
@@ -274,7 +285,7 @@
         const savedCity = isOwner ? localStorage.getItem('user_city') : null;
         if (savedCity) document.getElementById('display-city').innerText = "📍 " + savedCity.toUpperCase();
 
-        // --- MÉTÉO UNIQUEMENT SI DANS LE JARDIN ---
+        // MÉTÉO : Affichée seulement si la plante est possédée (Jardin)
         if (p.est_dans_jardin && p.Alertes && p.Alertes.length > 0) {
             document.getElementById('weather-wrapper').classList.remove('hidden');
             const adviceBox = document.getElementById('weather-advice');
@@ -287,9 +298,7 @@
                 const s = str.split('|');
                 const d = new Date(); 
                 d.setDate(new Date().getDate() + idx);
-                
                 let dayLabel = (idx === 0) ? "AUJOURD'HUI" : (idx === 1) ? "DEMAIN" : d.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase();
-
                 return `
                     <div class="w-col">
                         <span class="w-day">${dayLabel}</span>
@@ -315,8 +324,6 @@
             } else {
                 document.getElementById('watering-card').classList.add('hidden');
                 document.getElementById('upload-zone').classList.add('hidden');
-                
-                // Affichage du journal pour visiteur si public
                 if (p.Journal_Public === true || p.Journal_Public === "TRUE") {
                    document.getElementById('journal-visitor-view').classList.remove('hidden');
                    document.getElementById('visitor-journal-content').innerHTML = `
@@ -357,13 +364,11 @@
                 if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
                     const btn = document.getElementById('btn-water-main');
                     btn.innerText = "✅ Arrosé aujourd'hui"; 
-                    btn.className = "btn-eonia btn-disabled"; 
-                    btn.onclick = null;
+                    btn.className = "btn-eonia btn-disabled"; btn.onclick = null;
                 } else if (isOwner) {
                     const btn = document.getElementById('btn-water-main');
                     btn.innerText = "💦 Marquer comme arrosé";
-                    btn.className = "btn-eonia btn-water-theme";
-                    btn.onclick = handleWateringAction;
+                    btn.className = "btn-eonia btn-water-theme"; btn.onclick = handleWateringAction;
                 }
             }
             updateExtraFeatures();
@@ -384,37 +389,33 @@
     }
 
     async function handleWateringAction() {
+        if (!isOwner) return;
         const btn = document.getElementById('btn-water-main');
         btn.innerText = "⏳..."; btn.disabled = true;
         await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'record_watering' }) 
         });
         fetchUpdate();
     }
 
     async function deleteWatering(date) {
-        if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return;
+        if (!isOwner || !confirm(`Supprimer l'arrosage du ${date} ?`)) return;
         await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date }) 
         });
         fetchUpdate();
     }
 
     async function uploadPhoto(input) {
-        if (!input.files || !input.files[0]) return;
+        if (!isOwner || !input.files || !input.files[0]) return;
         const file = input.files[0];
         const btn = document.querySelector("#upload-zone button");
-        const oldText = btn.innerText;
-        btn.innerText = "⏳ Optimisation...";
-        btn.disabled = true;
+        btn.innerText = "⏳ Envoi..."; btn.disabled = true;
 
         try {
             const compressedFile = await compressImage(file, 1200); 
-            btn.innerText = "🚀 Envoi...";
             const formData = new FormData();
             formData.append('file', compressedFile);
             formData.append('action', 'upload_photo_binaire');
@@ -423,10 +424,9 @@
             formData.append('pin', userPin);
 
             const response = await fetch(API_URL, { method: 'POST', body: formData });
-            if (response.ok) { fetchUpdate(); } else { alert("Erreur d'envoi"); }
-        } catch (err) { alert("Erreur réseau"); } finally {
-            btn.innerText = oldText;
-            btn.disabled = false;
+            if (response.ok) fetchUpdate();
+        } catch (err) { alert("Erreur envoi"); } finally {
+            btn.innerText = "📸 Ajouter une photo"; btn.disabled = false;
         }
     }
 
@@ -451,27 +451,24 @@
     }
 
     async function deletePhoto(photoUrl) {
-        if (!confirm("Supprimer cette photo ?")) return;
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl: photoUrl })
-            });
-            if (res.ok) fetchUpdate();
-        } catch (e) { alert("Erreur suppression"); }
+        if (!isOwner || !confirm("Supprimer cette photo ?")) return;
+        await fetch(API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl: photoUrl })
+        });
+        fetchUpdate();
     }
 
     async function saveJournal() {
+        if (!isOwner) return;
         const note = document.getElementById('plant-note').value;
         const date = document.getElementById('plant-date').value;
         const isPublic = document.getElementById('journal-public-toggle').checked;
-        try {
-            await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'update_prive', note, date, journal_public: isPublic }) 
-            });
-            document.getElementById('btn-save-note').style.display = "none";
-            fetchUpdate();
-        } catch (e) { alert("Erreur sauvegarde"); }
+        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'update_prive', note, date, journal_public: isPublic }) 
+        });
+        document.getElementById('btn-save-note').style.display = "none";
+        fetchUpdate();
     }
 
     function toggleAcc(id) {
