@@ -357,10 +357,11 @@
 </section>
 
 <script>
-    // --- CONFIGURATION ---
     const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
     const urlParams = new URLSearchParams(window.location.search);
-    const plaqueEnAttente = urlParams.get('id');
+    
+    // On essaie de récupérer 'id' ou 'activate' dans l'URL
+    const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
 
     window.onload = () => {
         if (plaqueEnAttente) {
@@ -369,27 +370,16 @@
         }
     };
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') validerConnexion();
-    });
-
     async function validerConnexion() {
         const btn = document.getElementById('btn-entrer');
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if(!emailRegex.test(mail)) {
-            alert("Veuillez entrer une adresse email valide.");
-            return;
-        }
-        if(pin.length < 4) {
-            alert("Le code PIN doit comporter 4 chiffres.");
+        if(!mail || pin.length < 4) {
+            alert("Veuillez remplir correctement les champs.");
             return;
         }
 
-        // Animation de chargement
-        const originalText = btn.innerText;
         btn.innerText = "VÉRIFICATION...";
         btn.disabled = true;
 
@@ -401,25 +391,23 @@
             });
 
             if (response.ok) {
-                // Stockage sécurisé
                 localStorage.setItem('user_email', mail);
                 localStorage.setItem('user_pin', pin);
-                localStorage.setItem('eonia_access', 'client');
-
-                // Redirection logic
+                
+                // REDIRECTION : Si plaque scannée -> Catalogue, sinon -> Jardin
                 if (plaqueEnAttente) {
                     window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente;
                 } else {
-                    window.location.href = "jardin.html";
+                    // On peut forcer le catalogue si on veut que l'utilisateur voit tout
+                    window.location.href = "catalogue.html"; 
                 }
             } else {
-                alert("Email ou PIN incorrect pour ce jardin.");
-                btn.innerText = originalText;
+                alert("Email ou PIN incorrect.");
+                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER";
                 btn.disabled = false;
             }
         } catch (e) {
-            alert("Erreur réseau. Vérifiez votre connexion.");
-            btn.innerText = originalText;
+            alert("Erreur réseau.");
             btn.disabled = false;
         }
     }
@@ -428,26 +416,18 @@
         localStorage.clear();
         localStorage.setItem('user_email', 'invite@eonia.com');
         localStorage.setItem('user_pin', '0000');
-        localStorage.setItem('eonia_access', 'guest');
         window.location.href = "catalogue.html";
     }
 
-    // --- VISIBILITÉ PIN ---
     function togglePinVisibility() {
         const pinInput = document.getElementById('pin');
         const eyeIcon = document.getElementById('eye-icon');
-        const toggleBtn = document.getElementById('toggle-pin');
-
         if (pinInput.type === 'password') {
             pinInput.type = 'text';
-            toggleBtn.style.opacity = "1";
-            toggleBtn.style.color = "#4ade80";
-            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            eyeIcon.style.color = "#4ade80";
         } else {
             pinInput.type = 'password';
-            toggleBtn.style.opacity = "0.5";
-            toggleBtn.style.color = "#fff";
-            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            eyeIcon.style.color = "#fff";
         }
     }
 </script>
