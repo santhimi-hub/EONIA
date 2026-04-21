@@ -125,7 +125,6 @@
             });
             if (response.ok) {
                 localStorage.setItem('user_email', mail);
-                localStorage.setItem('user_pin', pin);
                 if (plaqueEnAttente) { window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; }
                 else { window.location.href = "catalogue.html"; }
             } else {
@@ -137,7 +136,6 @@
     function accesInvite() {
         localStorage.clear();
         localStorage.setItem('user_email', 'invite@eonia.com');
-        localStorage.setItem('user_pin', '0000');
         window.location.href = "catalogue.html";
     }
     function togglePinVisibility() {
