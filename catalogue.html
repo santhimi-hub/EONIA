@@ -84,19 +84,17 @@
 
 <script>
 // --- CONFIG & SÉCURITÉ ---
-const API_VERSION = "1.2"; // Change ceci quand tu modifies ta structure de données
+const API_VERSION = "1.3"; // Passage en 1.3 pour forcer la mise à jour
 const userEmail = localStorage.getItem('user_email');
 const authState = localStorage.getItem('auth_state');
 
-// 1. Protection du cache (Vérification de version)
 const cacheKey = `eonia_cache_${userEmail}`;
 const cachedData = JSON.parse(localStorage.getItem(cacheKey));
 
 if (cachedData && cachedData.version !== API_VERSION) {
-    localStorage.removeItem(cacheKey); // On purge si la version est obsolète
+    localStorage.removeItem(cacheKey);
 }
 
-// 2. Verrouillage Front
 if (!userEmail || !authState) {
     logout();
 }
@@ -107,7 +105,6 @@ let allPlants = [];
 // --- LOGIQUE DE CHARGEMENT ---
 
 async function loadData() {
-    // Affichage immédiat du cache pour l'UX
     if (cachedData) {
         allPlants = cachedData.plants;
         renderGrid();
@@ -118,36 +115,39 @@ async function loadData() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                action: "get_plants", 
+                action: "get_plants", // Le Worker ignore cette action et passe direct au catalogue
                 email: userEmail 
-                // Ici le Worker doit renvoyer uniquement les plantes publiques 
-                // + les plantes du jardin de cet email s'il est authentifié par ailleurs
             })
         });
         
         const plants = await res.json();
         
-        // Mise en cache avec versionnage
-        localStorage.setItem(cacheKey, JSON.stringify({
-            version: API_VERSION,
-            plants: plants
-        }));
-
-        allPlants = plants;
-        renderGrid();
+        // Si le worker renvoie une erreur ou un tableau vide, on ne met pas en cache
+        if (plants && plants.length > 0) {
+            localStorage.setItem(cacheKey, JSON.stringify({
+                version: API_VERSION,
+                plants: plants
+            }));
+            allPlants = plants;
+            renderGrid();
+        } else {
+            document.getElementById('plant-counter').innerText = "AUCUNE PLANTE TROUVÉE";
+        }
     } catch (e) {
         console.error("Synchro impossible");
+        document.getElementById('plant-counter').innerText = "ERREUR DE CONNEXION";
     }
 }
 
 // --- LOGIQUE D'ASSIGNATION SÉCURISÉE ---
 
 async function assignerPlante(p) {
-    const plaqueId = new URLSearchParams(window.location.search).get('assign_to');
-    if (!plaqueId) return;
+    const params = new URLSearchParams(window.location.search);
+    const idDeLaPlaque = params.get('assign_to'); // Ex: EON-001
+    
+    if (!idDeLaPlaque) return;
 
-    // SÉCURITÉ : On demande le PIN car il n'est PAS dans le localStorage
-    const pinConfirm = prompt(`Confirmez l'activation de la plaque ${plaqueId} pour : ${p["Nom commun"]}.\nEntrez votre code PIN à 4 chiffres :`);
+    const pinConfirm = prompt(`Confirmez l'activation de la plaque ${idDeLaPlaque} pour : ${p["Nom commun"]}.\nEntrez votre code PIN à 4 chiffres :`);
     
     if (!pinConfirm || !/^[0-9]{4}$/.test(pinConfirm)) {
         alert("PIN invalide.");
@@ -161,27 +161,31 @@ async function assignerPlante(p) {
             body: JSON.stringify({
                 action: "assign_plant",
                 email: userEmail,
-                pin: pinConfirm, // Envoyé uniquement au besoin
-                plaqueId: plaqueId,
+                pin: pinConfirm,
+                idPlaque: idDeLaPlaque, // Corrigé : idPlaque pour matcher le Worker
                 catalogueId: p.id
             })
         });
 
         const result = await res.json();
 
-        if (res.ok && result.success) {
+        if (result.success) {
             alert("Plaque activée avec succès !");
-            window.location.href = `jardin.html?id=${plaqueId}`;
+            // Redirection vers la fiche de la plante avec l'ID de la plaque
+            window.location.href = `fiche.html?id=${p.id}&idPlaque=${idDeLaPlaque}`;
         } else {
-            alert(result.message || "Erreur d'authentification ou plaque déjà assignée.");
+            alert(result.message || "Erreur : PIN incorrect ou plaque déjà utilisée.");
         }
     } catch (e) {
         alert("Erreur de connexion au serveur.");
     }
 }
 
-// --- RENDU ---
-// (On appelle assignerPlante(p) dans le onclick de la carte si plaqueAAssigner existe)
+// Ne pas oublier d'appeler loadData au démarrage
+window.onload = loadData;
+
+// Note : Assure-toi d'avoir tes fonctions renderGrid(), setFilter() et logout() 
+// définies après ou avant ce bloc.assignerPlante(p) dans le onclick de la carte si plaqueAAssigner existe)
 </script>
 </body>
 </html>
