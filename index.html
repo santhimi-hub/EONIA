@@ -117,7 +117,11 @@
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
         
-        if(!mail || pin.length < 4) { alert("Veuillez remplir correctement les champs."); return; }
+        // Validation stricte du PIN (4 chiffres uniquement)
+        if (!mail || pin.length !== 4 || isNaN(pin)) {
+            alert("PIN invalide (4 chiffres requis)");
+            return;
+        }
         
         btn.innerText = "VÉRIFICATION..."; btn.disabled = true;
         
@@ -129,7 +133,7 @@
             });
             
             if (response.ok) {
-                localStorage.setItem('is_logged_in', 'true');
+                localStorage.setItem('auth_state', 'user'); // État structuré
                 localStorage.setItem('user_email', mail);
                 // ne pas stocker le PIN côté navigateur
                 
@@ -151,7 +155,7 @@
 
     function accesInvite() {
         localStorage.clear(); 
-        localStorage.setItem('is_logged_in', 'guest'); 
+        localStorage.setItem('auth_state', 'guest'); // État structuré
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
