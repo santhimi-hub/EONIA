@@ -83,117 +83,33 @@
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <script>
-// --- SÉCURITÉ ET IDENTITÉ ---
+// --- CONFIG & SÉCURITÉ ---
+const API_VERSION = "1.2"; // Change ceci quand tu modifies ta structure de données
 const userEmail = localStorage.getItem('user_email');
-const userPin = localStorage.getItem('user_pin'); 
-const isOwner = (userEmail && userEmail !== 'invite@eonia.com' && userPin);
+const authState = localStorage.getItem('auth_state');
 
-// VERROU ANTI-GEOLOC POUR INVITES
-if (!isOwner) {
-    localStorage.removeItem('user_lat');
-    localStorage.removeItem('user_lon');
-    localStorage.removeItem('user_city');
+// 1. Protection du cache (Vérification de version)
+const cacheKey = `eonia_cache_${userEmail}`;
+const cachedData = JSON.parse(localStorage.getItem(cacheKey));
+
+if (cachedData && cachedData.version !== API_VERSION) {
+    localStorage.removeItem(cacheKey); // On purge si la version est obsolète
+}
+
+// 2. Verrouillage Front
+if (!userEmail || !authState) {
+    logout();
 }
 
 const API_URL = "https://eonia-api.santhimi.workers.dev";
-const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
-
-const urlParams = new URLSearchParams(window.location.search);
-const plaqueAAssigner = urlParams.get('assign_to');
-
-let currentView = 'catalogue';
 let allPlants = [];
-let activeFilter = 'all';
 
-// Sécurité redirection
-if (!userEmail) logout();
-if (isOwner) document.getElementById('client-menu').style.display = 'flex';
-
-function switchView(view) {
-    currentView = view;
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
-    renderGrid();
-}
-
-function renderGrid() {
-    const container = document.getElementById('catalogue-grid');
-    const searchVal = document.getElementById('searchBox').value.toLowerCase();
-    container.innerHTML = "";
-    let lastLetter = "";
-
-    let filtered = allPlants.filter(p => {
-        const nom = (p["Nom commun"] || "").toLowerCase();
-        const type = (p.Type || "").toLowerCase();
-        if (currentView === 'jardin' && !p.est_dans_jardin) return false;
-        const matchesFilter = activeFilter === 'all' || (type && type.includes(activeFilter.toLowerCase()));
-        return nom.includes(searchVal) && matchesFilter;
-    });
-
-    document.getElementById('plant-counter').textContent =
-        filtered.length === 0 ? "AUCUNE PLANTE TROUVÉE" : `${filtered.length} PLANTE${filtered.length > 1 ? 'S' : ''} TROUVÉE${filtered.length > 1 ? 'S' : ''}`;
-
-    filtered.forEach(p => {
-        const nomAffiche = p["Nom commun"] || "Plante sans nom";
-        const currentLetter = nomAffiche[0].toUpperCase();
-
-        if (currentView === 'catalogue' && currentLetter !== lastLetter && activeFilter === 'all' && !searchVal) {
-            const div = document.createElement('div');
-            div.className = "letter-divider";
-            div.textContent = currentLetter;
-            container.appendChild(div);
-            lastLetter = currentLetter;
-        }
-
-        const card = document.createElement('div');
-        card.className = "plant-card";
-        
-        card.onclick = async () => {
-            if (plaqueAAssigner) {
-                const confirmation = confirm(`Associer cette plaque à : ${nomAffiche} ?`);
-                if (!confirmation) return;
-                try {
-                    const res = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: "assign_plant",
-                            email: userEmail,
-                            pin: userPin,
-                            plaqueId: plaqueAAssigner,
-                            catalogueId: p.id,
-                            nomPlante: nomAffiche
-                        })
-                    });
-                    if (res.ok) {
-                        window.location.href = `jardin.html?id=${plaqueAAssigner}`;
-                    } else {
-                        alert("Erreur lors de l'association.");
-                    }
-                } catch (e) { alert("Erreur réseau."); }
-            } else {
-                // Utilisation de jardin.html pour tout le monde (la page gère l'affichage selon id)
-                window.location.href = `jardin.html?id=${p.id}`;
-            }
-        };
-
-        card.innerHTML = `
-            <div class="img-container">
-                <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${nomAffiche}</div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
+// --- LOGIQUE DE CHARGEMENT ---
 
 async function loadData() {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        allPlants = JSON.parse(cached);
+    // Affichage immédiat du cache pour l'UX
+    if (cachedData) {
+        allPlants = cachedData.plants;
         renderGrid();
     }
 
@@ -202,43 +118,70 @@ async function loadData() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                email: userEmail, 
-                pin: userPin,
-                lat: null, // Verrou : on n'envoie JAMAIS de geoloc depuis le catalogue
-                lon: null 
+                action: "get_plants", 
+                email: userEmail 
+                // Ici le Worker doit renvoyer uniquement les plantes publiques 
+                // + les plantes du jardin de cet email s'il est authentifié par ailleurs
             })
         });
         
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
+        const plants = await res.json();
+        
+        // Mise en cache avec versionnage
+        localStorage.setItem(cacheKey, JSON.stringify({
+            version: API_VERSION,
+            plants: plants
+        }));
 
-        const freshData = data.sort((a,b) => (a["Nom commun"] || "").localeCompare(b["Nom commun"] || ""));
-
-        if (JSON.stringify(freshData) !== cached) {
-            allPlants = freshData;
-            localStorage.setItem(cacheKey, JSON.stringify(allPlants));
-            renderGrid();
-        }
+        allPlants = plants;
+        renderGrid();
     } catch (e) {
-        console.error("Erreur API :", e);
-        if (!cached) document.getElementById('plant-counter').textContent = "ERREUR DE CONNEXION";
+        console.error("Synchro impossible");
     }
 }
 
-function setFilter(t, b) {
-    activeFilter = t;
-    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    renderGrid();
+// --- LOGIQUE D'ASSIGNATION SÉCURISÉE ---
+
+async function assignerPlante(p) {
+    const plaqueId = new URLSearchParams(window.location.search).get('assign_to');
+    if (!plaqueId) return;
+
+    // SÉCURITÉ : On demande le PIN car il n'est PAS dans le localStorage
+    const pinConfirm = prompt(`Confirmez l'activation de la plaque ${plaqueId} pour : ${p["Nom commun"]}.\nEntrez votre code PIN à 4 chiffres :`);
+    
+    if (!pinConfirm || !/^[0-9]{4}$/.test(pinConfirm)) {
+        alert("PIN invalide.");
+        return;
+    }
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: "assign_plant",
+                email: userEmail,
+                pin: pinConfirm, // Envoyé uniquement au besoin
+                plaqueId: plaqueId,
+                catalogueId: p.id
+            })
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+            alert("Plaque activée avec succès !");
+            window.location.href = `jardin.html?id=${plaqueId}`;
+        } else {
+            alert(result.message || "Erreur d'authentification ou plaque déjà assignée.");
+        }
+    } catch (e) {
+        alert("Erreur de connexion au serveur.");
+    }
 }
 
-function logout() {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "index.html";
-}
-
-loadData();
+// --- RENDU ---
+// (On appelle assignerPlante(p) dans le onclick de la carte si plaqueAAssigner existe)
 </script>
 </body>
 </html>
