@@ -53,8 +53,21 @@
 
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
         .evo-scroll::-webkit-scrollbar { display: none; }
-        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; }
+        .evo-scroll img { 
+width: 120px; 
+height: 120px; 
+object-fit: cover; 
+border-radius: 12px; 
+border: 1px solid var(--border); 
+flex-shrink: 0; 
+cursor: pointer;
+transition:0.3s;
+}
 
+.evo-scroll img:hover{
+transform:scale(1.05);
+border-color:var(--accent);
+}
         .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
