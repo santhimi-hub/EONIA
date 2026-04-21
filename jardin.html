@@ -52,9 +52,10 @@
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; transition: 0.3s; }
-        .evo-scroll img:hover { transform: scale(1.05); border-color: var(--accent); }
-        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255, 255, 255, 0.02); border-radius: 12px; border: 1px solid var(--border); }
+        .evo-scroll::-webkit-scrollbar { display: none; }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; transition:0.3s; }
+        .evo-scroll img:hover{ transform:scale(1.05); border-color:var(--accent); }
+        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -181,35 +182,54 @@
     const rawPlantId = urlParams.get('id');
     const userEmail = localStorage.getItem('user_email');
     const userPin = localStorage.getItem('user_pin');
-    let isOwner = false;
-    let chartInstance = null;
+    const isOwner = (userEmail && userPin); 
+    const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
     function fixNotionValues(key, val) {
-        if (!val || val === "-") return "-";
-        const map = {
-            "Difficulté": { "Facile": "⭐ Facile", "Modérée": "⭐⭐ Modérée", "Expert": "⭐⭐⭐ Expert" },
-            "Arrosage": { "Faible": "💧 Faible", "Régulier": "💧💧 Régulier", "Fréquent": "💧💧💧 Fréquent" },
-            "Exposition": { "Plein soleil": "☀️ Plein soleil", "Mi-ombre": "⛅ Mi-ombre", "Ombre": "☁️ Ombre" }
-        };
-        return (map[key] && map[key][val]) ? map[key][val] : val;
+        if (!val || val === "-" || val === "") return "-";
+        const v = String(val).trim();
+        if (key === "Difficulté") {
+            if (v === "1") return "💪"; if (v === "2") return "💪💪"; if (v === "3") return "💪💪💪";
+        }
+        if (key === "Exposition") {
+            if (v === "1") return "☀️"; if (v === "2") return "⛅"; if (v === "3") return "☁️";
+        }
+        if (key === "Arrosage") {
+            if (v.includes("3")) return "💧💧💧"; if (v.includes("2")) return "💧💧"; if (v.includes("1")) return "💧";
+        }
+        return v;
     }
 
     async function init() {
         if (!rawPlantId) return;
-        const city = localStorage.getItem('user_city');
-        fetchUpdate(null, null, city);
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            const plants = JSON.parse(cachedData);
+            const p = plants.find(item => item.id.replace(/-/g, "").toLowerCase() === rawPlantId.replace(/-/g, "").toLowerCase());
+            if (p) render(p); 
+        }
+        fetchUpdate(null, null, localStorage.getItem('user_city'));
     }
 
     async function fetchUpdate(lat, lon, city = null) {
-        let url = `${API_URL}?id=${rawPlantId}`;
-        if (lat && lon) url += `&lat=${lat}&lon=${lon}`;
-        if (city) url += `&city=${encodeURIComponent(city)}`;
         try {
-            const r = await fetch(url);
-            const p = await r.json();
-            isOwner = (userEmail && userPin && p.Proprietaire === userEmail);
-            render(p);
+            const res = await fetch(API_URL, { 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
+            });
+            const data = await res.json();
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            const p = data.find(item => item.id.replace(/-/g, "").toLowerCase() === rawPlantId.replace(/-/g, "").toLowerCase());
+            if (p) render(p);
         } catch (e) { console.error(e); }
+    }
+
+    function askLocationIfInGarden() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                fetchUpdate(pos.coords.latitude, pos.coords.longitude);
+            }, err => console.log("Géo refusée"), { timeout: 8000 });
+        }
     }
 
     function render(p) {
@@ -220,34 +240,59 @@
         document.getElementById('display-city').innerText = city ? "📍 " + city.toUpperCase() : "📍 VILLE ?";
 
         if (p.est_dans_jardin) {
+            if (!city) askLocationIfInGarden();
+            
+            sendWaterReminder(p);
             plantHealthAI(p);
-            document.getElementById('owner-area').classList.remove('hidden');
-            document.getElementById('owner-area-2').classList.remove('hidden');
-            updateExtraFeatures(p);
 
-            if (Array.isArray(p.Alertes) && p.Alertes.length > 0) {
+            if (p.Alertes && p.Alertes.length > 0) {
                 document.getElementById('weather-wrapper').classList.remove('hidden');
+                
+                // --- LOGIQUE METEO AFFINÉE ---
+                const today = p.Alertes[0].toLowerCase();
+                const tomorrow = p.Alertes[1] ? p.Alertes[1].toLowerCase() : "";
+                let advice = "";
+                
+                if ((tomorrow.includes("pluie") || tomorrow.includes("orage")) && !today.includes("pluie")) {
+                    advice = "⛅ Demain incertain (Pluie/Orage ?) : Arrosez légèrement si la terre est sèche.";
+                } else if (today.includes("pluie")) {
+                    advice = "🌧️ Pluie détectée : Inutile d’arroser aujourd’hui.";
+                } else if (today.includes("canicule") || today.includes("30")) {
+                    advice = "🔥 Forte chaleur : Arrosage impératif ce soir.";
+                } else {
+                    advice = "🌿 Conditions normales : Fiez-vous à l'humidité de la terre.";
+                }
+                document.getElementById("weather-advice").innerText = advice;
+
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                     const s = str.split('|'); 
                     const d = new Date(); d.setDate(new Date().getDate() + idx);
+                    const tempDisplay = (s[2] && s[2] !== "undefined") ? s[2] : "--";
                     return `<div class="w-col">
                         <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
                         <span class="w-icon">${s[1]}</span>
-                        <span class="w-temp" style="font-weight:bold; font-size:0.7rem;">${(s[2]||"--")}</span>
+                        <span class="w-temp" style="font-weight:bold; font-size:0.7rem;">${tempDisplay}</span>
                     </div>`;
                 }).join('');
             }
 
+            document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('owner-area-2').classList.remove('hidden');
+            
             if (isOwner) {
                 document.getElementById('upload-zone').classList.remove('hidden');
                 document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
                 document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
+                document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
             }
 
             const gallery = document.getElementById('evo-gallery');
             gallery.innerHTML = (p.Photos_Evolution && p.Photos_Evolution.length > 0) 
-                ? p.Photos_Evolution.map(url => `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(url)}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">${isOwner?`<div onclick="deletePhoto('${url}')" style="position:absolute;top:5px;right:5px;background:red;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer">×</div>`:''}</div>`).join('') 
-                : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
+                ? p.Photos_Evolution.map(url => `
+                    <div style="position:relative; flex-shrink:0;">
+                        <img src="${url}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">
+                        ${isOwner ? `<div onclick="deletePhoto('${url}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;">×</div>` : ''}
+                    </div>`).join('') : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
             
             document.getElementById('val-desc').innerText = p.Description_Technique || p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
@@ -255,13 +300,24 @@
             document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
             document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
             
+            const h = document.getElementById('watering-history');
+            if (p.Historique_Data && p.Historique_Data !== "-") {
+                const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
+                h.innerHTML = uniqueDates.slice().reverse().map(date => `<span class="history-tag">${date}${isOwner ? `<b onclick="deleteWatering('${date}')" style="color:var(--error); cursor:pointer; padding-left:5px;">×</b>` : ''}</span>`).join('');
+                if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
+                    const btn = document.getElementById('btn-water-main'); btn.innerText = "✅ Arrosé aujourd'hui"; btn.className = "btn-eonia btn-disabled"; btn.onclick = null;
+                } else if (isOwner) {
+                    const btn = document.getElementById('btn-water-main'); btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme"; btn.onclick = handleWateringAction;
+                }
+            }
             updateWateringChart(p.Historique_Data);
+            updateNextWatering(p.Historique_Data);
+            updateExtraFeatures();
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
             document.getElementById('catalog-desc-area').classList.remove('hidden');
             document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
-
         const fds = [
             {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
             {l:"Persistance", v:p.Persistance}, {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille maturité"]},
@@ -273,86 +329,99 @@
         document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    function updateExtraFeatures(p) {
+    function updateWateringChart(historyData) {
+        const ctx = document.getElementById('wateringChart').getContext('2d');
+        const dates = historyData && historyData !== "-" ? historyData.split(',').map(d => d.trim()) : [];
+        const labels = []; const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const format = d.toLocaleDateString('fr-FR');
+            labels.push(format.split('/')[0] + '/' + format.split('/')[1]);
+            data.push(dates.includes(format) ? 1 : 0.3);
+        }
+        if (window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ data, backgroundColor: data.map(v => v===1?'#38bdf8':'#1a1a1a'), barPercentage: 0.2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, max: 1.1 }, x: { grid: { display: false }, ticks: { color: '#666', font: { size: 9 } } } } } });
+    }
+
+    async function handleWateringAction() { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })}); fetchUpdate(); }
+    
+    async function deleteWatering(date) { 
+        if (!confirm(`Supprimer l'arrosage du ${date} ?`)) return; 
+        const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_watering', date: date })}); 
+        if(res.ok) fetchUpdate();
+    }
+    
+    async function deletePhoto(photoUrl) { 
+        if (!confirm("Supprimer cette photo ?")) return; 
+        try {
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl }) }); 
+            if(res.ok) fetchUpdate(); 
+        } catch(e) { alert("Erreur suppression"); }
+    }
+
+    async function uploadPhoto(input) { const formData = new FormData(); formData.append('file', input.files[0]); formData.append('action', 'upload_photo_binaire'); formData.append('plantId', rawPlantId); formData.append('email', userEmail); formData.append('pin', userPin); await fetch(API_URL, { method: 'POST', body: formData }); fetchUpdate(); }
+    
+    async function saveJournal() { const note = document.getElementById('plant-note').value; const date = document.getElementById('plant-date').value; const isPublic = document.getElementById('journal-public-toggle').checked; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic })}); document.getElementById('btn-save-note').style.display = "none"; fetchUpdate(); }
+    
+    function toggleAcc(id) { const c = document.getElementById(id); c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px"; }
+    
+    function updateNextWatering(historyData){
+        if(!historyData || historyData==="-") return;
+        const dates = historyData.split(',').map(d=>d.trim());
+        const last = dates[dates.length-1]; if(!last) return;
+        const parts = last.split('/');
+        const lastDate = new Date(parts[2],parts[1]-1,parts[0]);
+        const next = new Date(lastDate); next.setDate(next.getDate()+3);
+        document.getElementById("next-watering").innerText = "Prochain arrosage conseillé : "+next.toLocaleDateString("fr-FR");
+    }
+
+    function updateExtraFeatures() {
         const now = new Date(); const m = now.getMonth();
         const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
-        const fill = document.getElementById('cycle-fill');
-        if(fill) {
-            fill.style.width = pct + "%";
-            document.getElementById('cycle-pct').innerText = pct + "%";
-            const labels = ["Repos hivernal", "Dernières gelées", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison & Éclat 🌸", "Stabilité estivale ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Entrée en dormance", "Repos absolu"];
-            document.getElementById('cycle-label').innerText = labels[m];
-        }
-        const tips = ["Protégez les racines du gel.", "Taillez le bois mort.", "Apportez du compost.", "Surveillez les pucerons.", "Binez le sol.", "Arrosez soir ou matin.", "Paillez le pied.", "Supprimez les fleurs fanées.", "Réduisez l'eau.", "Plantez les bulbes.", "Installez les voiles d'hivernage.", "Laissez la plante au repos."];
+        document.getElementById('cycle-fill').style.width = pct + "%";
+        document.getElementById('cycle-pct').innerText = pct + "%";
+        const labels = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos"];
+        document.getElementById('cycle-label').innerText = labels[m];
+        const tips = ["Paillage épais recommandé.", "Supprimez le bois mort.", "Apport d'engrais organique.", "Surveillez les jeunes pousses.", "Binez le sol pour aérer.", "Arrosez généreusement le soir.", "Maintenez le pied humide.", "Taillez les fleurs fanées.", "Réduisez l'eau doucement.", "Installez les voiles d'hivernage.", "Laissez les feuilles au sol.", "La plante dort, ne taillez pas."];
+        document.getElementById('expert-month').innerText = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][m];
         document.getElementById('expert-text').innerText = tips[m];
-        const expertTitle = document.querySelector("#expert-area .section-title");
-        if(expertTitle) expertTitle.innerHTML = `Le Geste du Jardinier — <span>${["Janv.","Févr.","Mars","Avril","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."][m]}</span>`;
     }
 
-    function plantHealthAI(p) {
-        let status = "🟢 En pleine santé";
-        let el = document.getElementById("plant-ai");
-        if (!el) {
-            el = document.createElement("div"); el.id = "plant-ai"; el.className = "maintenance-card";
-            el.style.padding = "12px 20px";
-            document.getElementById("owner-area").prepend(el);
-        }
-        el.innerHTML = `<div style="color:var(--accent); font-size:0.55rem; font-weight:bold; text-transform:uppercase;">🌱 ANALYSE IA</div><div style="font-size:0.75rem; color:#eee; margin-top:4px;">${status}</div>`;
-    }
+    function showSave() { if(isOwner) document.getElementById('btn-save-note').style.display = "block"; }
+    function changeLocation() { const c = prompt("Ville :"); if(c){ localStorage.setItem('user_city', c); fetchUpdate(null, null, c); }}
+    function sharePlant() { const url = window.location.href; navigator.share ? navigator.share({title: 'Ma plante', url}) : window.prompt("Lien :", url); }
 
-    function toggleAcc(id) {
-        const content = document.getElementById(id);
-        content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
-    }
-
-    function updateWateringChart(data) {
-        if (!data || data === "-") return;
-        const ctx = document.getElementById('wateringChart').getContext('2d');
-        if (chartInstance) chartInstance.destroy();
-        const dates = data.split(',').map(d => d.trim());
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: { labels: dates, datasets: [{ data: dates.map(() => 1), borderColor: '#4ade80', tension: 0.4, pointRadius: 0 }] },
-            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+    function enableNotifications() {
+        if (!("Notification" in window)) return alert("Non supporté");
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") new Notification("🌿 ÉONIA activé", { body: "Notifications actives." });
         });
     }
 
-    async function handleWateringAction() {
-        if (!isOwner) return;
-        const dateStr = new Date().toLocaleDateString('fr-FR');
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'add_watering', plantId: rawPlantId, email: userEmail, pin: userPin, date: dateStr }) });
-        fetchUpdate();
+    function sendWaterReminder(p) {
+        if (Notification.permission !== "granted") return;
+        const last = p.Historique_Data?.split(',').pop(); if (!last) return;
+        const parts = last.trim().split('/'); if(parts.length < 3) return;
+        const diff = (new Date() - new Date(parts[2], parts[1]-1, parts[0])) / (1000 * 60 * 60 * 24);
+        if (diff >= 3) new Notification("💧 ÉONIA - Arrosage", { body: "Votre plante a besoin d’eau." });
     }
 
-    function showSave() { document.getElementById('btn-save-note').style.display = 'block'; }
-
-    async function saveJournal() {
-        const data = {
-            action: 'update_journal', plantId: rawPlantId, email: userEmail, pin: userPin,
-            note: document.getElementById('plant-note').value,
-            date: document.getElementById('plant-date').value
-        };
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-        document.getElementById('btn-save-note').style.display = 'none';
-        fetchUpdate();
-    }
-
-    async function uploadPhoto(input) {
-        if(!input.files[0]) return;
-        const formData = new FormData();
-        formData.append('file', input.files[0]);
-        formData.append('action', 'upload_photo_binaire');
-        formData.append('plantId', rawPlantId);
-        formData.append('email', userEmail);
-        formData.append('pin', userPin);
-        await fetch(API_URL, { method: 'POST', body: formData });
-        fetchUpdate();
-    }
-
-    async function deletePhoto(photoUrl) {
-        if (!confirm("Supprimer ?")) return;
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_photo', plantId: rawPlantId, email: userEmail, pin: userPin, photoUrl }) });
-        fetchUpdate();
+    function plantHealthAI(p) {
+        let score = 100;
+        if (p.Historique_Data && p.Historique_Data !== "-") {
+            const days = p.Historique_Data.split(',').length;
+            if (days < 2) score -= 30; if (days < 5) score -= 15;
+        } else { score -= 40; }
+        let status = score >= 85 ? "🟢 Plante en pleine santé" : (score >= 60 ? "🟡 Plante correcte" : "🔴 Attention : stress détecté");
+        let color = score >= 85 ? "#4ade80" : (score >= 60 ? "#facc15" : "#f87171");
+        let el = document.getElementById("plant-ai");
+        if (!el) {
+            el = document.createElement("div"); el.id = "plant-ai"; el.className = "maintenance-card";
+            const parent = document.getElementById("owner-area");
+            parent.insertBefore(el, parent.firstChild);
+        }
+        el.innerHTML = `<div style="color:${color}; font-size:0.6rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:bold;">🌱 IA ÉONIA — SANTÉ</div>
+                        <div style="font-size:0.9rem; margin-top:8px;">${status} <span style="opacity:0.5; font-size:0.7rem;">(${score}/100)</span></div>`;
     }
 
     init();
