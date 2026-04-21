@@ -108,6 +108,7 @@
                 <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 Marquer comme arrosé</button>
                 <div style="height: 120px; margin-top: 15px; position: relative;"><canvas id="wateringChart"></canvas></div>
                 <div id="watering-history" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px;"></div>
+                <div id="next-watering" style="font-size:0.6rem; color:#666; margin-top:8px;"></div>
             </div>
         </div>
 
@@ -290,6 +291,7 @@
                 }
             }
             updateWateringChart(p.Historique_Data);
+            updateNextWatering(p.Historique_Data);
             updateExtraFeatures();
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
@@ -345,7 +347,26 @@
     async function saveJournal() { const note = document.getElementById('plant-note').value; const date = document.getElementById('plant-date').value; const isPublic = document.getElementById('journal-public-toggle').checked; await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'save_journal', note, date_plantation: date, journal_public: isPublic })}); document.getElementById('btn-save-note').style.display = "none"; fetchUpdate(); }
     
     function toggleAcc(id) { const c = document.getElementById(id); c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px"; }
+    
+function updateNextWatering(historyData){
 
+if(!historyData || historyData==="-" ) return;
+
+const dates = historyData.split(',').map(d=>d.trim());
+const last = dates[dates.length-1];
+
+if(!last) return;
+
+const parts = last.split('/');
+const lastDate = new Date(parts[2],parts[1]-1,parts[0]);
+
+const next = new Date(lastDate);
+next.setDate(next.getDate()+3);
+
+document.getElementById("next-watering").innerText =
+"Prochain arrosage conseillé : "+next.toLocaleDateString("fr-FR");
+
+}
     function updateExtraFeatures() {
         const now = new Date(); const m = now.getMonth();
         const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
