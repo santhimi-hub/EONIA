@@ -112,39 +112,60 @@
         if (e.key === 'Enter') { validerConnexion(); }
     });
 
-    async function validerConnexion() 
+    async function validerConnexion() { 
         const btn = document.getElementById('btn-entrer');
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
+        
         if(!mail || pin.length < 4) { alert("Veuillez remplir correctement les champs."); return; }
+        
         btn.innerText = "VÉRIFICATION..."; btn.disabled = true;
+        
         try {
             const response = await fetch(WORKER_URL, {
-                method: "POST", headers: { "Content-Type": "application/json" },
+                method: "POST", 
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: mail, pin: pin })
             });
+            
             if (response.ok) {
-                { localStorage.setItem('is_logged_in', 'true');
+                localStorage.setItem('is_logged_in', 'true');
                 localStorage.setItem('user_email', mail);
-                if (plaqueEnAttente) { window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; }
-                else { window.location.href = "catalogue.html"; }
-            } else {
+                // ne pas stocker le PIN côté navigateur
+                
+                if (plaqueEnAttente) { 
+                    window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; 
+                } else { 
+                    window.location.href = "catalogue.html"; 
+                }
+            } else { 
                 alert("Email ou PIN incorrect.");
-                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; btn.disabled = false;
+                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; 
+                btn.disabled = false;
             }
-        } catch (e) { alert("Erreur réseau."); btn.disabled = false; }
+        } catch (e) { 
+            alert("Erreur réseau."); 
+            btn.disabled = false; 
+        }
     }
+
     function accesInvite() {
-        localStorage.setItem('is_logged_in', 'guest');
-        localStorage.clear();
+        localStorage.clear(); 
+        localStorage.setItem('is_logged_in', 'guest'); 
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
     }
+
     function togglePinVisibility() {
         const pinInput = document.getElementById('pin');
         const eyeIcon = document.getElementById('eye-icon');
-        if (pinInput.type === 'password') { pinInput.type = 'text'; eyeIcon.style.color = "#4ade80"; }
-        else { pinInput.type = 'password'; eyeIcon.style.color = "#fff"; }
+        if (pinInput.type === 'password') { 
+            pinInput.type = 'text'; 
+            eyeIcon.style.color = "#4ade80"; 
+        } else { 
+            pinInput.type = 'password'; 
+            eyeIcon.style.color = "#fff"; 
+        }
     }
 </script>
 </body>
