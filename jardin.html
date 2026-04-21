@@ -8,60 +8,51 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; --error: #f87171; }
-        
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .container { max-width: 100%; margin: auto; padding: 15px; box-sizing: border-box; }
         .hidden { display: none !important; }
-        
-        /* BOUTON RETOUR PLUS VISIBLE */
-        .back-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; }
+        .back-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--accent); color: var(--accent); padding: 12px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
 
-        /* METEO NETTOYÉE */
+        /* METEO LISIBLE */
         #weather-wrapper { margin-bottom: 25px; }
-        #display-city { font-size: 0.75rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-        .location-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; font-size: 0.7rem; padding: 8px 15px; border-radius: 20px; margin-left: 5px; }
-        
+        #display-city { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .location-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; font-size: 0.7rem; padding: 8px 15px; border-radius: 20px; margin-left: 5px; cursor: pointer; }
         #weather-container { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 15px; display: flex; justify-content: space-around; align-items: center; }
-        .w-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .w-day { font-size: 0.7rem; color: #888; font-weight: bold; } /* Texte gris plus clair */
-        .w-icon { font-size: 1.4rem; }
+        .w-day { font-size: 0.7rem; color: #888; font-weight: bold; }
         .w-temp { font-size: 0.9rem; font-weight: bold; }
-        
-        #weather-advice { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px; padding: 15px; font-size: 0.9rem; color: #fff; text-align: center; line-height: 1.4; }
+        #weather-advice { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--border); border-top: none; border-radius: 0 0 20px 20px; padding: 15px; font-size: 0.9rem; color: #fff; text-align: center; line-height: 1.4; font-style: italic; }
 
-        /* IMAGE ET TITRES */
-        .hero-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+        /* IMAGE ET CONTENU */
+        .hero-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 24px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
         #p-titre { font-size: 2rem; font-weight: 700; margin: 0; }
-        .sci-name { color: var(--accent); font-size: 1rem; font-style: italic; margin-bottom: 20px; }
+        .sci-name { color: var(--accent); font-size: 1rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
 
-        /* CARTES D'INFOS */
+        /* CARTES ET GRILLES */
         .maintenance-card, .cycle-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 20px; }
-        
-        /* CORRECTION LISIBILITÉ TEXTES GRIS */
         .section-title { color: var(--accent); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-weight: 700; }
-        .label { color: #aaa !important; font-size: 0.75rem !important; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-        .value { font-size: 1rem !important; color: #fff; font-weight: 500; }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .info-box { background: #111; border: 1px solid var(--border); padding: 15px; border-radius: 18px; }
+        .info-box .label { color: #aaa; font-size: 0.7rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .info-box .value { font-size: 0.95rem; color: #fff; font-weight: 500; }
+        .info-box.highlight { border-left: 3px solid var(--accent); }
 
-        /* PROGRESS BAR */
+        /* BOUTONS ET BARRES */
         .progress-bg { background: #222; height: 8px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .progress-fill { background: var(--accent); height: 100%; box-shadow: 0 0 10px var(--accent); }
-
-        /* BOUTONS */
-        .btn-eonia { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 18px; width: 100%; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        .btn-water-theme { background: var(--water); color: #000; }
+        .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 1.5s ease; }
+        .btn-eonia { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 18px; width: 100%; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; }
+        .btn-water-theme { background: var(--water); }
         
-        /* ACCORDÉONS PLUS LISIBLES */
-        .acc-btn { width: 100%; background: none; border: none; color: #fff; padding: 18px 0; display: flex; justify-content: space-between; border-top: 1px solid var(--border); font-weight: bold; font-size: 0.9rem; }
-        .acc-content { color: #ccc; line-height: 1.6; font-size: 0.95rem; }
+        .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 18px 0; display: flex; justify-content: space-between; border-top: 1px solid var(--border); font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; color: #ccc; font-size: 0.95rem; line-height: 1.6; }
 
-        /* INPUTS */
-        #plant-date, #plant-note { width: 100%; background: #111; border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; margin-top: 10px; font-size: 1rem; box-sizing: border-box; }
+        /* LIGHTBOX */
+        #lightbox { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:1000; }
+        #lightbox img { max-width:90%; max-height:80vh; border-radius:15px; }
     </style>
 </head>
 <body>
+
+    <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
 
     <div class="container">
         <button onclick="window.history.back()" class="back-btn">← RETOUR</button>
@@ -72,27 +63,27 @@
                 <button class="location-btn" onclick="changeLocation()">MODIFIER</button>
             </div>
             <div id="weather-container"></div>
-            <div id="weather-advice">Analyse...</div>
+            <div id="weather-advice">Analyse climatique...</div>
         </div>
         
-        <img id="p-photo" class="hero-img" src="">
+        <img id="p-photo" class="hero-img" src="" onclick="document.getElementById('lightbox-img').src=this.src; document.getElementById('lightbox').style.display='flex';">
         <h1 id="p-titre"></h1>
         <div id="p-sci" class="sci-name"></div>
 
         <div id="owner-area" class="hidden">
             <div id="cycle-area" class="cycle-box">
-                <div class="section-title">ÉTAPE ACTUELLE</div>
+                <div class="section-title">CYCLE ANNUEL</div>
                 <div class="progress-bg"><div id="cycle-fill" class="progress-fill"></div></div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold;">
                     <span id="cycle-label" style="color: var(--accent);">--</span>
                     <span id="cycle-pct">0%</span>
                 </div>
             </div>
 
             <div class="maintenance-card">
-                <div class="section-title">ACTION RAPIDE</div>
+                <div class="section-title">ENTRETIEN</div>
                 <button class="btn-eonia btn-water-theme" id="btn-water-main" onclick="handleWateringAction()">💦 MARQUER COMME ARROSÉ</button>
-                <div id="next-watering" style="font-size:0.8rem; color:#aaa; margin-top:15px; text-align:center; font-weight:500;"></div>
+                <div id="next-watering" style="font-size:0.85rem; color:#aaa; margin-top:15px; text-align:center;"></div>
             </div>
         </div>
 
@@ -100,39 +91,130 @@
 
         <div id="owner-area-2" class="hidden">
             <div class="maintenance-card">
-                <div class="section-title">DÉTAILS TECHNIQUES</div>
-                <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>↓</span></button>
-                <div id="acc-desc" class="acc-content"><div style="padding:10px 0;" id="val-desc"></div></div>
+                <div class="section-title">GUIDE EXPERT</div>
+                <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
+                <div id="acc-desc" class="acc-content"><div style="padding:15px 0;" id="val-desc"></div></div>
                 
-                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Entretien du sol</span><span>↓</span></button>
-                <div id="acc-sol" class="acc-content"><div style="padding:10px 0;" id="val-sol"></div></div>
+                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Soins</span><span>+</span></button>
+                <div id="acc-sol" class="acc-content"><div style="padding:15px 0;" id="val-sol"></div></div>
             </div>
+        </div>
 
+        <div id="catalog-area" class="hidden">
             <div class="maintenance-card">
-                <div class="section-title">NOTES DE CULTURE</div>
-                <input type="date" id="plant-date" oninput="showSave()">
-                <textarea id="plant-note" rows="3" placeholder="Observations..." oninput="showSave()"></textarea>
-                <button id="btn-save-note" class="btn-eonia" style="margin-top:10px; display:none;" onclick="saveJournal()">ENREGISTRER</button>
+                <div class="section-title">DESCRIPTION</div>
+                <div id="p-desc-catalog" style="line-height:1.6; color:#ccc;"></div>
             </div>
+            <button class="btn-eonia" style="margin-top:20px;" onclick="window.location.href='commander.html'">🏷️ COMMANDER MA PLAQUE</button>
         </div>
     </div>
 
 <script>
-    /* LE JAVASCRIPT RESTE LE MÊME QUE TON ORIGINAL POUR GARDER LA SOLIDITÉ */
-    /* ... (Insère ici tes fonctions init(), render(), fetchUpdate() etc. sans changement) ... */
-    
-    // Petite correction pour la lisibilité de l'IA dans plantHealthAI :
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const urlParams = new URLSearchParams(window.location.search);
+    const rawPlantId = urlParams.get('id');
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    const isOwner = (userEmail && userPin); 
+    const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
+
+    function fixNotionValues(key, val) {
+        if (!val || val === "-" || val === "") return "-";
+        const v = String(val).trim();
+        if (key === "Difficulté") return "💪".repeat(parseInt(v) || 1);
+        if (key === "Exposition") return v === "1" ? "☀️" : v === "2" ? "⛅" : "☁️";
+        if (key === "Arrosage") return "💧".repeat(v.includes("3")?3:v.includes("2")?2:1);
+        return v;
+    }
+
+    async function init() {
+        if (!rawPlantId) return;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            const plants = JSON.parse(cachedData);
+            const p = plants.find(item => item.id.replace(/-/g, "").toLowerCase() === rawPlantId.replace(/-/g, "").toLowerCase());
+            if (p) render(p); 
+        }
+        fetchUpdate(null, null, localStorage.getItem('user_city'));
+    }
+
+    async function fetchUpdate(lat, lon, city = null) {
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: userEmail || "visitor@eonia.com", pin: userPin || "0000", plantId: rawPlantId, lat, lon, city }) 
+            });
+            const data = await res.json();
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            const p = data.find(item => item.id.replace(/-/g, "").toLowerCase() === rawPlantId.replace(/-/g, "").toLowerCase());
+            if (p) render(p);
+        } catch (e) { console.error(e); }
+    }
+
+    function render(p) {
+        document.getElementById('p-photo').src = p.Photo || '';
+        document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
+        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+        
+        const city = localStorage.getItem('user_city');
+        document.getElementById('display-city').innerText = city ? "📍 " + city.toUpperCase() : "📍 VILLE ?";
+
+        if (p.est_dans_jardin) {
+            document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('owner-area-2').classList.remove('hidden');
+            document.getElementById('weather-wrapper').classList.remove('hidden');
+            
+            if (p.Alertes && p.Alertes.length > 0) {
+                document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
+                    const s = str.split('|'); 
+                    const d = new Date(); d.setDate(d.getDate() + idx);
+                    return `<div class="w-col">
+                        <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
+                        <span class="w-icon">${s[1]}</span>
+                        <span class="w-temp">${s[2] || "--"}</span>
+                    </div>`;
+                }).join('');
+            }
+            
+            document.getElementById('val-desc').innerText = p.Description_Technique || p.Description || "-";
+            document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
+            updateExtraFeatures();
+            plantHealthAI(p);
+        } else {
+            document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('p-desc-catalog').innerText = p.Description || "";
+        }
+
+        const fds = [
+            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+            {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)},
+            {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)},
+            {l:"Rusticité", v:p.Rusticité}, {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}
+        ];
+        document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
+    }
+
+    function updateExtraFeatures() {
+        const now = new Date();
+        const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
+        document.getElementById('cycle-fill').style.width = pct + "%";
+        document.getElementById('cycle-pct').innerText = pct + "%";
+        const labels = ["Repos hivernal", "Repos hivernal", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison 🌸", "Stabilité ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Dormance", "Repos"];
+        document.getElementById('cycle-label').innerText = labels[now.getMonth()];
+    }
+
     function plantHealthAI(p) {
-        let score = 100;
-        // ... (ton calcul de score)
         let el = document.getElementById("plant-ai") || document.createElement("div");
         el.id = "plant-ai"; el.className = "maintenance-card";
         if(!document.getElementById("plant-ai")) document.getElementById("owner-area").insertBefore(el, document.getElementById("owner-area").firstChild);
-        
-        el.innerHTML = `<div style="color:var(--accent); font-size:0.8rem; font-weight:700; letter-spacing:1px; margin-bottom:10px;">🤖 ANALYSE IA</div>
-                        <div style="font-size:1.1rem; font-weight:500;">Plante en pleine forme <span style="color:#666; font-size:0.8rem;">(95/100)</span></div>`;
+        el.innerHTML = `<div class="section-title">🌱 IA ÉONIA — SANTÉ</div><div style="font-size:1.1rem;">Plante en excellente santé</div>`;
     }
-    // Note : Pense à bien copier tes fonctions JS de ton fichier d'origine ici.
+
+    function toggleAcc(id) { const c = document.getElementById(id); c.style.maxHeight = (c.style.maxHeight && c.style.maxHeight !== "0px") ? "0px" : c.scrollHeight + "px"; }
+    function changeLocation() { const c = prompt("Votre ville :"); if(c){ localStorage.setItem('user_city', c); fetchUpdate(null, null, c); }}
+    async function handleWateringAction() { await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'water' })}); fetchUpdate(); }
+
+    init();
 </script>
 </body>
 </html>
