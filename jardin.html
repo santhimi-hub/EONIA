@@ -258,6 +258,7 @@ border-color:var(--accent);
                 document.getElementById('weather-advice').innerText = cleanAdvice ? cleanAdvice.charAt(0).toUpperCase() + cleanAdvice.slice(1) : "Conditions optimales.";
                 
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
+                    applySmartWeatherAdvice(p);
                     const s = str.split('|'); 
                     const d = new Date(); d.setDate(new Date().getDate() + idx);
                     const tempDisplay = (s[2] && s[2] !== "undefined") ? s[2] : "--";
