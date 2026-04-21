@@ -246,7 +246,7 @@
             if (!city) askLocationIfInGarden();
             
             sendWaterReminder(p);
-            plantHealthAI(p); // Ton IA est appelée ici
+            plantHealthAI(p); // RÉINTÉGRATION IA SANTÉ
 
             if (p.Alertes && p.Alertes.length > 0) {
                 document.getElementById('weather-wrapper').classList.remove('hidden');
@@ -423,7 +423,7 @@
         }
     }
 
-    // --- TON IA SANTE ---
+    // --- IA SANTE PLANTE ---
     function plantHealthAI(p) {
         let score = 100;
         if (p.Historique_Data && p.Historique_Data !== "-") {
@@ -431,7 +431,7 @@
             if (days < 2) score -= 30;
             if (days < 5) score -= 15;
         } else {
-            score -= 40;
+            score -= 40; // Pas d'historique = plante non suivie
         }
         if (p.Arrosage && p.Arrosage.includes("💧")) {
             score -= 10;
