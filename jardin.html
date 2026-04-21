@@ -52,10 +52,9 @@
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
 
         .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .evo-scroll::-webkit-scrollbar { display: none; }
-        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; transition:0.3s; }
-        .evo-scroll img:hover{ transform:scale(1.05); border-color:var(--accent); }
-        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
+        .evo-scroll img { width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); flex-shrink: 0; cursor: pointer; transition: 0.3s; }
+        .evo-scroll img:hover { transform: scale(1.05); border-color: var(--accent); }
+        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: rgba(255, 255, 255, 0.02); border-radius: 12px; border: 1px solid var(--border); }
         .toggle-label { font-size: 0.65rem; text-transform: uppercase; color: #888; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -188,11 +187,11 @@
     function fixNotionValues(key, val) {
         if (!val || val === "-") return "-";
         const map = {
-            "Difficulté": { "⭐": "Facile", "⭐⭐": "Modérée", "⭐⭐⭐": "Expert" },
-            "Arrosage": { "💧": "Faible", "💧💧": "Régulier", "💧💧💧": "Fréquent" },
-            "Exposition": { "☀️": "Plein soleil", "⛅": "Mi-ombre", "☁️": "Ombre" }
+            "Difficulté": { "Facile": "⭐ Facile", "Modérée": "⭐⭐ Modérée", "Expert": "⭐⭐⭐ Expert" },
+            "Arrosage": { "Faible": "💧 Faible", "Régulier": "💧💧 Régulier", "Fréquent": "💧💧💧 Fréquent" },
+            "Exposition": { "Plein soleil": "☀️ Plein soleil", "Mi-ombre": "⛅ Mi-ombre", "Ombre": "☁️ Ombre" }
         };
-        return (map[key] && map[key][val]) ? `${val} ${map[key][val]}` : val;
+        return (map[key] && map[key][val]) ? map[key][val] : val;
     }
 
     async function init() {
@@ -221,10 +220,10 @@
         document.getElementById('display-city').innerText = city ? "📍 " + city.toUpperCase() : "📍 VILLE ?";
 
         if (p.est_dans_jardin) {
-            plantHealthAI(p); // L'IA discrète
+            plantHealthAI(p);
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
-            updateExtraFeatures(p); // Le Cycle et le Geste
+            updateExtraFeatures(p);
 
             if (Array.isArray(p.Alertes) && p.Alertes.length > 0) {
                 document.getElementById('weather-wrapper').classList.remove('hidden');
@@ -250,7 +249,6 @@
                 ? p.Photos_Evolution.map(url => `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(url)}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">${isOwner?`<div onclick="deletePhoto('${url}')" style="position:absolute;top:5px;right:5px;background:red;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer">×</div>`:''}</div>`).join('') 
                 : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
             
-            // --- TES DESCRIPTIONS ORIGINALES ---
             document.getElementById('val-desc').innerText = p.Description_Technique || p.Description || "-";
             document.getElementById('val-flore').innerText = p.Floraison || "-";
             document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
@@ -319,6 +317,26 @@
         });
     }
 
+    async function handleWateringAction() {
+        if (!isOwner) return;
+        const dateStr = new Date().toLocaleDateString('fr-FR');
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'add_watering', plantId: rawPlantId, email: userEmail, pin: userPin, date: dateStr }) });
+        fetchUpdate();
+    }
+
+    function showSave() { document.getElementById('btn-save-note').style.display = 'block'; }
+
+    async function saveJournal() {
+        const data = {
+            action: 'update_journal', plantId: rawPlantId, email: userEmail, pin: userPin,
+            note: document.getElementById('plant-note').value,
+            date: document.getElementById('plant-date').value
+        };
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+        document.getElementById('btn-save-note').style.display = 'none';
+        fetchUpdate();
+    }
+
     async function uploadPhoto(input) {
         if(!input.files[0]) return;
         const formData = new FormData();
@@ -333,7 +351,7 @@
 
     async function deletePhoto(photoUrl) {
         if (!confirm("Supprimer ?")) return;
-        await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl }) });
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_photo', plantId: rawPlantId, email: userEmail, pin: userPin, photoUrl }) });
         fetchUpdate();
     }
 
