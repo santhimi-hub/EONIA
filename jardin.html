@@ -180,14 +180,14 @@
         if (!val || val === "-" || val === "") return "-";
         const v = String(val).trim();
         if (key === "Difficulté") {
-            if (v === "1") return "💪 Débutant";
-            if (v === "2") return "💪💪 Intermédiaire";
-            if (v === "3") return "💪💪💪 Expert";
+            if (v === "1") return "💪";
+            if (v === "2") return "💪💪";
+            if (v === "3") return "💪💪💪";
         }
         if (key === "Exposition") {
-            if (v === "1") return "☀️ Plein soleil";
-            if (v === "2") return "⛅ Mi-ombre";
-            if (v === "3") return "☁️ Ombre";
+            if (v === "1") return "☀️";
+            if (v === "2") return "⛅";
+            if (v === "3") return "☁️";
         }
         if (key === "Arrosage") {
             if (v.includes("3")) return "💧💧💧";
@@ -246,7 +246,7 @@
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
                     const s = str.split('|'); 
                     const d = new Date(); d.setDate(new Date().getDate() + idx);
-                    const tempDisplay = s[2] || "--";
+                    const tempDisplay = (s[2] && s[2] !== "undefined") ? s[2] : "--";
                     return `<div class="w-col">
                         <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
                         <span class="w-icon">${s[1]}</span>
@@ -315,7 +315,7 @@
             const d = new Date(); d.setDate(d.getDate() - i);
             const format = d.toLocaleDateString('fr-FR');
             labels.push(format.split('/')[0] + '/' + format.split('/')[1]);
-            data.push(dates.includes(format) ? 1 : 0);
+            data.push(dates.includes(format) ? 1 : 0.3);
         }
         if (window.myChart) window.myChart.destroy();
         window.myChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ data, backgroundColor: data.map(v => v?'#38bdf8':'#1a1a1a'), barPercentage: 0.2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, max: 1.1 }, x: { grid: { display: false }, ticks: { color: '#666', font: { size: 9 } } } } } });
