@@ -73,11 +73,11 @@
                 <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
             </div>
         </div>
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button>
+        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> localStorage.setItem('is_logged_in', 'true');
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
     </div>
     <nav class="bottom-nav">
-        <a href="#" onclick="accesInvite()">Accès Invité</a>
+        <a href="#" onclick="accesInvite()">Accès Invité</a> localStorage.setItem('is_logged_in', 'guest');
         <a href="#concept">Le Concept</a>
     </nav>
 </main>
