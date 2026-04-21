@@ -46,7 +46,7 @@
         .btn-save-theme { border-color: rgba(74, 222, 128, 0.4); color: var(--accent); display: none; }
         
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); }
-        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #ffffff; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
         .history-tag { font-size: 0.55rem; background: rgba(255,255,255,0.03); padding: 5px 10px; border-radius: 6px; color: #888; border: 1px solid var(--border); display: flex; align-items: center; gap: 5px; }
         .expert-card { background: linear-gradient(90deg, rgba(74,222,128,0.08) 0%, transparent 100%); border-left: 3px solid var(--accent); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
@@ -168,7 +168,7 @@
 
         <div class="maintenance-card hidden" id="catalog-desc-area">
             <div class="section-title">DESCRIPTION</div>
-            <div id="p-desc-catalog" style="line-height:1.8; color:#aaa;"></div>
+            <div id="p-desc-catalog" style="line-height:1.8; color:#ffffff;"></div>
         </div>
 
         <div id="catalog-area" class="hidden">
@@ -253,15 +253,12 @@
                 const tomorrow = p.Alertes[1] ? p.Alertes[1].toLowerCase() : "";
                 let advice = "";
                 
-                if ((tomorrow.includes("pluie") || tomorrow.includes("orage")) && !today.includes("pluie")) {
-                    advice = "⛅ Demain incertain (Pluie/Orage ?) : Arrosez légèrement si la terre est sèche.";
-                } else if (today.includes("pluie")) {
-                    advice = "🌧️ Pluie détectée : Inutile d’arroser aujourd’hui.";
-                } else if (today.includes("canicule") || today.includes("30")) {
-                    advice = "🔥 Forte chaleur : Arrosage impératif ce soir.";
-                } else {
-                    advice = "🌿 Conditions normales : Fiez-vous à l'humidité de la terre.";
-                }
+                // --- LOGIQUE METEO DU WORKER ---
+if (p.Conseil_Expert) {
+    document.getElementById("weather-advice").innerText = p.Conseil_Expert;
+} else {
+    document.getElementById("weather-advice").innerText = "Analyse des conditions en cours...";
+}
                 document.getElementById("weather-advice").innerText = advice;
 
                 document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
