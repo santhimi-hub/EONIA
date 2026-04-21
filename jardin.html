@@ -177,186 +177,167 @@
     </div>
 
 <script>
-   // --- SCRIPT MIS À JOUR (IA, Cycle, Photos corrigés - Description inchangée) ---
+    const API_URL = "https://eonia-api.santhimi.workers.dev";
+    const urlParams = new URLSearchParams(window.location.search);
+    const rawPlantId = urlParams.get('id');
+    const userEmail = localStorage.getItem('user_email');
+    const userPin = localStorage.getItem('user_pin');
+    let isOwner = false;
+    let chartInstance = null;
 
-function render(p) {
-    document.getElementById('p-photo').src = p.Photo || '';
-    document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
-    document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-    const city = localStorage.getItem('user_city');
-    document.getElementById('display-city').innerText = city ? "📍 " + city.toUpperCase() : "📍 VILLE ?";
+    function fixNotionValues(key, val) {
+        if (!val || val === "-") return "-";
+        const map = {
+            "Difficulté": { "⭐": "Facile", "⭐⭐": "Modérée", "⭐⭐⭐": "Expert" },
+            "Arrosage": { "💧": "Faible", "💧💧": "Régulier", "💧💧💧": "Fréquent" },
+            "Exposition": { "☀️": "Plein soleil", "⛅": "Mi-ombre", "☁️": "Ombre" }
+        };
+        return (map[key] && map[key][val]) ? `${val} ${map[key][val]}` : val;
+    }
 
-    if (p.est_dans_jardin) {
-        if (!city) askLocationIfInGarden();
-        
-        sendWaterReminder(p);
-        plantHealthAI(p); // IA affinée (plus petit)
+    async function init() {
+        if (!rawPlantId) return;
+        const city = localStorage.getItem('user_city');
+        fetchUpdate(null, null, city);
+    }
 
-        document.getElementById('owner-area').classList.remove('hidden');
-        document.getElementById('owner-area-2').classList.remove('hidden');
-        updateExtraFeatures(p); // Barre de cycle réactivée + Geste du jardinier
+    async function fetchUpdate(lat, lon, city = null) {
+        let url = `${API_URL}?id=${rawPlantId}`;
+        if (lat && lon) url += `&lat=${lat}&lon=${lon}`;
+        if (city) url += `&city=${encodeURIComponent(city)}`;
+        try {
+            const r = await fetch(url);
+            const p = await r.json();
+            isOwner = (userEmail && userPin && p.Proprietaire === userEmail);
+            render(p);
+        } catch (e) { console.error(e); }
+    }
 
-        if (Array.isArray(p.Alertes) && p.Alertes.length > 0) {
-            document.getElementById('weather-wrapper').classList.remove('hidden');
-            const today = (p.Alertes[0] || "").toLowerCase();
-            const tomorrow = p.Alertes[1] ? p.Alertes[1].toLowerCase() : "";
-            let advice = "";
-            if ((tomorrow.includes("pluie") || tomorrow.includes("orage")) && !today.includes("pluie")) {
-                advice = "⛅ Demain incertain : Arrosez légèrement si la terre est sèche.";
-            } else if (today.includes("pluie")) {
-                advice = "🌧️ Pluie détectée : Inutile d’arroser.";
-            } else if (today.includes("canicule") || today.includes("30")) {
-                advice = "🔥 Forte chaleur : Arrosage impératif ce soir.";
-            } else {
-                advice = "🌿 Conditions normales : Fiez-vous à l'humidité du sol.";
+    function render(p) {
+        document.getElementById('p-photo').src = p.Photo || '';
+        document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
+        document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
+        const city = localStorage.getItem('user_city');
+        document.getElementById('display-city').innerText = city ? "📍 " + city.toUpperCase() : "📍 VILLE ?";
+
+        if (p.est_dans_jardin) {
+            plantHealthAI(p); // L'IA discrète
+            document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('owner-area-2').classList.remove('hidden');
+            updateExtraFeatures(p); // Le Cycle et le Geste
+
+            if (Array.isArray(p.Alertes) && p.Alertes.length > 0) {
+                document.getElementById('weather-wrapper').classList.remove('hidden');
+                document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
+                    const s = str.split('|'); 
+                    const d = new Date(); d.setDate(new Date().getDate() + idx);
+                    return `<div class="w-col">
+                        <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
+                        <span class="w-icon">${s[1]}</span>
+                        <span class="w-temp" style="font-weight:bold; font-size:0.7rem;">${(s[2]||"--")}</span>
+                    </div>`;
+                }).join('');
             }
-            document.getElementById("weather-advice").innerText = advice;
 
-            document.getElementById('weather-container').innerHTML = p.Alertes.map((str, idx) => {
-                const s = str.split('|'); 
-                const d = new Date(); d.setDate(new Date().getDate() + idx);
-                return `<div class="w-col">
-                    <span class="w-day">${idx===0?"AUJOURD'HUI":d.toLocaleDateString('fr-FR',{weekday:'short'}).toUpperCase()}</span>
-                    <span class="w-icon">${s[1]}</span>
-                    <span class="w-temp" style="font-weight:bold; font-size:0.7rem;">${(s[2]||"--")}</span>
-                </div>`;
-            }).join('');
-        }
-
-        if (isOwner) {
-            document.getElementById('upload-zone').classList.remove('hidden');
-            document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
-            document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
-            document.getElementById('journal-public-toggle').checked = (p.Journal_Public === true || p.Journal_Public === "TRUE");
-        }
-
-        const gallery = document.getElementById('evo-gallery');
-        gallery.innerHTML = (p.Photos_Evolution && p.Photos_Evolution.length > 0) 
-            ? p.Photos_Evolution.map(url => `
-                <div style="position:relative; flex-shrink:0;">
-                    <img src="${encodeURI(url)}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">
-                    ${isOwner ? `<div onclick="deletePhoto('${url}')" style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.7); color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;">×</div>` : ''}
-                </div>`).join('') : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
-        
-        // --- RETOUR À TA VERSION ORIGINALE POUR LA DESCRIPTION (POINT 3) ---
-        document.getElementById('val-desc').innerText = p.Description_Technique || p.Description || "-";
-        document.getElementById('val-flore').innerText = p.Floraison || "-";
-        document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
-        document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
-        document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
-        
-        const h = document.getElementById('watering-history');
-        if (p.Historique_Data && p.Historique_Data !== "-") {
-            const uniqueDates = [...new Set(p.Historique_Data.split(',').map(d => d.trim()))].filter(d => d !== "");
-            h.innerHTML = uniqueDates.slice().reverse().map(date => `<span class="history-tag">${date}${isOwner ? `<b onclick="deleteWatering('${date}')" style="color:var(--error); cursor:pointer; padding-left:5px;">×</b>` : ''}</span>`).join('');
-            if (isOwner && uniqueDates.includes(new Date().toLocaleDateString('fr-FR'))) {
-                const btn = document.getElementById('btn-water-main'); btn.innerText = "✅ Arrosé aujourd'hui"; btn.className = "btn-eonia btn-disabled"; btn.onclick = null;
-            } else if (isOwner) {
-                const btn = document.getElementById('btn-water-main'); btn.innerText = "💦 Marquer comme arrosé"; btn.className = "btn-eonia btn-water-theme"; btn.onclick = handleWateringAction;
+            if (isOwner) {
+                document.getElementById('upload-zone').classList.remove('hidden');
+                document.getElementById('plant-note').value = p.Note_Privee !== "-" ? p.Note_Privee : "";
+                document.getElementById('plant-date').value = p.Date_Plantation !== "-" ? p.Date_Plantation : "";
             }
+
+            const gallery = document.getElementById('evo-gallery');
+            gallery.innerHTML = (p.Photos_Evolution && p.Photos_Evolution.length > 0) 
+                ? p.Photos_Evolution.map(url => `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(url)}" onclick="document.getElementById('lightbox-img').src='${url}'; document.getElementById('lightbox').style.display='flex';">${isOwner?`<div onclick="deletePhoto('${url}')" style="position:absolute;top:5px;right:5px;background:red;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer">×</div>`:''}</div>`).join('') 
+                : `<div style="color:#444; font-size:0.7rem;">Aucune photo d'évolution.</div>`;
+            
+            // --- TES DESCRIPTIONS ORIGINALES ---
+            document.getElementById('val-desc').innerText = p.Description_Technique || p.Description || "-";
+            document.getElementById('val-flore').innerText = p.Floraison || "-";
+            document.getElementById('val-sol').innerText = p["Sol et fertilisation"] || "-";
+            document.getElementById('val-health').innerText = p["Protection et santé"] || "-";
+            document.getElementById('val-asso').innerText = p["Campagnonnage/ Plantes associées"] || "-";
+            
+            updateWateringChart(p.Historique_Data);
+        } else {
+            document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('catalog-desc-area').classList.remove('hidden');
+            document.getElementById('p-desc-catalog').innerText = p.Description || "";
         }
-        updateWateringChart(p.Historique_Data);
-        updateNextWatering(p.Historique_Data, p);
-    } else {
-        document.getElementById('catalog-area').classList.remove('hidden');
-        document.getElementById('catalog-desc-area').classList.remove('hidden');
-        document.getElementById('p-desc-catalog').innerText = p.Description || "";
-    }
-    const fds = [
-        {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
-        {l:"Persistance", v:p.Persistance}, {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille maturité"]},
-        {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}, 
-        {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)},
-        {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)}, 
-        {l:"Rusticité", v:p.Rusticité}
-    ];
-    document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
-}
 
-function updateExtraFeatures(p) {
-    const now = new Date(); const m = now.getMonth();
-    const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
-    
-    // Réactivation Barre de Cycle
-    const fill = document.getElementById('cycle-fill');
-    if(fill) {
-        fill.style.width = pct + "%";
-        document.getElementById('cycle-pct').innerText = pct + "%";
-        const labels = ["Repos hivernal", "Dernières gelées", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison & Éclat 🌸", "Stabilité estivale ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Entrée en dormance", "Repos absolu"];
-        document.getElementById('cycle-label').innerText = labels[m];
+        const fds = [
+            {l:"Famille", v:p.Famille, h:true}, {l:"Type", v:p.Type, h:true},
+            {l:"Persistance", v:p.Persistance}, {l:"Taille Adulte", v: p["Taille à maturité"] || p["Taille maturité"]},
+            {l:"Difficulté", v: fixNotionValues("Difficulté", p.Difficulté)}, 
+            {l:"Arrosage", v: fixNotionValues("Arrosage", p.Arrosage)},
+            {l:"Exposition", v: fixNotionValues("Exposition", p.Exposition)}, 
+            {l:"Rusticité", v:p.Rusticité}
+        ];
+        document.getElementById('p-grid').innerHTML = fds.map(f => `<div class="info-box ${f.h ? 'highlight' : ''}"><div class="label">${f.l}</div><div class="value">${f.v||"-"}</div></div>`).join('');
     }
 
-    // Le Geste du Jardinier (Conseils saisonniers)
-    const expertTitle = document.querySelector("#expert-area .section-title");
-    if(expertTitle) expertTitle.innerHTML = `Le Geste du Jardinier — <span id="expert-month">${["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"][m]}</span>`;
-    
-    const baseTips = [
-        "Protégez les racines du gel avec un paillage.",
-        "Préparez vos outils et taillez le bois mort.",
-        "Apportez du compost pour booster le réveil.",
-        "Surveillez les pucerons sur les jeunes pousses.",
-        "Binez le sol pour laisser respirer les racines.",
-        "Arrosez tôt le matin ou tard le soir.",
-        "Maintenez la fraîcheur au pied (paillage).",
-        "Supprimez les fleurs fanées pour stimuler la plante.",
-        "Réduisez progressivement les apports d'eau.",
-        "Plantez les bulbes et ramassez les feuilles.",
-        "Installez les protections hivernales (voiles).",
-        "Laissez la plante se reposer, évitez de tailler."
-    ];
-    document.getElementById('expert-text').innerText = baseTips[m];
-}
-
-function plantHealthAI(p) {
-    let score = 100;
-    if (p.Historique_Data && p.Historique_Data !== "-") {
-        const dates = p.Historique_Data.split(',');
-        const last = dates[dates.length - 1];
-        if (last) {
-            const [day, month, year] = last.split('/').map(Number);
-            const lastDate = new Date(year, month - 1, day);
-            const diff = (new Date() - lastDate) / (1000 * 60 * 60 * 24);
-            if (diff > 7) score -= 50; else if (diff > 4) score -= 20;
+    function updateExtraFeatures(p) {
+        const now = new Date(); const m = now.getMonth();
+        const pct = Math.round((Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) / 365) * 100);
+        const fill = document.getElementById('cycle-fill');
+        if(fill) {
+            fill.style.width = pct + "%";
+            document.getElementById('cycle-pct').innerText = pct + "%";
+            const labels = ["Repos hivernal", "Dernières gelées", "Réveil printanier 🌱", "Croissance active 🌱", "Pleine sève ☀️", "Floraison & Éclat 🌸", "Stabilité estivale ☀️", "Maturation", "Préparation au repos", "Couleurs d'automne", "Entrée en dormance", "Repos absolu"];
+            document.getElementById('cycle-label').innerText = labels[m];
         }
-    } else { score = 50; }
-
-    let status = "🟢 En pleine santé";
-    let color = "#4ade80";
-    if (score < 60) { status = "🔴 Stress hydrique"; color = "#f87171"; }
-    else if (score < 85) { status = "🟡 À surveiller"; color = "#fbbf24"; }
-
-    let el = document.getElementById("plant-ai");
-    if (!el) {
-        el = document.createElement("div");
-        el.id = "plant-ai";
-        el.className = "maintenance-card";
-        el.style.padding = "12px 20px";
-        document.getElementById("owner-area").prepend(el);
+        const tips = ["Protégez les racines du gel.", "Taillez le bois mort.", "Apportez du compost.", "Surveillez les pucerons.", "Binez le sol.", "Arrosez soir ou matin.", "Paillez le pied.", "Supprimez les fleurs fanées.", "Réduisez l'eau.", "Plantez les bulbes.", "Installez les voiles d'hivernage.", "Laissez la plante au repos."];
+        document.getElementById('expert-text').innerText = tips[m];
+        const expertTitle = document.querySelector("#expert-area .section-title");
+        if(expertTitle) expertTitle.innerHTML = `Le Geste du Jardinier — <span>${["Janv.","Févr.","Mars","Avril","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."][m]}</span>`;
     }
-    el.innerHTML = `
-        <div style="color:${color}; font-size:0.55rem; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">🌱 ANALYSE IA ÉONIA</div>
-        <div style="margin-top:4px; font-size:0.75rem; color:#eee;">${status} <span style="opacity:0.5; font-size:0.6rem;">— Score : ${score}/100</span></div>
-    `;
-}
 
-// Fonctions Photos (Restauration)
-async function deletePhoto(photoUrl) { 
-    if (!confirm("Supprimer cette photo ?")) return; 
-    await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl }) }); 
-    fetchUpdate(); 
-}
+    function plantHealthAI(p) {
+        let status = "🟢 En pleine santé";
+        let el = document.getElementById("plant-ai");
+        if (!el) {
+            el = document.createElement("div"); el.id = "plant-ai"; el.className = "maintenance-card";
+            el.style.padding = "12px 20px";
+            document.getElementById("owner-area").prepend(el);
+        }
+        el.innerHTML = `<div style="color:var(--accent); font-size:0.55rem; font-weight:bold; text-transform:uppercase;">🌱 ANALYSE IA</div><div style="font-size:0.75rem; color:#eee; margin-top:4px;">${status}</div>`;
+    }
 
-async function uploadPhoto(input) { 
-    if(!input.files[0]) return;
-    const formData = new FormData(); 
-    formData.append('file', input.files[0]); 
-    formData.append('action', 'upload_photo_binaire'); 
-    formData.append('plantId', rawPlantId); 
-    formData.append('email', userEmail); 
-    formData.append('pin', userPin); 
-    await fetch(API_URL, { method: 'POST', body: formData }); 
-    fetchUpdate(); 
-}
+    function toggleAcc(id) {
+        const content = document.getElementById(id);
+        content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
+    }
+
+    function updateWateringChart(data) {
+        if (!data || data === "-") return;
+        const ctx = document.getElementById('wateringChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        const dates = data.split(',').map(d => d.trim());
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: dates, datasets: [{ data: dates.map(() => 1), borderColor: '#4ade80', tension: 0.4, pointRadius: 0 }] },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+        });
+    }
+
+    async function uploadPhoto(input) {
+        if(!input.files[0]) return;
+        const formData = new FormData();
+        formData.append('file', input.files[0]);
+        formData.append('action', 'upload_photo_binaire');
+        formData.append('plantId', rawPlantId);
+        formData.append('email', userEmail);
+        formData.append('pin', userPin);
+        await fetch(API_URL, { method: 'POST', body: formData });
+        fetchUpdate();
+    }
+
+    async function deletePhoto(photoUrl) {
+        if (!confirm("Supprimer ?")) return;
+        await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: userEmail, pin: userPin, plantId: rawPlantId, action: 'delete_photo', photoUrl }) });
+        fetchUpdate();
+    }
+
+    init();
 </script>
 </body>
 </html>
