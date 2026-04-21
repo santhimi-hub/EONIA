@@ -73,11 +73,11 @@
                 <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
             </div>
         </div>
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> localStorage.setItem('is_logged_in', 'true');
+        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> 
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
     </div>
     <nav class="bottom-nav">
-        <a href="#" onclick="accesInvite()">Accès Invité</a> localStorage.setItem('is_logged_in', 'guest');
+        <a href="#" onclick="accesInvite()">Accès Invité</a> 
         <a href="#concept">Le Concept</a>
     </nav>
 </main>
@@ -112,7 +112,7 @@
         if (e.key === 'Enter') { validerConnexion(); }
     });
 
-    async function validerConnexion() {
+    async function validerConnexion() 
         const btn = document.getElementById('btn-entrer');
         const mail = document.getElementById('email').value.toLowerCase().trim();
         const pin = document.getElementById('pin').value.trim();
@@ -124,6 +124,7 @@
                 body: JSON.stringify({ email: mail, pin: pin })
             });
             if (response.ok) {
+                { localStorage.setItem('is_logged_in', 'true');
                 localStorage.setItem('user_email', mail);
                 if (plaqueEnAttente) { window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; }
                 else { window.location.href = "catalogue.html"; }
@@ -134,6 +135,7 @@
         } catch (e) { alert("Erreur réseau."); btn.disabled = false; }
     }
     function accesInvite() {
+        localStorage.setItem('is_logged_in', 'guest');
         localStorage.clear();
         localStorage.setItem('user_email', 'invite@eonia.com');
         window.location.href = "catalogue.html";
