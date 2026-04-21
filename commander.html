@@ -129,108 +129,93 @@
         </div>
     </div>
 
-    <script>
-        let selectedMat = "Ardoise";
-        let currentPrice = 25;
-        let fixationPrice = 0;
-        let selectedFixationType = "piquet";
-        let offerName = "Ardoise Solo";
+   <script>
+    const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
+    const urlParams = new URLSearchParams(window.location.search);
+    const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
 
-        function selectOffer(el, mat, price, name) {
-            document.querySelectorAll('.options-grid:nth-of-type(2) .option-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedMat = mat;
-            currentPrice = price;
-            offerName = name;
-            
-            const surface = document.getElementById('plaque-surface');
-            surface.className = 'mat-' + mat.toLowerCase();
-            updateFinalPrice();
+    window.onload = () => {
+        if (plaqueEnAttente) {
+            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+            document.getElementById('activation-help').style.display = "block";
         }
+    };
 
-        function selectFixation(type, price) {
-            document.getElementById('opt-piquet').classList.remove('selected');
-            document.getElementById('opt-medaille').classList.remove('selected');
-            document.getElementById('opt-' + type).classList.add('selected');
-            
-            selectedFixationType = type;
-            fixationPrice = price;
-            
-            const piquetVis = document.getElementById('fixation-visual');
-            if(type === 'medaille') {
-                piquetVis.style.width = "260px";
-                piquetVis.style.height = "10px";
-                piquetVis.style.borderRadius = "10px";
-                piquetVis.style.marginTop = "-85px";
-            } else {
-                piquetVis.style.width = "12px";
-                piquetVis.style.height = "60px";
-                piquetVis.style.borderRadius = "0 0 4px 4px";
-                piquetVis.style.marginTop = "-10px";
-            }
-            updateFinalPrice();
+    // GESTION DE LA TOUCHE ENTRÉE (Limitée aux champs du formulaire)
+    document.querySelectorAll('#email, #pin').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') validerConnexion();
+        });
+    });
+
+    async function validerConnexion() { 
+        const btn = document.getElementById('btn-entrer');
+        const mail = document.getElementById('email').value.toLowerCase().trim();
+        const pin = document.getElementById('pin').value.trim();
+        const labelOriginal = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER";
+        
+        // Validation Front (4 chiffres)
+        if (!mail || !/^[0-9]{4}$/.test(pin)) {
+            alert("PIN invalide (4 chiffres requis)");
+            return;
         }
-
-        function updatePreview() {
-            const val = document.getElementById('gravure').value;
-            document.getElementById('text-render').innerText = val || "NOM DE VOTRE PLANTE";
-            updateFinalPrice();
-        }
-
-        function updateFinalPrice() {
-            const isVierge = document.getElementById('gravure').value === "";
-            let total = currentPrice + fixationPrice;
-            if (isVierge) total -= 5;
-            document.getElementById('final-price').innerText = total + "€";
-        }
-
-        // --- ENVOI DE COMMANDE VIA FORMSPREE ---
-        async function commander() {
-            const txt = document.getElementById('gravure').value || "Vierge";
-            const total = document.getElementById('final-price').innerText;
-            const btn = document.querySelector('.btn-order');
-
-            // 1. Demander l'email du client
-            const emailClient = prompt("Où pouvons-nous vous recontacter pour la livraison ? (Entrez votre email)");
+        
+        btn.innerText = "VÉRIFICATION..."; btn.disabled = true;
+        
+        try {
+            const response = await fetch(WORKER_URL, {
+                method: "POST", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: mail, pin: pin })
+            });
             
-            if (!emailClient || emailClient.indexOf('@') === -1) {
-                alert("Une adresse email valide est nécessaire pour traiter votre commande.");
-                return;
-            }
-
-            // 2. Animation de chargement
-            const originalText = btn.innerHTML;
-            btn.innerText = "⏳ TRANSMISSION EN COURS...";
-            btn.disabled = true;
-
-            // 3. Envoi des données
-            try {
-                const response = await fetch("https://formspree.io/f/TON_ID_ICI", { // <--- REMPLACE TON_ID_ICI ICI
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        client_email: emailClient,
-                        offre: offerName,
-                        materiau: selectedMat,
-                        fixation: selectedFixationType,
-                        gravure: txt,
-                        montant_total: total
-                    })
-                });
-
-                if (response.ok) {
-                    alert("Merci ! Votre commande ÉONIA a été transmise avec succès. Nous vous recontacterons très vite à l'adresse : " + emailClient);
-                    btn.innerText = "COMMANDE ENVOYÉE ✅";
-                    btn.style.background = "#4ade80";
-                } else {
-                    throw new Error();
+            const data = await response.json().catch(() => ({}));
+            
+            if (response.ok && data.success) { // Vérification du champ success attendu
+                localStorage.setItem('auth_state', 'user');
+                localStorage.setItem('user_email', mail);
+                // ne pas stocker le PIN côté navigateur
+                
+                if (plaqueEnAttente) { 
+                    window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; 
+                } else { 
+                    window.location.href = "catalogue.html"; 
                 }
-            } catch (error) {
-                alert("Une erreur est survenue lors de l'envoi. Veuillez réessayer ou nous contacter directement à contact@eonia.com");
-                btn.innerHTML = originalText;
+            } else { 
+                alert(data.message || "Email ou PIN incorrect.");
+                btn.innerText = labelOriginal; 
                 btn.disabled = false;
             }
+        } catch (e) { 
+            alert("Erreur réseau ou serveur indisponible."); 
+            btn.innerText = "RÉESSAYER";
+            btn.disabled = false;
+            
+            // UX : Remise à zéro du bouton après 3 secondes
+            setTimeout(() => {
+                if (btn.innerText === "RÉESSAYER") btn.innerText = labelOriginal;
+            }, 3000);
         }
-    </script>
+    }
+
+    function accesInvite() {
+        localStorage.clear(); 
+        localStorage.setItem('auth_state', 'guest');
+        localStorage.setItem('user_email', 'invite@eonia.com');
+        window.location.href = "catalogue.html";
+    }
+
+    function togglePinVisibility() {
+        const pinInput = document.getElementById('pin');
+        const eyeIcon = document.getElementById('eye-icon');
+        if (pinInput.type === 'password') { 
+            pinInput.type = 'text'; 
+            eyeIcon.style.color = "#4ade80"; 
+        } else { 
+            pinInput.type = 'password'; 
+            eyeIcon.style.color = "#fff"; 
+        }
+    }
+</script>
 </body>
 </html>
