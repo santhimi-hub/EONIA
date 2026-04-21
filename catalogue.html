@@ -21,11 +21,6 @@
         .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
-        /* NAVIGATION */
-        .client-nav { display: none; justify-content: center; gap: 15px; margin: 20px auto; }
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
-
         /* CONTROLS */
         .controls-area { max-width: 1000px; margin: 0 auto 10px auto; padding: 0 15px; text-align: center; }
         .search-input { width: 100%; max-width: 450px; padding: 14px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 15px; outline: none; transition: 0.3s; }
@@ -39,12 +34,10 @@
 
         /* GRID */
         .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; margin: 20px 0 10px 0; letter-spacing: 8px; border-bottom: 1px solid rgba(74, 222, 128, 0.1); }
         .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; }
         .plant-card:hover { transform: translateY(-5px); border-color: #333; }
         .img-container { width: 100%; height: 160px; overflow: hidden; background: #080808; }
         .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .plant-card:hover .plant-img { scale: 1.05; }
         .plant-info { padding: 15px 10px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
     </style>
@@ -61,98 +54,97 @@
     <p id="page-title">Notre Collection</p>
 </header>
 
-<div id="client-menu" class="client-nav">
-    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
-    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
-</div>
-
 <div class="controls-area">
     <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
     <div id="plant-counter">CHARGEMENT...</div>
 
     <div class="filter-nav">
-    <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-    <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-    <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-    <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-    <button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
-    <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
-</div>
+        <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+        <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+        <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        <button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
+        <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
+    </div>
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <script>
-// --- CONFIG & SÉCURITÉ ---
-const API_VERSION = "1.3"; // Passage en 1.3 pour forcer la mise à jour
+const API_VERSION = "1.3";
 const userEmail = localStorage.getItem('user_email');
 const authState = localStorage.getItem('auth_state');
+const API_URL = "https://eonia-api.santhimi.workers.dev";
+
+let allPlants = [];
+let currentFilter = 'all';
+
+// --- INITIALISATION ---
+if (!userEmail || !authState) { window.location.href = "index.html"; }
 
 const cacheKey = `eonia_cache_${userEmail}`;
 const cachedData = JSON.parse(localStorage.getItem(cacheKey));
-
-if (cachedData && cachedData.version !== API_VERSION) {
-    localStorage.removeItem(cacheKey);
-}
-
-if (!userEmail || !authState) {
-    logout();
-}
-
-const API_URL = "https://eonia-api.santhimi.workers.dev";
-let allPlants = [];
-
-// --- LOGIQUE DE CHARGEMENT ---
+if (cachedData && cachedData.version !== API_VERSION) { localStorage.removeItem(cacheKey); }
 
 async function loadData() {
-    if (cachedData) {
-        allPlants = cachedData.plants;
-        renderGrid();
-    }
+    if (cachedData) { allPlants = cachedData.plants; renderGrid(); }
 
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                action: "get_plants", // Le Worker ignore cette action et passe direct au catalogue
-                email: userEmail 
-            })
+            body: JSON.stringify({ action: "get_plants", email: userEmail })
         });
-        
         const plants = await res.json();
-        
-        // Si le worker renvoie une erreur ou un tableau vide, on ne met pas en cache
         if (plants && plants.length > 0) {
-            localStorage.setItem(cacheKey, JSON.stringify({
-                version: API_VERSION,
-                plants: plants
-            }));
+            localStorage.setItem(cacheKey, JSON.stringify({ version: API_VERSION, plants: plants }));
             allPlants = plants;
             renderGrid();
-        } else {
-            document.getElementById('plant-counter').innerText = "AUCUNE PLANTE TROUVÉE";
         }
-    } catch (e) {
-        console.error("Synchro impossible");
-        document.getElementById('plant-counter').innerText = "ERREUR DE CONNEXION";
-    }
+    } catch (e) { document.getElementById('plant-counter').innerText = "ERREUR DE CONNEXION"; }
 }
 
-// --- LOGIQUE D'ASSIGNATION SÉCURISÉE ---
+function setFilter(type, btn) {
+    currentFilter = type;
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid();
+}
+
+function renderGrid() {
+    const grid = document.getElementById('catalogue-grid');
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    const modeAssignation = params.get('assign_to');
+
+    const filtered = allPlants.filter(p => {
+        const matchSearch = p["Nom commun"].toLowerCase().includes(search);
+        const matchFilter = currentFilter === 'all' || p["Type"] === currentFilter;
+        return matchSearch && matchFilter;
+    });
+
+    document.getElementById('plant-counter').innerText = `${filtered.length} VARIÉTÉS RÉPERTORIÉES`;
+
+    grid.innerHTML = filtered.map(p => `
+        <div class="plant-card" onclick="${modeAssignation ? `assignerPlante(${JSON.stringify(p).replace(/"/g, '&quot;')})` : `goToFiche('${p.id}')`}">
+            <div class="img-container">
+                <img src="${p.Photo || 'https://via.placeholder.com/300x400?text=No+Image'}" class="plant-img">
+            </div>
+            <div class="plant-info">
+                <div class="plant-name">${p["Nom commun"]}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function goToFiche(id) { window.location.href = `fiche.html?id=${id}`; }
 
 async function assignerPlante(p) {
-    const params = new URLSearchParams(window.location.search);
-    const idDeLaPlaque = params.get('assign_to'); // Ex: EON-001
-    
+    const idDeLaPlaque = new URLSearchParams(window.location.search).get('assign_to');
     if (!idDeLaPlaque) return;
 
-    const pinConfirm = prompt(`Confirmez l'activation de la plaque ${idDeLaPlaque} pour : ${p["Nom commun"]}.\nEntrez votre code PIN à 4 chiffres :`);
-    
-    if (!pinConfirm || !/^[0-9]{4}$/.test(pinConfirm)) {
-        alert("PIN invalide.");
-        return;
-    }
+    const pinConfirm = prompt(`Activer la plaque ${idDeLaPlaque} pour : ${p["Nom commun"]} ?\nPIN :`);
+    if (!pinConfirm) return;
 
     try {
         const res = await fetch(API_URL, {
@@ -162,30 +154,21 @@ async function assignerPlante(p) {
                 action: "assign_plant",
                 email: userEmail,
                 pin: pinConfirm,
-                idPlaque: idDeLaPlaque, // Corrigé : idPlaque pour matcher le Worker
+                idPlaque: idDeLaPlaque,
                 catalogueId: p.id
             })
         });
-
         const result = await res.json();
-
         if (result.success) {
-            alert("Plaque activée avec succès !");
-            // Redirection vers la fiche de la plante avec l'ID de la plaque
+            alert("Succès !");
             window.location.href = `fiche.html?id=${p.id}&idPlaque=${idDeLaPlaque}`;
-        } else {
-            alert(result.message || "Erreur : PIN incorrect ou plaque déjà utilisée.");
-        }
-    } catch (e) {
-        alert("Erreur de connexion au serveur.");
-    }
+        } else { alert("Erreur : PIN incorrect"); }
+    } catch (e) { alert("Erreur serveur"); }
 }
 
-// Ne pas oublier d'appeler loadData au démarrage
-window.onload = loadData;
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
-// Note : Assure-toi d'avoir tes fonctions renderGrid(), setFilter() et logout() 
-// définies après ou avant ce bloc.assignerPlante(p) dans le onclick de la carte si plaqueAAssigner existe)
+window.onload = loadData;
 </script>
 </body>
 </html>
