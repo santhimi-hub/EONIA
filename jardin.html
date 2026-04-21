@@ -269,6 +269,33 @@ border-color:var(--accent);
                     </div>`;
                 }).join('');
             }
+            function applySmartWeatherAdvice(p) {
+    if (!p.Alertes || !p.Alertes.length) return;
+
+    const today = p.Alertes[0].toLowerCase();
+    let advice = "";
+
+    if (today.includes("pluie")) {
+        advice = "🌧️ Pluie détectée : inutile d’arroser aujourd’hui.";
+    }
+    else if (today.includes("orage")) {
+        advice = "⛈️ Orage : protégez les plantes fragiles.";
+    }
+    else if (today.includes("canicule") || today.includes("35") || today.includes("30")) {
+        advice = "🔥 Forte chaleur : arrosage conseillé le soir.";
+    }
+    else if (today.includes("gel") || today.includes("0°") || today.includes("-")) {
+        advice = "❄️ Risque de gel : protection recommandée.";
+    }
+    else if (today.includes("vent")) {
+        advice = "💨 Vent fort : surveillez les plantes hautes.";
+    }
+    else {
+        advice = "🌿 Conditions normales : entretien standard.";
+    }
+
+    document.getElementById("weather-advice").innerText = advice;
+            }
             document.getElementById('owner-area').classList.remove('hidden');
             document.getElementById('owner-area-2').classList.remove('hidden');
             if (isOwner) {
