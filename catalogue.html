@@ -40,13 +40,24 @@
         /* GRID */
         .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
         .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; margin: 20px 0 10px 0; letter-spacing: 8px; border-bottom: 1px solid rgba(74, 222, 128, 0.1); padding-bottom: 5px; text-align: left; }
-        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; }
+        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; position: relative; }
         .plant-card:hover { transform: translateY(-5px); border-color: #333; }
-        .img-container { width: 100%; height: 160px; overflow: hidden; background: #080808; }
+        .img-container { width: 100%; height: 160px; overflow: hidden; background: #080808; position: relative; }
         .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .plant-card:hover .plant-img { scale: 1.05; }
         .plant-info { padding: 15px 10px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* AJOUT LOGIQUE FAVORIS */
+        .card-fav-btn {
+            position: absolute; top: 10px; right: 10px; z-index: 5;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        .card-fav-btn svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; transition: 0.2s; }
+        .card-fav-btn.active svg { fill: #4ade80; stroke: #4ade80; }
     </style>
 </head>
 <body>
@@ -72,6 +83,7 @@
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('favoris', this)">❤ Favoris</button>
         <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
         <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
         <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
@@ -85,7 +97,6 @@
 <script>
 const userEmail = localStorage.getItem('user_email');
 const userPin = localStorage.getItem('user_pin'); 
-// Un utilisateur est considéré proprio s'il a un email et n'est pas l'invité par défaut
 const isOwner = (userEmail && userEmail !== 'invite@eonia.com');
 
 const API_URL = "https://eonia-api.santhimi.workers.dev";
@@ -98,7 +109,6 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-// Sécurité et Affichage Menu
 if (!userEmail) logout();
 if (isOwner) {
     document.getElementById('client-menu').style.display = 'flex';
@@ -112,9 +122,25 @@ function switchView(view) {
     renderGrid();
 }
 
+function toggleFav(event, p) {
+    event.stopPropagation();
+    let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+    const idx = favs.findIndex(f => f.id === p.id);
+    if (idx > -1) {
+        favs.splice(idx, 1);
+        event.currentTarget.classList.remove('active');
+    } else {
+        favs.push({ id: p.id, name: p["Nom commun"], photo: p.Photo });
+        event.currentTarget.classList.add('active');
+    }
+    localStorage.setItem('eonia_favs', JSON.stringify(favs));
+    if (activeFilter === 'favoris') renderGrid();
+}
+
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
     const searchVal = document.getElementById('searchBox').value.toLowerCase().trim();
+    const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
     container.innerHTML = "";
     let lastLetter = "";
 
@@ -122,14 +148,17 @@ function renderGrid() {
         const nom = (p["Nom commun"] || "").toLowerCase();
         const type = (p.Type || "").toLowerCase();
         
-        // Filtre de vue (Jardin vs Collection)
         if (currentView === 'jardin' && !p.est_dans_jardin) return false;
         
-        // Filtre de catégorie et recherche
-        const matchesFilter = activeFilter === 'all' || (type && type.includes(activeFilter.toLowerCase()));
+        // Logique Filtre Favoris
+        if (activeFilter === 'favoris') {
+            if (!favs.some(f => f.id === p.id)) return false;
+        } else if (activeFilter !== 'all') {
+            if (!type || !type.includes(activeFilter.toLowerCase())) return false;
+        }
+
         const matchesSearch = nom.includes(searchVal);
-        
-        return matchesFilter && matchesSearch;
+        return matchesSearch;
     });
 
     document.getElementById('plant-counter').textContent = 
@@ -138,8 +167,8 @@ function renderGrid() {
     filtered.forEach(p => {
         const nomAffiche = p["Nom commun"] || "Sans nom";
         const currentLetter = (p["Lettre"] || nomAffiche.charAt(0)).toUpperCase();
+        const isFav = favs.some(f => f.id === p.id);
 
-        // AFFICHAGE DES LETTRES (Seulement en vue Catalogue, sans recherche et sans filtre catégorie)
         if (currentView === 'catalogue' && activeFilter === 'all' && !searchVal) {
             if (currentLetter !== lastLetter) {
                 const div = document.createElement('div');
@@ -155,7 +184,6 @@ function renderGrid() {
         
         card.onclick = () => {
             if (plaqueAAssigner) {
-                // Logique d'assignation
                 if(confirm(`Assigner cette plaque à : ${nomAffiche} ?`)) {
                     assignPlaque(p.id, nomAffiche);
                 }
@@ -166,6 +194,9 @@ function renderGrid() {
 
         card.innerHTML = `
             <div class="img-container">
+                <div class="card-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
                 <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info">
@@ -194,14 +225,12 @@ async function assignPlaque(catalogueId, nom) {
 }
 
 async function loadData() {
-    // 1. Affichage du cache immédiat
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
         allPlants = JSON.parse(cached);
         renderGrid();
     }
 
-    // 2. Refresh depuis l'API
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
