@@ -7,42 +7,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; --error: #f87171; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .hidden { display: none !important; }
         .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
         
+        /* MÉTÉO STYLE */
         #weather-wrapper { margin-bottom: 25px; }
-        .weather-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 8px; }
-        #display-city { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-        
-        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 80px; }
+        #weather-container { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 20px; display: flex; justify-content: center; align-items: center; }
         .w-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
-        .w-day { font-size: 0.55rem; color: #666; font-weight: bold; letter-spacing: 1px; }
+        .w-day { font-size: 0.55rem; color: #666; font-weight: bold; }
         .w-icon { font-size: 1.5rem; }
         .w-temp { font-size: 0.8rem; }
         #weather-advice { background: rgba(74, 222, 128, 0.05); border: 1px solid var(--border); border-top: none; border-radius: 0 0 24px 24px; padding: 12px; font-size: 0.75rem; color: var(--accent); text-align: center; font-style: italic; }
 
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #080808; }
+        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; }
         .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-        .info-box .value { font-size: 0.85rem; color: #fff; }
+        .info-box .value { font-size: 0.85rem; }
         
         .maintenance-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
         .btn-eonia { background: none; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; width: 100%; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         
+        /* ACCORDÉONS */
         .acc-btn { width: 100%; background: none; border: none; color: var(--accent); padding: 15px 0; display: flex; justify-content: space-between; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; border-top: 1px solid var(--border); }
         .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 0.85rem; color: #aaa; line-height: 1.6; }
         .acc-inner { padding: 10px 0 20px 0; }
-
-        .evo-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; }
-        .evo-item { position: relative; flex-shrink: 0; }
-        .evo-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; }
         
         #plant-date, #plant-note { width: 100%; background: #080808; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; margin-top: 5px; box-sizing: border-box; }
     </style>
@@ -53,9 +48,8 @@
         <button onclick="window.history.back()" class="back-btn">← Retour</button>
         
         <div id="weather-wrapper" class="hidden">
-            <div class="weather-header"><span id="display-city">Chargement météo...</span></div>
             <div id="weather-container"></div>
-            <div id="weather-advice">Analyse...</div>
+            <div id="weather-advice">Analyse de l'environnement...</div>
         </div>
         
         <img id="p-photo" class="hero-img" src="">
@@ -66,7 +60,7 @@
             <div class="maintenance-card">
                 <div class="section-title">SUIVI ARROSAGE</div>
                 <button class="btn-eonia" style="color:var(--water); border-color:var(--water);" onclick="handleWateringAction()">💦 Arrosé aujourd'hui</button>
-                <div id="watering-history" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:15px;"></div>
+                <div style="height: 120px; margin-top:15px;"><canvas id="wateringChart"></canvas></div>
             </div>
         </div>
 
@@ -74,25 +68,26 @@
 
         <div id="owner-area-2" class="hidden">
             <div class="maintenance-card">
-                <div class="section-title">GUIDE COMPLET</div>
-                <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>Description</span><span>+</span></button>
+                <div class="section-title">GUIDE EXPERT</div>
+                <button class="acc-btn" onclick="toggleAcc('acc-desc')"><span>📖 Description</span><span>+</span></button>
                 <div id="acc-desc" class="acc-content"><div class="acc-inner" id="val-desc"></div></div>
                 
-                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>Sol & Fertilisation</span><span>+</span></button>
+                <button class="acc-btn" onclick="toggleAcc('acc-sol')"><span>🪴 Sol & Fertilisation</span><span>+</span></button>
                 <div id="acc-sol" class="acc-content"><div class="acc-inner" id="val-sol"></div></div>
                 
-                <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>Protection & Santé</span><span>+</span></button>
+                <button class="acc-btn" onclick="toggleAcc('acc-health')"><span>🛡️ Protection & Santé</span><span>+</span></button>
                 <div id="acc-health" class="acc-content"><div class="acc-inner" id="val-health"></div></div>
 
-                <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>Floraison</span><span>+</span></button>
+                <button class="acc-btn" onclick="toggleAcc('acc-flore')"><span>🌸 Floraison</span><span>+</span></button>
                 <div id="acc-flore" class="acc-content"><div class="acc-inner" id="val-flore"></div></div>
             </div>
 
             <div class="maintenance-card">
-                <div class="section-title">JOURNAL</div>
+                <div class="section-title">MON JOURNAL</div>
+                <div class="label" style="font-size:0.6rem; color:#666;">DATE DE PLANTATION</div>
                 <input type="date" id="plant-date">
-                <textarea id="plant-note" rows="3" placeholder="Notes..."></textarea>
-                <button class="btn-eonia" onclick="saveJournal()">💾 Enregistrer</button>
+                <textarea id="plant-note" rows="3" placeholder="Mes observations..."></textarea>
+                <button class="btn-eonia" onclick="saveJournal()">💾 Sauvegarder</button>
             </div>
         </div>
     </div>
@@ -104,6 +99,7 @@
     const userEmail = localStorage.getItem('user_email') || "visitor@eonia.com";
     const userPin = localStorage.getItem('user_pin') || "0000";
 
+    // --- PICTOGRAMMES ---
     function getExpoIcon(txt) {
         const t = (txt || "").toLowerCase();
         if (t.includes("soleil")) return "☀️";
@@ -112,23 +108,24 @@
         return "🌱";
     }
 
+    // --- MÉTÉO ---
     async function updateWeather() {
         navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&hourly=temperature_2m,weathercode&current_weather=true&timezone=auto`);
-                const data = await res.json();
-                document.getElementById('weather-wrapper').classList.remove('hidden');
-                document.getElementById('display-city').innerText = "📍 MA POSITION";
-                let html = "";
-                for(let i=0; i<4; i++) {
-                    html += `<div class="w-col">
-                        <span class="w-day">${i === 0 ? 'Mnt' : '+'+i+'h'}</span>
-                        <span class="w-icon">${getWMOEmoji(data.hourly.weathercode[i])}</span>
-                        <span class="w-temp">${Math.round(data.hourly.temperature_2m[i])}°</span>
-                    </div>`;
-                }
-                document.getElementById('weather-container').innerHTML = html;
-            } catch (e) {}
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&hourly=temperature_2m,weathercode&current_weather=true&timezone=auto`);
+            const data = await res.json();
+            document.getElementById('weather-wrapper').classList.remove('hidden');
+            let html = "";
+            for(let i=0; i<4; i++) {
+                html += `<div class="w-col">
+                    <span class="w-day">${i === 0 ? 'Mnt' : '+'+i+'h'}</span>
+                    <span class="w-icon">${getWMOEmoji(data.hourly.weathercode[i])}</span>
+                    <span class="w-temp">${Math.round(data.hourly.temperature_2m[i])}°</span>
+                </div>`;
+            }
+            document.getElementById('weather-container').innerHTML = html;
+            const code = data.current_weather.weathercode;
+            if(code >= 51) document.getElementById('weather-advice').innerText = "Pluie détectée : Inutile d'arroser.";
+            else document.getElementById('weather-advice').innerText = "Ciel clair : Surveillez l'évaporation.";
         });
     }
 
@@ -136,6 +133,26 @@
         if (code <= 1) return "☀️"; if (code <= 3) return "🌤️"; if (code <= 67) return "🌧️"; return "☁️";
     }
 
+    // --- GRAPHIQUE ---
+    function updateChart(hist) {
+        const ctx = document.getElementById('wateringChart').getContext('2d');
+        const dates = hist ? hist.split(',').map(d => d.trim()) : [];
+        const labels = []; const data = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const fmt = d.toLocaleDateString('fr-FR');
+            labels.push(fmt.split('/')[0]+'/'+fmt.split('/')[1]);
+            data.push(dates.includes(fmt) ? 1 : 0.2);
+        }
+        if (window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ data, backgroundColor: data.map(v => v===1?'#38bdf8':'#1a1a1a'), borderRadius: 5 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444', font: { size: 9 } } } } }
+        });
+    }
+
+    // --- DONNÉES ---
     async function fetchUpdate() {
         const res = await fetch(API_URL, {
             method: 'POST',
@@ -144,30 +161,29 @@
         });
         const data = await res.json();
         const p = data.find(i => i.id === currentId || i.cleanId === currentId);
-        if (p) render(p);
-    }
+        if (p) {
+            document.getElementById('p-photo').src = p.Photo;
+            document.getElementById('p-titre').innerText = p["Nom commun"];
+            document.getElementById('p-sci').innerText = p["Nom scientifique"];
+            
+            document.getElementById('p-grid').innerHTML = `
+                <div class="info-box"><div class="label">Exposition</div><div class="value">${getExpoIcon(p.Exposition)} ${p.Exposition}</div></div>
+                <div class="info-box"><div class="label">Arrosage</div><div class="value">💧 ${p.Arrosage}</div></div>
+                <div class="info-box"><div class="label">Type</div><div class="value">🌿 ${p.Type}</div></div>
+                <div class="info-box"><div class="label">Rusticité</div><div class="value">❄️ ${p.Rusticité}</div></div>
+            `;
 
-    function render(p) {
-        document.getElementById('p-photo').src = p.Photo;
-        document.getElementById('p-titre').innerText = p["Nom commun"];
-        document.getElementById('p-sci').innerText = p["Nom scientifique"];
-        
-        document.getElementById('p-grid').innerHTML = `
-            <div class="info-box"><div class="label">Exposition</div><div class="value">${getExpoIcon(p.Exposition)} ${p.Exposition}</div></div>
-            <div class="info-box"><div class="label">Arrosage</div><div class="value">💧 ${p.Arrosage}</div></div>
-            <div class="info-box"><div class="label">Type</div><div class="value">${p.Type}</div></div>
-            <div class="info-box"><div class="label">Rusticité</div><div class="value">❄️ ${p.Rusticité}</div></div>
-        `;
-
-        if (p.est_dans_jardin) {
-            document.getElementById('owner-area').classList.remove('hidden');
-            document.getElementById('owner-area-2').classList.remove('hidden');
-            document.getElementById('val-desc').innerText = p.Description || "Infos à venir.";
-            document.getElementById('val-sol').innerText = p.Sol || "Infos à venir.";
-            document.getElementById('val-health').innerText = p.Sante || "Infos à venir.";
-            document.getElementById('val-flore').innerText = p.Floraison || "Infos à venir.";
-            document.getElementById('plant-note').value = p.Note_Privee;
-            document.getElementById('plant-date').value = p.Date_Plantation;
+            if (p.est_dans_jardin) {
+                document.getElementById('owner-area').classList.remove('hidden');
+                document.getElementById('owner-area-2').classList.remove('hidden');
+                document.getElementById('val-desc').innerText = p.Description || "Données en cours de saisie...";
+                document.getElementById('val-sol').innerText = p.Sol || "Données en cours de saisie...";
+                document.getElementById('val-health').innerText = p.Sante || "Données en cours de saisie...";
+                document.getElementById('val-flore').innerText = p.Floraison || "Données en cours de saisie...";
+                document.getElementById('plant-note').value = p.Note_Privee;
+                document.getElementById('plant-date').value = p.Date_Plantation;
+                updateChart(p.Historique_Data);
+            }
         }
     }
 
@@ -185,7 +201,7 @@
         const note = document.getElementById('plant-note').value;
         const date = document.getElementById('plant-date').value;
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_journal', email: userEmail, pin: userPin, plantId: currentId, note, date_plantation: date })});
-        alert("Enregistré !");
+        alert("Journal mis à jour !");
     }
 
     updateWeather();
