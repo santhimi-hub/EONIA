@@ -24,8 +24,11 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* CONTAINER GLOBAL */
-        .container { max-width: 900px; margin: auto; padding: 10px 15px 40px; opacity: 0; transition: 0.5s; }
+        .container { max-width: 1200px; margin: auto; padding: 10px 15px 40px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
+
+        /* ZONE DE TEXTE RESSERRÉE (PC) */
+        .content-narrow { max-width: 100%; margin: auto; }
 
         /* BOUTON RETOUR */
         .nav-header { padding: 10px 0; margin-bottom: 10px; }
@@ -37,11 +40,9 @@
             text-decoration: none; cursor: pointer; transition: 0.3s;
         }
         .back-btn img { width: 12px; height: auto; }
-        .back-btn:hover { background: var(--accent); color: #000; }
-        .back-btn:hover img { filter: brightness(0); }
 
         /* IMAGE HERO */
-        .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #050505; }
+        .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #050505; margin-bottom: 20px; }
         .hero-img { width: 100%; height: 50vh; object-fit: cover; display: block; }
         
         .fav-btn {
@@ -49,60 +50,38 @@
             background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
             width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px); z-index: 10; transition: 0.3s;
+            cursor: pointer; backdrop-filter: blur(10px); z-index: 10;
         }
         .fav-btn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.5; }
         .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
-        /* IDENTITÉ PLANTE */
-        .plant-identity { margin: 15px 0 20px; }
-        h1 { font-size: 2rem; font-weight: 100; letter-spacing: 2px; text-transform: uppercase; }
-        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; opacity: 0.5; font-weight: 300; }
-        
-        /* GRILLE D'INFOS (MOBILE PAR DÉFAUT) */
+        /* GRILLE & TEXTES (MOBILE) */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; transition: 0.3s; }
-        .info-box.highlight { border-left: 2px solid var(--accent); }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; }
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 2px; }
         .value { font-size: 0.75rem; font-weight: 300; color: #ccc; }
 
-        /* DESCRIPTION */
         .desc-box { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
         #p-desc { line-height: 1.5; color: #999; font-size: 0.8rem; font-weight: 300; white-space: pre-wrap; }
-        #p-desc strong { color: #fff; font-weight: 500; display: block; margin: 12px 0 4px 0; font-size: 0.85rem; }
 
-        .btn-order-container { margin-top: 25px; }
-        .btn-order { display: block; width: 100%; padding: 15px; background: var(--accent); color: #000; text-decoration: none; border-radius: 40px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; text-align: center; }
-
-        /* --- OPTIMISATION PC (Écrans > 1024px) --- */
+        /* --- OPTIMISATION PC --- */
         @media (min-width: 1025px) {
-            .container { max-width: 1100px; padding: 40px 20px; }
-            .nav-header { margin-bottom: 25px; }
-            .back-btn { font-size: 0.75rem; padding: 12px 24px; }
-            .back-btn img { width: 16px; }
-
-            .hero-img { height: 60vh; border-radius: 24px; }
+            .content-narrow { max-width: 850px; } /* On resserre ici ! */
             
-            .plant-identity { margin: 30px 0; }
-            h1 { font-size: 3.5rem; letter-spacing: 6px; }
-            .sci-name { font-size: 1.1rem; }
+            .nav-header { max-width: 850px; margin: 0 auto 25px auto; }
+            .hero-img { height: 65vh; border-radius: 24px; }
+            
+            h1 { font-size: 3rem; letter-spacing: 5px; margin-top: 20px; }
+            .sci-name { font-size: 1rem; margin-bottom: 30px; }
 
-            .info-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
-            .info-box { padding: 25px; border-radius: 15px; }
-            .label { font-size: 0.7rem; letter-spacing: 3px; margin-bottom: 8px; }
-            .value { font-size: 1.1rem; }
+            .info-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } /* Retour à 2 colonnes */
+            .info-box { padding: 20px; }
+            .label { font-size: 0.65rem; letter-spacing: 2.5px; }
+            .value { font-size: 1rem; }
 
-            .desc-box { margin-top: 50px; padding-top: 30px; }
-            .section-title { font-size: 0.8rem; letter-spacing: 5px; margin-bottom: 20px; }
-            #p-desc { font-size: 1.05rem; line-height: 1.8; color: #bbb; max-width: 900px; }
-            #p-desc strong { font-size: 1.2rem; margin: 30px 0 10px 0; }
-        }
-
-        /* Ajustement tablette intermédiaire */
-        @media (max-width: 1024px) and (min-width: 601px) {
-            h1 { font-size: 2.5rem; }
-            .info-grid { gap: 12px; }
+            .desc-box { margin-top: 40px; padding-top: 25px; }
+            #p-desc { font-size: 1rem; line-height: 1.7; color: #bbb; }
         }
 
         @media (max-width: 600px) { .hero-img { height: 40vh; } h1 { font-size: 1.6rem; } }
@@ -130,20 +109,22 @@
             </div>
         </div>
         
-        <div class="plant-identity">
-            <h1 id="p-titre">...</h1>
-            <div id="p-sci" class="sci-name"></div>
-        </div>
+        <div class="content-narrow">
+            <div class="plant-identity">
+                <h1 id="p-titre">...</h1>
+                <div id="p-sci" class="sci-name"></div>
+            </div>
 
-        <div class="info-grid" id="p-grid"></div>
+            <div class="info-grid" id="p-grid"></div>
 
-        <div class="desc-box">
-            <div class="section-title">Informations Générales</div>
-            <div id="p-desc"></div>
-        </div>
+            <div class="desc-box">
+                <div class="section-title">Informations Générales</div>
+                <div id="p-desc"></div>
+            </div>
 
-        <div id="catalog-area" style="display:none;" class="btn-order-container">
-            <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
+            <div id="catalog-area" style="display:none;" class="btn-order-container">
+                <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
+            </div>
         </div>
     </div>
 
@@ -218,8 +199,8 @@
                 if (!currentPlant.est_dans_jardin) document.getElementById('catalog-area').style.display = 'block';
 
                 const fields = [
-                    {l:"Famille", v: currentPlant.Famille, h:true},
-                    {l:"Type", v: currentPlant.Type, h:true},
+                    {l:"Famille", v: currentPlant.Famille},
+                    {l:"Type", v: currentPlant.Type},
                     {l:"Difficulté", v: getVisual("difficulté", currentPlant.Difficulté)},
                     {l:"Arrosage", v: getVisual("arrosage", currentPlant.Arrosage)},
                     {l:"Exposition", v: getVisual("exposition", currentPlant.Exposition)},
@@ -230,7 +211,7 @@
                 ];
 
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
-                    <div class="info-box ${f.h ? 'highlight' : ''}">
+                    <div class="info-box">
                         <div class="label">${f.l}</div>
                         <div class="value">${f.v || "-"}</div>
                     </div>
