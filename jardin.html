@@ -6,87 +6,90 @@
     <title>ÉONIA — Mémoire Végétale</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #080808; --border: #121212; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0a0a0a; --border: #151515; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { 
             background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; 
-            -webkit-font-smoothing: antialiased; overflow-x: hidden;
+            -webkit-font-smoothing: antialiased; line-height: 1.4;
         }
 
-        .container { max-width: 1000px; margin: auto; padding: 20px 20px 80px; }
+        /* Container fluide et élégant */
+        .container { max-width: 900px; margin: auto; padding: 10px 15px 40px; }
 
-        /* Bouton Retour Amélioré */
-        .nav-header { position: absolute; top: 30px; left: 30px; z-index: 100; }
+        /* Header discret */
+        .nav-header { display: flex; align-items: center; padding: 10px 0; margin-bottom: 10px; }
         .back-btn { 
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s;
-            color: var(--accent); text-decoration: none; font-size: 1.2rem;
+            text-decoration: none; color: var(--accent); font-size: 1.2rem; 
+            opacity: 0.7; transition: 0.3s; cursor: pointer;
         }
-        .back-btn:hover { transform: scale(1.1); background: var(--accent); color: #000; }
 
-        /* Image Panoramique */
-        .hero-wrapper { position: relative; width: 100%; margin-bottom: 30px; margin-top: 10px; }
-        .hero-img { 
-            width: 100%; height: 60vh; 
-            object-fit: cover; border-radius: 20px; border: 1px solid var(--border);
-            display: block;
-        }
+        /* Image Panoramique Format Cinéma */
+        .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+        .hero-img { width: 100%; height: 50vh; object-fit: cover; display: block; }
         
-        /* Favoris */
+        /* Favoris discret */
         .fav-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-            width: 45px; height: 45px; border-radius: 50%;
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            width: 38px; height: 38px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; backdrop-filter: blur(10px);
+            cursor: pointer; backdrop-filter: blur(10px);
         }
-        .fav-btn svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.5; }
+        .fav-btn svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.5; }
         .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
-        h1 { font-size: 2rem; font-weight: 100; letter-spacing: 3px; margin-top: 20px; text-transform: uppercase; }
-        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; opacity: 0.5; margin-bottom: 35px; font-weight: 300; }
+        /* Titre et Identité */
+        .plant-identity { margin: 20px 0 25px; text-align: left; }
+        h1 { font-size: 2.2rem; font-weight: 100; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
+        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; opacity: 0.5; font-weight: 300; margin-top: -2px; }
         
-        /* Grille épurée avec Pictos */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 12px; }
+        /* Grille d'informations ultra-compacte */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .info-box { 
+            background: var(--card); border: 1px solid var(--border); 
+            padding: 12px 15px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center;
+        }
         .info-box.highlight { border-left: 2px solid var(--accent); }
-        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 600; letter-spacing: 2px; margin-bottom: 8px; }
-        .value { font-size: 0.8rem; font-weight: 200; color: #bbb; }
-        .picto-val { font-size: 1.1rem; margin-top: 2px; }
-
-        /* Description & Gras Notion */
-        .desc-box { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); }
-        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-weight: 500; }
         
-        #p-desc { line-height: 1.8; color: #999; font-size: 0.9rem; font-weight: 300; text-align: justify; white-space: pre-wrap; }
+        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 4px; opacity: 0.8; }
+        .value { font-size: 0.8rem; font-weight: 300; color: #ddd; display: flex; align-items: center; gap: 8px; }
+        .picto-val { font-size: 1rem; }
+
+        /* Section Description Raffinée */
+        .desc-box { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 15px; font-weight: 500; }
+        
+        #p-desc { line-height: 1.6; color: #aaa; font-size: 0.85rem; font-weight: 300; white-space: pre-wrap; text-align: left; }
+        
+        /* Titres internes venant de Notion (ex: **Essence**) */
         #p-desc strong { 
-            color: #fff !important; font-weight: 600 !important; display: block; 
-            margin: 25px 0 10px 0; font-size: 0.95rem; border-left: 2px solid var(--accent); padding-left: 10px;
+            color: #fff; font-weight: 500; display: block; 
+            margin: 15px 0 5px 0; font-size: 0.9rem; letter-spacing: 0.5px;
         }
 
-        .btn-order-container { width: 100%; margin-top: 40px; }
+        /* Bouton d'action */
+        .btn-order-container { margin-top: 30px; }
         .btn-order { 
-            display: block; width: 100%; padding: 20px; background: var(--accent); color: #000; 
-            text-decoration: none; border-radius: 50px; font-weight: 700; text-transform: uppercase; 
-            letter-spacing: 3px; font-size: 0.75rem; text-align: center;
+            display: block; width: 100%; padding: 16px; background: var(--accent); color: #000; 
+            text-decoration: none; border-radius: 40px; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 2px; font-size: 0.7rem; text-align: center;
         }
 
         @media (max-width: 600px) {
-            .hero-img { height: 45vh; }
-            .nav-header { top: 25px; left: 25px; }
+            .hero-img { height: 35vh; }
+            h1 { font-size: 1.8rem; }
+            .info-grid { gap: 8px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <a onclick="history.back()" class="back-btn">←</a>
-    </div>
-
     <div class="container">
+        <div class="nav-header">
+            <a onclick="history.back()" class="back-btn">←</a>
+        </div>
+
         <div class="hero-wrapper">
             <img id="p-photo" class="hero-img">
             <div id="fav-trigger" class="fav-btn">
@@ -94,8 +97,10 @@
             </div>
         </div>
         
-        <h1 id="p-titre">...</h1>
-        <div id="p-sci" class="sci-name"></div>
+        <div class="plant-identity">
+            <h1 id="p-titre">...</h1>
+            <div id="p-sci" class="sci-name"></div>
+        </div>
 
         <div class="info-grid" id="p-grid"></div>
 
@@ -104,7 +109,7 @@
             <div id="p-desc"></div>
         </div>
 
-        <div id="catalog-area" class="hidden btn-order-container">
+        <div id="catalog-area" style="display:none;" class="btn-order-container">
             <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
         </div>
     </div>
@@ -116,47 +121,30 @@
 
     function formatNotionText(text) {
         if (!text) return "";
+        // Transforme **Texte** en <strong>Texte</strong> pour le gras Notion
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
-    function getVisual(type, val) {
+    function getVisual(type, val, icon) {
         if (!val || val === "-" || val === "0") return "-";
         const v = val.toString().toLowerCase();
+        let result = val;
+        
         if (type === "arrosage") {
-            if (v.includes("1")) return "💧";
-            if (v.includes("2")) return "💧💧";
-            if (v.includes("3")) return "💧💧💧";
-            return "💧";
+            if (v.includes("1")) result = "💧";
+            else if (v.includes("2")) result = "💧💧";
+            else if (v.includes("3")) result = "💧💧💧";
+        } else if (type === "exposition") {
+            if (v.includes("soleil")) result = "☀️";
+            else if (v.includes("ombre")) result = "⛅";
+        } else if (type === "difficulté") {
+            if (v.includes("1") || v.includes("facile")) result = "🟢";
+            else if (v.includes("2") || v.includes("moyen")) result = "🟡";
+            else result = "🔴";
         }
-        if (type === "exposition") {
-            if (v.includes("soleil")) return "☀️";
-            if (v.includes("mi-ombre")) return "⛅";
-            return "☀️";
-        }
-        if (type === "difficulté") {
-            if (v.includes("1") || v.includes("facile")) return "🟢";
-            if (v.includes("2") || v.includes("moyen")) return "🟡";
-            return "🔴";
-        }
-        return val;
-    }
-
-    function toggleFav(plant) {
-        let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        const idx = favs.findIndex(f => f.id === plant.id);
-        if (idx > -1) {
-            favs.splice(idx, 1);
-            document.getElementById('fav-trigger').classList.remove('active');
-        } else {
-            favs.push({ id: plant.id, name: plant["Nom commun"], photo: plant.Photo });
-            document.getElementById('fav-trigger').classList.add('active');
-        }
-        localStorage.setItem('eonia_favs', JSON.stringify(favs));
-    }
-
-    function checkFav(id) {
-        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        if (favs.some(f => f.id === id)) document.getElementById('fav-trigger').classList.add('active');
+        
+        // Ajoute l'icône de base si disponible (ex: l'ADN, la feuille)
+        return icon ? `<span style="margin-right:8px; opacity:0.6;">${icon}</span> ${result}` : result;
     }
 
     async function load() {
@@ -175,26 +163,24 @@
                 document.getElementById('p-sci').innerText = p["Nom scientifique"];
                 document.getElementById('p-desc').innerHTML = formatNotionText(p["Description"]);
                 
-                checkFav(p.id);
-                document.getElementById('fav-trigger').onclick = () => toggleFav(p);
-                if (!p.est_dans_jardin) document.getElementById('catalog-area').classList.remove('hidden');
+                if (!p.est_dans_jardin) document.getElementById('catalog-area').style.display = 'block';
 
                 const fields = [
-                    {l:"Famille", v:p.Famille, h:true},
-                    {l:"Type", v:p.Type, h:true},
-                    {l:"Difficulté", v:getVisual("difficulté", p.Difficulté), vis:true},
-                    {l:"Arrosage", v:getVisual("arrosage", p.Arrosage), vis:true},
-                    {l:"Exposition", v:getVisual("exposition", p.Exposition), vis:true},
-                    {l:"Rusticité", v:p.Rusticité},
-                    {l:"Taille", v:p["Taille à maturité"]},
-                    {l:"Floraison", v:p.Floraison},
-                    {l:"Persistance", v:p.Persistance}
+                    {l:"Famille", v: p.Famille, i: "🧬", h:true},
+                    {l:"Type", v: p.Type, i: "🌿", h:true},
+                    {l:"Difficulté", v: getVisual("difficulté", p.Difficulté), vis:true},
+                    {l:"Arrosage", v: getVisual("arrosage", p.Arrosage), vis:true},
+                    {l:"Exposition", v: getVisual("exposition", p.Exposition), vis:true},
+                    {l:"Rusticité", v: p.Rusticité, i: "❄️"},
+                    {l:"Taille", v: p["Taille à maturité"], i: "📏"},
+                    {l:"Floraison", v: p.Floraison, i: "🌸"},
+                    {l:"Persistance", v: p.Persistance, i: "🍂"}
                 ];
 
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
                     <div class="info-box ${f.h ? 'highlight' : ''}">
                         <div class="label">${f.l}</div>
-                        <div class="${f.vis ? 'picto-val' : 'value'}">${f.v || "-"}</div>
+                        <div class="value">${f.i && !f.vis ? `<span style="margin-right:8px;opacity:0.5;">${f.i}</span>` : ''}${f.v || "-"}</div>
                     </div>
                 `).join('');
             }
