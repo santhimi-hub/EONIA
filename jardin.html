@@ -14,9 +14,18 @@
             -webkit-font-smoothing: antialiased; line-height: 1.4;
         }
 
-        .container { max-width: 900px; margin: auto; padding: 10px 15px 40px; }
+        /* CHARGEMENT */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; transition: 0.5s;
+        }
+        .spinner { width: 40px; height: 40px; border: 2px solid rgba(74, 222, 128, 0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* BOUTON RETOUR ÉONIA */
+        .container { max-width: 900px; margin: auto; padding: 10px 15px 40px; opacity: 0; transition: 0.5s; }
+        .container.loaded { opacity: 1; }
+
         .nav-header { padding: 10px 0; margin-bottom: 10px; }
         .back-btn { 
             display: inline-flex; align-items: center; gap: 10px;
@@ -26,61 +35,48 @@
             text-decoration: none; cursor: pointer; transition: 0.3s;
         }
         .back-btn img { width: 12px; height: auto; }
-        .back-btn:hover { background: var(--accent); color: #000; }
-        .back-btn:hover img { filter: brightness(0); }
 
-        /* IMAGE PANORAMIQUE */
-        .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+        .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #050505; }
         .hero-img { width: 100%; height: 50vh; object-fit: cover; display: block; }
         
         .fav-btn {
             position: absolute; top: 15px; right: 15px;
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px);
+            cursor: pointer; backdrop-filter: blur(10px); z-index: 10; transition: 0.3s;
         }
-        .fav-btn svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.5; }
+        .fav-btn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.5; transition: 0.3s; }
         .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
-        /* TITRES COMPACTS */
         .plant-identity { margin: 15px 0 20px; }
         h1 { font-size: 2rem; font-weight: 100; letter-spacing: 2px; text-transform: uppercase; }
         .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; opacity: 0.5; font-weight: 300; }
         
-        /* GRILLE DENSE */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .info-box { 
-            background: var(--card); border: 1px solid var(--border); 
-            padding: 10px 15px; border-radius: 10px;
-        }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; }
         .info-box.highlight { border-left: 2px solid var(--accent); }
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 2px; }
         .value { font-size: 0.75rem; font-weight: 300; color: #ccc; }
 
-        /* DESCRIPTION */
         .desc-box { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
-        
         #p-desc { line-height: 1.5; color: #999; font-size: 0.8rem; font-weight: 300; white-space: pre-wrap; }
-        #p-desc strong { 
-            color: #fff; font-weight: 500; display: block; 
-            margin: 12px 0 4px 0; font-size: 0.85rem;
-        }
 
         .btn-order-container { margin-top: 25px; }
-        .btn-order { 
-            display: block; width: 100%; padding: 15px; background: var(--accent); color: #000; 
-            text-decoration: none; border-radius: 40px; font-weight: 700; text-transform: uppercase; 
-            letter-spacing: 2px; font-size: 0.7rem; text-align: center;
-        }
+        .btn-order { display: block; width: 100%; padding: 15px; background: var(--accent); color: #000; text-decoration: none; border-radius: 40px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; text-align: center; }
 
         @media (max-width: 600px) { .hero-img { height: 40vh; } h1 { font-size: 1.6rem; } }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-size: 0.6rem; letter-spacing: 2px; color: #4ade80;">ÉONIA — CHARGEMENT</p>
+    </div>
+
+    <div class="container" id="main-content">
         <div class="nav-header">
             <a onclick="history.back()" class="back-btn">
                 <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="Logo">
@@ -90,7 +86,7 @@
 
         <div class="hero-wrapper">
             <img id="p-photo" class="hero-img">
-            <div id="fav-trigger" class="fav-btn">
+            <div id="fav-trigger" class="fav-btn" onclick="toggleFav()">
                 <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             </div>
         </div>
@@ -116,17 +112,32 @@
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const urlParams = new URLSearchParams(window.location.search);
     const rawId = urlParams.get('id');
+    let currentPlant = null;
 
     function formatNotionText(text) {
         if (!text) return "";
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
-    // REMISE EN PLACE DES PICTOGRAMMES
+    function toggleFav() {
+        if (!currentPlant) return;
+        let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const idx = favs.findIndex(f => f.id === currentPlant.id);
+        const btn = document.getElementById('fav-trigger');
+        
+        if (idx > -1) {
+            favs.splice(idx, 1);
+            btn.classList.remove('active');
+        } else {
+            favs.push({ id: currentPlant.id, name: currentPlant["Nom commun"], photo: currentPlant.Photo });
+            btn.classList.add('active');
+        }
+        localStorage.setItem('eonia_favs', JSON.stringify(favs));
+    }
+
     function getVisual(type, val) {
         if (!val || val === "-" || val === "0") return "-";
         const v = val.toString().toLowerCase();
-        
         if (type === "arrosage") {
             if (v.includes("1")) return "💧";
             if (v.includes("2")) return "💧💧";
@@ -153,26 +164,32 @@
                 body: JSON.stringify({ email: localStorage.getItem('user_email') || "invite@eonia.com", plantId: rawId }) 
             });
             const data = await res.json();
-            const p = data.find(x => x.id === rawId);
+            currentPlant = data.find(x => x.id === rawId);
             
-            if (p) {
-                document.getElementById('p-photo').src = p.Photo;
-                document.getElementById('p-titre').innerText = p["Nom commun"];
-                document.getElementById('p-sci').innerText = p["Nom scientifique"];
-                document.getElementById('p-desc').innerHTML = formatNotionText(p["Description"]);
+            if (currentPlant) {
+                document.getElementById('p-photo').src = currentPlant.Photo;
+                document.getElementById('p-titre').innerText = currentPlant["Nom commun"];
+                document.getElementById('p-sci').innerText = currentPlant["Nom scientifique"];
+                document.getElementById('p-desc').innerHTML = formatNotionText(currentPlant["Description"]);
                 
-                if (!p.est_dans_jardin) document.getElementById('catalog-area').style.display = 'block';
+                // État du coeur
+                const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+                if (favs.some(f => f.id === currentPlant.id)) {
+                    document.getElementById('fav-trigger').classList.add('active');
+                }
+
+                if (!currentPlant.est_dans_jardin) document.getElementById('catalog-area').style.display = 'block';
 
                 const fields = [
-                    {l:"Famille", v: p.Famille, h:true},
-                    {l:"Type", v: p.Type, h:true},
-                    {l:"Difficulté", v: getVisual("difficulté", p.Difficulté)},
-                    {l:"Arrosage", v: getVisual("arrosage", p.Arrosage)},
-                    {l:"Exposition", v: getVisual("exposition", p.Exposition)},
-                    {l:"Rusticité", v: p.Rusticité},
-                    {l:"Taille", v: p["Taille à maturité"]},
-                    {l:"Floraison", v: p.Floraison},
-                    {l:"Persistance", v: p.Persistance} // RÉINTÉGRATION ICI
+                    {l:"Famille", v: currentPlant.Famille, h:true},
+                    {l:"Type", v: currentPlant.Type, h:true},
+                    {l:"Difficulté", v: getVisual("difficulté", currentPlant.Difficulté)},
+                    {l:"Arrosage", v: getVisual("arrosage", currentPlant.Arrosage)},
+                    {l:"Exposition", v: getVisual("exposition", currentPlant.Exposition)},
+                    {l:"Rusticité", v: currentPlant.Rusticité},
+                    {l:"Taille", v: currentPlant["Taille à maturité"]},
+                    {l:"Floraison", v: currentPlant.Floraison},
+                    {l:"Persistance", v: currentPlant.Persistance}
                 ];
 
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
@@ -181,6 +198,13 @@
                         <div class="value">${f.v || "-"}</div>
                     </div>
                 `).join('');
+
+                // On cache le loader et on affiche le contenu
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('main-content').classList.add('loaded');
+                }, 500);
             }
         } catch(e) { console.error(e); }
     }
