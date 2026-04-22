@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Mémoire Végétale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #080808; --border: #121212; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,14 +23,11 @@
         .spinner { width: 40px; height: 40px; border: 2px solid rgba(74, 222, 128, 0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* CONTAINER GLOBAL */
         .container { max-width: 1200px; margin: auto; padding: 10px 15px 40px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
-        /* ZONE DE TEXTE RESSERRÉE (PC) */
         .content-narrow { max-width: 100%; margin: auto; }
 
-        /* BOUTON RETOUR */
         .nav-header { padding: 10px 0; margin-bottom: 10px; }
         .back-btn { 
             display: inline-flex; align-items: center; gap: 10px;
@@ -41,7 +38,6 @@
         }
         .back-btn img { width: 12px; height: auto; }
 
-        /* IMAGE HERO */
         .hero-wrapper { position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #050505; margin-bottom: 20px; }
         .hero-img { width: 100%; height: 50vh; object-fit: cover; display: block; }
         
@@ -55,7 +51,11 @@
         .fav-btn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.5; }
         .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
-        /* GRILLE & TEXTES (MOBILE) */
+        /* TITRES ORIGINAUX */
+        .plant-identity { margin: 15px 0 20px; }
+        h1 { font-size: 2rem; font-weight: 100; letter-spacing: 2px; text-transform: uppercase; }
+        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; opacity: 0.5; font-weight: 300; }
+        
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 10px; }
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 2px; }
@@ -64,24 +64,39 @@
         .desc-box { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
         #p-desc { line-height: 1.5; color: #999; font-size: 0.8rem; font-weight: 300; white-space: pre-wrap; }
+        #p-desc strong { color: #fff; font-weight: 500; display: block; margin: 12px 0 4px 0; font-size: 0.85rem; }
+
+        /* BOUTON COMMANDER ORIGINAL */
+        .btn-order-container { margin-top: 25px; }
+        .btn-order { 
+            display: block; width: 100%; padding: 15px; background: var(--accent); color: #000; 
+            text-decoration: none; border-radius: 40px; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 2px; font-size: 0.7rem; text-align: center;
+        }
 
         /* --- OPTIMISATION PC --- */
         @media (min-width: 1025px) {
-            .content-narrow { max-width: 850px; } /* On resserre ici ! */
-            
+            .content-narrow { max-width: 850px; }
             .nav-header { max-width: 850px; margin: 0 auto 25px auto; }
-            .hero-img { height: 65vh; border-radius: 24px; }
+            .hero-img { height: 65vh; }
             
-            h1 { font-size: 3rem; letter-spacing: 5px; margin-top: 20px; }
-            .sci-name { font-size: 1rem; margin-bottom: 30px; }
+            /* Titre plus élégant et lisible sur PC */
+            h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; letter-spacing: 2px; margin-top: 20px; text-transform: none; font-weight: 400; }
+            .sci-name { font-size: 1.2rem; margin-bottom: 35px; opacity: 0.7; }
 
-            .info-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } /* Retour à 2 colonnes */
+            .info-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .info-box { padding: 20px; }
             .label { font-size: 0.65rem; letter-spacing: 2.5px; }
-            .value { font-size: 1rem; }
+            .value { font-size: 1.1rem; }
 
-            .desc-box { margin-top: 40px; padding-top: 25px; }
-            #p-desc { font-size: 1rem; line-height: 1.7; color: #bbb; }
+            .desc-box { margin-top: 50px; padding-top: 30px; }
+            .section-title { font-size: 0.8rem; letter-spacing: 4px; }
+            
+            /* Texte plus lisible (blanc cassé) et plus grand sur PC */
+            #p-desc { font-size: 1.1rem; line-height: 1.8; color: #eee; } 
+            #p-desc strong { font-size: 1.25rem; margin-top: 30px; }
+            
+            .btn-order { font-size: 0.8rem; padding: 20px; max-width: 400px; margin: 40px auto 0; }
         }
 
         @media (max-width: 600px) { .hero-img { height: 40vh; } h1 { font-size: 1.6rem; } }
