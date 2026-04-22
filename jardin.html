@@ -58,7 +58,7 @@
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 2px; }
         .value { font-size: 0.75rem; font-weight: 300; color: #ccc; }
 
-        /* DESCRIPTION SANS ESPACES INUTILES */
+        /* DESCRIPTION */
         .desc-box { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); }
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
         
@@ -122,6 +122,29 @@
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
+    // REMISE EN PLACE DES PICTOGRAMMES
+    function getVisual(type, val) {
+        if (!val || val === "-" || val === "0") return "-";
+        const v = val.toString().toLowerCase();
+        
+        if (type === "arrosage") {
+            if (v.includes("1")) return "💧";
+            if (v.includes("2")) return "💧💧";
+            if (v.includes("3")) return "💧💧💧";
+        } 
+        if (type === "exposition") {
+            if (v.includes("soleil")) return "☀️";
+            if (v.includes("ombre")) return "⛅";
+            if (v.includes("mi")) return "⛅☀️";
+        } 
+        if (type === "difficulté") {
+            if (v.includes("1") || v.includes("facile")) return "🟢";
+            if (v.includes("2") || v.includes("moyen")) return "🟡";
+            if (v.includes("3") || v.includes("difficile")) return "🔴";
+        }
+        return val;
+    }
+
     async function load() {
         try {
             const res = await fetch(API_URL, { 
@@ -143,12 +166,13 @@
                 const fields = [
                     {l:"Famille", v: p.Famille, h:true},
                     {l:"Type", v: p.Type, h:true},
-                    {l:"Difficulté", v: p.Difficulté},
-                    {l:"Arrosage", v: p.Arrosage},
-                    {l:"Exposition", v: p.Exposition},
+                    {l:"Difficulté", v: getVisual("difficulté", p.Difficulté)},
+                    {l:"Arrosage", v: getVisual("arrosage", p.Arrosage)},
+                    {l:"Exposition", v: getVisual("exposition", p.Exposition)},
                     {l:"Rusticité", v: p.Rusticité},
                     {l:"Taille", v: p["Taille à maturité"]},
-                    {l:"Floraison", v: p.Floraison}
+                    {l:"Floraison", v: p.Floraison},
+                    {l:"Persistance", v: p.Persistance} // RÉINTÉGRATION ICI
                 ];
 
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
