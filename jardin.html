@@ -3,56 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Détails</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;500&display=swap" rel="stylesheet">
+    <title>ÉONIA — Mémoire Végétale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --water: #38bdf8; }
-        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: auto; padding: 20px; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --text-muted: #666; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 800px; margin: auto; padding: 30px 20px; }
         .hidden { display: none !important; }
         
-        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-size: 0.7rem; text-transform: uppercase; }
+        /* Navigation */
+        .back-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; padding: 0; }
         
-        .hero-img { width: 100%; height: 40vh; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--border); background: #111; }
-        .sci-name { color: var(--accent); font-size: 0.8rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        /* Hero Section */
+        .hero-img { width: 100%; height: 45vh; object-fit: cover; border-radius: 24px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        h1 { font-size: 2.2rem; font-weight: 200; margin: 0; letter-spacing: -1px; }
+        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-top: 5px; margin-bottom: 35px; opacity: 0.6; font-weight: 300; }
         
-        /* Grille des rubriques */
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 14px; display: flex; flex-direction: column; min-height: 80px; justify-content: center; }
-        .info-box.highlight { border-left: 3px solid var(--accent); background: rgba(74, 222, 128, 0.03); }
-        .info-box .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
-        .info-box .value-container { display: flex; align-items: center; gap: 8px; }
-        .info-box .icon { font-size: 1.2rem; }
-        .info-box .value { font-size: 0.85rem; color: #fff; }
+        /* Grid Design Luxe */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: all 0.4s ease; }
+        .info-box.highlight { border: 1px solid rgba(74, 222, 128, 0.2); background: linear-gradient(145deg, #0f0f0f 0%, #050505 100%); }
+        
+        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 500; letter-spacing: 2px; margin-bottom: 12px; opacity: 0.8; }
+        .value { font-size: 0.9rem; font-weight: 300; color: #eee; line-height: 1.4; }
+        
+        /* Pictos Centrés (Arrosage, Expo, Difficulté) */
+        .visual-center { font-size: 1.8rem; margin: 5px 0; display: flex; gap: 4px; justify-content: center; }
+        
+        /* Description */
+        .desc-box { background: #050505; padding: 35px 25px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 30px; position: relative; }
+        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; font-weight: 700; }
+        #p-desc { line-height: 1.8; color: #999; font-size: 0.9rem; font-weight: 300; }
 
-        /* Style pour les gros pictos seuls */
-        .big-picto-value { font-size: 2rem !important; text-align: center; display: block; width: 100%; }
-        
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin: 30px 0; display: block; text-decoration: none; text-align: center; box-sizing: border-box; }
-        .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
-        .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
+        /* Bouton Commander Premium */
+        .btn-order-wrapper { margin: 40px 0 60px 0; text-align: center; }
+        .btn-order { 
+            display: inline-block; width: 100%; padding: 22px; 
+            background: #fff; color: #000; 
+            text-decoration: none; border-radius: 50px; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-order:hover { transform: translateY(-3px); background: var(--accent); box-shadow: 0 10px 20px rgba(74, 222, 128, 0.2); }
     </style>
 </head>
 <body>
     <div class="container">
-        <button onclick="window.history.back()" class="back-btn">← Retour</button>
+        <button onclick="window.history.back()" class="back-btn">← Collection</button>
         
-        <img id="p-photo" class="hero-img">
-        <h1 id="p-titre" style="font-size:2.1rem; font-weight:200; margin:0 0 5px 0;">Chargement...</h1>
+        <img id="p-photo" class="hero-img" alt="Plante">
+        <h1 id="p-titre">Chargement...</h1>
         <div id="p-sci" class="sci-name"></div>
 
-        <div id="owner-area" class="hidden">
+        <div class="info-grid" id="p-grid">
             </div>
 
-        <div class="info-grid" id="p-grid"></div>
-
         <div class="desc-box">
-            <div class="section-title">DESCRIPTION</div>
-            <div id="p-desc" style="line-height:1.6; color:#aaa; font-size:0.9rem;"></div>
+            <div class="section-title">Informations Générales</div>
+            <div id="p-desc"></div>
         </div>
 
-        <div id="catalog-area" class="hidden">
-            <a href="https://eonia.fr/boutique" class="btn-order">🏷️ Commander ma plaque ÉONIA</a>
+        <div id="catalog-area" class="hidden btn-order-wrapper">
+            <a href="commander.html" id="order-link" class="btn-order">Commander ma plaque ÉONIA</a>
         </div>
     </div>
 
@@ -62,30 +74,28 @@
     const rawPlantId = urlParams.get('id');
     const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
-    // Convertisseur de texte/chiffre en émoji pur
-    function getVisual(type, val) {
-        if (!val || val === "-") return "-";
+    // Gestion de l'esthétique des valeurs (Emojis uniquement pour les catégories clés)
+    function getVisualValue(type, val) {
+        if (!val || val === "-" || val === "0") return "-";
         const v = val.toString().toLowerCase().trim();
 
         if (type === "arrosage") {
             if (v.includes("1")) return "💧";
             if (v.includes("2")) return "💧💧";
             if (v.includes("3")) return "💧💧💧";
-            return val; 
+            return "💧";
         }
-
         if (type === "exposition") {
             if (v.includes("soleil")) return "☀️";
             if (v.includes("mi-ombre")) return "⛅";
             if (v.includes("ombre")) return "☁️";
-            return val;
+            return "☀️";
         }
-
         if (type === "difficulté") {
             if (v.includes("1") || v.includes("facile")) return "🟢";
             if (v.includes("2") || v.includes("moyen")) return "🟡";
             if (v.includes("3") || v.includes("expert")) return "🔴";
-            return "🌱";
+            return "🟢";
         }
         return val;
     }
@@ -109,41 +119,30 @@
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
         document.getElementById('p-desc').innerText = p["Description"] || "";
 
-        if (p["est_dans_jardin"]) {
-            document.getElementById('owner-area').classList.remove('hidden');
-        } else {
+        // Correction du lien de commande pour passer l'ID si besoin
+        if (!p["est_dans_jardin"]) {
             document.getElementById('catalog-area').classList.remove('hidden');
+            document.getElementById('order-link').href = `commander.html?id=${p.id}`;
         }
 
         const fields = [
-            {l:"Famille", v:p["Famille"], i:"🧬", h:true},
-            {l:"Type", v:p["Type"], i:"🌿", h:true},
-            {l:"Difficulté", v:getVisual("difficulté", p["Difficulté"]), i:"", isPure:true},
-            {l:"Arrosage", v:getVisual("arrosage", p["Arrosage"]), isPure:true}, 
-            {l:"Exposition", v:getVisual("exposition", p["Exposition"]), isPure:true},
-            {l:"Taille", v:p["Taille à maturité"], i:"📏"}, 
-            {l:"Persistance", v:p["Persistance"], i:"🍂"},
-            {l:"Floraison", v:p["Floraison"], i:"🌸"},
-            {l:"Rusticité", v:p["Rusticité"], i:"❄️"}
+            {l:"Famille", v:p["Famille"], h:true},
+            {l:"Type", v:p["Type"], h:true},
+            {l:"Difficulté", v:getVisualValue("difficulté", p["Difficulté"]), isVisual:true},
+            {l:"Arrosage", v:getVisualValue("arrosage", p["Arrosage"]), isVisual:true}, 
+            {l:"Exposition", v:getVisualValue("exposition", p["Exposition"]), isVisual:true},
+            {l:"Taille", v:p["Taille à maturité"]}, 
+            {l:"Persistance", v:p["Persistance"]},
+            {l:"Floraison", v:p["Floraison"]},
+            {l:"Rusticité", v:p["Rusticité"]}
         ];
 
-        document.getElementById('p-grid').innerHTML = fields.map(f => {
-            if (f.isPure) {
-                return `
-                <div class="info-box">
-                    <div class="label">${f.l}</div>
-                    <div class="value big-picto-value">${f.v}</div>
-                </div>`;
-            }
-            return `
+        document.getElementById('p-grid').innerHTML = fields.map(f => `
             <div class="info-box ${f.h ? 'highlight' : ''}">
                 <div class="label">${f.l}</div>
-                <div class="value-container">
-                    <span class="icon">${f.i}</span>
-                    <span class="value">${f.v || "-"}</span>
-                </div>
-            </div>`;
-        }).join('');
+                <div class="${f.isVisual ? 'visual-center' : 'value'}">${f.v || "-"}</div>
+            </div>
+        `).join('');
     }
 
     loadData();
