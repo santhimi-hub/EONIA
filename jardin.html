@@ -18,30 +18,14 @@
             overflow-x: hidden;
         }
 
-        /* Image Bord à Bord */
-        .hero-container {
-            width: 100%;
-            height: 55vh;
-            background: #111;
-        }
-        .hero-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover;
-        }
-
-        /* Conteneur de contenu */
-        .main-content { 
+        /* Conteneur principal centré */
+        .container { 
             max-width: 800px; 
-            margin: -40px auto 0; 
-            padding: 40px 25px 80px; 
-            background: var(--bg);
-            border-radius: 40px 40px 0 0; 
-            position: relative;
-            z-index: 10;
+            margin: auto; 
+            padding: 20px 25px 80px; 
         }
 
-        .nav-top { margin-bottom: 25px; }
+        .nav-top { margin-bottom: 20px; }
         .back-link { 
             color: var(--accent); 
             text-decoration: none; 
@@ -50,6 +34,17 @@
             letter-spacing: 3px; 
             cursor: pointer; 
             font-weight: 500;
+        }
+
+        /* Image "Contenue" (Rétablie comme avant) */
+        .hero-img { 
+            width: 100%; 
+            height: 45vh; /* Hauteur ajustée pour ne pas trop couper */
+            object-fit: cover;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+            display: block;
         }
         
         h1 { 
@@ -67,7 +62,7 @@
             letter-spacing: 1px;
         }
         
-        /* Grille */
+        /* Grille FORCÉE à 2 colonnes (Même sur mobile) */
         .info-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -79,6 +74,9 @@
             border: 1px solid var(--border); 
             padding: 18px 20px; 
             border-radius: 16px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .info-box.highlight { 
             border-left: 2px solid var(--accent); 
@@ -92,17 +90,17 @@
             letter-spacing: 2px; 
             margin-bottom: 8px; 
         }
-        .value { font-size: 0.85rem; font-weight: 300; color: #ddd; letter-spacing: 0.5px; }
+        .value { font-size: 0.8rem; font-weight: 300; color: #ddd; letter-spacing: 0.5px; line-height: 1.4; }
         .visual-val { font-size: 1.2rem; }
 
-        /* Correction Titre & Description */
+        /* Description : Contraste & Lisibilité améliorés */
         .desc-box { 
             margin-top: 40px; 
             padding-top: 30px; 
             border-top: 1px solid var(--border); 
         }
         .section-title { 
-            color: var(--accent); /* Changé en vert */
+            color: var(--accent); 
             font-size: 0.65rem; 
             text-transform: uppercase; 
             letter-spacing: 4px; 
@@ -111,13 +109,13 @@
         }
         #p-desc { 
             line-height: 1.8; 
-            color: #aaa; 
-            font-size: 0.95rem; 
+            color: #ccc; /* Plus clair pour le contraste */
+            font-size: 0.9rem; /* Légèrement plus grand */
             font-weight: 300; 
             text-align: justify;
         }
 
-        /* Correction Bouton (box-sizing) */
+        /* Bouton ( box-sizing corrigé) */
         .btn-order-container {
             width: 100%;
             margin-top: 50px;
@@ -140,22 +138,21 @@
         }
         .btn-order:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
+        /* Mobile : On s'assure que h1 reste élégant */
         @media (max-width: 600px) {
-            .info-grid { grid-template-columns: 1fr; }
             h1 { font-size: 1.8rem; }
+            .hero-img { height: 40vh; }
         }
     </style>
 </head>
 <body>
 
-    <div class="hero-container">
-        <img id="p-photo" class="hero-img" alt="">
-    </div>
-
-    <div class="main-content">
+    <div class="container">
         <div class="nav-top">
             <a onclick="history.back()" class="back-link">← Collection</a>
         </div>
+        
+        <img id="p-photo" class="hero-img" alt="">
         
         <h1 id="p-titre">...</h1>
         <div id="p-sci" class="sci-name"></div>
