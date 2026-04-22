@@ -3,63 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Détails</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <title>ÉONIA — Mémoire Végétale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
-        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
-        .container { max-width: 600px; margin: auto; padding: 25px; }
-        .hidden { display: none !important; }
         
-        .back-link { color: var(--accent); text-decoration: none; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; opacity: 0.8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Hero */
-        .hero-img { width: 100%; height: 42vh; object-fit: cover; border-radius: 20px; margin: 20px 0; border: 1px solid var(--border); }
-        h1 { font-size: 1.8rem; font-weight: 200; margin: 0; letter-spacing: 1px; }
-        .sci-name { color: var(--accent); font-size: 0.75rem; font-style: italic; opacity: 0.6; margin-bottom: 30px; margin-top: 5px; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Raleway', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Image Bord à Bord */
+        .hero-container {
+            width: 100%;
+            height: 55vh;
+            background: #111;
+        }
+        .hero-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+        }
+
+        /* Conteneur de contenu */
+        .main-content { 
+            max-width: 800px; 
+            margin: -40px auto 0; 
+            padding: 40px 25px 80px; 
+            background: var(--bg);
+            border-radius: 40px 40px 0 0; 
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-top { margin-bottom: 25px; }
+        .back-link { 
+            color: var(--accent); 
+            text-decoration: none; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            cursor: pointer; 
+            font-weight: 500;
+        }
         
-        /* Grille de Rubriques Épurée */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        h1 { 
+            font-size: 2.2rem; 
+            font-weight: 200; 
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+        .sci-name { 
+            color: var(--accent); 
+            font-size: 0.85rem; 
+            font-style: italic; 
+            opacity: 0.5; 
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        
+        /* Grille */
+        .info-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            margin-bottom: 40px;
+        }
         .info-box { 
             background: var(--card); 
             border: 1px solid var(--border); 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center;
+            padding: 18px 20px; 
+            border-radius: 16px; 
+        }
+        .info-box.highlight { 
+            border-left: 2px solid var(--accent); 
         }
         
-        /* Le liseré vert pour Famille et Type */
-        .info-box.highlight { border-left: 2px solid var(--accent); background: rgba(74, 222, 128, 0.02); }
-        
-        .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 6px; opacity: 0.7; }
-        .value { font-size: 0.75rem; font-weight: 300; color: #ccc; }
-        
-        /* Pictos plus petits et élégants */
-        .visual-val { font-size: 1.1rem; display: flex; align-items: center; min-height: 1.2rem; }
+        .label { 
+            color: var(--accent); 
+            font-size: 0.55rem; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+            letter-spacing: 2px; 
+            margin-bottom: 8px; 
+        }
+        .value { font-size: 0.85rem; font-weight: 300; color: #ddd; letter-spacing: 0.5px; }
+        .visual-val { font-size: 1.2rem; }
 
-        /* Description */
-        .desc-box { margin-top: 35px; padding-top: 25px; border-top: 1px solid var(--border); }
-        .section-title { color: #444; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; }
-        #p-desc { line-height: 1.7; color: #999; font-size: 0.85rem; font-weight: 300; }
+        /* Correction Titre & Description */
+        .desc-box { 
+            margin-top: 40px; 
+            padding-top: 30px; 
+            border-top: 1px solid var(--border); 
+        }
+        .section-title { 
+            color: var(--accent); /* Changé en vert */
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            margin-bottom: 25px; 
+            font-weight: 600;
+        }
+        #p-desc { 
+            line-height: 1.8; 
+            color: #aaa; 
+            font-size: 0.95rem; 
+            font-weight: 300; 
+            text-align: justify;
+        }
 
-        /* Bouton Vert Éonia */
+        /* Correction Bouton (box-sizing) */
+        .btn-order-container {
+            width: 100%;
+            margin-top: 50px;
+        }
         .btn-order { 
-            display: block; width: 100%; padding: 18px; 
-            background: var(--accent); color: #000; 
-            text-decoration: none; border-radius: 40px; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;
-            text-align: center; margin: 40px 0; transition: 0.3s;
+            display: block; 
+            width: 100%; 
+            padding: 22px 10px; 
+            background: var(--accent); 
+            color: #000; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-size: 0.75rem;
+            text-align: center; 
+            transition: 0.3s;
+            border: none;
         }
         .btn-order:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a onclick="history.back()" class="back-link">← Retour</a>
+
+    <div class="hero-container">
+        <img id="p-photo" class="hero-img" alt="">
+    </div>
+
+    <div class="main-content">
+        <div class="nav-top">
+            <a onclick="history.back()" class="back-link">← Collection</a>
+        </div>
         
-        <img id="p-photo" class="hero-img">
         <h1 id="p-titre">...</h1>
         <div id="p-sci" class="sci-name"></div>
 
@@ -70,7 +167,7 @@
             <div id="p-desc"></div>
         </div>
 
-        <div id="catalog-area" class="hidden">
+        <div id="catalog-area" class="hidden btn-order-container">
             <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
         </div>
     </div>
@@ -104,41 +201,43 @@
     }
 
     async function load() {
-        const res = await fetch(API_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ email: localStorage.getItem('user_email') || "invite@eonia.com", plantId: rawId }) 
-        });
-        const data = await res.json();
-        const p = data.find(x => x.id === rawId || x.cleanId === (rawId||"").replace(/-/g,"").toLowerCase());
-        
-        if (p) {
-            document.getElementById('p-photo').src = p.Photo;
-            document.getElementById('p-titre').innerText = p["Nom commun"];
-            document.getElementById('p-sci').innerText = p["Nom scientifique"];
-            document.getElementById('p-desc').innerText = p["Description"];
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: localStorage.getItem('user_email') || "invite@eonia.com", plantId: rawId }) 
+            });
+            const data = await res.json();
+            const p = data.find(x => x.id === rawId || x.cleanId === (rawId||"").replace(/-/g,"").toLowerCase());
             
-            if (!p.est_dans_jardin) document.getElementById('catalog-area').classList.remove('hidden');
+            if (p) {
+                document.getElementById('p-photo').src = p.Photo;
+                document.getElementById('p-titre').innerText = p["Nom commun"];
+                document.getElementById('p-sci').innerText = p["Nom scientifique"];
+                document.getElementById('p-desc').innerText = p["Description"];
+                
+                if (!p.est_dans_jardin) document.getElementById('catalog-area').classList.remove('hidden');
 
-            const fields = [
-                {l:"Famille", v:p.Famille, h:true},
-                {l:"Type", v:p.Type, h:true},
-                {l:"Difficulté", v:getVisual("difficulté", p.Difficulté), vis:true},
-                {l:"Arrosage", v:getVisual("arrosage", p.Arrosage), vis:true},
-                {l:"Exposition", v:getVisual("exposition", p.Exposition), vis:true},
-                {l:"Rusticité", v:p.Rusticité},
-                {l:"Taille", v:p["Taille à maturité"]},
-                {l:"Floraison", v:p.Floraison},
-                {l:"Persistance", v:p.Persistance}
-            ];
+                const fields = [
+                    {l:"Famille", v:p.Famille, h:true},
+                    {l:"Type", v:p.Type, h:true},
+                    {l:"Difficulté", v:getVisual("difficulté", p.Difficulté), vis:true},
+                    {l:"Arrosage", v:getVisual("arrosage", p.Arrosage), vis:true},
+                    {l:"Exposition", v:getVisual("exposition", p.Exposition), vis:true},
+                    {l:"Rusticité", v:p.Rusticité},
+                    {l:"Taille", v:p["Taille à maturité"]},
+                    {l:"Floraison", v:p.Floraison},
+                    {l:"Persistance", v:p.Persistance}
+                ];
 
-            document.getElementById('p-grid').innerHTML = fields.map(f => `
-                <div class="info-box ${f.h ? 'highlight' : ''}">
-                    <div class="label">${f.l}</div>
-                    <div class="${f.vis ? 'visual-val' : 'value'}">${f.v || "-"}</div>
-                </div>
-            `).join('');
-        }
+                document.getElementById('p-grid').innerHTML = fields.map(f => `
+                    <div class="info-box ${f.h ? 'highlight' : ''}">
+                        <div class="label">${f.l}</div>
+                        <div class="${f.vis ? 'visual-val' : 'value'}">${f.v || "-"}</div>
+                    </div>
+                `).join('');
+            }
+        } catch(e) { console.error(e); }
     }
     load();
 </script>
