@@ -15,20 +15,30 @@
         }
 
         .container { max-width: 900px; margin: auto; padding: 20px 25px 80px; }
-        .nav-top { margin-bottom: 20px; }
+        .nav-top { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .back-link { color: var(--accent); text-decoration: none; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 500; cursor: pointer; }
 
-        /* Image Majestueuse sur PC */
+        /* Image & Favoris */
+        .hero-wrapper { position: relative; width: 100%; margin-bottom: 35px; }
         .hero-img { 
-            width: 100%; height: 60vh; /* Agrandie pour le PC */
+            width: 100%; height: 60vh; 
             object-fit: cover; border-radius: 24px; border: 1px solid var(--border);
-            margin-bottom: 35px; display: block;
+            display: block;
         }
+        .fav-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);
+        }
+        .fav-btn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; transition: 0.3s; }
+        .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
         h1 { font-size: 2.5rem; font-weight: 200; letter-spacing: 2px; margin-top: 10px; }
         .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; opacity: 0.5; margin-bottom: 40px; }
         
-        /* Grille par 2 */
+        /* Grille */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 45px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; }
         .info-box.highlight { border-left: 3px solid var(--accent); }
@@ -36,18 +46,12 @@
         .value { font-size: 0.85rem; font-weight: 300; color: #eee; }
         .visual-val { font-size: 1.3rem; }
 
-        /* Section Description avec titres lisibles */
+        /* Description & Titres Notion */
         .desc-box { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); }
         .section-title { color: var(--accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-weight: 700; }
         
-        #p-desc { 
-            line-height: 1.9; color: #ccc; font-size: 0.95rem; font-weight: 300; text-align: justify; white-space: pre-wrap; 
-        }
-
-        /* Style pour les titres en gras venant de Notion */
-        #p-desc strong { 
-            color: #fff; font-weight: 600; display: inline-block; margin-top: 10px; font-size: 1rem;
-        }
+        #p-desc { line-height: 1.9; color: #ccc; font-size: 0.95rem; font-weight: 300; text-align: justify; white-space: pre-wrap; }
+        #p-desc strong { color: #fff; font-weight: 700; display: inline-block; margin-top: 15px; font-size: 1rem; border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
 
         .btn-order-container { width: 100%; margin-top: 50px; }
         .btn-order { 
@@ -69,7 +73,12 @@
             <a onclick="history.back()" class="back-link">← Collection</a>
         </div>
         
-        <img id="p-photo" class="hero-img">
+        <div class="hero-wrapper">
+            <img id="p-photo" class="hero-img">
+            <div id="fav-trigger" class="fav-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+        </div>
         
         <h1 id="p-titre">...</h1>
         <div id="p-sci" class="sci-name"></div>
@@ -91,33 +100,31 @@
     const urlParams = new URLSearchParams(window.location.search);
     const rawId = urlParams.get('id');
 
-    // Fonction pour transformer le gras Notion **Texte** en <strong>Texte</strong>
     function formatNotionText(text) {
         if (!text) return "";
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
-    function getVisual(type, val) {
-        if (!val || val === "-" || val === "0") return "-";
-        const v = val.toString().toLowerCase();
-        if (type === "arrosage") {
-            if (v.includes("1")) return "💧";
-            if (v.includes("2")) return "💧💧";
-            if (v.includes("3")) return "💧💧💧";
-            return "💧";
+    // Gestion des Favoris
+    function toggleFav(plant) {
+        let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const idx = favs.findIndex(f => f.id === plant.id);
+        
+        if (idx > -1) {
+            favs.splice(idx, 1);
+            document.getElementById('fav-trigger').classList.remove('active');
+        } else {
+            favs.push({ id: plant.id, name: plant["Nom commun"], photo: plant.Photo });
+            document.getElementById('fav-trigger').classList.add('active');
         }
-        if (type === "exposition") {
-            if (v.includes("soleil")) return "☀️";
-            if (v.includes("mi-ombre")) return "⛅";
-            if (v.includes("ombre")) return "☁️";
-            return "☀️";
+        localStorage.setItem('eonia_favs', JSON.stringify(favs));
+    }
+
+    function checkFav(id) {
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        if (favs.some(f => f.id === id)) {
+            document.getElementById('fav-trigger').classList.add('active');
         }
-        if (type === "difficulté") {
-            if (v.includes("1") || v.includes("facile")) return "🟢";
-            if (v.includes("2") || v.includes("moyen")) return "🟡";
-            return "🔴";
-        }
-        return val;
     }
 
     async function load() {
@@ -134,18 +141,19 @@
                 document.getElementById('p-photo').src = p.Photo;
                 document.getElementById('p-titre').innerText = p["Nom commun"];
                 document.getElementById('p-sci').innerText = p["Nom scientifique"];
-                
-                // Utilisation de innerHTML pour accepter les balises <strong>
                 document.getElementById('p-desc').innerHTML = formatNotionText(p["Description"]);
                 
+                checkFav(p.id);
+                document.getElementById('fav-trigger').onclick = () => toggleFav(p);
+
                 if (!p.est_dans_jardin) document.getElementById('catalog-area').classList.remove('hidden');
 
                 const fields = [
                     {l:"Famille", v:p.Famille, h:true},
                     {l:"Type", v:p.Type, h:true},
-                    {l:"Difficulté", v:getVisual("difficulté", p.Difficulté), vis:true},
-                    {l:"Arrosage", v:getVisual("arrosage", p.Arrosage), vis:true},
-                    {l:"Exposition", v:getVisual("exposition", p.Exposition), vis:true},
+                    {l:"Difficulté", v:p.Difficulté, vis:true},
+                    {l:"Arrosage", v:p.Arrosage, vis:true},
+                    {l:"Exposition", v:p.Exposition, vis:true},
                     {l:"Rusticité", v:p.Rusticité},
                     {l:"Taille", v:p["Taille à maturité"]},
                     {l:"Floraison", v:p.Floraison},
@@ -155,7 +163,7 @@
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
                     <div class="info-box ${f.h ? 'highlight' : ''}">
                         <div class="label">${f.l}</div>
-                        <div class="${f.vis ? 'visual-val' : 'value'}">${f.v || "-"}</div>
+                        <div class="value">${f.v || "-"}</div>
                     </div>
                 `).join('');
             }
