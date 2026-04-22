@@ -150,7 +150,6 @@ function renderGrid() {
         
         if (currentView === 'jardin' && !p.est_dans_jardin) return false;
         
-        // Logique Filtre Favoris
         if (activeFilter === 'favoris') {
             if (!favs.some(f => f.id === p.id)) return false;
         } else if (activeFilter !== 'all') {
