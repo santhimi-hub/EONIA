@@ -25,10 +25,9 @@
         .info-box .icon { font-size: 1.2rem; }
         .info-box .value { font-size: 0.85rem; color: #fff; }
 
-        /* Style spécial pour les gros pictos (Arrosage / Expo) */
-        .big-picto { font-size: 1.6rem !important; justify-content: center; padding: 20px 15px; }
+        .big-picto { font-size: 2rem !important; justify-content: center; align-items: center; text-align: center; }
         
-        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin: 30px 0; }
+        .btn-order { background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; margin: 30px 0; display: block; text-decoration: none; text-align: center; }
         .desc-box { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px;}
         .section-title { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.8; }
         
@@ -59,7 +58,7 @@
         </div>
 
         <div id="catalog-area" class="hidden">
-            <button class="btn-order" onclick="window.location.href='https://eonia.fr/boutique'">🏷️ Commander ma plaque ÉONIA</button>
+            <a href="https://eonia.fr/boutique" class="btn-order">🏷️ Commander ma plaque ÉONIA</a>
         </div>
     </div>
 
@@ -69,14 +68,14 @@
     const rawPlantId = urlParams.get('id');
     const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
-    // Fonction pour extraire uniquement l'émoji d'un texte
+    // Extraction Emoji
     function extractEmoji(text) {
         if (!text || text === "-") return "-";
-        const match = text.match(/(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g);
+        const match = text.match(/(\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|\u2600-\u27bf)/g);
         return match ? match[0] : text;
     }
 
-    // Fonction pour générer l'émoji de difficulté
+    // Emoji Difficulté
     function getDiffEmoji(val) {
         if (!val) return "🌱";
         const v = val.toLowerCase();
@@ -94,43 +93,41 @@
                 body: JSON.stringify({ email: userEmail, plantId: rawPlantId }) 
             });
             const data = await res.json();
-            const p = data.find(item => item.id === rawPlantId || item.ID_Plaque === rawPlantId || (item.id && item.id.replace(/-/g,'') === rawPlantId.replace(/-/g,'')));
+            const p = data.find(item => item.id === rawPlantId || item.cleanId === rawPlantId.replace(/-/g, "").toLowerCase());
             if (p) render(p);
         } catch (e) { console.error(e); }
     }
 
     function render(p) {
-        document.getElementById('p-photo').src = p.Photo || "";
+        document.getElementById('p-photo').src = p["Photo"] || "";
         document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante";
         document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-        document.getElementById('p-desc').innerText = p.Description || "";
+        document.getElementById('p-desc').innerText = p["Description"] || "";
 
-        if (p.est_dans_jardin) {
+        // Logique Catalogue vs Jardin
+        if (p["est_dans_jardin"]) {
             document.getElementById('owner-area').classList.remove('hidden');
+            document.getElementById('catalog-area').classList.add('hidden');
         } else {
             document.getElementById('catalog-area').classList.remove('hidden');
         }
 
-        // Configuration des 9 rubriques avec icônes
+        // Configuration des 9 rubriques avec les noms exacts du Worker
         const fields = [
-            {l:"Famille", v:p.Famille, i:"🧬", h:true},
-            {l:"Type", v:p.Type, i:"🌿", h:true},
-            {l:"Difficulté", v:p.Difficulté, i:getDiffEmoji(p.Difficulté)},
-            {l:"Arrosage", v:extractEmoji(p.Arrosage), i:"", big:true}, 
-            {l:"Exposition", v:extractEmoji(p.Exposition), i:"", big:true},
-            {l:"Taille", v:p.Taille, i:"📏"}, 
-            {l:"Persistance", v:p.Persistance, i:"🍂"},
-            {l:"Floraison", v:p.Floraison, i:"🌸"},
-            {l:"Rusticité", v:p.Rusticité, i:"❄️"}
+            {l:"Famille", v:p["Famille"], i:"🧬", h:true},
+            {l:"Type", v:p["Type"], i:"🌿", h:true},
+            {l:"Difficulté", v:p["Difficulté"], i:getDiffEmoji(p["Difficulté"])},
+            {l:"Arrosage", v:extractEmoji(p["Arrosage"]), big:true}, 
+            {l:"Exposition", v:extractEmoji(p["Exposition"]), big:true},
+            {l:"Taille", v:p["Taille à maturité"], i:"📏"}, 
+            {l:"Persistance", v:p["Persistance"], i:"🍂"},
+            {l:"Floraison", v:p["Floraison"], i:"🌸"},
+            {l:"Rusticité", v:p["Rusticité"], i:"❄️"}
         ];
 
         document.getElementById('p-grid').innerHTML = fields.map(f => {
             if (f.big) {
-                return `
-                <div class="info-box big-picto">
-                    <div class="label">${f.l}</div>
-                    <div class="value" style="font-size:2rem;">${f.v || "-"}</div>
-                </div>`;
+                return `<div class="info-box"><div class="label">${f.l}</div><div class="value big-picto">${f.v || "-"}</div></div>`;
             }
             return `
             <div class="info-box ${f.h ? 'highlight' : ''}">
@@ -142,17 +139,12 @@
             </div>`;
         }).join('');
 
-        // Historique arrosage
-        if (p.Historique_Data && p.est_dans_jardin) {
+        // Historique
+        if (p["Historique_Data"] && p["est_dans_jardin"]) {
             const h = document.getElementById('watering-history');
-            const dates = p.Historique_Data.split(',').filter(d => d.trim() !== "");
+            const dates = p["Historique_Data"].split(',').filter(d => d.trim() !== "");
             h.innerHTML = dates.slice().reverse().slice(0, 5).map(d => `<span style="font-size:0.55rem; background:#1a1a1a; padding:4px 8px; border-radius:5px; color:#666; border:1px solid #222;">${d}</span>`).join('');
         }
-    }
-
-    async function recordWatering() {
-        await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail, action: 'record_watering', plantId: rawPlantId }) });
-        location.reload();
     }
 
     loadData();
