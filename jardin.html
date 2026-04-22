@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Mémoire Végétale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
+        :root { --accent: #4ade80; --bg: #000; --card: #080808; --border: #121212; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { 
@@ -14,65 +14,79 @@
             -webkit-font-smoothing: antialiased; overflow-x: hidden;
         }
 
-        .container { max-width: 900px; margin: auto; padding: 20px 25px 80px; }
-        .nav-top { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .back-link { color: var(--accent); text-decoration: none; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 500; cursor: pointer; }
+        .container { max-width: 1000px; margin: auto; padding: 20px 20px 80px; }
 
-        /* Image & Favoris */
-        .hero-wrapper { position: relative; width: 100%; margin-bottom: 35px; }
-        .hero-img { 
-            width: 100%; height: 60vh; 
-            object-fit: cover; border-radius: 24px; border: 1px solid var(--border);
-            display: block;
-        }
-        .fav-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+        /* Bouton Retour Amélioré */
+        .nav-header { position: absolute; top: 30px; left: 30px; z-index: 100; }
+        .back-btn { 
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
             width: 45px; height: 45px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);
+            cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s;
+            color: var(--accent); text-decoration: none; font-size: 1.2rem;
         }
-        .fav-btn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; transition: 0.3s; }
+        .back-btn:hover { transform: scale(1.1); background: var(--accent); color: #000; }
+
+        /* Image Panoramique */
+        .hero-wrapper { position: relative; width: 100%; margin-bottom: 30px; margin-top: 10px; }
+        .hero-img { 
+            width: 100%; height: 60vh; 
+            object-fit: cover; border-radius: 20px; border: 1px solid var(--border);
+            display: block;
+        }
+        
+        /* Favoris */
+        .fav-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s; backdrop-filter: blur(10px);
+        }
+        .fav-btn svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.5; }
         .fav-btn.active svg { fill: var(--accent); stroke: var(--accent); }
         
-        h1 { font-size: 2.5rem; font-weight: 200; letter-spacing: 2px; margin-top: 10px; }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; opacity: 0.5; margin-bottom: 40px; }
+        h1 { font-size: 2rem; font-weight: 100; letter-spacing: 3px; margin-top: 20px; text-transform: uppercase; }
+        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; opacity: 0.5; margin-bottom: 35px; font-weight: 300; }
         
-        /* Grille */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 45px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; }
-        .info-box.highlight { border-left: 3px solid var(--accent); }
-        .label { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; margin-bottom: 10px; }
-        .value { font-size: 0.85rem; font-weight: 300; color: #eee; }
-        .visual-val { font-size: 1.3rem; }
+        /* Grille épurée avec Pictos */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 40px; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 12px; }
+        .info-box.highlight { border-left: 2px solid var(--accent); }
+        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 600; letter-spacing: 2px; margin-bottom: 8px; }
+        .value { font-size: 0.8rem; font-weight: 200; color: #bbb; }
+        .picto-val { font-size: 1.1rem; margin-top: 2px; }
 
-        /* Description & Titres Notion */
+        /* Description & Gras Notion */
         .desc-box { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); }
-        .section-title { color: var(--accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-weight: 700; }
+        .section-title { color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 25px; font-weight: 500; }
         
-        #p-desc { line-height: 1.9; color: #ccc; font-size: 0.95rem; font-weight: 300; text-align: justify; white-space: pre-wrap; }
-        #p-desc strong { color: #fff; font-weight: 700; display: inline-block; margin-top: 15px; font-size: 1rem; border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+        #p-desc { line-height: 1.8; color: #999; font-size: 0.9rem; font-weight: 300; text-align: justify; white-space: pre-wrap; }
+        #p-desc strong { 
+            color: #fff !important; font-weight: 600 !important; display: block; 
+            margin: 25px 0 10px 0; font-size: 0.95rem; border-left: 2px solid var(--accent); padding-left: 10px;
+        }
 
-        .btn-order-container { width: 100%; margin-top: 50px; }
+        .btn-order-container { width: 100%; margin-top: 40px; }
         .btn-order { 
-            display: block; width: 100%; padding: 22px; background: var(--accent); color: #000; 
-            text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; 
-            letter-spacing: 3px; font-size: 0.8rem; text-align: center; transition: 0.3s;
+            display: block; width: 100%; padding: 20px; background: var(--accent); color: #000; 
+            text-decoration: none; border-radius: 50px; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 3px; font-size: 0.75rem; text-align: center;
         }
 
         @media (max-width: 600px) {
             .hero-img { height: 45vh; }
-            h1 { font-size: 1.9rem; }
+            .nav-header { top: 25px; left: 25px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="nav-header">
+        <a onclick="history.back()" class="back-btn">←</a>
+    </div>
+
     <div class="container">
-        <div class="nav-top">
-            <a onclick="history.back()" class="back-link">← Collection</a>
-        </div>
-        
         <div class="hero-wrapper">
             <img id="p-photo" class="hero-img">
             <div id="fav-trigger" class="fav-btn">
@@ -105,11 +119,31 @@
         return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
 
-    // Gestion des Favoris
+    function getVisual(type, val) {
+        if (!val || val === "-" || val === "0") return "-";
+        const v = val.toString().toLowerCase();
+        if (type === "arrosage") {
+            if (v.includes("1")) return "💧";
+            if (v.includes("2")) return "💧💧";
+            if (v.includes("3")) return "💧💧💧";
+            return "💧";
+        }
+        if (type === "exposition") {
+            if (v.includes("soleil")) return "☀️";
+            if (v.includes("mi-ombre")) return "⛅";
+            return "☀️";
+        }
+        if (type === "difficulté") {
+            if (v.includes("1") || v.includes("facile")) return "🟢";
+            if (v.includes("2") || v.includes("moyen")) return "🟡";
+            return "🔴";
+        }
+        return val;
+    }
+
     function toggleFav(plant) {
         let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
         const idx = favs.findIndex(f => f.id === plant.id);
-        
         if (idx > -1) {
             favs.splice(idx, 1);
             document.getElementById('fav-trigger').classList.remove('active');
@@ -122,9 +156,7 @@
 
     function checkFav(id) {
         const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        if (favs.some(f => f.id === id)) {
-            document.getElementById('fav-trigger').classList.add('active');
-        }
+        if (favs.some(f => f.id === id)) document.getElementById('fav-trigger').classList.add('active');
     }
 
     async function load() {
@@ -145,15 +177,14 @@
                 
                 checkFav(p.id);
                 document.getElementById('fav-trigger').onclick = () => toggleFav(p);
-
                 if (!p.est_dans_jardin) document.getElementById('catalog-area').classList.remove('hidden');
 
                 const fields = [
                     {l:"Famille", v:p.Famille, h:true},
                     {l:"Type", v:p.Type, h:true},
-                    {l:"Difficulté", v:p.Difficulté, vis:true},
-                    {l:"Arrosage", v:p.Arrosage, vis:true},
-                    {l:"Exposition", v:p.Exposition, vis:true},
+                    {l:"Difficulté", v:getVisual("difficulté", p.Difficulté), vis:true},
+                    {l:"Arrosage", v:getVisual("arrosage", p.Arrosage), vis:true},
+                    {l:"Exposition", v:getVisual("exposition", p.Exposition), vis:true},
                     {l:"Rusticité", v:p.Rusticité},
                     {l:"Taille", v:p["Taille à maturité"]},
                     {l:"Floraison", v:p.Floraison},
@@ -163,7 +194,7 @@
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
                     <div class="info-box ${f.h ? 'highlight' : ''}">
                         <div class="label">${f.l}</div>
-                        <div class="value">${f.v || "-"}</div>
+                        <div class="${f.vis ? 'picto-val' : 'value'}">${f.v || "-"}</div>
                     </div>
                 `).join('');
             }
