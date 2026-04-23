@@ -48,7 +48,6 @@
         .plant-info { padding: 15px 10px; text-align: center; }
         .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* AJOUT LOGIQUE FAVORIS */
         .card-fav-btn {
             position: absolute; top: 10px; right: 10px; z-index: 5;
             background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
@@ -58,9 +57,26 @@
         }
         .card-fav-btn svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; transition: 0.2s; }
         .card-fav-btn.active svg { fill: #4ade80; stroke: #4ade80; }
+
+        /* --- AJOUTS ÉONIA : LOADER, IA & TOP --- */
+        #eonia-loader { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .spin-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .load-txt { font-size: 0.6rem; letter-spacing: 3px; color: #4ade80; text-transform: uppercase; }
+
+        #ai-bubble { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; background: #000; border: 2px solid #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9000; box-shadow: 0 0 15px rgba(74,222,128,0.3); }
+        #ai-bubble img { width: 38px; }
+        #ai-chat { display: none; position: fixed; bottom: 95px; left: 20px; width: 280px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 20px; z-index: 9001; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+
+        #topBtn { display: none; position: fixed; bottom: 25px; right: 20px; width: 50px; height: 50px; background: #4ade80; color: #000; border: none; border-radius: 50%; cursor: pointer; z-index: 9000; font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
+
+<div id="eonia-loader">
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spin-logo">
+    <div class="load-txt">Chargement de la plante...</div>
+</div>
 
 <div class="top-bar">
     <button class="logout-header-btn" onclick="logout()">Quitter</button>
@@ -94,14 +110,22 @@
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
+<div id="ai-bubble" onclick="toggleAI()">
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+</div>
+<div id="ai-chat">
+    <h3 style="color:#4ade80; font-size:0.7rem; letter-spacing:2px; margin-bottom:10px; text-transform:uppercase;">Assistant Éonia</h3>
+    <p style="font-size:0.75rem; color:#ccc; line-height:1.4;">Besoin d'aide pour trouver une plante ou l'ajouter à votre jardin ? Je suis là pour vous conseiller.</p>
+</div>
+
+<button id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
 <script>
 const userEmail = localStorage.getItem('user_email');
 const userPin = localStorage.getItem('user_pin'); 
 const isOwner = (userEmail && userEmail !== 'invite@eonia.com');
-
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
-
 const urlParams = new URLSearchParams(window.location.search);
 const plaqueAAssigner = urlParams.get('assign_to');
 
@@ -110,9 +134,18 @@ let allPlants = [];
 let activeFilter = 'all';
 
 if (!userEmail) logout();
-if (isOwner) {
-    document.getElementById('client-menu').style.display = 'flex';
+if (isOwner) { document.getElementById('client-menu').style.display = 'flex'; }
+
+function toggleAI() {
+    const chat = document.getElementById('ai-chat');
+    chat.style.display = (chat.style.display === 'block') ? 'none' : 'block';
 }
+
+window.onscroll = function() {
+    const btn = document.getElementById("topBtn");
+    if (window.scrollY > 500) btn.style.display = "block";
+    else btn.style.display = "none";
+};
 
 function switchView(view) {
     currentView = view;
@@ -147,17 +180,13 @@ function renderGrid() {
     let filtered = allPlants.filter(p => {
         const nom = (p["Nom commun"] || "").toLowerCase();
         const type = (p.Type || "").toLowerCase();
-        
         if (currentView === 'jardin' && !p.est_dans_jardin) return false;
-        
         if (activeFilter === 'favoris') {
             if (!favs.some(f => f.id === p.id)) return false;
         } else if (activeFilter !== 'all') {
             if (!type || !type.includes(activeFilter.toLowerCase())) return false;
         }
-
-        const matchesSearch = nom.includes(searchVal);
-        return matchesSearch;
+        return nom.includes(searchVal);
     });
 
     document.getElementById('plant-counter').textContent = 
@@ -180,14 +209,13 @@ function renderGrid() {
 
         const card = document.createElement('div');
         card.className = "plant-card";
-        
         card.onclick = () => {
             if (plaqueAAssigner) {
-                if(confirm(`Assigner cette plaque à : ${nomAffiche} ?`)) {
-                    assignPlaque(p.id, nomAffiche);
-                }
+                if(confirm(`Assigner cette plaque à : ${nomAffiche} ?`)) { assignPlaque(p.id, nomAffiche); }
             } else {
-                window.location.href = `jardin.html?id=${p.id}`;
+                // ACTIVER LE LOADER AVANT LA NAVIGATION
+                document.getElementById('eonia-loader').style.display = 'flex';
+                setTimeout(() => { window.location.href = `jardin.html?id=${p.id}`; }, 50);
             }
         };
 
@@ -211,12 +239,7 @@ async function assignPlaque(catalogueId, nom) {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: "assign_plant",
-                email: userEmail,
-                plaqueId: plaqueAAssigner,
-                catalogueId: catalogueId
-            })
+            body: JSON.stringify({ action: "assign_plant", email: userEmail, plaqueId: plaqueAAssigner, catalogueId: catalogueId })
         });
         if (res.ok) window.location.href = `jardin.html?id=${catalogueId}`;
         else alert("Erreur lors de l'assignation");
@@ -225,11 +248,7 @@ async function assignPlaque(catalogueId, nom) {
 
 async function loadData() {
     const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        allPlants = JSON.parse(cached);
-        renderGrid();
-    }
-
+    if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
@@ -252,10 +271,7 @@ function setFilter(t, b) {
     renderGrid();
 }
 
-function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-}
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
 loadData();
 </script>
