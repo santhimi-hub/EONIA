@@ -3,122 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Dashboard Jardin</title>
+    <title>ÉONIA — Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --blue: #00aaff; --purple: #a855f7; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* LOADER ÉONIA PERSISTANT */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner-logo { width: 60px; height: 60px; margin-bottom: 20px; animation: spin 2s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: var(--accent); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
-
-        /* CONTAINER & LAYOUT */
-        .container { max-width: 850px; margin: auto; padding: 20px 15px 100px; opacity: 0; transition: 0.5s; }
+        .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
-        /* IMAGE HERO RECTANGLE PC/MOBILE */
-        .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 25px; }
+        /* HERO 16/9 */
+        .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
 
-        h1 { font-size: 2.2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 30px; opacity: 0.8; }
+        h1 { font-size: 2.1rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
+        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
 
-        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
-        .block-title { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        /* BLOCS */
+        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
 
-        /* GRILLE TECHNIQUE - LES 9 RUBRIQUES */
+        /* GRILLE 9 RUBRIQUES */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; border-left: 3px solid var(--accent); }
-        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
-        .value { font-size: 0.85rem; color: #eee; font-weight: 300; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; border-left: 3px solid var(--accent); }
+        .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .value { font-size: 0.8rem; color: #eee; font-weight: 300; }
 
         /* ARROSAGE GRAPH */
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 70px; margin-top: 20px; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 10%; cursor: pointer; }
-        .bar { width: 100%; background: #1a1a1a; border-radius: 4px 4px 0 0; transition: 0.4s; height: 20%; }
-        .bar.active { background: var(--blue); box-shadow: 0 0 10px rgba(0,170,255,0.3); height: 80%; }
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 65px; margin-top: 15px; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .bar { width: 100%; background: #1a1a1a; border-radius: 4px; height: 20%; transition: 0.4s; }
+        .bar.active { background: var(--blue); height: 80%; box-shadow: 0 0 10px rgba(0,170,255,0.3); }
         .bar-day { font-size: 0.5rem; color: #444; margin-top: 5px; }
 
-        /* GALERIE PHOTO R2 */
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #080808; }
-        .evo-photo img { width: 100%; height: 100%; object-fit: cover; }
+        /* BOUTONS */
+        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.75rem; margin-top: 10px; text-decoration: none; display: block; text-align: center; }
+        .btn-order { background: var(--accent); color: #000; border: none; margin-top: 20px; }
 
-        /* BOUTONS ACTIONS */
-        .btn-action { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 600; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-bottom: 10px; }
-        .btn-notify { border-color: var(--purple); color: var(--purple); }
+        /* INPUTS SPECIAL JARDIN */
+        input[type="date"], textarea { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; font-size: 0.8rem; margin-top: 5px; outline: none; }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 10px 25px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 10001; }
+        .mon-jardin-only { display: none; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
-    <div class="loading-text">Synchronisation...</div>
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:50px;">
 </div>
 
-<div id="toast">C'est noté !</div>
+<div class="container" id="app">
+    <button onclick="history.back()" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR</button>
 
-<div class="container" id="main-content">
-    <button onclick="history.back()" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:8px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR</button>
+    <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
+    <h1 id="p-titre">...</h1>
+    <div id="p-sci" class="sci-name">...</div>
 
-    <div class="hero-wrapper">
-        <img id="p-photo" class="hero-img" src="" alt="">
-    </div>
-
-    <h1 id="p-titre">CHARGEMENT...</h1>
-    <div id="p-sci" class="sci-name"></div>
-
-    <div class="dash-block">
+    <div class="dash-block mon-jardin-only">
         <div class="block-title">IA ÉONIA — SANTÉ & CYCLE</div>
-        <div style="display:flex; align-items:center; margin-bottom:15px;"><span style="width:10px; height:10px; background:var(--accent); border-radius:50%; margin-right:10px; box-shadow:0 0 8px var(--accent);"></span> Optimale (85/100)</div>
-        <div style="height:6px; background:#1a1a1a; border-radius:10px;"><div id="cycle-bar" style="height:100%; background:var(--accent); width:35%; border-radius:10px;"></div></div>
+        <div style="display:flex; align-items:center; margin-bottom:12px;"><span style="width:10px; height:10px; background:var(--accent); border-radius:50%; margin-right:10px; box-shadow: 0 0 10px var(--accent);"></span> Santé Optimale</div>
+        <div style="height:5px; background:#1a1a1a; border-radius:10px;"><div id="p-cycle" style="height:100%; background:var(--accent); width:0%; border-radius:10px; transition:1.2s;"></div></div>
     </div>
 
-    <div class="dash-block">
+    <div class="dash-block mon-jardin-only">
         <div class="block-title">SUIVI D'ARROSAGE</div>
-        <button class="btn-action" style="border-color:var(--blue); color:var(--blue);" onclick="trackAction('Arrosage')">💧 MARQUER COMME ARROSÉ</button>
-        <div class="graph-container" id="water-graph">
-            </div>
+        <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="alert('Arrosage synchronisé')">💧 MARQUER COMME ARROSÉ</button>
+        <div class="graph-container" id="p-graph"></div>
     </div>
 
-    <div class="info-grid" id="p-grid">
-        </div>
+    <div class="info-grid" id="p-grid"></div>
 
     <div class="dash-block">
-        <div class="block-title" style="color:var(--accent)">Description de l'espèce</div>
+        <div class="block-title">DESCRIPTION DE L'ESPÈCE</div>
         <p id="p-desc" style="color:#888; font-size:0.85rem; line-height:1.6;"></p>
     </div>
 
-    <div class="dash-block">
-        <div class="block-title">ALERTE & RAPPEL</div>
-        <button class="btn-action btn-notify" onclick="trackAction('Notifications')">🔔 ACTIVER LES RAPPELS</button>
+    <div class="mon-jardin-only" style="border-left: 2px solid var(--accent); padding-left: 15px; margin: 30px 0;">
+        <div class="label">Le geste de l'artisan</div>
+        <div id="p-tip" style="font-style: italic; color: #ccc; font-size: 0.9rem; margin-top: 5px;">...</div>
     </div>
 
-    <div style="border-left: 2px solid var(--accent); padding-left: 15px; margin: 30px 0;">
-        <div style="font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">Le geste de l'artisan — Avril</div>
-        <div id="p-tip" style="font-style: italic; color: #ccc; margin-top:5px;">...</div>
-    </div>
-
-    <div class="dash-block">
+    <div class="dash-block mon-jardin-only">
         <div class="block-title">PHOTOS D'ÉVOLUTION (R2)</div>
-        <div class="photo-grid" id="gallery">
-            </div>
-        <button class="btn-action" style="border-color:#333; color:#666; margin-top:15px;" onclick="document.getElementById('file-input').click()">+ AJOUTER UNE PHOTO</button>
-        <input type="file" id="file-input" hidden onchange="handleUpload(this)">
+        <div class="photo-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;" id="p-gallery"></div>
+        <button class="btn-main" style="border-color:#333; color:#666; margin-top:15px;">+ AJOUTER UNE PHOTO</button>
     </div>
 
-    <div class="dash-block">
-        <div class="block-title">JOURNAL PRIVÉ</div>
-        <textarea id="p-notes" rows="3" style="width:100%; background:#080808; border:1px solid #1a1a1a; color:#fff; padding:12px; border-radius:10px; font-family:inherit;" placeholder="Mes notes..."></textarea>
+    <div class="dash-block mon-jardin-only">
+        <div class="block-title">JOURNAL DE BORD</div>
+        
+        <div style="margin-bottom:15px;">
+            <label class="label" style="display:block; margin-bottom:5px;">Date de plantation</label>
+            <input type="date" id="date-picker">
+        </div>
+
+        <label class="label" style="display:block; margin-bottom:5px;">Notes de croissance</label>
+        <textarea rows="3" placeholder="Ex: Rempotage effectué, nouvelles pousses..."></textarea>
+        
+        <button class="btn-main" style="margin-top:15px;" onclick="alert('Journal mis à jour')">SAUVEGARDER LE JOURNAL</button>
     </div>
 
-    <button class="btn-action" style="background:var(--accent); color:#000;" onclick="trackAction('Partage')">✨ PARTAGER MA PLANTE</button>
+    <button class="mon-jardin-only btn-main" onclick="alert('Lien de partage prêt')">✨ PARTAGER MA PLANTE</button>
+
+    <div class="dash-block" style="border-color: var(--accent); background: rgba(74, 222, 128, 0.05);">
+        <div class="block-title">Acquérir une plaque ÉONIA</div>
+        <p style="font-size: 0.75rem; color: #888; margin-bottom: 15px;">Identifiez vos plantes avec élégance et accédez au suivi intelligent ÉONIA.</p>
+        <a href="commander.html" class="btn-main btn-order">🛒 COMMANDER MA PLAQUE</a>
+    </div>
 </div>
 
 <script>
@@ -126,76 +119,53 @@
     const urlParams = new URLSearchParams(window.location.search);
     const plantId = urlParams.get('id');
 
-    async function loadData() {
+    async function init() {
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ plantId: plantId, email: localStorage.getItem('user_email') || "invite@eonia.com" })
+                body: JSON.stringify({ plantId, email: localStorage.getItem('user_email') || "invite@eonia.com" })
             });
             const data = await res.json();
             const plant = data.find(p => p.id === plantId);
 
             if (plant) {
-                // Photos et Textes
                 document.getElementById('p-photo').src = plant.Photo;
                 document.getElementById('p-titre').innerText = plant["Nom commun"];
                 document.getElementById('p-sci').innerText = plant["Nom scientifique"];
                 document.getElementById('p-desc').innerText = plant.Description;
-                document.getElementById('p-tip').innerText = plant.Geste_Artisan || "Surveillez l'humidité du terreau avant d'arroser.";
-                
-                // Les 9 Rubriques
+
+                // 9 Rubriques
                 const rubriques = [
                     {l:"Famille", v:plant.Famille}, {l:"Type", v:plant.Type},
-                    {l:"Difficulté", v:plant.Difficulté_Icon || "🟢"}, {l:"Arrosage", v:plant.Arrosage_Icon || "💧"},
-                    {l:"Exposition", v:plant.Exposition_Icon || "☀️"}, {l:"Taille", v:plant["Taille à maturité"]},
-                    {l:"Floraison", v:plant.Floraison}, {l:"Persistance", v:plant.Persistance},
-                    {l:"Rusticité", v:plant.Rusticité}
+                    {l:"Difficulté", v:plant.Difficulté_Icon}, {l:"Arrosage", v:plant.Arrosage_Icon},
+                    {l:"Exposition", v:plant.Exposition_Icon}, {l:"Taille", v:plant["Taille à maturité"]},
+                    {l:"Floraison", v:plant.Floraison}, {l:"Persistance", v:plant.Persistance}, {l:"Rusticité", v:plant.Rusticité}
                 ];
                 document.getElementById('p-grid').innerHTML = rubriques.map(r => `
                     <div class="info-box"><div class="label">${r.l}</div><div class="value">${r.v || "-"}</div></div>
                 `).join('');
 
-                // Graphique Arrosage (7 jours)
-                const history = plant.Watering_History || [0, 1, 0, 1, 0, 0, 0];
-                const days = ['L','M','M','J','V','S','D'];
-                document.getElementById('water-graph').innerHTML = days.map((d, i) => `
-                    <div class="bar-wrapper" onclick="toggleBar(this)">
-                        <div class="bar ${history[i] ? 'active' : ''}"></div>
-                        <div class="bar-day">${d}</div>
-                    </div>
-                `).join('');
-
-                // Galerie
-                if(plant.Photos_R2) {
-                    document.getElementById('gallery').innerHTML = plant.Photos_R2.map(url => `
-                        <div class="evo-photo"><img src="${url}"></div>
+                // Logique Mon Jardin
+                if (plant.est_dans_jardin) {
+                    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+                    document.getElementById('p-cycle').style.width = (plant.Cycle || 50) + "%";
+                    document.getElementById('p-tip').innerText = plant.Geste_Artisan || "Vérifiez l'humidité du terreau.";
+                    document.getElementById('date-picker').value = plant.Date_Plantation_ISO || "2024-04-12";
+                    
+                    const hist = plant.Watering_History || [1, 0, 1, 0, 1, 0, 1];
+                    const days = ['L','M','M','J','V','S','D'];
+                    document.getElementById('p-graph').innerHTML = days.map((d, i) => `
+                        <div class="bar-wrapper"><div class="bar ${hist[i] ? 'active' : ''}"></div><div class="bar-day">${d}</div></div>
                     `).join('');
                 }
 
                 document.getElementById('loader').style.display = 'none';
-                document.getElementById('main-content').classList.add('loaded');
+                document.getElementById('app').classList.add('loaded');
             }
-        } catch(e) { console.error("Erreur API:", e); }
+        } catch(e) { console.error(e); }
     }
-
-    function toggleBar(el) {
-        el.querySelector('.bar').classList.toggle('active');
-        showToast("Mise à jour graphique...");
-    }
-
-    function trackAction(name) {
-        showToast(name + " enregistré !");
-    }
-
-    function showToast(text) {
-        const t = document.getElementById('toast');
-        t.innerText = text; t.style.opacity = '1';
-        setTimeout(() => t.style.opacity = '0', 2000);
-    }
-
-    loadData();
+    init();
 </script>
-
 </body>
 </html>
