@@ -3,171 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MON JARDIN — ÉONIA</title>
+    <title>ÉONIA — Mon Jardin & Collection</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --blue: #00aaff; --purple: #a855f7; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .container { max-width: 900px; margin: auto; padding: 20px 15px 100px; }
-        
+        /* LOADER ÉONIA */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .spinner-logo { 
+            width: 60px; height: 60px; margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--accent); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
+
+        .container { max-width: 850px; margin: auto; padding: 20px 15px 100px; opacity: 0; transition: 0.5s; }
+        .container.loaded { opacity: 1; }
+
         /* NAVIGATION */
         .nav-header { margin-bottom: 20px; }
-        .back-btn { display: inline-flex; align-items: center; border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .back-btn { display: inline-flex; align-items: center; border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
 
-        /* MÉTÉO (Fidèle à la capture) */
+        /* IMAGE HERO - FORMAT RECTANGLE LARGE */
+        .hero-img { 
+            width: calc(100% + 40px); margin-left: -20px; /* Dépasse légèrement sur les côtés */
+            aspect-ratio: 16 / 9; object-fit: cover;
+            border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--border); 
+        }
+
+        h1 { font-size: 2.2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
+        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 30px; opacity: 0.8; }
+
+        /* BLOCS DASHBOARD */
+        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        .block-title { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+
+        /* GRILLE TECHNIQUE (9 RUBRIQUES) */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; border-left: 3px solid var(--accent); }
+        .label { color: var(--accent); font-size: 0.55rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .value { font-size: 0.85rem; color: #eee; font-weight: 300; }
+
+        /* SECTIONS CONDITIONNELLES */
+        .premium-only { display: none; }
+        .catalog-only { display: none; }
+
+        /* MÉTÉO, SANTÉ, ARROSAGE, NOTIF, GALERIE (PREMIUM) */
         .weather-section { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 25px; }
         .weather-grid { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin: 15px 0; }
         .w-day { font-size: 0.55rem; color: #666; margin-bottom: 8px; text-transform: uppercase; }
         .w-temp { font-size: 0.8rem; font-weight: 600; }
-        .weather-footer { border-top: 1px solid #1a1a1a; padding-top: 12px; font-size: 0.65rem; color: var(--accent); text-align: center; font-style: italic; }
-
-        /* IDENTITÉ VISUELLE */
-        .hero-img { width: 100%; height: auto; border-radius: 25px; margin-bottom: 20px; border: 1px solid var(--border); }
-        h1 { font-size: 2.2rem; font-weight: 200; letter-spacing: 1px; text-transform: uppercase; }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 30px; opacity: 0.8; }
-
-        /* DASHBOARD BLOCKS */
-        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
-        .block-title { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
-        
-        /* SANTÉ & CYCLE */
-        .dot { width: 14px; height: 14px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); display: inline-block; margin-right: 10px; vertical-align: middle; }
+        .dot { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; display: inline-block; box-shadow: 0 0 10px var(--accent); margin-right: 8px; }
         .progress-container { height: 8px; background: #1a1a1a; border-radius: 10px; margin: 15px 0; }
         .progress-bar { height: 100%; background: var(--accent); border-radius: 10px; }
-
-        /* ENTRETIEN (Graphique Glissant 7 jours) */
-        .btn-water { display: block; width: 100%; padding: 15px; background: transparent; border: 1px solid var(--blue); color: var(--blue); border-radius: 15px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-bottom: 25px; text-transform: uppercase; }
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 100px; margin-bottom: 15px; padding: 0 10px; }
-        .bar { width: 10px; background: #222; border-radius: 4px; height: 20%; transition: 0.3s; }
-        .bar.active { background: var(--blue); height: 80%; box-shadow: 0 0 15px rgba(0,170,255,0.3); }
-
-        /* INFO GRID (2 Colonnes comme avant) */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 15px; border-left: 3px solid var(--accent); }
-        .label { color: var(--accent); font-size: 0.6rem; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-        .value { font-size: 0.9rem; color: #eee; font-weight: 300; }
-
-        /* GESTE DE L'ARTISAN */
+        .btn-water { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--blue); color: var(--blue); border-radius: 15px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; cursor: pointer; margin-bottom: 20px; }
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 60px; padding: 0 10px; }
+        .bar { width: 8px; background: #222; border-radius: 4px; height: 20%; }
+        .bar.active { background: var(--blue); height: 80%; }
         .artisan-tip { border-left: 2px solid var(--accent); padding-left: 15px; margin: 30px 0; }
-        .artisan-label { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
-        .artisan-text { font-style: italic; font-weight: 300; font-size: 1rem; color: #ccc; }
-
-        /* PHOTOS EVOLUTION */
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .evo-photo { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
         .evo-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-add-photo { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 12px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* JOURNAL */
         .switch-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .switch { width: 42px; height: 22px; background: #222; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
-        .switch::after { content: ''; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; background: #666; border-radius: 50%; transition: 0.3s; }
+        .switch { width: 40px; height: 20px; background: #333; border-radius: 20px; position: relative; cursor: pointer; }
         .switch.active { background: var(--accent); }
-        .switch.active::after { left: 23px; background: #fff; }
-        
-        .input-group { margin-bottom: 20px; }
-        .input-label { font-size: 0.6rem; color: #555; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
-        input, textarea { width: 100%; background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 10px; color: #fff; font-family: inherit; font-size: 0.9rem; }
+        .switch::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .switch.active::after { left: 22px; }
+        input, textarea { width: 100%; background: #080808; border: 1px solid #1a1a1a; padding: 12px; border-radius: 10px; color: #fff; font-family: inherit; margin-bottom: 15px; }
 
-        /* ACTIONS */
-        .btn-share { display: block; width: 100%; padding: 18px; background: #0c0c0c; border: 1px solid #1a1a1a; color: #888; border-radius: 40px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 30px; cursor: pointer; }
+        /* BOUTON COMMANDE & PARTAGE */
+        .btn-order { display: block; width: 100%; padding: 18px; background: var(--accent); color: #000; border-radius: 40px; font-weight: 700; text-transform: uppercase; text-align: center; text-decoration: none; font-size: 0.8rem; }
+        .btn-share { display: block; width: 100%; padding: 18px; background: #0c0c0c; border: 1px solid #1a1a1a; color: #888; border-radius: 40px; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
 
-        @media (min-width: 1025px) { .container { max-width: 850px; } }
+        @media (max-width: 600px) { 
+            .hero-img { width: 100%; margin-left: 0; } 
+            h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="nav-header">
-            <a onclick="history.back()" class="back-btn">← RETOUR</a>
-        </div>
+<div id="loader">
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
+    <div class="loading-text">Chargement...</div>
+</div>
 
-        <div class="weather-section">
-            <div style="font-size: 0.65rem; color: #888;">📍 VILLE ? <span style="float:right; background:#1a1a1a; padding:4px 12px; border-radius:20px; color:#fff; font-size:0.55rem; cursor:pointer;">CHANGER</span></div>
-            <div class="weather-grid">
-                <div><div class="w-day">AUJOURD'HUI</div>☁️<div class="w-temp">8°/27°</div></div>
-                <div><div class="w-day">MER.</div>🌧️<div class="w-temp">13°/27°</div></div>
-                <div><div class="w-day">JEU.</div>☁️<div class="w-temp">14°/25°</div></div>
-                <div><div class="w-day">VEN.</div>☀️<div class="w-temp">9°/26°</div></div>
-            </div>
-            <div class="weather-footer">🌿 Conditions normales : Fiez-vous à l'humidité de la terre.</div>
-        </div>
-
-        <img id="p-photo" class="hero-img" src="">
-        <h1 id="p-titre">...</h1>
-        <div id="p-sci" class="sci-name">...</div>
-
-        <div class="dash-block">
-            <div class="block-title">🌱 IA ÉONIA — SANTÉ</div>
-            <div class="health-status"><div class="dot"></div> Plante en pleine santé <span style="color:#555; font-size:0.8rem; margin-left:10px;">(85/100)</span></div>
-        </div>
-
-        <div class="dash-block">
-            <div class="block-title">CYCLE DE VIE ANNUEL</div>
-            <div class="progress-container"><div class="progress-bar" style="width: 35%;"></div></div>
-            <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:#666;">
-                <span>Croissance active 🌱</span><span>35%</span>
-            </div>
-        </div>
-
-        <div class="dash-block">
-            <div class="block-title">ENTRETIEN & SUIVI</div>
-            <button class="btn-water">💧 MARQUER COMME ARROSÉ</button>
-            <div class="graph-container">
-                <div class="bar"></div><div class="bar active"></div><div class="bar"></div><div class="bar"></div><div class="bar active"></div><div class="bar"></div><div class="bar active"></div>
-            </div>
-            <div style="font-size:0.6rem; color:#444; text-align:center;">Historique des 7 derniers jours</div>
-        </div>
-
-        <div class="info-grid" id="p-grid"></div>
-
-        <div class="dash-block">
-            <div class="block-title">ALERTE & RAPPEL</div>
-            <button style="border:1px solid var(--purple); color:var(--purple); background:none; width:100%; padding:15px; border-radius:15px; font-weight:600; font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; cursor:pointer;">🔔 ACTIVER LES NOTIFICATIONS</button>
-        </div>
-
-        <div class="dash-block">
-            <div class="block-title">GUIDE EXPERT</div>
-            <div style="color:var(--accent); font-size:0.75rem; text-transform:uppercase; border-bottom:1px solid #1a1a1a; padding:18px 0; display:flex; justify-content:space-between; cursor:pointer;">DESCRIPTION <span>+</span></div>
-            <div style="color:var(--accent); font-size:0.75rem; text-transform:uppercase; border-bottom:1px solid #1a1a1a; padding:18px 0; display:flex; justify-content:space-between; cursor:pointer;">FLORAISON <span>+</span></div>
-            <div style="color:var(--accent); font-size:0.75rem; text-transform:uppercase; border-bottom:1px solid #1a1a1a; padding:18px 0; display:flex; justify-content:space-between; cursor:pointer;">SOL & FERTILISATION <span>+</span></div>
-        </div>
-
-        <div class="artisan-tip">
-            <div class="artisan-label">Le geste de l'artisan — Avril</div>
-            <div class="artisan-text" id="p-tip">Surveillez l'apparition des premiers bourgeons et maintenez un arrosage régulier.</div>
-        </div>
-
-        <div class="dash-block">
-            <div class="block-title">PHOTOS D'ÉVOLUTION</div>
-            <div class="photo-grid">
-                <div class="evo-photo"><img src="https://via.placeholder.com/150" alt="evolution"></div>
-                <div class="evo-photo"><img src="https://via.placeholder.com/150" alt="evolution"></div>
-                <div class="evo-photo"><img src="https://via.placeholder.com/150" alt="evolution"></div>
-            </div>
-            <button class="btn-add-photo">📁 AJOUTER UNE PHOTO</button>
-        </div>
-
-        <div class="dash-block">
-            <div class="block-title">TABLEAU DE BORD - JOURNAL</div>
-            <div class="switch-container">
-                <span style="font-size:0.7rem; color:#666; letter-spacing:1px;">PARTAGER LE JOURNAL (PUBLIC)</span>
-                <div class="switch" id="public-switch" onclick="this.classList.toggle('active')"></div>
-            </div>
-            <div class="input-group">
-                <label class="input-label">Date de plantation</label>
-                <input type="text" placeholder="JJ/MM/AAAA">
-            </div>
-            <div class="input-group">
-                <label class="input-label">Observations personnelles</label>
-                <textarea rows="3" placeholder="Notes sur la croissance, engrais utilisé..."></textarea>
-            </div>
-        </div>
-
-        <button class="btn-share">✨ PARTAGER MA PLANTE</button>
+<div class="container" id="main-content">
+    <div class="nav-header">
+        <a onclick="history.back()" class="back-btn" id="nav-btn-text">← RETOUR</a>
     </div>
+
+    <div class="weather-section premium-only">
+        <div style="font-size: 0.65rem; color: #888;">📍 VILLE ? <span style="float:right; background:#1a1a1a; padding:4px 12px; border-radius:20px; color:#fff;">CHANGER</span></div>
+        <div class="weather-grid">
+            <div><div class="w-day">AUJOURD'HUI</div>☁️<div class="w-temp">8°/27°</div></div>
+            <div><div class="w-day">MER.</div>🌧️<div class="w-temp">13°/27°</div></div>
+            <div><div class="w-day">JEU.</div>☁️<div class="w-temp">14°/25°</div></div>
+            <div><div class="w-day">VEN.</div>☀️<div class="w-temp">9°/26°</div></div>
+        </div>
+    </div>
+
+    <img id="p-photo" class="hero-img">
+    <h1 id="p-titre">...</h1>
+    <div id="p-sci" class="sci-name"></div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">🌱 IA ÉONIA — SANTÉ</div>
+        <div class="health-status"><div class="dot"></div> Plante en pleine santé <span style="color:#555; font-size:0.8rem; margin-left:10px;">(85/100)</span></div>
+    </div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">CYCLE DE VIE ANNUEL</div>
+        <div class="progress-container"><div class="progress-bar" style="width: 35%;"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:#666;"><span>Croissance active 🌱</span><span>35%</span></div>
+    </div>
+
+    <div class="info-grid" id="p-grid"></div>
+
+    <div class="dash-block">
+        <div class="block-title" style="color:var(--accent)">Description</div>
+        <div id="p-desc" style="color:#999; font-size:0.85rem; line-height:1.6; font-weight:300;"></div>
+    </div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">ENTRETIEN & SUIVI</div>
+        <button class="btn-water">💧 MARQUER COMME ARROSÉ</button>
+        <div class="graph-container">
+            <div class="bar active"></div><div class="bar"></div><div class="bar"></div><div class="bar active"></div><div class="bar"></div><div class="bar active"></div><div class="bar"></div>
+        </div>
+    </div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">ALERTE & RAPPEL</div>
+        <button style="border:1px solid var(--purple); color:var(--purple); background:none; width:100%; padding:15px; border-radius:15px; font-weight:600; font-size:0.7rem; text-transform:uppercase;">🔔 ACTIVER LES NOTIFICATIONS</button>
+    </div>
+
+    <div class="artisan-tip premium-only">
+        <div class="artisan-label">Le geste de l'artisan — Avril</div>
+        <div id="p-tip" class="artisan-text">Surveillez l'apparition des premiers bourgeons.</div>
+    </div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">PHOTOS D'ÉVOLUTION</div>
+        <div class="photo-grid">
+            <div class="evo-photo"><img src="https://via.placeholder.com/150"></div>
+            <div class="evo-photo"><img src="https://via.placeholder.com/150"></div>
+            <div class="evo-photo"><img src="https://via.placeholder.com/150"></div>
+        </div>
+    </div>
+
+    <div class="dash-block premium-only">
+        <div class="block-title">JOURNAL DE BORD</div>
+        <div class="switch-container">
+            <span style="font-size:0.7rem; color:#666;">JOURNAL PUBLIC</span>
+            <div class="switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <input type="text" value="Date de plantation : 29/03/2026">
+        <textarea rows="3">Observations...</textarea>
+    </div>
+
+    <div class="catalog-only">
+        <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
+    </div>
+    <button class="btn-share premium-only">✨ PARTAGER MA PLANTE</button>
+</div>
 
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
@@ -188,24 +192,34 @@
                 document.getElementById('p-photo').src = plant.Photo;
                 document.getElementById('p-titre').innerText = plant["Nom commun"];
                 document.getElementById('p-sci').innerText = plant["Nom scientifique"];
-                
+                document.getElementById('p-desc').innerText = plant["Description"];
+
+                if (plant.est_dans_jardin) {
+                    document.getElementById('nav-btn-text').innerText = "← MON JARDIN";
+                    document.querySelectorAll('.premium-only').forEach(el => el.style.display = 'block');
+                } else {
+                    document.getElementById('nav-btn-text').innerText = "← NOTRE COLLECTION";
+                    document.querySelectorAll('.catalog-only').forEach(el => el.style.display = 'block');
+                }
+
                 const fields = [
                     {l:"Famille", v: plant.Famille},
                     {l:"Type", v: plant.Type},
-                    {l:"Difficulté", v: "💪"},
+                    {l:"Difficulté", v: "🟢"},
                     {l:"Arrosage", v: "💧💧"},
+                    {l:"Exposition", v: "☀️"},
+                    {l:"Taille", v: plant["Taille à maturité"]},
+                    {l:"Floraison", v: plant.Floraison || "-"},
                     {l:"Persistance", v: plant.Persistance},
-                    {l:"Taille Adulte", v: plant["Taille à maturité"]},
-                    {l:"Exposition", v: "☀️ Soleil"},
-                    {l:"Rusticité", v: plant.Rusticité}
+                    {l:"Rusticité", v: plant.Rusticité || "-"}
                 ];
 
                 document.getElementById('p-grid').innerHTML = fields.map(f => `
-                    <div class="info-box">
-                        <div class="label">${f.l}</div>
-                        <div class="value">${f.v || "-"}</div>
-                    </div>
+                    <div class="info-box"><div class="label">${f.l}</div><div class="value">${f.v || "-"}</div></div>
                 `).join('');
+
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('main-content').classList.add('loaded');
             }
         } catch(e) { console.error(e); }
     }
