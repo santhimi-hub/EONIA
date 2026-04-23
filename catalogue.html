@@ -133,6 +133,11 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
+// SÉCURITÉ : Cacher le loader si on revient en arrière avec le navigateur
+window.addEventListener('pageshow', function(event) {
+    document.getElementById('eonia-loader').style.display = 'none';
+});
+
 if (!userEmail) logout();
 if (isOwner) { document.getElementById('client-menu').style.display = 'flex'; }
 
@@ -213,7 +218,6 @@ function renderGrid() {
             if (plaqueAAssigner) {
                 if(confirm(`Assigner cette plaque à : ${nomAffiche} ?`)) { assignPlaque(p.id, nomAffiche); }
             } else {
-                // ACTIVER LE LOADER AVANT LA NAVIGATION
                 document.getElementById('eonia-loader').style.display = 'flex';
                 setTimeout(() => { window.location.href = `jardin.html?id=${p.id}`; }, 50);
             }
