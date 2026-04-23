@@ -3,233 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Mon Jardin & Collection</title>
+    <title>ÉONIA — Gestion Intelligente</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --blue: #00aaff; --purple: #a855f7; }
+        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --blue: #00aaff; --purple: #a855f7; --error: #ff4444; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* LOADER */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner-logo { width: 60px; height: 60px; margin-bottom: 20px; animation: spin 2s linear infinite; }
+        /* LOADER ET ÉTATS D'ERREUR */
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; }
+        .spinner-logo { width: 50px; height: 50px; margin-bottom: 20px; animation: spin 2s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: var(--accent); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
+        .error-msg { color: var(--error); text-align: center; display: none; padding: 20px; }
 
-        .container { max-width: 850px; margin: auto; padding: 20px 15px 100px; opacity: 0; transition: 0.5s; }
-        .container.loaded { opacity: 1; }
+        /* SKELETON UI (UX PREMIUM DURANT CHARGEMENT) */
+        .skeleton { background: linear-gradient(90deg, #0c0c0c 25%, #1a1a1a 50%, #0c0c0c 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 15px; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* NAVIGATION & HERO */
-        .nav-header { margin-bottom: 20px; }
-        .back-btn { display: inline-flex; align-items: center; border: 1px solid var(--accent); color: var(--accent); padding: 8px 18px; border-radius: 40px; text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
-        .hero-img { width: calc(100% + 40px); margin-left: -20px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--border); cursor: zoom-in; }
-        h1 { font-size: 2.2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
-        .sci-name { color: var(--accent); font-size: 0.9rem; font-style: italic; margin-bottom: 30px; opacity: 0.8; }
+        .container { max-width: 850px; margin: auto; padding: 20px 15px 100px; opacity: 0; }
+        .container.loaded { opacity: 1; transition: opacity 0.8s ease; }
 
-        /* BLOCS */
-        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; position: relative; }
-        .block-title { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        /* IMAGE HERO FORMAT PC / MOBILE */
+        .hero-wrapper { position: relative; width: calc(100% + 40px); margin-left: -20px; overflow: hidden; border-radius: 0 0 30px 30px; border: 1px solid var(--border); }
+        .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; cursor: zoom-in; }
 
-        /* INTERACTIFS */
-        .premium-only { display: none; }
-        .catalog-only { display: none; }
+        /* TOAST NOTIFICATION (REMPLACE ALERT JS) */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 0.8rem; z-index: 10000; opacity: 0; transition: 0.3s; pointer-events: none; }
 
-        /* GRAPHIQUE ARROSAGE AMÉLIORÉ */
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 60px; padding: 0 10px; margin-top: 15px; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .bar { width: 10px; background: #222; border-radius: 4px; height: 20%; transition: 0.3s; }
-        .bar.active { background: var(--blue); height: 80%; box-shadow: 0 0 10px rgba(0,170,255,0.4); }
-        .bar-wrapper:hover .bar { background: #444; }
-        .del-water { font-size: 10px; color: #ff4444; margin-top: 5px; opacity: 0; }
-        .bar-wrapper:hover .del-water { opacity: 1; }
+        /* GRAPHIQUE D'ARROSAGE PERSISTANT */
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 5px; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .bar { width: 100%; background: #1a1a1a; border-radius: 4px 4px 0 0; transition: height 0.5s ease, background 0.3s; cursor: pointer; }
+        .bar.active { background: var(--blue); box-shadow: 0 0 15px rgba(0,170,255,0.2); }
+        .bar-day { font-size: 0.5rem; color: #444; margin-top: 5px; text-transform: uppercase; }
 
-        /* GALERIE PHOTOS */
-        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .evo-photo { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
-        .evo-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-del { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; }
-
-        /* BOUTONS ACTIONS */
-        .btn-water { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--blue); color: var(--blue); border-radius: 15px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; cursor: pointer; }
-        .btn-notify { border: 1px solid var(--purple); color: var(--purple); background: none; width: 100%; padding: 15px; border-radius: 15px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; }
-        .btn-order { display: block; width: 100%; padding: 18px; background: var(--accent); color: #000; border-radius: 40px; font-weight: 700; text-transform: uppercase; text-align: center; text-decoration: none; font-size: 0.8rem; }
-        .btn-share { display: block; width: 100%; padding: 18px; background: #0c0c0c; border: 1px solid var(--border); color: #fff; border-radius: 40px; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; border: 1px solid var(--accent); }
-
+        /* DASHBOARD BLOCKS */
+        .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px; border-left: 3px solid var(--accent); }
+        
+        /* GALERIE */
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #080808; border: 1px solid var(--border); position: relative; }
+        .evo-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-primary { width: 100%; padding: 18px; border-radius: 40px; border: none; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn-water { background: transparent; border: 1px solid var(--blue); color: var(--blue); margin-bottom: 15px; }
+        .btn-share { background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-top: 20px; }
+
+        .premium-only, .catalog-only { display: none; }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
-    <div class="loading-text">Chargement...</div>
-</div>
+    <div id="toast">Action enregistrée</div>
 
-<div class="container" id="main-content">
-    <div class="nav-header"><a onclick="history.back()" class="back-btn" id="nav-btn-text">← RETOUR</a></div>
+    <div id="loader">
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo" alt="Logo Eonia">
+        <div class="loading-text" id="loader-status">Analyse de votre jardin...</div>
+        <div class="error-msg" id="error-display">Impossible de charger vos données. <br><br> <button onclick="location.reload()" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:10px; border-radius:20px;">Réessayer</button></div>
+    </div>
 
-    <div class="weather-section premium-only">
-        <div style="font-size: 0.65rem; color: #888;">📍 VILLE ? <span style="float:right; background:#1a1a1a; padding:4px 12px; border-radius:20px; color:#fff;">CHANGER</span></div>
-        <div class="weather-grid" id="weather-data">
+    <div class="container" id="app">
+        <div class="nav-header">
+            <button onclick="history.back()" class="btn-primary" style="width:auto; padding:8px 20px; font-size:0.6rem; background:none; border:1px solid var(--accent); color:var(--accent);">← RETOUR</button>
+        </div>
+
+        <div class="hero-wrapper">
+            <img id="p-photo" class="hero-img" loading="lazy" alt="Photo de la plante">
+        </div>
+
+        <h1 id="p-titre">...</h1>
+        <div id="p-sci" class="sci-name">...</div>
+
+        <div class="premium-only">
+            <div class="dash-block">
+                <div class="block-title">Score Santé Réel</div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div id="health-score" style="font-size: 2rem; font-weight: 100; color: var(--accent);">--</div>
+                    <div style="font-size:0.8rem; color:#666;">Basé sur l'arrosage et la météo locale.</div>
+                </div>
             </div>
-    </div>
 
-    <img id="p-photo" class="hero-img" onclick="toggleZoom(this)">
-    <h1 id="p-titre">...</h1>
-    <div id="p-sci" class="sci-name"></div>
+            <div class="dash-block">
+                <div class="block-title">Suivi d'arrosage (7 jours)</div>
+                <button class="btn-primary btn-water" onclick="syncAction('water')">💧 MARQUER COMME ARROSÉ</button>
+                <div class="graph-container" id="watering-graph">
+                    </div>
+            </div>
+        </div>
 
-    <div class="dash-block premium-only">
-        <div class="block-title">🌱 IA ÉONIA — SANTÉ</div>
-        <div style="display:flex; align-items:center;"><span style="width:12px; height:12px; background:var(--accent); border-radius:50%; margin-right:10px; box-shadow:0 0 10px var(--accent);"></span> Plante en pleine santé <span style="color:#555; margin-left:10px;">(85/100)</span></div>
-    </div>
+        <div class="info-grid" id="p-grid"></div>
 
-    <div class="dash-block premium-only">
-        <div class="block-title">CYCLE DE VIE ANNUEL</div>
-        <div style="height:8px; background:#1a1a1a; border-radius:10px; margin:15px 0;"><div id="cycle-bar" style="height:100%; background:var(--accent); border-radius:10px; width:35%;"></div></div>
-        <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:#666;"><span>Croissance active 🌱</span><span>35%</span></div>
-    </div>
+        <div class="dash-block">
+            <div class="block-title">Description & Conseil</div>
+            <p id="p-desc" style="color:#888; font-size:0.9rem; line-height:1.6;"></p>
+        </div>
 
-    <div class="dash-block premium-only">
-        <div class="block-title">ENTRETIEN & SUIVI</div>
-        <button class="btn-water" onclick="addWatering()">💧 MARQUER COMME ARROSÉ</button>
-        <div class="graph-container" id="watering-graph">
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar active"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar active"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar active"></div><span class="del-water">suppr.</span></div>
-            <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar"></div><span class="del-water">suppr.</span></div>
+        <div class="premium-only">
+            <div class="dash-block">
+                <div class="block-title">Galerie d'Évolution</div>
+                <div class="photo-grid" id="p-gallery"></div>
+                <button class="btn-primary" style="background:none; border:1px solid #333; color:#666; margin-top:15px; font-size:0.7rem;" onclick="document.getElementById('upload').click()">+ Ajouter une photo</button>
+                <input type="file" id="upload" hidden onchange="syncAction('upload', this)">
+            </div>
+            <button class="btn-primary btn-share" onclick="shareSocial()">✨ GÉNÉRER UNE CARTE DE PARTAGE</button>
+        </div>
+
+        <div class="catalog-only">
+            <a href="/commander" class="btn-primary" style="background:var(--accent); color:#000; text-decoration:none; display:block; text-align:center;">Commander ma plaque ÉONIA</a>
         </div>
     </div>
-
-    <div class="info-grid" id="p-grid"></div>
-
-    <div class="dash-block">
-        <div class="block-title" style="color:var(--accent)">Description</div>
-        <div id="p-desc" style="color:#999; font-size:0.85rem; line-height:1.6; font-weight:300;"></div>
-    </div>
-
-    <div class="dash-block premium-only">
-        <div class="block-title">ALERTE & RAPPEL</div>
-        <button class="btn-notify" onclick="setupReminder()">🔔 ACTIVER LES RAPPELS D'ARROSAGE</button>
-    </div>
-
-    <div class="artisan-tip premium-only">
-        <div class="artisan-label">Le geste de l'artisan — Avril</div>
-        <div id="p-tip" class="artisan-text">Surveillez l'apparition des premiers bourgeons et aérez le sol.</div>
-    </div>
-
-    <div class="dash-block premium-only">
-        <div class="block-title">PHOTOS D'ÉVOLUTION</div>
-        <div class="photo-grid" id="gallery">
-            <div class="evo-photo"><img src="https://via.placeholder.com/150" onclick="toggleZoom(this)"><button class="photo-del" onclick="this.parentElement.remove()">×</button></div>
-        </div>
-        <input type="file" id="add-photo-input" style="display:none" onchange="previewPhoto(event)">
-        <button style="width:100%; background:none; border:1px solid var(--accent); color:var(--accent); padding:12px; border-radius:12px; font-size:0.7rem; cursor:pointer;" onclick="document.getElementById('add-photo-input').click()">📁 AJOUTER UNE PHOTO</button>
-    </div>
-
-    <div class="catalog-only">
-        <a href="commander.html" class="btn-order">Commander ma plaque ÉONIA</a>
-    </div>
-    <button class="btn-share premium-only" onclick="sharePlant()">✨ PARTAGER MA PLANTE</button>
-</div>
 
 <script>
-    // --- LOGIQUE INTERACTIVE ---
-
-    function toggleZoom(img) {
-        if(img.style.transform === "scale(1.5)") {
-            img.style.transform = "scale(1)";
-            img.style.zIndex = "1";
-        } else {
-            img.style.transform = "scale(1.5)";
-            img.style.zIndex = "100";
-            img.style.transition = "0.3s";
-        }
-    }
-
-    function toggleBar(wrapper) {
-        wrapper.querySelector('.bar').classList.toggle('active');
-    }
-
-    function addWatering() {
-        alert("Arrosage enregistré pour aujourd'hui !");
-        const bars = document.querySelectorAll('.bar');
-        bars[bars.length - 1].classList.add('active');
-    }
-
-    function previewPhoto(event) {
-        const reader = new FileReader();
-        reader.onload = function() {
-            const div = document.createElement('div');
-            div.className = 'evo-photo';
-            div.innerHTML = `<img src="${reader.result}" onclick="toggleZoom(this)"><button class="photo-del" onclick="this.parentElement.remove()">×</button>`;
-            document.getElementById('gallery').appendChild(div);
-        }
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
-    function setupReminder() {
-        alert("Rappels activés ! Vous recevrez une notification tous les 3 jours.");
-    }
-
-    function sharePlant() {
-        if (navigator.share) {
-            navigator.share({ title: 'Mon Jardin Éonia', text: 'Regardez ma plante !', url: window.location.href });
-        } else {
-            alert("Lien copié dans le presse-papier !");
-        }
-    }
-
-    // --- CHARGEMENT API ---
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     const urlParams = new URLSearchParams(window.location.search);
-    const rawId = urlParams.get('id');
+    const plantId = urlParams.get('id');
 
-    async function load() {
+    // Sécurité : Rediriger si pas d'ID
+    if (!plantId) window.location.href = "/collection.html";
+
+    async function initApp() {
+        const token = localStorage.getItem('eonia_auth_token'); // JWT suggéré
+        
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ email: localStorage.getItem('user_email') || "invite@eonia.com", plantId: rawId }) 
+            const res = await fetch(`${API_URL}/plant-details`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ plantId })
             });
+
+            if (!res.ok) throw new Error("Erreur serveur");
             const data = await res.json();
-            const plant = data.find(x => x.id === rawId);
-            
-            if (plant) {
-                document.getElementById('p-photo').src = plant.Photo;
-                document.getElementById('p-titre').innerText = plant["Nom commun"];
-                document.getElementById('p-sci').innerText = plant["Nom scientifique"];
-                document.getElementById('p-desc').innerText = plant["Description"];
-
-                if (plant.est_dans_jardin) {
-                    document.getElementById('nav-btn-text').innerText = "← MON JARDIN";
-                    document.querySelectorAll('.premium-only').forEach(el => el.style.display = 'block');
-                } else {
-                    document.getElementById('nav-btn-text').innerText = "← NOTRE COLLECTION";
-                    document.querySelectorAll('.catalog-only').forEach(el => el.style.display = 'block');
-                }
-
-                const fields = [
-                    {l:"Famille", v: plant.Famille}, {l:"Type", v: plant.Type},
-                    {l:"Difficulté", v: "🟢"}, {l:"Arrosage", v: "💧💧"},
-                    {l:"Exposition", v: "☀️ Soleil"}, {l:"Taille", v: plant["Taille à maturité"]},
-                    {l:"Floraison", v: plant.Floraison || "-"}, {l:"Persistance", v: plant.Persistance},
-                    {l:"Rusticité", v: plant.Rusticité || "-"}
-                ];
-
-                document.getElementById('p-grid').innerHTML = fields.map(f => `
-                    <div class="info-box"><div class="label">${f.l}</div><div class="value">${f.v || "-"}</div></div>
-                `).join('');
-
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('main-content').classList.add('loaded');
-            }
-        } catch(e) { console.error(e); }
+            renderPlant(data);
+        } catch (err) {
+            document.getElementById('loader-status').style.display = 'none';
+            document.getElementById('error-display').style.display = 'block';
+        }
     }
-    load();
+
+    function renderPlant(plant) {
+        document.getElementById('p-photo').src = plant.Photo;
+        document.getElementById('p-titre').innerText = plant["Nom commun"] || "Plante Inconnue";
+        document.getElementById('p-sci').innerText = plant["Nom scientifique"];
+        document.getElementById('p-desc').innerText = plant.Description;
+
+        // Gestion Mode Premium vs Catalogue
+        if (plant.est_dans_jardin) {
+            document.querySelectorAll('.premium-only').forEach(el => el.style.display = 'block');
+            document.getElementById('health-score').innerText = plant.health_score + "%";
+            buildGraph(plant.watering_history);
+            renderGallery(plant.gallery);
+        } else {
+            document.querySelectorAll('.catalog-only').forEach(el => el.style.display = 'block');
+        }
+
+        // Grille Technique dynamique
+        const fields = [
+            {l: "Rusticité", v: plant.Rusticité},
+            {l: "Arrosage", v: plant.Arrosage_Icon}, // API renvoie "💧💧"
+            {l: "Exposition", v: plant.Exposition_Icon},
+            {l: "Difficulté", v: plant.Difficulté_Icon}
+        ];
+        document.getElementById('p-grid').innerHTML = fields.map(f => `
+            <div class="info-box"><div class="label">${f.l}</div><div class="value">${f.v || "-"}</div></div>
+        `).join('');
+
+        document.getElementById('loader').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app').classList.add('loaded');
+        }, 500);
+    }
+
+    function buildGraph(history = []) {
+        const container = document.getElementById('watering-graph');
+        const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        container.innerHTML = days.map((day, i) => `
+            <div class="bar-wrapper">
+                <div class="bar ${history.includes(i) ? 'active' : ''}" style="height: ${history.includes(i) ? '80%' : '20%'}"></div>
+                <div class="bar-day">${day}</div>
+            </div>
+        `).join('');
+    }
+
+    // GESTION DES ACTIONS (SYNC API RÉELLE)
+    async function syncAction(type, element = null) {
+        showToast("Synchronisation...");
+        
+        try {
+            // Ici, on envoie la vraie info au serveur (Cloudflare Worker + KV/D1)
+            const res = await fetch(`${API_URL}/sync-garden`, {
+                method: 'PUT',
+                body: JSON.stringify({ plantId, action: type, timestamp: Date.now() })
+            });
+            
+            if (res.ok) {
+                showToast(type === 'water' ? "Arrosage enregistré ✨" : "Photo ajoutée ✨");
+                // Optionnel : Re-fetch ou mise à jour locale de l'UI
+                if(type === 'water') addWateringVisual();
+            }
+        } catch (e) {
+            showToast("Erreur de connexion ⚠️");
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.opacity = '1';
+        setTimeout(() => t.style.opacity = '0', 3000);
+    }
+
+    function shareSocial() {
+        // Logique Web Share API
+        if (navigator.share) {
+            navigator.share({
+                title: 'Mon Jardin Éonia',
+                text: `Découvrez mon ${document.getElementById('p-titre').innerText} !`,
+                url: window.location.href
+            });
+        }
+    }
+
+    initApp();
 </script>
 </body>
 </html>
