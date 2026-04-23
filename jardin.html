@@ -4,260 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÉONIA — Notre Collection</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            font-family: 'Raleway', sans-serif; 
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; overflow-x: hidden; }
+
+        /* --- LOADER ÉONIA --- */
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .spinner-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .load-txt { font-size: 0.6rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; }
+
+        /* --- CONTENU PRINCIPAL --- */
+        #main-app { opacity: 0; transition: opacity 0.5s ease; }
+        #main-app.loaded { opacity: 1; }
+
+        .header { text-align: center; padding: 30px 20px; }
+        .logo-top { width: 50px; }
+        h1 { font-weight: 200; letter-spacing: 5px; margin-top: 10px; font-size: 1.5rem; }
+        .sub { color: var(--accent); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* TES FILTRES ET RECHERCHE EXISTANTS */
+        .search-area { padding: 0 20px; max-width: 600px; margin: 0 auto; }
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px 0; margin-bottom: 10px; }
+        .filter-item { padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.7rem; color: #888; white-space: nowrap; }
+        .filter-item.active { border-color: var(--accent); color: var(--accent); }
+
+        /* LA GRILLE */
+        .catalog-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; 
+            max-width: 900px; margin: 0 auto 100px;
         }
 
-        /* --- HEADER & RECHERCHE --- */
-        .header-container {
-            text-align: center;
-            padding: 40px 20px 20px;
+        /* --- LES BOUTONS FLOTTANTS (IA & TOP) --- */
+
+        /* IA CONSEILLÈRE (BAS GAUCHE) */
+        #ai-bubble {
+            position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px;
+            background: #000; border: 2px solid var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 5000; box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
         }
+        #ai-bubble img { width: 38px; }
 
-        .logo-main {
-            width: 50px;
-            margin-bottom: 15px;
+        #ai-chat-box {
+            display: none; position: fixed; bottom: 95px; left: 20px; width: 280px;
+            background: #0c0c0c; border: 1px solid var(--border); border-radius: 20px;
+            z-index: 5001; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
+        .ai-title { background: #1a1a1a; color: var(--accent); padding: 12px; font-size: 0.7rem; font-weight: bold; text-align: center; letter-spacing: 2px; }
+        .ai-body { padding: 15px; font-size: 0.8rem; color: #ccc; line-height: 1.5; }
+        .ai-link { margin-top: 10px; padding: 10px; background: #151515; border: 1px solid #222; border-radius: 10px; color: var(--accent); cursor: pointer; text-align: center; }
 
-        h1 {
-            font-weight: 200;
-            letter-spacing: 6px;
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: var(--accent);
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-        }
-
-        .search-wrapper {
-            position: sticky;
-            top: 10px;
-            z-index: 100;
-            padding: 0 15px;
-            margin-bottom: 30px;
-        }
-
-        .search-input {
-            width: 100%;
-            max-width: 600px;
-            display: block;
-            margin: 0 auto;
-            background: #111;
-            border: 1px solid var(--border);
-            padding: 15px 25px;
-            border-radius: 40px;
-            color: #fff;
-            font-family: inherit;
-            outline: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* --- GRILLE DE VIGNETTES --- */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            padding: 15px;
-            max-width: 800px;
-            margin: 0 auto 100px;
-        }
-
-        .plant-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.3s;
-        }
-
-        .plant-card:active { transform: scale(0.97); }
-
-        .plant-img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            display: block;
-            background: #111;
-        }
-
-        .plant-info { padding: 12px; text-align: center; }
-        
-        .plant-name {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* --- BULLE IA CONSEILLÈRE (BAS GAUCHE) --- */
-        #ai-catalog-bubble {
-            position: fixed;
-            bottom: 25px;
-            left: 20px;
-            width: 60px;
-            height: 60px;
-            background: #000;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 9999;
-            box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
-        }
-
-        #ai-catalog-bubble img { width: 38px; }
-
-        #ai-catalog-chat {
-            display: none;
-            position: fixed;
-            bottom: 95px;
-            left: 20px;
-            width: 280px;
-            background: #0c0c0c;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            z-index: 9999;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .ai-header {
-            background: #1a1a1a;
-            color: var(--accent);
-            padding: 12px;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            font-weight: bold;
-            text-align: center;
-            border-bottom: 1px solid #222;
-        }
-
-        .ai-content { padding: 15px; font-size: 0.8rem; color: #ccc; line-height: 1.5; }
-
-        .ai-btn {
-            margin-top: 10px;
-            padding: 10px;
-            background: #151515;
-            border: 1px solid #222;
-            border-radius: 10px;
-            color: var(--accent);
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-align: center;
-        }
-
-        .ai-btn:hover { background: var(--accent); color: #000; }
-
-        /* --- BOUTON RETOUR EN HAUT (BAS DROITE) --- */
-        #backToTop {
-            display: none;
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 9998;
-            font-size: 1.3rem;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        /* BOUTON TOP (BAS DROITE) */
+        #back-to-top {
+            display: none; position: fixed; bottom: 25px; right: 20px; width: 50px; height: 50px;
+            background: var(--accent); color: #000; border: none; border-radius: 50%;
+            cursor: pointer; z-index: 5000; font-size: 1.3rem; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Eonia">
-        <h1>ÉONIA</h1>
-        <p class="subtitle">Notre Collection</p>
+    <div id="loader">
+        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
+        <div class="load-txt">Chargement...</div>
     </div>
 
-    <div class="search-wrapper">
-        <input type="text" id="searchInput" class="search-input" placeholder="RECHERCHER PARMI 500 ESPÈCES...">
-    </div>
-
-    <div class="catalog-grid" id="catalogList">
+    <div id="main-app">
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-top">
+            <h1>ÉONIA</h1>
+            <div class="sub">Notre Collection</div>
         </div>
 
-    <div id="ai-catalog-bubble" onclick="toggleAIChat()">
-        <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" alt="Eonia Logo">
-    </div>
-
-    <div id="ai-catalog-chat">
-        <div class="ai-header">ASSISTANT ÉONIA</div>
-        <div class="ai-content" id="aiContent">
-            <p>Bonjour ! Je suis là pour vous guider dans le catalogue ÉONIA.</p>
-            <div class="ai-btn" onclick="aiAction('choisir')">🔍 Comment bien choisir ?</div>
-            <div class="ai-btn" onclick="aiAction('commander')">🛒 Comment commander ?</div>
+        <div class="search-area">
+            <input type="text" id="mainSearch" style="width:100%; padding:15px 25px; border-radius:40px; background:#111; border:1px solid #222; color:#fff; outline:none;" placeholder="RECHERCHER UNE PLANTE...">
+            
+            <div class="filter-bar">
+                <div class="filter-item active">TOUT</div>
+                <div class="filter-item">FRUITIERS</div>
+                <div class="filter-item">ARBRES</div>
+                <div class="filter-item">FLEURS</div>
+                <div class="filter-item">INTÉRIEUR</div>
+            </div>
         </div>
+
+        <div class="catalog-grid" id="plantGrid">
+            </div>
+
+        <div id="ai-bubble" onclick="toggleChat()">
+            <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+        </div>
+        <div id="ai-chat-box">
+            <div class="ai-title">ASSISTANT ÉONIA</div>
+            <div class="ai-body" id="aiContent">
+                <p>Besoin d'un conseil pour choisir votre plante parmi nos 500 espèces ?</p>
+                <div class="ai-link" onclick="aiTalk('filtre')">🔍 Comment filtrer ?</div>
+                <div class="ai-link" onclick="aiTalk('commande')">🛒 Commander une plaque</div>
+            </div>
+        </div>
+
+        <button id="back-to-top" onclick="scrollToTop()">↑</button>
     </div>
 
-    <button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+    // 1. GESTION DU CHARGEMENT
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('main-app').classList.add('loaded');
+        }, 1000);
+    });
 
-    <script>
-        // --- LOGIQUE DE L'ASSISTANT ---
-        function toggleAIChat() {
-            const win = document.getElementById('ai-catalog-chat');
-            win.style.display = (win.style.display === 'block') ? 'none' : 'block';
+    // 2. GESTION DE LA BULLE IA
+    function toggleChat() {
+        const box = document.getElementById('ai-chat-box');
+        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function aiTalk(topic) {
+        const content = document.getElementById('aiContent');
+        if(topic === 'filtre') {
+            content.innerHTML = "<p>Utilisez les boutons (Fruitiers, Arbres...) juste au-dessus de la liste pour affiner votre recherche !</p>";
+        } else {
+            content.innerHTML = "<p>Cliquez sur la plante qui vous plaît, vous trouverez le bouton de commande sur sa fiche détaillée.</p>";
         }
+        content.innerHTML += '<div class="ai-link" style="margin-top:10px; opacity:0.5;" onclick="location.reload()">Retour</div>';
+    }
 
-        function aiAction(type) {
-            const content = document.getElementById('aiContent');
-            if(type === 'choisir') {
-                content.innerHTML = "<p>Utilisez la barre de recherche en haut ou nos filtres par catégories pour trouver la plante idéale pour votre environnement.</p>";
-            } else {
-                content.innerHTML = "<p>Cliquez sur la plante de votre choix, puis sur le bouton 'Commander' pour obtenir votre plaque ÉONIA.</p>";
-            }
-            content.innerHTML += '<div class="ai-btn" style="margin-top:15px; background:transparent; border-color:#444;" onclick="resetAI()">← Retour</div>';
+    // 3. BOUTON TOP
+    const topBtn = document.getElementById("back-to-top");
+    window.onscroll = function() {
+        if (window.pageYOffset > 400) {
+            topBtn.style.display = "block";
+        } else {
+            topBtn.style.display = "none";
         }
+    };
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        function resetAI() {
-            document.getElementById('aiContent').innerHTML = `
-                <p>Bonjour ! Je suis là pour vous guider dans le catalogue ÉONIA.</p>
-                <div class="ai-btn" onclick="aiAction('choisir')">🔍 Comment bien choisir ?</div>
-                <div class="ai-btn" onclick="aiAction('commander')">🛒 Comment commander ?</div>
-            `;
-        }
+    // --- ICI TU GARDES TA LOGIQUE DE RECHERCHE ET DE CHARGEMENT API ---
+</script>
 
-        // --- GESTION DU RETOUR EN HAUT ---
-        const topBtn = document.getElementById("backToTop");
-        window.onscroll = function() {
-            if (window.pageYOffset > 400) {
-                topBtn.style.display = "block";
-            } else {
-                topBtn.style.display = "none";
-            }
-        };
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // --- TON SCRIPT DE CHARGEMENT API ICI ---
-        // Ex: loadCatalog();
-    </script>
 </body>
 </html>
