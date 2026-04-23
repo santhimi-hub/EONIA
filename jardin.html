@@ -18,38 +18,38 @@
         .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
+        /* WEATHER */
         .weather-bar { display: flex; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 25px; }
         .weather-item { text-align: center; flex: 1; }
-        .weather-item span { display: block; font-size: 0.55rem; font-weight: 600; margin-bottom: 5px; color: #888; }
-        .weather-item b { display: block; font-size: 0.7rem; margin-top: 5px; color: #fff; }
-        .weather-item img { width: 22px; margin: 0 auto; }
+        .weather-item span { display: block; font-size: 0.55rem; color: #888; margin-bottom: 5px; }
+        .weather-item b { font-size: 0.7rem; }
 
+        /* HERO */
         .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
-        .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
+        .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
 
-        h1 { font-size: 2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
-        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
+        h1 { font-size: 2rem; font-weight: 200; text-transform: uppercase; }
+        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-bottom: 20px; }
 
+        /* INFO */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
-        .info-box { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; transition: 0.3s; }
-        .info-box.liseret { border-left: 3px solid var(--accent); }
-        .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
-        .value { font-size: 0.85rem; color: #eee; min-height: 1.2rem; }
+        .info-box { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; }
+        .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; }
+        .value { font-size: 0.85rem; }
 
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; cursor: pointer; }
-        .bar { width: 100%; background: #1a1a1a; border-radius: 4px; height: 15%; transition: 0.3s; }
-        .bar.active { background: var(--blue); height: 85%; box-shadow: 0 0 10px rgba(0,170,255,0.4); }
-        .bar-date { font-size: 0.5rem; color: #444; margin-top: 5px; }
-
+        /* DASH BLOCK */
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        .block-title { font-size: 0.6rem; color: var(--accent); margin-bottom: 15px; letter-spacing: 2px; }
 
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; font-size: 0.85rem; margin-top: 5px; }
+        /* GRAPH */
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .bar { width: 100%; height: 15%; background: #1a1a1a; border-radius: 4px; }
+        .bar.active { background: var(--blue); height: 85%; }
 
-        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; text-decoration: none; display: block; text-align: center; }
-
+        /* PHOTO */
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #111; }
+        .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
         .evo-photo img { width: 100%; height: 100%; object-fit: cover; }
 
         .mon-jardin-only, .collection-only { display: none; }
@@ -59,21 +59,71 @@
 
 <div id="loader">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
-    <div class="load-txt">Téléchargement...</div>
+    <div class="load-txt">Chargement...</div>
 </div>
 
 <div class="container" id="app">
 
-    <button onclick="history.back()" class="btn-main">← RETOUR</button>
+    <!-- RETOUR -->
+    <button onclick="history.back()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:8px 18px;border-radius:40px;margin-bottom:20px;cursor:pointer;">
+        ← RETOUR
+    </button>
 
-    <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
-    <h1 id="p-titre">...</h1>
-    <div id="p-sci" class="sci-name">...</div>
+    <!-- MÉTÉO -->
+    <div class="weather-bar mon-jardin-only">
+        <div class="weather-item"><span>AUJOURD'HUI</span><b>☀️ 27°</b></div>
+        <div class="weather-item"><span>J+1</span><b>🌤️ 26°</b></div>
+        <div class="weather-item"><span>J+2</span><b>🌧️ 24°</b></div>
+        <div class="weather-item"><span>J+3</span><b>☀️ 28°</b></div>
+    </div>
 
+    <!-- HERO -->
+    <div class="hero-wrapper">
+        <img id="p-photo" class="hero-img">
+    </div>
+
+    <h1 id="p-titre"></h1>
+    <div class="sci-name" id="p-sci"></div>
+
+    <!-- SANTÉ / CYCLE -->
+    <div class="mon-jardin-only dash-block">
+        <div class="block-title">IA ÉONIA — SANTÉ</div>
+        🌱 Santé globale : 85/100
+    </div>
+
+    <div class="mon-jardin-only dash-block">
+        <div class="block-title">CYCLE DE VIE</div>
+        <div style="height:6px;background:#222;border-radius:10px;">
+            <div style="width:40%;height:100%;background:var(--accent);border-radius:10px;"></div>
+        </div>
+    </div>
+
+    <!-- ARROSAGE -->
+    <div class="mon-jardin-only dash-block">
+        <div class="block-title">ARROSAGE</div>
+        <div class="graph-container" id="graph"></div>
+    </div>
+
+    <!-- INFOS -->
     <div class="info-grid" id="p-grid"></div>
 
+    <!-- DESCRIPTION -->
     <div class="dash-block">
-        <p id="p-desc"></p>
+        <div class="block-title">DESCRIPTION</div>
+        <div id="p-desc" style="color:#aaa"></div>
+    </div>
+
+    <!-- GALERIE -->
+    <div class="mon-jardin-only dash-block">
+        <div class="block-title">GALERIE</div>
+        <div class="photo-grid" id="gallery"></div>
+    </div>
+
+    <!-- COMMANDE -->
+    <div class="collection-only">
+        <a href="commander.html" style="display:block;text-align:center;padding:15px;background:var(--accent);color:#000;border-radius:40px;text-decoration:none;">
+            Commander ma plaque
+        </a>
     </div>
 
 </div>
@@ -83,54 +133,56 @@ const API_URL = "https://eonia-api.santhimi.workers.dev";
 const plantId = new URLSearchParams(window.location.search).get('id');
 
 async function load() {
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET' // ✅ UNIQUE AJOUT
-            },
-            body: JSON.stringify({ 
-                plantId, 
-                email: localStorage.getItem('user_email') || "invite@eonia.com" 
-            })
-        });
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': 'EONIA_2026_SECRET'
+        },
+        body: JSON.stringify({
+            plantId,
+            email: localStorage.getItem('user_email') || "invite@eonia.com"
+        })
+    });
 
-        const data = await res.json();
-        const p = data.find(item => item.id === plantId);
+    const data = await res.json();
+    const p = data.find(x => x.id === plantId);
 
-        if (p) {
-            document.getElementById('p-photo').src = p.Photo;
-            document.getElementById('p-titre').innerText = p["Nom commun"];
-            document.getElementById('p-sci').innerText = p["Nom scientifique"];
-            document.getElementById('p-desc').innerText = p.Description;
+    if (!p) return;
 
-            const cols = [
-                {n:"Famille", v:p.Famille},
-                {n:"Type", v:p.Type},
-                {n:"Floraison", v:p.Floraison},
-                {n:"Difficulté", v:p.Difficulté},
-                {n:"Arrosage", v:p.Arrosage},
-                {n:"Exposition", v:p.Exposition},
-                {n:"Taille", v:p["Taille à maturité"]},
-                {n:"Persistance", v:p.Persistance},
-                {n:"Rusticité", v:p.Rusticité}
-            ];
+    document.getElementById('p-photo').src = p.Photo;
+    document.getElementById('p-titre').innerText = p["Nom commun"];
+    document.getElementById('p-sci').innerText = p["Nom scientifique"];
+    document.getElementById('p-desc').innerText = p.Description;
 
-            document.getElementById('p-grid').innerHTML = cols.map(c => `
-                <div class="info-box">
-                    <div class="label">${c.n}</div>
-                    <div class="value">${c.v || "-"}</div>
-                </div>
-            `).join('');
+    const cols = [
+        {n:"Famille",v:p.Famille},
+        {n:"Type",v:p.Type},
+        {n:"Exposition",v:p.Exposition},
+        {n:"Arrosage",v:p.Arrosage},
+        {n:"Taille",v:p["Taille à maturité"]},
+        {n:"Rusticité",v:p.Rusticité}
+    ];
 
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('app').classList.add('loaded');
-        }
+    document.getElementById('p-grid').innerHTML = cols.map(c => `
+        <div class="info-box">
+            <div class="label">${c.n}</div>
+            <div class="value">${c.v||"-"}</div>
+        </div>
+    `).join('');
 
-    } catch(e) {
-        console.error(e);
-    }
+    document.getElementById('graph').innerHTML =
+        [1,0,1,0,1,1,0].map(v => `
+            <div class="bar-wrapper">
+                <div class="bar ${v?'active':''}"></div>
+            </div>
+        `).join('');
+
+    document.getElementById('loader').style.display = "none";
+    document.getElementById('app').classList.add('loaded');
+
+    document.querySelectorAll('.mon-jardin-only').forEach(e=>e.style.display='block');
+    document.querySelectorAll('.collection-only').forEach(e=>e.style.display='block');
 }
 
 load();
