@@ -43,13 +43,10 @@
         .bar-date { font-size: 0.5rem; color: #444; margin-top: 5px; }
 
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
 
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; font-size: 0.85rem; margin-top: 5px; outline: none; }
+        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; font-size: 0.85rem; margin-top: 5px; }
 
         .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; text-decoration: none; display: block; text-align: center; }
-        .btn-blue { border-color: var(--blue); color: var(--blue); }
-        .btn-save { background: var(--accent); color: #000; border: none; margin-top: 15px; }
 
         .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .evo-photo { aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #111; }
@@ -66,6 +63,7 @@
 </div>
 
 <div class="container" id="app">
+
     <button onclick="history.back()" class="btn-main">← RETOUR</button>
 
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
@@ -75,39 +73,22 @@
     <div class="info-grid" id="p-grid"></div>
 
     <div class="dash-block">
-        <div class="block-title">INFORMATIONS GÉNÉRALES</div>
         <p id="p-desc"></p>
     </div>
+
 </div>
 
 <script>
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const plantId = new URLSearchParams(window.location.search).get('id');
 
-// ✅ sécurité ID
-if (!plantId || plantId.length > 50) {
-    document.body.innerHTML = "Erreur : plante invalide";
-    throw new Error("Invalid plantId");
-}
-
-// ✅ anti double load
-let loading = false;
-
-// ✅ protection HTML
-function safe(val) {
-    return String(val || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 async function load() {
-    if (loading) return;
-    loading = true;
-
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET'
+                'x-api-key': 'EONIA_2026_SECRET' // ✅ UNIQUE AJOUT
             },
             body: JSON.stringify({ 
                 plantId, 
@@ -119,10 +100,10 @@ async function load() {
         const p = data.find(item => item.id === plantId);
 
         if (p) {
-            document.getElementById('p-photo').src = p.Photo || "";
-            document.getElementById('p-titre').innerText = p["Nom commun"] || "Plante inconnue";
-            document.getElementById('p-sci').innerText = p["Nom scientifique"] || "";
-            document.getElementById('p-desc').innerText = p.Description || "";
+            document.getElementById('p-photo').src = p.Photo;
+            document.getElementById('p-titre').innerText = p["Nom commun"];
+            document.getElementById('p-sci').innerText = p["Nom scientifique"];
+            document.getElementById('p-desc').innerText = p.Description;
 
             const cols = [
                 {n:"Famille", v:p.Famille},
@@ -138,20 +119,17 @@ async function load() {
 
             document.getElementById('p-grid').innerHTML = cols.map(c => `
                 <div class="info-box">
-                    <div class="label">${safe(c.n)}</div>
-                    <div class="value">${safe(c.v)}</div>
+                    <div class="label">${c.n}</div>
+                    <div class="value">${c.v || "-"}</div>
                 </div>
             `).join('');
 
             document.getElementById('loader').style.display = 'none';
             document.getElementById('app').classList.add('loaded');
-        } else {
-            document.getElementById('loader').innerHTML = "Plante introuvable";
         }
 
     } catch(e) {
         console.error(e);
-        document.getElementById('loader').innerHTML = "⚠️ Erreur de chargement";
     }
 }
 
