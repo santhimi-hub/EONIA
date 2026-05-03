@@ -86,6 +86,7 @@
 
 <div class="label">Longitude</div>
 <input type="text" id="lonInput" placeholder="ex : 2.3522">
+        <button class="btn-main" onclick="getLocation()">📍 UTILISER MA POSITION</button>
 
 <button class="btn-main" onclick="saveLocation()">📍 ENREGISTRER MA POSITION</button>
         <div class="block-title">SUIVI D'ARROSAGE</div>
@@ -190,8 +191,8 @@
   async function loadWeather() {
     try {
         // ⚠️ tu peux changer la ville ici (Paris par défaut)
-       const lat = localStorage.getItem("eonia_lat") || 48.8566;
-const lon = localStorage.getItem("eonia_lon") || 2.3522;
+       const lat = parseFloat(localStorage.getItem("eonia_lat")) || 48.8566;
+const lon = parseFloat(localStorage.getItem("eonia_lon")) || 2.3522;
 
 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`;
 
@@ -237,6 +238,23 @@ const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${
 
     alert("Position enregistrée !");
     loadWeather();
+}
+    function getLocation() {
+    navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        document.getElementById("latInput").value = lat;
+        document.getElementById("lonInput").value = lon;
+
+        localStorage.setItem("eonia_lat", lat);
+        localStorage.setItem("eonia_lon", lon);
+
+        loadWeather(); // recharge météo
+        alert("Position détectée !");
+    }, () => {
+        alert("Impossible de récupérer la position");
+    });
 }
 </script>
 </body>
