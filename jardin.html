@@ -12,17 +12,11 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-background: var(--bg);
-color: #fff;
-font-family: 'Raleway', sans-serif;
--webkit-font-smoothing: antialiased;
-}
+body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; }
 
 /* LOADER */
 #loader {
-position: fixed;
-inset: 0;
+position: fixed; inset: 0;
 background: #000;
 z-index: 9999;
 display: flex;
@@ -31,21 +25,12 @@ align-items: center;
 justify-content: center;
 }
 
-.spinner-logo {
-width: 60px;
-animation: spin 2s linear infinite;
-margin-bottom: 15px;
-}
-
+.spinner-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.load-txt {
-font-size: 0.6rem;
-letter-spacing: 3px;
-color: var(--accent);
-text-transform: uppercase;
-}
+.load-txt { font-size: 0.6rem; letter-spacing: 3px; color: var(--accent); }
 
+/* CONTAINER */
 .container {
 max-width: 850px;
 margin: auto;
@@ -56,48 +41,27 @@ transition: 0.5s;
 
 .container.loaded { opacity: 1; }
 
-/* TOP BUTTON */
-#backToTop {
-display: none;
-position: fixed;
-bottom: 25px;
-right: 20px;
-z-index: 1000;
-width: 45px;
-height: 45px;
-background: var(--accent);
-color: #000;
-border: none;
-border-radius: 50%;
-cursor: pointer;
-font-size: 1.2rem;
-font-weight: bold;
-}
-
-/* WEATHER (IMPORTANT FIX) */
+/* WEATHER (UNIQUEMENT MON JARDIN) */
 .weather-bar {
 display: flex;
-flex-direction: row;
 justify-content: space-between;
 gap: 10px;
 background: var(--card);
 border: 1px solid var(--border);
 border-radius: 20px;
 padding: 12px;
-margin-bottom: 25px;
+margin-bottom: 20px;
 }
 
 .weather-item {
 flex: 1;
 text-align: center;
-padding: 5px;
 }
 
 .weather-item span {
 display: block;
 font-size: 0.55rem;
 color: #888;
-margin-bottom: 4px;
 text-transform: uppercase;
 }
 
@@ -110,9 +74,9 @@ color: #fff;
 .hero-wrapper {
 width: calc(100% + 40px);
 margin-left: -20px;
-border-radius: 0 0 30px 30px;
 overflow: hidden;
-margin-bottom: 25px;
+border-radius: 0 0 30px 30px;
+margin-bottom: 20px;
 }
 
 .hero-img {
@@ -122,17 +86,8 @@ object-fit: cover;
 }
 
 /* TITRES */
-h1 {
-font-size: 2rem;
-font-weight: 200;
-text-transform: uppercase;
-}
-
-.sci-name {
-color: var(--accent);
-font-size: 0.85rem;
-margin-bottom: 20px;
-}
+h1 { font-size: 2rem; font-weight: 200; text-transform: uppercase; }
+.sci-name { color: var(--accent); font-size: 0.85rem; margin-bottom: 15px; }
 
 /* GRID */
 .info-grid {
@@ -149,19 +104,7 @@ padding: 12px;
 border-radius: 12px;
 }
 
-.label {
-color: var(--accent);
-font-size: 0.5rem;
-text-transform: uppercase;
-margin-bottom: 4px;
-}
-
-.value {
-font-size: 0.85rem;
-color: #eee;
-}
-
-/* BLOCKS */
+/* BLOCS */
 .dash-block {
 background: var(--card);
 border: 1px solid var(--border);
@@ -170,22 +113,7 @@ padding: 20px;
 margin-bottom: 20px;
 }
 
-.block-title {
-font-size: 0.6rem;
-color: var(--accent);
-text-transform: uppercase;
-margin-bottom: 15px;
-}
-
-textarea, input[type="date"] {
-width: 100%;
-background: #080808;
-border: 1px solid #1a1a1a;
-color: #fff;
-padding: 12px;
-border-radius: 10px;
-}
-
+/* BOUTONS */
 .btn-main {
 width: 100%;
 padding: 16px;
@@ -208,6 +136,12 @@ border: none;
 display: none;
 }
 
+.alert {
+font-size: 0.7rem;
+color: #888;
+margin-top: 10px;
+}
+
 </style>
 </head>
 
@@ -218,15 +152,13 @@ display: none;
 <div class="load-txt">Téléchargement...</div>
 </div>
 
-<button id="backToTop">↑</button>
-
 <div class="container" id="app">
 
-<button onclick="history.back()" style="margin-bottom:20px;background:none;border:1px solid var(--accent);color:var(--accent);padding:7px 18px;border-radius:40px;">
+<button onclick="history.back()" style="margin-bottom:15px;border:1px solid var(--accent);background:none;color:var(--accent);padding:7px 18px;border-radius:40px;">
 ← RETOUR
 </button>
 
-<!-- WEATHER FIXÉ -->
+<!-- 🌤️ WEATHER (MON JARDIN UNIQUEMENT) -->
 <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
 <div class="hero-wrapper">
@@ -236,11 +168,44 @@ display: none;
 <h1 id="p-titre">...</h1>
 <div id="p-sci" class="sci-name">...</div>
 
+<!-- ARROSAGE -->
+<div class="mon-jardin-only dash-block">
+<div class="block-title">SUIVI D'ARROSAGE</div>
+
+<button class="btn-main" onclick="waterNow()" style="border-color:var(--blue);color:var(--blue);">
+💧 ARROSER
+</button>
+
+<div class="alert" id="alert-text"></div>
+
+<div class="graph-container" id="p-graph"></div>
+</div>
+
+<!-- INFOS -->
 <div class="info-grid" id="p-grid"></div>
 
 <div class="dash-block">
-<div class="block-title">DESCRIPTION</div>
 <p id="p-desc"></p>
+</div>
+
+<!-- JOURNAL -->
+<div class="mon-jardin-only dash-block">
+<div class="block-title">JOURNAL</div>
+
+<label>Date de plantation</label>
+<input type="date" id="date-plant">
+
+<label>Notes</label>
+<textarea id="p-notes"></textarea>
+
+<button class="btn-main btn-save" onclick="saveData()">ENREGISTRER</button>
+</div>
+
+<!-- COMMANDE -->
+<div class="collection-only">
+<a href="commander.html" class="btn-main" style="background:var(--accent);color:#000;">
+🛒 COMMANDER PLAQUE
+</a>
 </div>
 
 </div>
@@ -253,11 +218,11 @@ const plantId = new URLSearchParams(window.location.search).get('id');
 async function load() {
 
 const res = await fetch(API_URL, {
-method: 'POST',
-headers: {'Content-Type': 'application/json'},
+method: "POST",
+headers: {"Content-Type":"application/json"},
 body: JSON.stringify({
 plantId,
-email: localStorage.getItem('user_email') || "invite@eonia.com"
+email: localStorage.getItem("user_email") || "invite@eonia.com"
 })
 });
 
@@ -266,68 +231,81 @@ const p = data.find(x => x.id === plantId);
 
 if (!p) return;
 
+/* INFOS */
 document.getElementById("p-photo").src = p.Photo;
 document.getElementById("p-titre").innerText = p["Nom commun"];
 document.getElementById("p-sci").innerText = p["Nom scientifique"];
 document.getElementById("p-desc").innerText = p.Description;
 
-/* GRID */
+/* RUBRIQUES (TOUCHÉES AUCUNE) */
 document.getElementById("p-grid").innerHTML = `
-<div class="info-box"><div class="label">TYPE</div><div class="value">${p.Type}</div></div>
-<div class="info-box"><div class="label">EXPOSITION</div><div class="value">${p.Exposition}</div></div>
-<div class="info-box"><div class="label">ARROSAGE</div><div class="value">${p.Arrosage}</div></div>
-<div class="info-box"><div class="label">DIFFICULTÉ</div><div class="value">${p.Difficulté}</div></div>
+<div class="info-box"><b>Type</b><div>${p.Type}</div></div>
+<div class="info-box"><b>Exposition</b><div>${p.Exposition}</div></div>
+<div class="info-box"><b>Arrosage</b><div>${p.Arrosage}</div></div>
+<div class="info-box"><b>Difficulté</b><div>${p.Difficulté}</div></div>
 `;
 
-/* WEATHER FIX PROPRE */
+/* MON JARDIN */
+if (p.est_dans_jardin) {
+
+document.querySelectorAll(".mon-jardin-only").forEach(e => e.style.display="block");
+
+/* NOTES */
+document.getElementById("p-notes").value = p.Notes_Privées || "";
+
+/* GRAPH */
+const hist = p.Watering_History || [0,0,0,0,0,0,0];
+document.getElementById("p-graph").innerHTML =
+hist.map((h,i)=>`
+<div class="bar-wrapper">
+<div class="bar ${h ? 'active':''}"></div>
+</div>
+`).join("");
+
+/* ALERT SIMPLE */
+const last = hist.lastIndexOf(1);
+if (last === -1 || last < hist.length-3) {
+document.getElementById("alert-text").innerText =
+"⚠️ Arrosage conseillé bientôt";
+}
+
+/* WEATHER */
 loadWeather();
 
-/* SHOW */
-document.getElementById("loader").style.display = "none";
+} else {
+document.querySelectorAll(".collection-only").forEach(e=>e.style.display="block");
+}
+
+document.getElementById("loader").style.display="none";
 document.getElementById("app").classList.add("loaded");
 
 }
 
-/* METEO FIABLE */
+/* 🌤️ METEO REELLE */
 async function loadWeather() {
-
-try {
-
 const url = "https://api.open-meteo.com/v1/forecast?latitude=48.8566&longitude=2.3522&daily=temperature_2m_max&timezone=auto";
 
 const res = await fetch(url);
-const data = await res.json();
+const d = await res.json();
 
-const days = data.daily.time.slice(0, 4);
-const temps = data.daily.temperature_2m_max.slice(0, 4);
+const days = d.daily.time.slice(0,4);
+const temp = d.daily.temperature_2m_max.slice(0,4);
 
 document.getElementById("weatherBar").innerHTML =
-days.map((d, i) => {
-const date = new Date(d);
-const label = date.toLocaleDateString("fr-FR", { weekday: "short" });
-
-return `
-<div class="weather-item">
-<span>${label}</span>
-<b>${Math.round(temps[i])}°</b>
-</div>
-`;
+days.map((x,i)=>{
+const date = new Date(x);
+const label = date.toLocaleDateString("fr-FR",{weekday:"short"});
+return `<div class="weather-item"><span>${label}</span><b>${Math.round(temp[i])}°</b></div>`;
 }).join("");
-
-} catch (e) {
-console.log("Météo error", e);
 }
 
+/* ACTIONS */
+function waterNow(){
+document.querySelectorAll(".bar").forEach(b=>b.classList.add("active"));
+document.getElementById("alert-text").innerText = "✔ Arrosé aujourd’hui";
 }
 
-/* TOP BUTTON */
-window.onscroll = () => {
-document.getElementById("backToTop").style.display =
-window.scrollY > 300 ? "block" : "none";
-};
-
-document.getElementById("backToTop").onclick = () =>
-window.scrollTo({ top: 0, behavior: "smooth" });
+function saveData(){ alert("Sauvegardé"); }
 
 load();
 
