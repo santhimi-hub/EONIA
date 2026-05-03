@@ -81,14 +81,7 @@
     <div id="p-sci" class="sci-name">...</div>
 
     <div class="mon-jardin-only dash-block">
-        <div class="label">Latitude</div>
-<input type="text" id="latInput" placeholder="ex : 48.8566">
-
-<div class="label">Longitude</div>
-<input type="text" id="lonInput" placeholder="ex : 2.3522">
-        <button class="btn-main" onclick="getLocation()">📍 UTILISER MA POSITION</button>
-
-<button class="btn-main" onclick="saveLocation()">📍 ENREGISTRER MA POSITION</button>
+       <button class="btn-main" onclick="getLocation()">📍 ME GÉOLOCALISER</button>
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
         <div class="graph-container" id="p-graph"></div>
@@ -191,8 +184,13 @@
   async function loadWeather() {
     try {
         // ⚠️ tu peux changer la ville ici (Paris par défaut)
-       const lat = parseFloat(localStorage.getItem("eonia_lat")) || 48.8566;
-const lon = parseFloat(localStorage.getItem("eonia_lon")) || 2.3522;
+      let lat = parseFloat(localStorage.getItem("eonia_lat"));
+let lon = parseFloat(localStorage.getItem("eonia_lon"));
+
+if (!lat || !lon) {
+    lat = 48.8566;
+    lon = 2.3522;
+}
 
 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`;
 
@@ -229,31 +227,20 @@ const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${
         console.log("Erreur météo", e);
     }
 }
-    function saveLocation() {
-    const lat = document.getElementById("latInput").value;
-    const lon = document.getElementById("lonInput").value;
-
-    localStorage.setItem("eonia_lat", lat);
-    localStorage.setItem("eonia_lon", lon);
-
-    alert("Position enregistrée !");
-    loadWeather();
-}
     function getLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
+
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-
-        document.getElementById("latInput").value = lat;
-        document.getElementById("lonInput").value = lon;
 
         localStorage.setItem("eonia_lat", lat);
         localStorage.setItem("eonia_lon", lon);
 
-        loadWeather(); // recharge météo
-        alert("Position détectée !");
+        loadWeather();
+
+        alert("📍 Position enregistrée !");
     }, () => {
-        alert("Impossible de récupérer la position");
+        alert("Impossible d'obtenir la position");
     });
 }
 </script>
