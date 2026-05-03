@@ -81,6 +81,13 @@
     <div id="p-sci" class="sci-name">...</div>
 
     <div class="mon-jardin-only dash-block">
+        <div class="label">Latitude</div>
+<input type="text" id="latInput" placeholder="ex : 48.8566">
+
+<div class="label">Longitude</div>
+<input type="text" id="lonInput" placeholder="ex : 2.3522">
+
+<button class="btn-main" onclick="saveLocation()">📍 ENREGISTRER MA POSITION</button>
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
         <div class="graph-container" id="p-graph"></div>
@@ -183,7 +190,10 @@
   async function loadWeather() {
     try {
         // ⚠️ tu peux changer la ville ici (Paris par défaut)
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=48.8566&longitude=2.3522&daily=temperature_2m_max,weathercode&timezone=auto";
+       const lat = localStorage.getItem("eonia_lat") || 48.8566;
+const lon = localStorage.getItem("eonia_lon") || 2.3522;
+
+const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`;
 
         const res = await fetch(url);
         const data = await res.json();
@@ -217,6 +227,16 @@
     } catch (e) {
         console.log("Erreur météo", e);
     }
+}
+    function saveLocation() {
+    const lat = document.getElementById("latInput").value;
+    const lon = document.getElementById("lonInput").value;
+
+    localStorage.setItem("eonia_lat", lat);
+    localStorage.setItem("eonia_lon", lon);
+
+    alert("Position enregistrée !");
+    loadWeather();
 }
 </script>
 </body>
