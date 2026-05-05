@@ -177,7 +177,15 @@
     topBtn.onclick = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
 
     function toggleBar(el) { el.querySelector('.bar').classList.toggle('active'); }
-    function waterNow() { const bars = document.querySelectorAll('.bar'); bars[bars.length-1].classList.add('active'); }
+    function waterNow() {
+    const bars = document.querySelectorAll('.bar');
+
+    if (bars.length === 0) return;
+
+    bars[bars.length - 1].classList.add('active');
+
+    alert("💧 Arrosage enregistré !");
+}
     function saveData() { alert("Modifications enregistrées !"); }
 
     load();
@@ -187,7 +195,7 @@
       let lat = parseFloat(localStorage.getItem("eonia_lat"));
 let lon = parseFloat(localStorage.getItem("eonia_lon"));
 
-if (!lat || !lon) {
+if (isNaN(lat) || isNaN(lon)) {
     lat = 48.8566;
     lon = 2.3522;
 }
