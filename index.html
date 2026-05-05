@@ -10,30 +10,14 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body, html { height:100%; font-family:'Raleway', sans-serif; background:#000; color:#fff; scroll-behavior:smooth; }
         .hero {
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    background:
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
-    url('background.jpg') center/cover no-repeat;
-    animation: fadeIn 1.2s ease;
-    position: relative;
-}
-
-.hero::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 30%, rgba(74,222,128,0.08), transparent 60%);
-}
+            height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)), url('background.jpg') center/cover no-repeat;
+            animation: fadeIn 1.2s ease;
+        }
         .logo-main { width:120px; margin-bottom:25px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.2s; transition: 0.4s; }
         .logo-main:hover { transform: scale(1.05); }
-        .brand-title { font-size:3.2rem; font-weight:300; letter-spacing:6px; text-transform:uppercase; color:#ffffff; line-height:1; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.4s; }
-        .tagline { font-style:italic; font-weight:400; font-size:0.85rem; color:rgba(255,255,255,0.8); margin-top:35px; margin-bottom:45px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.6s; }
+        .brand-title { font-size:4rem; font-weight:300; letter-spacing:6px; text-transform:uppercase; color:#ffffff; line-height:1; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.4s; }
+        .tagline { font-style:italic; font-weight:400; font-size:0.9rem; color:rgba(255,255,255,0.8); margin-top:35px; margin-bottom:45px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.6s; }
         .auth-container { display:flex; flex-direction:column; gap:12px; width:280px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.8s; }
         input { width:100%; padding:14px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.1); backdrop-filter: blur(5px); color:white; outline:none; font-family:'Raleway', sans-serif; text-align:center; transition:0.3s; }
         input:focus { background:rgba(255,255,255,0.18); border-color:#4ade80; box-shadow:0 0 15px rgba(74,222,128,0.15); }
@@ -58,11 +42,11 @@
         .bottom-nav a { color:#4ade80; text-decoration:none; font-size:0.65rem; text-transform:uppercase; letter-spacing:2.5px; transition:0.3s; font-weight:500; cursor: pointer; }
         .bottom-nav a:hover { color:#fff; }
         .content-section { padding:100px 30px; text-align:center; background:#050505; border-top: 1px solid #1a1a1a; }
-        .content-section h2 { color:#4ade80; font-weight:300; text-transform:uppercase; letter-spacing:4px; margin-bottom:15px; font-size:1.2rem; }
+        .content-section h2 { color:#4ade80; font-weight:300; text-transform:uppercase; letter-spacing:4px; margin-bottom:25px; font-size:1.5rem; }
         .content-section p { max-width:700px; margin:0 auto 20px auto; line-height:1.8; color:#bbb; }
         .highlight { color:#fff; font-weight:500; }
         .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 1000px; margin: 60px auto 0 auto; }
-        .pillar-item span { font-size: 0.8rem; display: block; margin-bottom: 15px; }
+        .pillar-item span { font-size: 2rem; display: block; margin-bottom: 15px; }
         .pillar-item h3 { font-size: 0.75rem; color: #4ade80; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .pillar-item p { font-size: 0.85rem; color: #888; line-height: 1.5; }
         .manifesto-box { max-width: 700px; margin: 80px auto 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; }
@@ -76,7 +60,7 @@
 <main class="hero">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Éonia Logo">
     <h1 class="brand-title">ÉONIA</h1>
-    <p class="tagline">Bienvenue dans votre mémoire végétale vivante.</p>
+    <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
     <div class="auth-container">
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
         <div style="display:flex;flex-direction:column;gap:8px;position:relative;">
@@ -89,11 +73,8 @@
                 <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
             </div>
         </div>
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">Accéder à mon jardin</button> 
-        <p id="error-msg" style="color:#ff6b6b; font-size:0.7rem; display:none;"></p>
-        <a href="commander.html" class="link-order">Créer la mémoire de votre plante</a>
-        <p style="font-size:0.65rem; color:#4ade80; margin-top:10px; letter-spacing:2px;">
-</p>
+        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> 
+        <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
     </div>
     <nav class="bottom-nav">
         <a href="#" onclick="accesInvite()">Accès Invité</a> 
@@ -101,92 +82,40 @@
     </nav>
 </main>
 <section class="content-section" id="concept">
-
-    <h2>Comment ça marche</h2>
-
-    <p>
-        Un système simple pour entretenir vos plantes sans vous poser de questions.
-    </p>
-
+    <h2>Notre Concept</h2>
+    <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <br><span class="highlight">Scanner, Cultiver, Raconter.</span></p>
     <div class="pillar-grid">
-
-        <div class="pillar-item">
-            <span>📱</span>
-            <h3>Scanner</h3>
-            <p>Scannez la plaque pour accéder instantanément au tableau de bord de votre plante.</p>
-        </div>
-
-        <div class="pillar-item">
-            <span>🌿</span>
-            <h3>Comprendre</h3>
-            <p>Consultez ses besoins précis : arrosage, lumière, entretien.</p>
-        </div>
-
-        <div class="pillar-item">
-            <span>📊</span>
-            <h3>Suivre</h3>
-            <p>Recevez des rappels et suivez l’évolution de votre plante dans le temps.</p>
-        </div>
-
+        <div class="pillar-item"><span>🌿</span><h3>Scanner</h3><p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p></div>
+        <div class="pillar-item"><span>📖</span><h3>Raconter</h3><p>Créez un journal de bord vivant pour documenter sa croissance.</p></div>
+        <div class="pillar-item"><span>♾️</span><h3>Transmettre</h3><p>Faites vivre la mémoire de votre jardin pour les générations futures.</p></div>
     </div>
-
     <div class="manifesto-box">
-
-        <h2>Une présence discrète, une intelligence invisible</h2>
-
-        <p>
-            Chaque plaque ÉONIA s’intègre naturellement dans votre jardin.<br>
-            Elle vous donne accès aux bonnes informations, au bon moment.<br>
-            Et demain, elle pourra interagir directement avec votre environnement.
-        </p>
-
-    </div>
-
-    <div class="manifesto-box">
-
-        <h2>Plus qu’un outil, une mémoire vivante</h2>
-
-       <h2>Mémoire vivante</h2>
-<p>
-Chaque plante raconte une histoire.<br>
-ÉONIA vous permet de la conserver et de la transmettre.
-</p>
+        <h2>L'âme d'Éonia</h2>
+        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
         <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
     </div>
-
 </section>
 <script>
     const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
 
-   window.onload = () => {
-    const savedEmail = localStorage.getItem('user_email');
-    if (savedEmail) {
-        document.getElementById('email').value = savedEmail;
-    }
-
-    if (plaqueEnAttente) {
-        document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-        document.getElementById('activation-help').style.display = "block";
-    }
-};
+    window.onload = () => {
+        if (plaqueEnAttente) {
+            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+            document.getElementById('activation-help').style.display = "block";
+        }
+    };
 
     // GESTION DE LA TOUCHE ENTRÉE
     document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') { validerConnexion(); }
     });
 
- async function validerConnexion() { 
-
-    if (navigator.vibrate) {
-        navigator.vibrate(10);
-    }
-
-    const btn = document.getElementById('btn-entrer');
-
-    const mail = document.getElementById('email').value.toLowerCase().trim();
-    const pin = document.getElementById('pin').value.trim();
+    async function validerConnexion() { 
+        const btn = document.getElementById('btn-entrer');
+        const mail = document.getElementById('email').value.toLowerCase().trim();
+        const pin = document.getElementById('pin').value.trim();
         
         // Validation stricte du PIN (4 chiffres uniquement)
         if (!mail || pin.length !== 4 || isNaN(pin)) {
@@ -214,9 +143,8 @@ Chaque plante raconte une histoire.<br>
                     window.location.href = "catalogue.html"; 
                 }
             } else { 
-                document.getElementById('error-msg').innerText = "Email ou PIN incorrect";
-document.getElementById('error-msg').style.display = "block";
-                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "Accéder à mon jardin";
+                alert("Email ou PIN incorrect.");
+                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; 
                 btn.disabled = false;
             }
         } catch (e) { 
