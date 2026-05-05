@@ -10,10 +10,26 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body, html { height:100%; font-family:'Raleway', sans-serif; background:#000; color:#fff; scroll-behavior:smooth; }
         .hero {
-            height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)), url('background.jpg') center/cover no-repeat;
-            animation: fadeIn 1.2s ease;
-        }
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.85)),
+    url('background.jpg') center/cover no-repeat;
+    animation: fadeIn 1.2s ease;
+    position: relative;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 30%, rgba(74,222,128,0.08), transparent 60%);
+}
         .logo-main { width:120px; margin-bottom:25px; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.2s; transition: 0.4s; }
         .logo-main:hover { transform: scale(1.05); }
         .brand-title { font-size:3.2rem; font-weight:300; letter-spacing:6px; text-transform:uppercase; color:#ffffff; line-height:1; opacity:0; animation: fadeUp 1s ease forwards; animation-delay: 0.4s; }
@@ -73,8 +89,9 @@
                 <a href="mailto:contact@eonia.com" class="pin-forgot">PIN oublié ?</a>
             </div>
         </div>
-        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> 
-        <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
+        <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">Accéder à mon jardin</button> 
+        <p id="error-msg" style="color:#ff6b6b; font-size:0.7rem; display:none;"></p>
+        <a href="commander.html" class="link-order">Créer la mémoire de votre plante</a>
         <p style="font-size:0.65rem; color:#4ade80; margin-top:10px; letter-spacing:2px;">
 </p>
     </div>
@@ -143,22 +160,33 @@ Chaque plante raconte une histoire.<br>
     const urlParams = new URLSearchParams(window.location.search);
     const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
 
-    window.onload = () => {
-        if (plaqueEnAttente) {
-            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-            document.getElementById('activation-help').style.display = "block";
-        }
-    };
+   window.onload = () => {
+    const savedEmail = localStorage.getItem('user_email');
+    if (savedEmail) {
+        document.getElementById('email').value = savedEmail;
+    }
+
+    if (plaqueEnAttente) {
+        document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+        document.getElementById('activation-help').style.display = "block";
+    }
+};
 
     // GESTION DE LA TOUCHE ENTRÉE
     document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') { validerConnexion(); }
     });
 
-    async function validerConnexion() { 
-        const btn = document.getElementById('btn-entrer');
-        const mail = document.getElementById('email').value.toLowerCase().trim();
-        const pin = document.getElementById('pin').value.trim();
+ async function validerConnexion() { 
+
+    if (navigator.vibrate) {
+        navigator.vibrate(10);
+    }
+
+    const btn = document.getElementById('btn-entrer');
+
+    const mail = document.getElementById('email').value.toLowerCase().trim();
+    const pin = document.getElementById('pin').value.trim();
         
         // Validation stricte du PIN (4 chiffres uniquement)
         if (!mail || pin.length !== 4 || isNaN(pin)) {
@@ -186,8 +214,9 @@ Chaque plante raconte une histoire.<br>
                     window.location.href = "catalogue.html"; 
                 }
             } else { 
-                alert("Email ou PIN incorrect.");
-                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; 
+                document.getElementById('error-msg').innerText = "Email ou PIN incorrect";
+document.getElementById('error-msg').style.display = "block";
+                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "Accéder à mon jardin";
                 btn.disabled = false;
             }
         } catch (e) { 
