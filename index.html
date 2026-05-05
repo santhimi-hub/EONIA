@@ -60,7 +60,7 @@
 <main class="hero">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main" alt="Éonia Logo">
     <h1 class="brand-title">ÉONIA</h1>
-    <p class="tagline">Bienvenue dans votre mémoire végétale.</p>
+    <p class="tagline">Bienvenue dans votre mémoire végétale vivante.</p>
     <div class="auth-container">
         <input type="email" id="email" placeholder="Email" required autocomplete="email">
         <div style="display:flex;flex-direction:column;gap:8px;position:relative;">
@@ -75,6 +75,9 @@
         </div>
         <button class="btn-main" id="btn-entrer" onclick="validerConnexion()">ENTRER</button> 
         <a href="commander.html" class="link-order">Commander votre plaque ÉONIA</a>
+        <p style="font-size:0.65rem; color:#4ade80; margin-top:10px; letter-spacing:2px;">
+Tableau de bord • Rappels intelligents • Scan instantané • Sans application
+</p>
     </div>
     <nav class="bottom-nav">
         <a href="#" onclick="accesInvite()">Accès Invité</a> 
@@ -82,18 +85,60 @@
     </nav>
 </main>
 <section class="content-section" id="concept">
-    <h2>Notre Concept</h2>
-    <p>Éonia fusionne l'élégance du support et la puissance du numérique. Chaque plante a une histoire. <br><span class="highlight">Scanner, Cultiver, Raconter.</span></p>
+
+    <h2>Comment ça marche</h2>
+
+    <p>
+        Un système simple pour entretenir vos plantes sans vous poser de questions.
+    </p>
+
     <div class="pillar-grid">
-        <div class="pillar-item"><span>🌿</span><h3>Scanner</h3><p>Accès immédiat à l'identité et aux besoins de votre spécimen.</p></div>
-        <div class="pillar-item"><span>📖</span><h3>Raconter</h3><p>Créez un journal de bord vivant pour documenter sa croissance.</p></div>
-        <div class="pillar-item"><span>♾️</span><h3>Transmettre</h3><p>Faites vivre la mémoire de votre jardin pour les générations futures.</p></div>
+
+        <div class="pillar-item">
+            <span>📱</span>
+            <h3>Scanner</h3>
+            <p>Scannez la plaque pour accéder instantanément au tableau de bord de votre plante.</p>
+        </div>
+
+        <div class="pillar-item">
+            <span>🌿</span>
+            <h3>Comprendre</h3>
+            <p>Consultez ses besoins précis : arrosage, lumière, entretien.</p>
+        </div>
+
+        <div class="pillar-item">
+            <span>📊</span>
+            <h3>Suivre</h3>
+            <p>Recevez des rappels et suivez l’évolution de votre plante dans le temps.</p>
+        </div>
+
     </div>
+
     <div class="manifesto-box">
-        <h2>L'âme d'Éonia</h2>
-        <p>Un journal de bord pour vos arbres, une empreinte pour l'éternité. Transmettez la mémoire de votre jardin aux générations futures.</p>
-        <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
+
+        <h2>Une présence discrète, une intelligence invisible</h2>
+
+        <p>
+            Chaque plaque ÉONIA s’intègre naturellement dans votre jardin.<br>
+            Elle vous donne accès aux bonnes informations, au bon moment.<br>
+            Et demain, elle pourra interagir directement avec votre environnement.
+        </p>
+
     </div>
+
+    <div class="manifesto-box">
+
+        <h2>Plus qu’un outil, une mémoire vivante</h2>
+
+        <p>
+            Derrière chaque plante, il y a une histoire.<br>
+            ÉONIA vous permet de la conserver, de la suivre, et de la transmettre.
+        </p>
+
+        <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
+
+    </div>
+
 </section>
 <script>
     const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
