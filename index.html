@@ -113,104 +113,102 @@
 </div>
 </section>
 <script>
-    const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
+const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
 
-       // 🔥 capture automatique de la plaque depuis QR code
+// 🔥 QR CODE
 const urlParams = new URLSearchParams(window.location.search);
-const plaqueFromQR = urlParams.get('assign_to');
+const mode = urlParams.get('mode');
+const plaque = urlParams.get('plaque');
 
-if (plaqueFromQR) {
-    localStorage.setItem("eonia_pending_plaque", plaqueFromQR);
+// activation si QR
+const isActivationMode = (mode === 'activation' && plaque);
+
+if (isActivationMode) {
+    localStorage.setItem("pending_plaque", plaque);
 }
 
-if (plaqueFromQR) {
-    localStorage.setItem("eonia_plaque", plaqueFromQR);
+window.onload = () => {
+    if (isActivationMode) {
+        document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
+        document.getElementById('activation-help').style.display = "block";
+    }
+};
+
+// ENTER
+document.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') validerConnexion();
+});
+
+async function validerConnexion() {
+    const btn = document.getElementById('btn-entrer');
+    const mail = document.getElementById('email').value.toLowerCase().trim();
+    const pin = document.getElementById('pin').value.trim();
+
+    if (!mail || pin.length !== 4 || isNaN(pin)) {
+        alert("PIN invalide (4 chiffres requis)");
+        return;
+    }
+
+    btn.innerText = "VÉRIFICATION...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: mail, pin: pin })
+        });
+
+        if (response.ok) {
+
+            localStorage.setItem('auth_state', 'user');
+            localStorage.setItem('user_email', mail);
+
+            const pendingPlaque = localStorage.getItem("pending_plaque");
+
+            if (pendingPlaque) {
+                localStorage.setItem("active_plaque", pendingPlaque);
+                localStorage.removeItem("pending_plaque");
+
+                window.location.href =
+                    "catalogue.html?mode=activation&plaque=" + pendingPlaque;
+            } else {
+                window.location.href = "catalogue.html";
+            }
+
+        } else {
+            alert("Email ou PIN incorrect.");
+            btn.innerText = isActivationMode ? "ACTIVER MA PLAQUE" : "ENTRER";
+            btn.disabled = false;
+        }
+
+    } catch (e) {
+        alert("Erreur réseau.");
+        btn.disabled = false;
+    }
 }
 
-    window.onload = () => {
-       if (plaqueFromQR) {
-            document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
-            document.getElementById('activation-help').style.display = "block";
-        }
-    };
-
-    // GESTION DE LA TOUCHE ENTRÉE
-    document.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') { validerConnexion(); }
-    });
-
-    async function validerConnexion() { 
-        const btn = document.getElementById('btn-entrer');
-        const mail = document.getElementById('email').value.toLowerCase().trim();
-        const pin = document.getElementById('pin').value.trim();
-        
-        // Validation stricte du PIN (4 chiffres uniquement)
-        if (!mail || pin.length !== 4 || isNaN(pin)) {
-            alert("PIN invalide (4 chiffres requis)");
-            return;
-        }
-        
-        btn.innerText = "VÉRIFICATION..."; btn.disabled = true;
-        
-        try {
-            const response = await fetch(WORKER_URL, {
-                method: "POST", 
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: mail, pin: pin })
-            });
-            
-            if (response.ok) {
-               localStorage.setItem('auth_state', 'user');
-localStorage.setItem('user_email', mail);
-
-const plaque = localStorage.getItem("eonia_pending_plaque");
-
-if (plaque) {
-    localStorage.setItem("eonia_active_plaque", plaque);
-    localStorage.removeItem("eonia_pending_plaque");
-    window.location.href = "catalogue.html?plaque=" + plaque;
-} else {
-   const savedAssign = sessionStorage.getItem("assign_to");
-
-if (savedAssign) {
-    sessionStorage.removeItem("assign_to");
-    window.location.href = `catalogue.html?assign_to=${savedAssign}`;
-} else {
+// INVITE
+function accesInvite() {
+    localStorage.clear();
+    localStorage.setItem('auth_state', 'guest');
+    localStorage.setItem('user_email', 'invite@eonia.com');
     window.location.href = "catalogue.html";
 }
+
+// PIN
+function togglePinVisibility() {
+    const pinInput = document.getElementById('pin');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    if (pinInput.type === 'password') {
+        pinInput.type = 'text';
+        eyeIcon.style.color = "#4ade80";
+    } else {
+        pinInput.type = 'password';
+        eyeIcon.style.color = "#fff";
+    }
 }
-                // ne pas stocker le PIN côté navigateur
-                              
-            } else { 
-                alert("Email ou PIN incorrect.");
-                btn.innerText = plaqueFromQR ? "ACTIVER MA PLAQUE" : "ENTRER";
-                btn.disabled = false;
-            }
-        } catch (e) { 
-            alert("Erreur réseau."); 
-            btn.disabled = false; 
-        }
-    }
-
-    function accesInvite() {
-        localStorage.clear(); 
-        localStorage.setItem('auth_state', 'guest'); // État structuré
-        localStorage.setItem('user_email', 'invite@eonia.com');
-        window.location.href = "catalogue.html";
-    }
-
-    function togglePinVisibility() {
-        const pinInput = document.getElementById('pin');
-        const eyeIcon = document.getElementById('eye-icon');
-        if (pinInput.type === 'password') { 
-            pinInput.type = 'text'; 
-            eyeIcon.style.color = "#4ade80"; 
-        } else { 
-            pinInput.type = 'password'; 
-            eyeIcon.style.color = "#fff"; 
-        }
-           }
-
 </script>
 </body>
 </html>
