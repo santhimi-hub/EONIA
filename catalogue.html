@@ -143,12 +143,6 @@ window.addEventListener('pageshow', function() {
     document.getElementById('eonia-loader').style.display = 'none';
 });
 
-if (!userEmail) {
-    if (plaqueAAssigner) {
-        sessionStorage.setItem("assign_to", plaqueAAssigner);
-    }
-    window.location.href = "index.html";
-}
 if (isOwner) {
     const menu = document.getElementById('client-menu');
     if (menu) menu.style.display = 'flex';
@@ -190,15 +184,14 @@ function openPlant(p) {
     const plaque = localStorage.getItem("pending_plaque");
 
     if (plaque) {
-
         if (confirm("Associer cette plante à votre plaque ?")) {
             assignToPlaque(p.id);
         }
-
         return;
     }
 
-    window.location.href = `jardin.html?id=${p.id}`;
+    localStorage.removeItem("pending_plaque");
+    window.location.href = "jardin.html?id=" + p.id;
 }
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
@@ -291,6 +284,7 @@ async function assignToPlaque(plantId) {
             window.location.href = "jardin.html";
         } else {
             alert("Erreur : assignation impossible");
+            localStorage.removeItem("pending_plaque");
         }
 
     } catch (e) {
