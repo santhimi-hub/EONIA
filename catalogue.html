@@ -133,13 +133,15 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-// SÉCURITÉ : Cacher le loader si on revient en arrière avec le navigateur
-window.addEventListener('pageshow', function(event) {
+window.addEventListener('pageshow', function() {
     document.getElementById('eonia-loader').style.display = 'none';
 });
 
 if (!userEmail) logout();
-if (isOwner) { document.getElementById('client-menu').style.display = 'flex'; }
+if (isOwner) {
+    const menu = document.getElementById('client-menu');
+    if (menu) menu.style.display = 'flex';
+}
 
 function toggleAI() {
     const chat = document.getElementById('ai-chat');
@@ -148,8 +150,8 @@ function toggleAI() {
 
 window.onscroll = function() {
     const btn = document.getElementById("topBtn");
-    if (window.scrollY > 500) btn.style.display = "block";
-    else btn.style.display = "none";
+    if (!btn) return;
+    btn.style.display = window.scrollY > 500 ? "block" : "none";
 };
 
 function switchView(view) {
@@ -164,38 +166,53 @@ function toggleFav(event, p) {
     event.stopPropagation();
     let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
     const idx = favs.findIndex(f => f.id === p.id);
-    if (idx > -1) {
-        favs.splice(idx, 1);
-        event.currentTarget.classList.remove('active');
-    } else {
-        favs.push({ id: p.id, name: p["Nom commun"], photo: p.Photo });
-        event.currentTarget.classList.add('active');
-    }
+
+    if (idx > -1) favs.splice(idx, 1);
+    else favs.push({ id: p.id, name: p["Nom commun"], photo: p.Photo });
+
     localStorage.setItem('eonia_favs', JSON.stringify(favs));
-    if (activeFilter === 'favoris') renderGrid();
+    renderGrid();
+}
+
+function openPlant(p) {
+    if (plaqueAAssigner) {
+        const nom = p["Nom commun"] || "Cette plante";
+        if (confirm(`Assigner cette plaque à : ${nom} ?`)) {
+            assignPlaque(p.id, nom);
+        }
+    } else {
+        document.getElementById('eonia-loader').style.display = 'flex';
+        setTimeout(() => {
+            window.location.href = `jardin.html?id=${p.id}`;
+        }, 100);
+    }
 }
 
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
     const searchVal = document.getElementById('searchBox').value.toLowerCase().trim();
     const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+
     container.innerHTML = "";
     let lastLetter = "";
 
     let filtered = allPlants.filter(p => {
         const nom = (p["Nom commun"] || "").toLowerCase();
         const type = (p.Type || "").toLowerCase();
+
         if (currentView === 'jardin' && !p.est_dans_jardin) return false;
+
         if (activeFilter === 'favoris') {
             if (!favs.some(f => f.id === p.id)) return false;
         } else if (activeFilter !== 'all') {
-            if (!type || !type.includes(activeFilter.toLowerCase())) return false;
+            if (!type.includes(activeFilter.toLowerCase())) return false;
         }
+
         return nom.includes(searchVal);
     });
 
-    document.getElementById('plant-counter').textContent = 
-        filtered.length === 0 ? "AUCUNE PLANTE" : `${filtered.length} VARIÉTÉ${filtered.length > 1 ? 'S' : ''}`;
+    document.getElementById('plant-counter').textContent =
+        filtered.length === 0 ? "AUCUNE PLANTE" : `${filtered.length} VARIÉTÉ(S)`;
 
     filtered.forEach(p => {
         const nomAffiche = p["Nom commun"] || "Sans nom";
@@ -214,19 +231,15 @@ function renderGrid() {
 
         const card = document.createElement('div');
         card.className = "plant-card";
-        card.onclick = () => {
-            if (plaqueAAssigner) {
-                if(confirm(`Assigner cette plaque à : ${nomAffiche} ?`)) { assignPlaque(p.id, nomAffiche); }
-            } else {
-                document.getElementById('eonia-loader').style.display = 'flex';
-                setTimeout(() => { window.location.href = `jardin.html?id=${p.id}`; }, 50);
-            }
-        };
+
+        card.addEventListener("click", () => openPlant(p));
 
         card.innerHTML = `
             <div class="img-container">
-                <div class="card-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
-                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <div class="card-fav-btn ${isFav ? 'active' : ''}">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
                 </div>
                 <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
             </div>
@@ -234,6 +247,10 @@ function renderGrid() {
                 <div class="plant-name">${nomAffiche}</div>
             </div>
         `;
+
+        card.querySelector(".card-fav-btn")
+            .addEventListener("click", (e) => toggleFav(e, p));
+
         container.appendChild(card);
     });
 }
@@ -242,30 +259,47 @@ async function assignPlaque(catalogueId, nom) {
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "assign_plant", email: userEmail, plaqueId: plaqueAAssigner, catalogueId: catalogueId })
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                action: "assign_plant",
+                email: userEmail,
+                plaqueId: plaqueAAssigner,
+                catalogueId
+            })
         });
+
         if (res.ok) window.location.href = `jardin.html?id=${catalogueId}`;
-        else alert("Erreur lors de l'assignation");
-    } catch (e) { alert("Erreur réseau"); }
+        else alert("Erreur assignation");
+    } catch (e) {
+        alert("Erreur réseau");
+    }
 }
 
 async function loadData() {
     const cached = localStorage.getItem(cacheKey);
-    if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
+    if (cached) {
+        allPlants = JSON.parse(cached);
+        renderGrid();
+    }
+
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ email: userEmail })
         });
+
         const data = await res.json();
         if (!data.error) {
             allPlants = data;
             localStorage.setItem(cacheKey, JSON.stringify(data));
             renderGrid();
         }
-    } catch (e) { console.error("Erreur API", e); }
+    } catch (e) {
+        console.error(e);
+    }
+
+    document.getElementById('eonia-loader').style.display = 'none';
 }
 
 function setFilter(t, b) {
@@ -275,7 +309,10 @@ function setFilter(t, b) {
     renderGrid();
 }
 
-function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+}
 
 loadData();
 </script>
