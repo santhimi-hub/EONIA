@@ -122,12 +122,18 @@
 
 <script>
 const userEmail = localStorage.getItem('user_email');
-const userPin = localStorage.getItem('user_pin'); 
 const isOwner = (userEmail && userEmail !== 'invite@eonia.com');
+
 const API_URL = "https://eonia-api.santhimi.workers.dev";
+
 const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
+
 const urlParams = new URLSearchParams(window.location.search);
-const plaqueAAssigner = urlParams.get('assign_to');
+const plaqueFromQR = urlParams.get('plaque');
+
+if (plaqueFromQR) {
+    localStorage.setItem("pending_plaque", plaqueFromQR);
+}
 
 let currentView = 'catalogue';
 let allPlants = [];
@@ -175,17 +181,19 @@ function toggleFav(event, p) {
 }
 
 function openPlant(p) {
-    if (plaqueAAssigner) {
-        const nom = p["Nom commun"] || "Cette plante";
-        if (confirm(`Assigner cette plaque à : ${nom} ?`)) {
-            assignPlaque(p.id, nom);
+
+    const plaque = localStorage.getItem("pending_plaque");
+
+    if (plaque) {
+
+        if (confirm("Associer cette plante à votre plaque ?")) {
+            assignToPlaque(p.id);
         }
-    } else {
-        document.getElementById('eonia-loader').style.display = 'flex';
-        setTimeout(() => {
-            window.location.href = `jardin.html?id=${p.id}`;
-        }, 50);
+
+        return;
     }
+
+    window.location.href = `jardin.html?id=${p.id}`;
 }
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
@@ -254,21 +262,32 @@ function renderGrid() {
     });
 }
 
-async function assignPlaque(catalogueId, nom) {
+async function assignToPlaque(plantId) {
+
+    const email = localStorage.getItem("user_email");
+    const plaqueId = localStorage.getItem("pending_plaque");
+
     try {
         const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 action: "assign_plant",
-                email: userEmail,
-                plaqueId: plaqueAAssigner,
-                catalogueId
+                email: email,
+                plantId: plantId,
+                plaqueId: plaqueId
             })
         });
 
-        if (res.ok) window.location.href = `jardin.html?id=${catalogueId}`;
-        else alert("Erreur assignation");
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Plante associée à votre plaque !");
+            window.location.href = "jardin.html";
+        } else {
+            alert("Erreur : assignation impossible");
+        }
+
     } catch (e) {
         alert("Erreur réseau");
     }
