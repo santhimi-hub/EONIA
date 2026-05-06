@@ -182,11 +182,11 @@ function openPlant(p) {
         }
     } else {
         document.getElementById('eonia-loader').style.display = 'flex';
-        setTimeout(() => 
-            {window.location.href = `jardin.html?id=${p.id}`;
+        setTimeout(() => {
+            window.location.href = `jardin.html?id=${p.id}`;
+        }, 50);
     }
 }
-
 function renderGrid() {
     const container = document.getElementById('catalogue-grid');
     const searchVal = document.getElementById('searchBox').value.toLowerCase().trim();
