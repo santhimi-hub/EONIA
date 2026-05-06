@@ -85,7 +85,7 @@
     <h2>L'expérience Éonia</h2>
     <p>Chaque plante a une histoire.<br> 
         ÉONIA est un outil simple qui vous guide pour en prendre soin, naturellement. <br><span class="highlight">Scanner, Comprendre, Suivre.</span></p>
-   <div class="pillar-grid">
+  <div class="pillar-grid">
     <div class="pillar-item">
         <span>📱</span>
         <h3>Scanner</h3>
@@ -103,20 +103,28 @@
         <h3>Suivre</h3>
         <p>Recevez des rappels au bon moment et accompagnez son évolution en toute sérénité.</p>
     </div>
-    <div class="manifesto-box">
-        <h2>Une présence discrète</h2>
-        <p>Chaque plaque ÉONIA s’intègre naturellement dans votre jardin.<br>
-            Invisible, mais toujours là quand vous en avez besoin.</p>
-        <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
-    </div>
+</div>
+
+<div class="manifesto-box">
+    <h2>Une présence discrète</h2>
+    <p>Chaque plaque ÉONIA s’intègre naturellement dans votre jardin.<br>
+    Presque invisible, mais toujours là quand vous en avez besoin.</p>
+    <a href="a-propos.html" class="link-philosophy">Découvrir notre philosophie</a>
+</div>
 </section>
 <script>
     const WORKER_URL = "https://eonia-api.santhimi.workers.dev/";
-    const urlParams = new URLSearchParams(window.location.search);
-    const plaqueEnAttente = urlParams.get('id') || urlParams.get('activate');
+
+       // 🔥 capture automatique de la plaque depuis QR code
+const urlParams = new URLSearchParams(window.location.search);
+const plaqueFromQR = urlParams.get("plaque") || urlParams.get("id") || urlParams.get("activate");
+
+if (plaqueFromQR) {
+    localStorage.setItem("pending_plaque", plaqueFromQR);
+}
 
     window.onload = () => {
-        if (plaqueEnAttente) {
+       if (plaqueFromQR) {
             document.getElementById('btn-entrer').innerText = "ACTIVER MA PLAQUE";
             document.getElementById('activation-help').style.display = "block";
         }
@@ -150,16 +158,18 @@
             if (response.ok) {
                 localStorage.setItem('auth_state', 'user'); // État structuré
                 localStorage.setItem('user_email', mail);
+                const plaque = localStorage.getItem("pending_plaque");
+
+if (plaque) {
+    window.location.href = "catalogue.html?plaque=" + plaque;
+} else {
+    window.location.href = "catalogue.html";
+}
                 // ne pas stocker le PIN côté navigateur
-                
-                if (plaqueEnAttente) { 
-                    window.location.href = "catalogue.html?assign_to=" + plaqueEnAttente; 
-                } else { 
-                    window.location.href = "catalogue.html"; 
-                }
+                              
             } else { 
                 alert("Email ou PIN incorrect.");
-                btn.innerText = plaqueEnAttente ? "ACTIVER MA PLAQUE" : "ENTRER"; 
+                btn.innerText = plaqueFromQR ? "ACTIVER MA PLAQUE" : "ENTRER";
                 btn.disabled = false;
             }
         } catch (e) { 
@@ -185,7 +195,8 @@
             pinInput.type = 'password'; 
             eyeIcon.style.color = "#fff"; 
         }
-    }
+           }
+
 </script>
 </body>
 </html>
