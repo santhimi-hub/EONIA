@@ -117,10 +117,10 @@
 
        // 🔥 capture automatique de la plaque depuis QR code
 const urlParams = new URLSearchParams(window.location.search);
-const plaqueFromQR = urlParams.get("plaque") || urlParams.get("id") || urlParams.get("activate");
+const plaqueFromQR = urlParams.get('plaque');
 
 if (plaqueFromQR) {
-    localStorage.setItem("pending_plaque", plaqueFromQR);
+    localStorage.setItem("eonia_plaque", plaqueFromQR);
 }
 
     window.onload = () => {
