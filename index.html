@@ -117,7 +117,7 @@
 
        // 🔥 capture automatique de la plaque depuis QR code
 const urlParams = new URLSearchParams(window.location.search);
-const plaqueFromQR = urlParams.get('plaque');
+const plaqueFromQR = urlParams.get('assign_to');
 
 if (plaqueFromQR) {
     localStorage.setItem("eonia_pending_plaque", plaqueFromQR);
@@ -170,7 +170,14 @@ if (plaque) {
     localStorage.removeItem("eonia_pending_plaque");
     window.location.href = "catalogue.html?plaque=" + plaque;
 } else {
+   const savedAssign = sessionStorage.getItem("assign_to");
+
+if (savedAssign) {
+    sessionStorage.removeItem("assign_to");
+    window.location.href = `catalogue.html?assign_to=${savedAssign}`;
+} else {
     window.location.href = "catalogue.html";
+}
 }
                 // ne pas stocker le PIN côté navigateur
                               
