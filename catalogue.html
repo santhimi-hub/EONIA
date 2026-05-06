@@ -9,240 +9,288 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background:#000; color:#fff; font-family:'Raleway',sans-serif; min-height:100vh; padding-top:60px; }
+body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; min-height: 100vh; padding-top: 60px; }
 
 .top-bar {
-position:fixed; top:0; left:0; width:100%; height:60px;
-background:rgba(0,0,0,0.85);
-display:flex; justify-content:flex-end; align-items:center;
-padding:0 20px; z-index:3000;
+  position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+  background: rgba(0,0,0,0.85);
+  display: flex; justify-content: flex-end; align-items: center;
+  padding: 0 20px; z-index: 3000;
 }
 
 .logout-header-btn {
-border:1px solid #4ade80;
-background:none;
-color:#4ade80;
-padding:6px 16px;
-border-radius:20px;
-cursor:pointer;
+  background: none; border: 1px solid #4ade80;
+  color: #4ade80; padding: 6px 16px; border-radius: 20px;
+  cursor: pointer;
 }
 
-header { text-align:center; padding:30px 20px; }
+header { text-align: center; padding: 30px 20px; }
 
-.brand-title { font-weight:300; letter-spacing:8px; font-size:2.1rem; }
+.logo-main { width: 70px; margin-bottom: 10px; }
 
-.client-nav { display:none; justify-content:center; gap:15px; margin:20px; }
+.brand-title {
+  font-weight: 300;
+  letter-spacing: 8px;
+  font-size: 2rem;
+}
+
+#page-title {
+  font-size: 0.7rem;
+  color: #4ade80;
+  text-transform: uppercase;
+}
+
+.client-nav {
+  display: none;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px;
+}
 
 .nav-btn {
-background:none; border:1px solid #333;
-color:#fff; padding:10px 20px;
-border-radius:25px; cursor:pointer;
+  background: none;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
 }
 
-.nav-btn.active { border-color:#4ade80; color:#4ade80; }
+.nav-btn.active {
+  border-color: #4ade80;
+  color: #4ade80;
+}
 
-.controls-area { text-align:center; padding:0 15px; }
+.controls-area {
+  text-align: center;
+  padding: 0 15px;
+}
 
 .search-input {
-width:100%; max-width:450px;
-padding:14px;
-border-radius:50px;
-background:#0c0c0c;
-border:1px solid #1a1a1a;
-color:#fff;
+  width: 100%;
+  max-width: 450px;
+  padding: 12px;
+  border-radius: 40px;
+  border: 1px solid #222;
+  background: #111;
+  color: #fff;
 }
 
-.filter-nav { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:15px 0; }
+.filter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
 
 .f-btn {
-border:1px solid #1a1a1a;
-background:none;
-color:#777;
-padding:8px 18px;
-border-radius:20px;
-cursor:pointer;
+  background: none;
+  border: 1px solid #222;
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.7rem;
 }
 
-.f-btn.active { border-color:#4ade80; color:#4ade80; }
+.f-btn.active {
+  border-color: #4ade80;
+  color: #4ade80;
+}
 
 .catalog-container {
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
-gap:20px;
-padding:20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 20px;
 }
 
 .plant-card {
-background:#0c0c0c;
-border-radius:15px;
-overflow:hidden;
-border:1px solid #1a1a1a;
-cursor:pointer;
-position:relative;
-transition:0.3s;
+  background: #0c0c0c;
+  border-radius: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #1a1a1a;
 }
 
-.plant-card:hover { transform:translateY(-5px); }
+.img-container {
+  height: 160px;
+  position: relative;
+}
 
-.img-container { height:160px; overflow:hidden; position:relative; }
+.plant-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-.plant-img { width:100%; height:100%; object-fit:cover; }
+.plant-info {
+  padding: 10px;
+  text-align: center;
+}
 
-.plant-info { padding:15px; text-align:center; }
-
-.plant-name { font-size:0.75rem; color:#ccc; text-transform:uppercase; }
+.plant-name {
+  font-size: 0.75rem;
+  color: #ccc;
+}
 
 .card-fav-btn {
-position:absolute;
-top:10px; right:10px;
-width:32px; height:32px;
-border-radius:50%;
-background:rgba(0,0,0,0.5);
-display:flex; align-items:center; justify-content:center;
-cursor:pointer;
-z-index:5;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.card-fav-btn svg { width:16px; height:16px; stroke:#fff; fill:none; }
-.card-fav-btn.active svg { fill:#4ade80; stroke:#4ade80; }
+.card-fav-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+  fill: none;
+}
+
+.card-fav-btn.active svg {
+  fill: #4ade80;
+  stroke: #4ade80;
+}
 </style>
 </head>
 
 <body>
 
 <div class="top-bar">
-<button class="logout-header-btn" onclick="logout()">Quitter</button>
+  <button class="logout-header-btn" onclick="logout()">Quitter</button>
 </div>
 
 <header>
-<h1 class="brand-title">ÉONIA</h1>
+  <img class="logo-main" src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
+  <div class="brand-title">ÉONIA</div>
+  <div id="page-title">Notre Collection</div>
 </header>
 
 <div id="client-menu" class="client-nav">
-<button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
-<button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Jardin</button>
+  <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Collection</button>
+  <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Jardin</button>
 </div>
 
 <div class="controls-area">
-<input type="text" id="searchBox" class="search-input" oninput="renderGrid()" placeholder="Rechercher...">
+  <input id="searchBox" class="search-input" placeholder="Rechercher..." oninput="renderGrid()">
 
-<div class="filter-nav">
-<button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-<button class="f-btn" onclick="setFilter('favoris', this)">❤</button>
-<button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-<button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
-<button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-<button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-<button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
-<button class="f-btn" onclick="setFilter('Succulente', this)">Succulentes</button>
-</div>
+  <div class="filter-nav">
+    <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+    <button class="f-btn" onclick="setFilter('favoris', this)">❤ Favoris</button>
+    <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+    <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+    <button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
+    <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+    <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
+    <button class="f-btn" onclick="setFilter('Succulente', this)">Succulentes</button>
+  </div>
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <script>
-
-const userEmail = localStorage.getItem('user_email');
-const API_URL = "https://eonia-api.santhimi.workers.dev/";
-
 let allPlants = [];
-let activeFilter = 'all';
-let currentView = 'catalogue';
+let activeFilter = "all";
+let currentView = "catalogue";
 
-function toggleFav(e,p){
-e.stopPropagation();
+const favs = JSON.parse(localStorage.getItem("eonia_favs") || "[]");
 
-let favs = JSON.parse(localStorage.getItem('eonia_favs')||'[]');
+function toggleFav(e, p) {
+  e.stopPropagation();
 
-const idx = favs.findIndex(f=>f.id===p.id);
+  let favs = JSON.parse(localStorage.getItem("eonia_favs") || "[]");
+  const i = favs.findIndex(f => f.id === p.id);
 
-if(idx>-1) favs.splice(idx,1);
-else favs.push({id:p.id});
+  if (i > -1) favs.splice(i, 1);
+  else favs.push({ id: p.id });
 
-localStorage.setItem('eonia_favs',JSON.stringify(favs));
-renderGrid();
+  localStorage.setItem("eonia_favs", JSON.stringify(favs));
+  renderGrid();
 }
 
-function renderGrid(){
+function renderGrid() {
+  const container = document.getElementById("catalogue-grid");
+  const search = document.getElementById("searchBox").value.toLowerCase();
 
-const container = document.getElementById("catalogue-grid");
-const search = document.getElementById("searchBox").value.toLowerCase();
-const favs = JSON.parse(localStorage.getItem('eonia_favs')||'[]');
+  const favs = JSON.parse(localStorage.getItem("eonia_favs") || "[]");
 
-container.innerHTML="";
+  container.innerHTML = "";
 
-let filtered = allPlants.filter(p=>{
+  const filtered = allPlants.filter(p => {
+    const nom = (p["Nom commun"] || "").toLowerCase();
+    const type = (p.Type || "").toLowerCase();
 
-const nom = (p["Nom commun"]||"").toLowerCase();
-const type = (p.Type||"").toLowerCase();
+    if (currentView === "jardin" && !p.est_dans_jardin) return false;
 
-if(activeFilter==="favoris"){
-if(!favs.some(f=>f.id===p.id)) return false;
-}
-else if(activeFilter!=="all"){
-if(!type.includes(activeFilter.toLowerCase())) return false;
-}
+    if (activeFilter === "favoris") {
+      if (!favs.some(f => f.id === p.id)) return false;
+    } else if (activeFilter !== "all") {
+      if (!type.includes(activeFilter.toLowerCase())) return false;
+    }
 
-return nom.includes(search);
-});
+    return nom.includes(search);
+  });
 
-filtered.forEach(p=>{
+  filtered.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "plant-card";
 
-const nom = p["Nom commun"]||"Sans nom";
-const isFav = favs.some(f=>f.id===p.id);
+    const isFav = favs.some(f => f.id === p.id);
 
-const card = document.createElement("div");
-card.className="plant-card";
+    card.innerHTML = `
+      <div class="img-container">
+        <div class="card-fav-btn ${isFav ? "active" : ""}">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        <img class="plant-img" src="${p.Photo}">
+      </div>
+      <div class="plant-info">
+        <div class="plant-name">${p["Nom commun"]}</div>
+      </div>
+    `;
 
-card.innerHTML=`
-<div class="img-container">
+    card.querySelector(".card-fav-btn")
+      .addEventListener("click", (e) => toggleFav(e, p));
 
-<div class="card-fav-btn ${isFav?'active':''}">
-<svg viewBox="0 0 24 24">
-<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-</svg>
-</div>
-
-<img src="${p.Photo||''}" class="plant-img">
-</div>
-
-<div class="plant-info">
-<div class="plant-name">${nom}</div>
-</div>
-`;
-
-card.addEventListener("click",()=> {
-window.location.href = `jardin.html?id=${p.id}`;
-});
-
-card.querySelector(".card-fav-btn")
-.addEventListener("click",(e)=>toggleFav(e,p));
-
-container.appendChild(card);
-});
+    container.appendChild(card);
+  });
 }
 
-function setFilter(t,btn){
-activeFilter=t;
-document.querySelectorAll(".f-btn").forEach(b=>b.classList.remove("active"));
-btn.classList.add("active");
-renderGrid();
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll(".f-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderGrid();
 }
 
-function logout(){
-localStorage.clear();
-window.location.href="index.html";
+function switchView(v) {
+  currentView = v;
+  renderGrid();
 }
 
-// DEMO (remplace par API)
-allPlants=[
-{id:1,"Nom commun":"Rosier",Type:"Fleur",Photo:""},
-{id:2,"Nom commun":"Basilic",Type:"Aromate",Photo:""},
-{id:3,"Nom commun":"Pommier",Type:"Fruitier",Photo:""}
+function logout() {
+  localStorage.clear();
+  location.href = "index.html";
+}
+
+// DEMO DATA (remplace par API)
+allPlants = [
+  { id: 1, "Nom commun": "Olivier", Type: "Arbre", Photo: "https://picsum.photos/200" },
+  { id: 2, "Nom commun": "Rose", Type: "Fleur", Photo: "https://picsum.photos/201" },
+  { id: 3, "Nom commun": "Basilic", Type: "Aromate", Photo: "https://picsum.photos/202" }
 ];
 
 renderGrid();
-
 </script>
 
 </body>
