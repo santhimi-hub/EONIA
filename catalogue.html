@@ -95,7 +95,7 @@
 
 <div class="controls-area">
     <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
-    <div id="plant-counter">CHARGEMENT...</div>
+    <div id="plant-counter">""...</div>
 
     <div class="filter-nav">
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
@@ -275,6 +275,9 @@ async function assignPlaque(catalogueId, nom) {
 }
 
 async function loadData() {
+    const counter = document.getElementById('plant-counter');
+    counter.textContent = ""; // au lieu de "CHARGEMENT..."
+
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
         allPlants = JSON.parse(cached);
@@ -300,7 +303,6 @@ async function loadData() {
 
     document.getElementById('eonia-loader').style.display = 'none';
 }
-
 function setFilter(t, b) {
     activeFilter = t;
     document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
