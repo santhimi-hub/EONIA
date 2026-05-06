@@ -120,6 +120,10 @@ const urlParams = new URLSearchParams(window.location.search);
 const plaqueFromQR = urlParams.get('plaque');
 
 if (plaqueFromQR) {
+    localStorage.setItem("eonia_pending_plaque", plaqueFromQR);
+}
+
+if (plaqueFromQR) {
     localStorage.setItem("eonia_plaque", plaqueFromQR);
 }
 
@@ -156,11 +160,14 @@ if (plaqueFromQR) {
             });
             
             if (response.ok) {
-                localStorage.setItem('auth_state', 'user'); // État structuré
-                localStorage.setItem('user_email', mail);
-                const plaque = localStorage.getItem("pending_plaque");
+               localStorage.setItem('auth_state', 'user');
+localStorage.setItem('user_email', mail);
+
+const plaque = localStorage.getItem("eonia_pending_plaque");
 
 if (plaque) {
+    localStorage.setItem("eonia_active_plaque", plaque);
+    localStorage.removeItem("eonia_pending_plaque");
     window.location.href = "catalogue.html?plaque=" + plaque;
 } else {
     window.location.href = "catalogue.html";
