@@ -263,12 +263,29 @@ function renderGrid() {
 async function assignToPlaque(plantId) {
 
     const email = localStorage.getItem("user_email");
-    const plaqueId = localStorage.getItem("pending_plaque");
+
+    // priorité URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    let plaqueId =
+        urlParams.get("plaque") ||
+        localStorage.getItem("pending_plaque") ||
+        localStorage.getItem("active_plaque");
+
+    if (!plaqueId) {
+        alert("Aucune plaque détectée");
+        return;
+    }
+
+    console.log("PLAQUE:", plaqueId);
 
     try {
+
         const res = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 action: "assign_plant",
                 email: email,
@@ -279,19 +296,31 @@ async function assignToPlaque(plantId) {
 
         const data = await res.json();
 
+        console.log(data);
+
         if (data.success) {
-            alert("Plante associée à votre plaque !");
-            window.location.href = "jardin.html";
-        } else {
-            alert("Erreur : assignation impossible");
+
+            localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
+
+            alert("Plante associée avec succès 🌿");
+
+            window.location.href =
+                "jardin.html?id=" + plantId;
+
+        } else {
+
+            alert(data.error || "Assignation impossible");
+
         }
 
     } catch (e) {
+
+        console.error(e);
         alert("Erreur réseau");
+
     }
 }
-
 async function loadData() {
     const counter = document.getElementById('plant-counter');
     counter.textContent = ""; // au lieu de "CHARGEMENT..."
