@@ -183,14 +183,14 @@ async function openPlant(p) {
     const plaque = localStorage.getItem("pending_plaque");
 
     if (plaque) {
-        // On attend la réponse du serveur avant de faire quoi que ce soit
-        const success = await assignToPlaque(p.id); 
+        // ATTENTION : On attend le résultat de l'assignation
+        const success = await assignToPlaque(p.id);
         
-        // SI ÇA ÉCHOUE (mauvais PIN), ON S'ARRÊTE ICI. 
-        // On ne laisse pas le code atteindre la ligne du bas.
+        // SI LE PIN EST MAUVAIS : success sera false, on arrête TOUT.
         if (!success) return; 
     }
 
+    // On n'arrive ici QUE si le PIN était bon ou s'il n'y avait pas de plaque
     localStorage.removeItem("pending_plaque");
     window.location.href = "jardin.html?id=" + p.id;
 }
@@ -289,15 +289,17 @@ async function assignToPlaque(plantId) {
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            return true; // <--- INDISPENSABLE
+            return true; // Autorise le passage vers jardin.html
         } else {
+            // BLOCAGE VISUEL
             alert("⚠️ ACCÈS REFUSÉ : " + (data.error || "PIN Incorrect"));
-            // On peut même rediriger pour bien bloquer :
+            
+            // OPTIONNEL : Rediriger vers l'accueil pour punir l'erreur
             window.location.href = "index.html"; 
-            return false; // <--- INDISPENSABLE
+            return false; // Bloque le passage
         }
     } catch (e) {
-        alert("Erreur réseau");
+        alert("Erreur de connexion");
         return false;
     }
 }
