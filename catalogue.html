@@ -223,18 +223,17 @@ async function assignToPlaque(plantId) {
 
         const data = await res.json();
 
-        if (data.success) {
+        if (data && data.success === true) { 
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            return true; // Dit à openPlant : "C'est bon, tu peux y aller"
+            return true; 
         } else {
-            // ALERTE ET BLOCAGE
-            alert("⚠️ BLOQUÉ : " + (data.error || "PIN Incorrect"));
-            // On peut même vider le cache pour forcer une reconnexion
+            // SI LE SERVEUR DIT FALSE OU ENVOIE UNE ERREUR
+            alert("⚠️ ACCÈS REFUSÉ : " + (data.error || "Code PIN Incorrect"));
             localStorage.removeItem("pending_plaque");
             window.location.href = "index.html"; 
-            return false; // Dit à openPlant : "Surtout n'ouvre pas la page"
+            return false; 
         }
     } catch (e) {
         alert("Erreur de connexion au serveur de sécurité.");
