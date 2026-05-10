@@ -137,68 +137,25 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-// --- FONCTION DE RENDU DE LA GRILLE (C'est ici qu'on crée les cartes) ---
-function renderGrid() {
-    const grid = document.getElementById('catalogue-grid');
-    grid.innerHTML = "";
-    
-    const search = document.getElementById('searchBox').value.toLowerCase();
-    
-    // Filtrage des plantes
-    let filtered = allPlants.filter(p => {
-        const matchSearch = p["Nom commun"].toLowerCase().includes(search);
-        const isFav = JSON.parse(localStorage.getItem('eonia_favs') || '[]').some(f => f.id === p.id);
-        
-        if (activeFilter === 'favoris') return matchSearch && isFav;
-        if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
-        return matchSearch;
-    });
-
-    if (currentView === 'jardin') {
-        filtered = filtered.filter(p => p.est_dans_jardin);
-    }
-
-    // Affichage des cartes
-    filtered.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'plant-card';
-        // L'ACTION EST ICI : On utilise "await" pour bloquer si le PIN est faux
-        card.onclick = () => openPlant(p); 
-
-        card.innerHTML = `
-            <div class="img-container">
-                <img src="${p.Photo}" class="plant-img">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${p["Nom commun"]}</div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-
-    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
-}
-
-// --- LE VERROU DE SÉCURITÉ ---
+// 1. LE VERROU (Cette fonction décide si on change de page ou non)
 async function openPlant(p) {
     const plaqueId = localStorage.getItem("pending_plaque");
 
     if (plaqueId) {
-        // ÉTAPE 1 : Appeler le serveur et ATTENDRE la réponse
+        // On demande le PIN et on attend la validation du serveur
         const success = await assignToPlaque(p.id, plaqueId);
         
-        // ÉTAPE 2 : Si le serveur dit que le PIN est FAUX, on s'arrête net
-        if (!success) {
-            return; // Bloque la redirection
-        }
+        // SI LE PIN EST MAUVAIS : On s'arrête ici. 
+        // Le "return" empêche de lire la ligne window.location.href plus bas.
+        if (!success) return; 
     }
 
-    // ÉTAPE 3 : Si tout est bon, on affiche le loader et on y va
+    // SI LE PIN EST BON (ou pas de plaque scannée) : On autorise l'accès
     document.getElementById('eonia-loader').style.display = 'flex';
-    window.location.href = "jardin.html?id=" + p.id + (p.est_dans_jardin ? "&view=garden" : "");
+    window.location.href = "jardin.html?id=" + p.id;
 }
 
-// --- L'APPEL AU SERVEUR ---
+// 2. LA VÉRIFICATION (C'est elle qui communique avec ton Worker)
 async function assignToPlaque(plantId, plaqueId) {
     const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA :");
     if (!pinSaisi) return false;
@@ -221,31 +178,62 @@ async function assignToPlaque(plantId, plaqueId) {
 
         const data = await res.json();
 
+        // CONDITION DE BLOCAGE CRITIQUE
         if (data && data.success === true) {
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            return true;
+            return true; // Autorise le passage
         } else {
-            // ALERTE ET REDIRECTION SI PIN MAUVAIS
-            alert("⚠️ BLOQUÉ : " + (data.error || "PIN Incorrect"));
-            localStorage.removeItem("pending_plaque");
-            window.location.href = "index.html"; 
-            return false;
+            alert("⚠️ CODE INCORRECT : Accès refusé.");
+            localStorage.removeItem("pending_plaque"); // On annule la tentative
+            return false; // Bloque le passage
         }
     } catch (e) {
-        alert("Erreur de connexion.");
+        alert("Erreur de connexion au serveur.");
         return false;
     }
 }
 
-// --- CHARGEMENT INITIAL ---
+// 3. LA GRILLE (On lie chaque carte à la fonction openPlant)
+function renderGrid() {
+    const grid = document.getElementById('catalogue-grid');
+    grid.innerHTML = "";
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    
+    let filtered = allPlants.filter(p => {
+        const matchSearch = p["Nom commun"].toLowerCase().includes(search);
+        const isFav = JSON.parse(localStorage.getItem('eonia_favs') || '[]').some(f => f.id === p.id);
+        if (activeFilter === 'favoris') return matchSearch && isFav;
+        if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
+        return matchSearch;
+    });
+
+    if (currentView === 'jardin') filtered = filtered.filter(p => p.est_dans_jardin);
+
+    filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'plant-card';
+        // IMPORTANT : On appelle openPlant au clic
+        card.onclick = () => openPlant(p); 
+
+        card.innerHTML = `
+            <div class="img-container">
+                <img src="${p.Photo}" class="plant-img">
+            </div>
+            <div class="plant-info">
+                <div class="plant-name">${p["Nom commun"]}</div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
+}
+
+// 4. CHARGEMENT DES DONNÉES
 async function loadData() {
     const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        allPlants = JSON.parse(cached);
-        renderGrid();
-    }
+    if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
 
     try {
         const res = await fetch(API_URL, {
@@ -262,6 +250,13 @@ async function loadData() {
     } catch (e) { console.error(e); }
 }
 
+function setFilter(t, b) {
+    activeFilter = t;
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderGrid();
+}
+
 function switchView(view) {
     currentView = view;
     document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
@@ -269,10 +264,7 @@ function switchView(view) {
     renderGrid();
 }
 
-function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-}
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
 loadData();
 </script>
