@@ -183,82 +183,17 @@ async function openPlant(p) {
     const plaque = localStorage.getItem("pending_plaque");
 
     if (plaque) {
-        // ATTENTION : On attend le résultat de l'assignation
+        // ON ATTEND la réponse du serveur (le blocage se passe ici)
         const success = await assignToPlaque(p.id);
         
-        // SI LE PIN EST MAUVAIS : success sera false, on arrête TOUT.
+        // Si le PIN était faux, success est false, et on S'ARRÊTE.
+        // La ligne window.location.href ne sera jamais lue.
         if (!success) return; 
     }
 
-    // On n'arrive ici QUE si le PIN était bon ou s'il n'y avait pas de plaque
+    // Accès autorisé ou consultation simple
     localStorage.removeItem("pending_plaque");
     window.location.href = "jardin.html?id=" + p.id;
-}
-function renderGrid() {
-    const container = document.getElementById('catalogue-grid');
-    const searchVal = document.getElementById('searchBox').value.toLowerCase().trim();
-    const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-
-    container.innerHTML = "";
-    let lastLetter = "";
-
-    let filtered = allPlants.filter(p => {
-        const nom = (p["Nom commun"] || "").toLowerCase();
-        const type = (p.Type || "").toLowerCase();
-
-        if (currentView === 'jardin' && !p.est_dans_jardin) return false;
-
-        if (activeFilter === 'favoris') {
-            if (!favs.some(f => f.id === p.id)) return false;
-        } else if (activeFilter !== 'all') {
-            if (!type.includes(activeFilter.toLowerCase())) return false;
-        }
-
-        return nom.includes(searchVal);
-    });
-
-    document.getElementById('plant-counter').textContent =
-        filtered.length === 0 ? "AUCUNE PLANTE" : `${filtered.length} VARIÉTÉ(S)`;
-
-    filtered.forEach(p => {
-        const nomAffiche = p["Nom commun"] || "Sans nom";
-        const currentLetter = (p["Lettre"] || nomAffiche.charAt(0)).toUpperCase();
-        const isFav = favs.some(f => f.id === p.id);
-
-        if (currentView === 'catalogue' && activeFilter === 'all' && !searchVal) {
-            if (currentLetter !== lastLetter) {
-                const div = document.createElement('div');
-                div.className = "letter-divider";
-                div.textContent = currentLetter;
-                container.appendChild(div);
-                lastLetter = currentLetter;
-            }
-        }
-
-        const card = document.createElement('div');
-        card.className = "plant-card";
-
-        card.addEventListener("click", () => openPlant(p));
-
-        card.innerHTML = `
-            <div class="img-container">
-                <div class="card-fav-btn ${isFav ? 'active' : ''}">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                </div>
-                <img src="${p.Photo || ''}" class="plant-img" loading="lazy">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${nomAffiche}</div>
-            </div>
-        `;
-
-        card.querySelector(".card-fav-btn")
-            .addEventListener("click", (e) => toggleFav(e, p));
-
-        container.appendChild(card);
-    });
 }
 
 async function assignToPlaque(plantId) {
@@ -267,13 +202,16 @@ async function assignToPlaque(plantId) {
 
     if (!plaqueId) return false;
 
-    const pinSaisi = prompt("Veuillez saisir le code PIN de la plaque :");
+    const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA :");
     if (pinSaisi === null) return false; 
 
     try {
         const res = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "x-api-key": "EONIA_2026_SECRET" 
+            },
             body: JSON.stringify({
                 action: "assign_plant",
                 email: email,
@@ -289,17 +227,17 @@ async function assignToPlaque(plantId) {
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            return true; // Autorise le passage vers jardin.html
+            return true; // Dit à openPlant : "C'est bon, tu peux y aller"
         } else {
-            // BLOCAGE VISUEL
-            alert("⚠️ ACCÈS REFUSÉ : " + (data.error || "PIN Incorrect"));
-            
-            // OPTIONNEL : Rediriger vers l'accueil pour punir l'erreur
+            // ALERTE ET BLOCAGE
+            alert("⚠️ BLOQUÉ : " + (data.error || "PIN Incorrect"));
+            // On peut même vider le cache pour forcer une reconnexion
+            localStorage.removeItem("pending_plaque");
             window.location.href = "index.html"; 
-            return false; // Bloque le passage
+            return false; // Dit à openPlant : "Surtout n'ouvre pas la page"
         }
     } catch (e) {
-        alert("Erreur de connexion");
+        alert("Erreur de connexion au serveur de sécurité.");
         return false;
     }
 }
