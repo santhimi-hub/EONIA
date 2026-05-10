@@ -179,15 +179,16 @@ function toggleFav(event, p) {
     renderGrid();
 }
 
-function openPlant(p) {
-
+async function openPlant(p) {
     const plaque = localStorage.getItem("pending_plaque");
 
     if (plaque) {
-        if (confirm("Associer cette plante à votre plaque ?")) {
-            assignToPlaque(p.id);
-        }
-        return;
+        // On attend la réponse du serveur avant de faire quoi que ce soit
+        const success = await assignToPlaque(p.id); 
+        
+        // SI ÇA ÉCHOUE (mauvais PIN), ON S'ARRÊTE ICI. 
+        // On ne laisse pas le code atteindre la ligne du bas.
+        if (!success) return; 
     }
 
     localStorage.removeItem("pending_plaque");
@@ -262,20 +263,12 @@ function renderGrid() {
 
 async function assignToPlaque(plantId) {
     const email = localStorage.getItem("user_email");
-    const urlParams = new URLSearchParams(window.location.search);
+    const plaqueId = localStorage.getItem("pending_plaque");
 
-    let plaqueId = urlParams.get("plaque") || 
-                   localStorage.getItem("pending_plaque") || 
-                   localStorage.getItem("active_plaque");
+    if (!plaqueId) return false;
 
-    if (!plaqueId) {
-        alert("Aucune plaque détectée");
-        return;
-    }
-
-    // --- AJOUT : Demander le code PIN ---
     const pinSaisi = prompt("Veuillez saisir le code PIN de la plaque :");
-    if (pinSaisi === null) return; // Annule si on clique sur Annuler
+    if (pinSaisi === null) return false; 
 
     try {
         const res = await fetch(API_URL, {
@@ -286,7 +279,7 @@ async function assignToPlaque(plantId) {
                 email: email,
                 plantId: plantId,
                 plaqueId: plaqueId,
-                pin: pinSaisi // <--- IMPORTANT : On envoie le PIN ici !
+                pin: pinSaisi
             })
         });
 
@@ -296,14 +289,16 @@ async function assignToPlaque(plantId) {
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            window.location.href = "jardin.html?id=" + plantId;
+            return true; // <--- INDISPENSABLE
         } else {
-            // Ici, si le Worker renvoie "Code PIN incorrect", l'alerte l'affichera
-            alert(data.error || "Assignation impossible");
+            alert("⚠️ ACCÈS REFUSÉ : " + (data.error || "PIN Incorrect"));
+            // On peut même rediriger pour bien bloquer :
+            window.location.href = "index.html"; 
+            return false; // <--- INDISPENSABLE
         }
     } catch (e) {
-        console.error(e);
         alert("Erreur réseau");
+        return false;
     }
 }
 async function loadData() {
