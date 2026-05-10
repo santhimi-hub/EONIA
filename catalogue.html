@@ -137,34 +137,47 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-// 1. LE VERROU (Cette fonction décide si on change de page ou non)
+// --- 1. LE SYSTÈME DE VÉRIFICATION EN BOUCLE ---
 async function openPlant(p) {
     const plaqueId = localStorage.getItem("pending_plaque");
 
     if (plaqueId) {
-        // On demande le PIN et on attend la validation du serveur
-        const success = await assignToPlaque(p.id, plaqueId);
-        
-        // SI LE PIN EST MAUVAIS : On s'arrête ici. 
-        // Le "return" empêche de lire la ligne window.location.href plus bas.
-        if (!success) return; 
+        let isCorrect = false;
+
+        // Tant que le code n'est pas bon, on reste ici
+        while (!isCorrect) {
+            const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA pour associer cette plaque :");
+            
+            // Si l'utilisateur clique sur "Annuler", on arrête tout et on reste sur le catalogue
+            if (pinSaisi === null) return; 
+
+            // Appel au Worker pour vérifier le PIN
+            const result = await verifyAndAssign(p.id, plaqueId, pinSaisi);
+
+            if (result && result.success === true) {
+                isCorrect = true; // On sort de la boucle
+                alert("Plante associée avec succès 🌿");
+            } else {
+                // Si faux, on affiche l'erreur. La boucle while va relancer le prompt.
+                alert("⚠️ CODE INCORRECT : " + (result.error || "Veuillez réessayer."));
+            }
+        }
     }
 
-    // SI LE PIN EST BON (ou pas de plaque scannée) : On autorise l'accès
+    // On n'arrive ici que si :
+    // 1. Il n'y avait pas de plaque (consultation simple)
+    // 2. OU le code PIN saisi dans la boucle était correct
     document.getElementById('eonia-loader').style.display = 'flex';
     window.location.href = "jardin.html?id=" + p.id;
 }
 
-// 2. LA VÉRIFICATION (C'est elle qui communique avec ton Worker)
-async function assignToPlaque(plantId, plaqueId) {
-    const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA :");
-    if (!pinSaisi) return false;
-
+// Fonction qui parle au Worker
+async function verifyAndAssign(plantId, plaqueId, pin) {
     try {
         const res = await fetch(API_URL, {
             method: "POST",
             headers: { 
-                "Content-Type": "application/json",
+                "Content-Type": "application/json", 
                 "x-api-key": "EONIA_2026_SECRET" 
             },
             body: JSON.stringify({
@@ -172,54 +185,45 @@ async function assignToPlaque(plantId, plaqueId) {
                 email: userEmail,
                 plantId: plantId,
                 plaqueId: plaqueId,
-                pin: pinSaisi
+                pin: pin
             })
         });
-
-        const data = await res.json();
-
-        // CONDITION DE BLOCAGE CRITIQUE
-        if (data && data.success === true) {
-            localStorage.setItem("active_plaque", plaqueId);
-            localStorage.removeItem("pending_plaque");
-            alert("Plante associée avec succès 🌿");
-            return true; // Autorise le passage
-        } else {
-            alert("⚠️ CODE INCORRECT : Accès refusé.");
-            localStorage.removeItem("pending_plaque"); // On annule la tentative
-            return false; // Bloque le passage
-        }
+        return await res.json();
     } catch (e) {
-        alert("Erreur de connexion au serveur.");
-        return false;
+        return { success: false, error: "Erreur de connexion au serveur." };
     }
 }
 
-// 3. LA GRILLE (On lie chaque carte à la fonction openPlant)
+// --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
 function renderGrid() {
     const grid = document.getElementById('catalogue-grid');
+    if (!grid) return;
     grid.innerHTML = "";
+    
     const search = document.getElementById('searchBox').value.toLowerCase();
     
     let filtered = allPlants.filter(p => {
         const matchSearch = p["Nom commun"].toLowerCase().includes(search);
-        const isFav = JSON.parse(localStorage.getItem('eonia_favs') || '[]').some(f => f.id === p.id);
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const isFav = favs.some(f => f.id === p.id);
+        
         if (activeFilter === 'favoris') return matchSearch && isFav;
         if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
         return matchSearch;
     });
 
-    if (currentView === 'jardin') filtered = filtered.filter(p => p.est_dans_jardin);
+    if (currentView === 'jardin') {
+        filtered = filtered.filter(p => p.est_dans_jardin);
+    }
 
     filtered.forEach(p => {
         const card = document.createElement('div');
         card.className = 'plant-card';
-        // IMPORTANT : On appelle openPlant au clic
         card.onclick = () => openPlant(p); 
 
         card.innerHTML = `
             <div class="img-container">
-                <img src="${p.Photo}" class="plant-img">
+                <img src="${p.Photo}" class="plant-img" loading="lazy">
             </div>
             <div class="plant-info">
                 <div class="plant-name">${p["Nom commun"]}</div>
@@ -227,13 +231,17 @@ function renderGrid() {
         `;
         grid.appendChild(card);
     });
+
     document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
 }
 
-// 4. CHARGEMENT DES DONNÉES
+// --- 3. CHARGEMENT DES DONNÉES ---
 async function loadData() {
     const cached = localStorage.getItem(cacheKey);
-    if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
+    if (cached) {
+        allPlants = JSON.parse(cached);
+        renderGrid();
+    }
 
     try {
         const res = await fetch(API_URL, {
@@ -241,19 +249,23 @@ async function loadData() {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ email: userEmail })
         });
+
         const data = await res.json();
         if (!data.error) {
             allPlants = data;
             localStorage.setItem(cacheKey, JSON.stringify(data));
             renderGrid();
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Erreur de chargement:", e);
+    }
 }
 
+// --- 4. NAVIGATION & FILTRES ---
 function setFilter(t, b) {
     activeFilter = t;
     document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
+    if (b) b.classList.add('active');
     renderGrid();
 }
 
@@ -261,11 +273,16 @@ function switchView(view) {
     currentView = view;
     document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
     document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
     renderGrid();
 }
 
-function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+}
 
+// Initialisation
 loadData();
 </script>
 </body>
