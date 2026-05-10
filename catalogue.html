@@ -123,9 +123,7 @@
 <script>
 const userEmail = localStorage.getItem('user_email');
 const isOwner = (userEmail && userEmail !== 'invite@eonia.com');
-
 const API_URL = "https://eonia-api.santhimi.workers.dev";
-
 const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -139,71 +137,71 @@ let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-window.addEventListener('pageshow', function() {
-    document.getElementById('eonia-loader').style.display = 'none';
-});
-
-if (isOwner) {
-    const menu = document.getElementById('client-menu');
-    if (menu) menu.style.display = 'flex';
-}
-
-function toggleAI() {
-    const chat = document.getElementById('ai-chat');
-    chat.style.display = (chat.style.display === 'block') ? 'none' : 'block';
-}
-
-window.onscroll = function() {
-    const btn = document.getElementById("topBtn");
-    if (!btn) return;
-    btn.style.display = window.scrollY > 500 ? "block" : "none";
-};
-
-function switchView(view) {
-    currentView = view;
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
-    renderGrid();
-}
-
-function toggleFav(event, p) {
-    event.stopPropagation();
-    let favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-    const idx = favs.findIndex(f => f.id === p.id);
-
-    if (idx > -1) favs.splice(idx, 1);
-    else favs.push({ id: p.id, name: p["Nom commun"], photo: p.Photo });
-
-    localStorage.setItem('eonia_favs', JSON.stringify(favs));
-    renderGrid();
-}
-
-async function openPlant(p) {
-    const plaque = localStorage.getItem("pending_plaque");
-
-    if (plaque) {
-        // ON ATTEND la réponse du serveur (le blocage se passe ici)
-        const success = await assignToPlaque(p.id);
+// --- FONCTION DE RENDU DE LA GRILLE (C'est ici qu'on crée les cartes) ---
+function renderGrid() {
+    const grid = document.getElementById('catalogue-grid');
+    grid.innerHTML = "";
+    
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    
+    // Filtrage des plantes
+    let filtered = allPlants.filter(p => {
+        const matchSearch = p["Nom commun"].toLowerCase().includes(search);
+        const isFav = JSON.parse(localStorage.getItem('eonia_favs') || '[]').some(f => f.id === p.id);
         
-        // Si le PIN était faux, success est false, et on S'ARRÊTE.
-        // La ligne window.location.href ne sera jamais lue.
-        if (!success) return; 
+        if (activeFilter === 'favoris') return matchSearch && isFav;
+        if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
+        return matchSearch;
+    });
+
+    if (currentView === 'jardin') {
+        filtered = filtered.filter(p => p.est_dans_jardin);
     }
 
-    // Accès autorisé ou consultation simple
-    localStorage.removeItem("pending_plaque");
-    window.location.href = "jardin.html?id=" + p.id;
+    // Affichage des cartes
+    filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'plant-card';
+        // L'ACTION EST ICI : On utilise "await" pour bloquer si le PIN est faux
+        card.onclick = () => openPlant(p); 
+
+        card.innerHTML = `
+            <div class="img-container">
+                <img src="${p.Photo}" class="plant-img">
+            </div>
+            <div class="plant-info">
+                <div class="plant-name">${p["Nom commun"]}</div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
 }
 
-async function assignToPlaque(plantId) {
-    const email = localStorage.getItem("user_email");
+// --- LE VERROU DE SÉCURITÉ ---
+async function openPlant(p) {
     const plaqueId = localStorage.getItem("pending_plaque");
 
-    if (!plaqueId) return false;
+    if (plaqueId) {
+        // ÉTAPE 1 : Appeler le serveur et ATTENDRE la réponse
+        const success = await assignToPlaque(p.id, plaqueId);
+        
+        // ÉTAPE 2 : Si le serveur dit que le PIN est FAUX, on s'arrête net
+        if (!success) {
+            return; // Bloque la redirection
+        }
+    }
 
+    // ÉTAPE 3 : Si tout est bon, on affiche le loader et on y va
+    document.getElementById('eonia-loader').style.display = 'flex';
+    window.location.href = "jardin.html?id=" + p.id + (p.est_dans_jardin ? "&view=garden" : "");
+}
+
+// --- L'APPEL AU SERVEUR ---
+async function assignToPlaque(plantId, plaqueId) {
     const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA :");
-    if (pinSaisi === null) return false; 
+    if (!pinSaisi) return false;
 
     try {
         const res = await fetch(API_URL, {
@@ -214,7 +212,7 @@ async function assignToPlaque(plantId) {
             },
             body: JSON.stringify({
                 action: "assign_plant",
-                email: email,
+                email: userEmail,
                 plantId: plantId,
                 plaqueId: plaqueId,
                 pin: pinSaisi
@@ -223,27 +221,26 @@ async function assignToPlaque(plantId) {
 
         const data = await res.json();
 
-        if (data && data.success === true) { 
+        if (data && data.success === true) {
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
             alert("Plante associée avec succès 🌿");
-            return true; 
+            return true;
         } else {
-            // SI LE SERVEUR DIT FALSE OU ENVOIE UNE ERREUR
-            alert("⚠️ ACCÈS REFUSÉ : " + (data.error || "Code PIN Incorrect"));
+            // ALERTE ET REDIRECTION SI PIN MAUVAIS
+            alert("⚠️ BLOQUÉ : " + (data.error || "PIN Incorrect"));
             localStorage.removeItem("pending_plaque");
             window.location.href = "index.html"; 
-            return false; 
+            return false;
         }
     } catch (e) {
-        alert("Erreur de connexion au serveur de sécurité.");
+        alert("Erreur de connexion.");
         return false;
     }
 }
-async function loadData() {
-    const counter = document.getElementById('plant-counter');
-    counter.textContent = ""; // au lieu de "CHARGEMENT..."
 
+// --- CHARGEMENT INITIAL ---
+async function loadData() {
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
         allPlants = JSON.parse(cached);
@@ -256,23 +253,19 @@ async function loadData() {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ email: userEmail })
         });
-
         const data = await res.json();
         if (!data.error) {
             allPlants = data;
             localStorage.setItem(cacheKey, JSON.stringify(data));
             renderGrid();
         }
-    } catch (e) {
-        console.error(e);
-    }
-
-    document.getElementById('eonia-loader').style.display = 'none';
+    } catch (e) { console.error(e); }
 }
-function setFilter(t, b) {
-    activeFilter = t;
-    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
+
+function switchView(view) {
+    currentView = view;
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
     renderGrid();
 }
 
