@@ -261,64 +261,49 @@ function renderGrid() {
 }
 
 async function assignToPlaque(plantId) {
-
     const email = localStorage.getItem("user_email");
-
-    // priorité URL
     const urlParams = new URLSearchParams(window.location.search);
 
-    let plaqueId =
-        urlParams.get("plaque") ||
-        localStorage.getItem("pending_plaque") ||
-        localStorage.getItem("active_plaque");
+    let plaqueId = urlParams.get("plaque") || 
+                   localStorage.getItem("pending_plaque") || 
+                   localStorage.getItem("active_plaque");
 
     if (!plaqueId) {
         alert("Aucune plaque détectée");
         return;
     }
 
-    console.log("PLAQUE:", plaqueId);
+    // --- AJOUT : Demander le code PIN ---
+    const pinSaisi = prompt("Veuillez saisir le code PIN de la plaque :");
+    if (pinSaisi === null) return; // Annule si on clique sur Annuler
 
     try {
-
         const res = await fetch(API_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 action: "assign_plant",
                 email: email,
                 plantId: plantId,
-                plaqueId: plaqueId
+                plaqueId: plaqueId,
+                pin: pinSaisi // <--- IMPORTANT : On envoie le PIN ici !
             })
         });
 
         const data = await res.json();
 
-        console.log(data);
-
         if (data.success) {
-
             localStorage.setItem("active_plaque", plaqueId);
             localStorage.removeItem("pending_plaque");
-
             alert("Plante associée avec succès 🌿");
-
-            window.location.href =
-                "jardin.html?id=" + plantId;
-
+            window.location.href = "jardin.html?id=" + plantId;
         } else {
-
+            // Ici, si le Worker renvoie "Code PIN incorrect", l'alerte l'affichera
             alert(data.error || "Assignation impossible");
-
         }
-
     } catch (e) {
-
         console.error(e);
         alert("Erreur réseau");
-
     }
 }
 async function loadData() {
