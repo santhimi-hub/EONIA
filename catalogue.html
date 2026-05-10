@@ -122,167 +122,117 @@
 
 <script>
 const userEmail = localStorage.getItem('user_email');
-const isOwner = (userEmail && userEmail !== 'invite@eonia.com');
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 
 const urlParams = new URLSearchParams(window.location.search);
 const plaqueFromQR = urlParams.get('plaque');
+if (plaqueFromQR) localStorage.setItem("pending_plaque", plaqueFromQR);
 
-if (plaqueFromQR) {
-    localStorage.setItem("pending_plaque", plaqueFromQR);
-}
-
-let currentView = 'catalogue';
 let allPlants = [];
+let currentView = 'catalogue';
 let activeFilter = 'all';
 
-// --- 1. LE SYSTÈME DE VÉRIFICATION EN BOUCLE ---
-async function openPlant(p) {
+// --- LE VERROU TOTAL ---
+async function openPlant(event, p) {
+    // 1. ON STOPPE TOUT (Empêche le navigateur de suivre un lien ou de recharger)
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     const plaqueId = localStorage.getItem("pending_plaque");
 
     if (plaqueId) {
         let isCorrect = false;
-
-        // Tant que le code n'est pas bon, on reste ici
+        
         while (!isCorrect) {
-            const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA pour associer cette plaque :");
+            const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA :");
             
-            // Si l'utilisateur clique sur "Annuler", on arrête tout et on reste sur le catalogue
-            if (pinSaisi === null) return; 
+            if (pinSaisi === null) return; // L'utilisateur a cliqué sur annuler, on reste là.
 
-            // Appel au Worker pour vérifier le PIN
-            const result = await verifyAndAssign(p.id, plaqueId, pinSaisi);
+            // APPEL AU SERVEUR
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "x-api-key": "EONIA_2026_SECRET" },
+                    body: JSON.stringify({
+                        action: "assign_plant",
+                        email: userEmail,
+                        plantId: p.id,
+                        plaqueId: plaqueId,
+                        pin: pinSaisi
+                    })
+                });
 
-            if (result && result.success === true) {
-                isCorrect = true; // On sort de la boucle
-                alert("Plante associée avec succès 🌿");
-            } else {
-                // Si faux, on affiche l'erreur. La boucle while va relancer le prompt.
-                alert("⚠️ CODE INCORRECT : " + (result.error || "Veuillez réessayer."));
+                const data = await res.json();
+
+                // VERIFICATION RADICALE
+                if (data && data.success === true) {
+                    isCorrect = true; 
+                    alert("✅ Code correct !");
+                    localStorage.removeItem("pending_plaque");
+                } else {
+                    // C'est ici que ça doit bloquer
+                    alert("❌ CODE INCORRECT. L'accès à cette plante est verrouillé.");
+                    // On ne met pas isCorrect à true, donc la boucle while recommence.
+                }
+            } catch (e) {
+                alert("Erreur réseau");
+                return;
             }
         }
     }
 
-    // On n'arrive ici que si :
-    // 1. Il n'y avait pas de plaque (consultation simple)
-    // 2. OU le code PIN saisi dans la boucle était correct
+    // SI ON ARRIVE ICI, C'EST QUE LE PIN EST VALIDE
     document.getElementById('eonia-loader').style.display = 'flex';
     window.location.href = "jardin.html?id=" + p.id;
 }
 
-// Fonction qui parle au Worker
-async function verifyAndAssign(plantId, plaqueId, pin) {
-    try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json", 
-                "x-api-key": "EONIA_2026_SECRET" 
-            },
-            body: JSON.stringify({
-                action: "assign_plant",
-                email: userEmail,
-                plantId: plantId,
-                plaqueId: plaqueId,
-                pin: pin
-            })
-        });
-        return await res.json();
-    } catch (e) {
-        return { success: false, error: "Erreur de connexion au serveur." };
-    }
-}
-
-// --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
 function renderGrid() {
     const grid = document.getElementById('catalogue-grid');
-    if (!grid) return;
     grid.innerHTML = "";
-    
     const search = document.getElementById('searchBox').value.toLowerCase();
     
     let filtered = allPlants.filter(p => {
         const matchSearch = p["Nom commun"].toLowerCase().includes(search);
-        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        const isFav = favs.some(f => f.id === p.id);
-        
-        if (activeFilter === 'favoris') return matchSearch && isFav;
-        if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
-        return matchSearch;
+        if (activeFilter === 'all') return matchSearch;
+        return matchSearch && p.Type === activeFilter;
     });
 
-    if (currentView === 'jardin') {
-        filtered = filtered.filter(p => p.est_dans_jardin);
-    }
+    if (currentView === 'jardin') filtered = filtered.filter(p => p.est_dans_jardin);
 
     filtered.forEach(p => {
         const card = document.createElement('div');
         card.className = 'plant-card';
-        card.onclick = () => openPlant(p); 
+        // ON PASSE L'ÉVÈNEMENT À LA FONCTION
+        card.onclick = (e) => openPlant(e, p); 
 
         card.innerHTML = `
-            <div class="img-container">
-                <img src="${p.Photo}" class="plant-img" loading="lazy">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${p["Nom commun"]}</div>
-            </div>
+            <div class="img-container"><img src="${p.Photo}" class="plant-img"></div>
+            <div class="plant-info"><div class="plant-name">${p["Nom commun"]}</div></div>
         `;
         grid.appendChild(card);
     });
-
-    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
 }
 
-// --- 3. CHARGEMENT DES DONNÉES ---
 async function loadData() {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        allPlants = JSON.parse(cached);
-        renderGrid();
-    }
-
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ email: userEmail })
         });
-
         const data = await res.json();
-        if (!data.error) {
-            allPlants = data;
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-            renderGrid();
-        }
-    } catch (e) {
-        console.error("Erreur de chargement:", e);
-    }
+        allPlants = data;
+        renderGrid();
+    } catch (e) { console.error(e); }
 }
 
-// --- 4. NAVIGATION & FILTRES ---
-function setFilter(t, b) {
-    activeFilter = t;
-    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
-    if (b) b.classList.add('active');
-    renderGrid();
-}
+function switchView(v) { currentView = v; renderGrid(); }
+function setFilter(f, b) { activeFilter = f; renderGrid(); }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
-function switchView(view) {
-    currentView = view;
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
-    renderGrid();
-}
-
-function logout() {
-    localStorage.clear();
-    window.location.href = "index.html";
-}
-
-// Initialisation
 loadData();
 </script>
 </body>
