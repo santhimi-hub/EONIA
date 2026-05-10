@@ -117,70 +117,97 @@ const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
 async function load() {
     try {
+        // 1. APPEL API (On récupère les données)
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+            headers: {
+                'Content-Type': 'application/json', 
+                'x-api-key': 'EONIA_2026_SECRET'
+            },
             body: JSON.stringify({ plantId, email: userEmail })
         });
+        
         const data = await res.json();
         const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
-        if (p) {
-            document.getElementById('p-photo').src = p.Photo;
-            document.getElementById('p-titre').innerText = p["Nom commun"];
-            document.getElementById('p-sci').innerText = p["Nom scientifique"];
-            document.getElementById('p-desc').innerText = p.Description;
-
-            const rubriques = [
-                {n:"Famille", v:p.Famille, highlight:true},
-                {n:"Type", v:p.Type, highlight:true},
-                {n:"Floraison", v:p.Floraison},
-                {n:"Difficulté", v:p.Difficulté},
-                {n:"Arrosage", v:p.Arrosage},
-                {n:"Exposition", v:p.Exposition},
-                {n:"Taille Adulte", v:p["Taille à maturité"]},
-                {n:"Persistance", v:p.Persistance},
-                {n:"Rusticité", v:p.Rusticité}
-            ];
-            document.getElementById('p-grid').innerHTML = rubriques.map(r => `
-                <div class="info-box ${r.highlight ? 'liseret' : ''}">
-                    <div class="label">${r.n}</div>
-                    <div class="value">${r.v || "-"}</div>
-                </div>
-            `).join('');
-
-            if (p.est_dans_jardin) {
-                document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
-                document.getElementById('p-notes').value = p.Note_Privee || "";
-                document.getElementById('date-plant').value = p.Date_Plantation || "";
-                
-                const histData = p.Historique_Data || "";
-                const container = document.getElementById('p-graph');
-                container.innerHTML = "";
-                
-                for(let i=6; i>=0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
-                    const dateStr = d.toLocaleDateString('fr-FR');
-                    const isWatered = histData.includes(dateStr);
-                    
-                    container.innerHTML += `
-                        <div class="bar-wrapper">
-                            <div class="bar ${isWatered ? 'active' : ''}"></div>
-                            <div class="bar-date">${dateStr.slice(0,5)}</div>
-                        </div>
-                    `;
-                }
-            } else {
-                document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
-            }
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('app').classList.add('loaded');
-            loadWeather(); // Lancement de la météo après le chargement
+        // 2. SÉCURITÉ : SI LA PLANTE N'EXISTE PAS
+        if (!p) {
+             alert("Plante introuvable.");
+             window.location.href = "index.html";
+             return;
         }
-    } catch(e) { console.error("Erreur Load:", e); }
+
+        // 3. SÉCURITÉ : SI L'UTILISATEUR FORCE L'ACCÈS AU JARDIN SANS DROITS
+        // Si est_dans_jardin est false, le Worker dit que cet email n'est pas le proprio
+        if (!p.est_dans_jardin && document.querySelectorAll('.mon-jardin-only').length > 0) {
+            // Ici on laisse le code continuer mais l'interface jardin restera cachée
+            console.log("Mode consultation catalogue uniquement.");
+        }
+
+        // 4. REMPLISSAGE DES DONNÉES (Tes rubriques conservées)
+        document.getElementById('p-photo').src = p.Photo;
+        document.getElementById('p-titre').innerText = p["Nom commun"];
+        document.getElementById('p-sci').innerText = p["Nom scientifique"];
+        document.getElementById('p-desc').innerText = p.Description;
+
+        const rubriques = [
+            {n:"Famille", v:p.Famille, highlight:true},
+            {n:"Type", v:p.Type, highlight:true},
+            {n:"Floraison", v:p.Floraison},
+            {n:"Difficulté", v:p.Difficulté},
+            {n:"Arrosage", v:p.Arrosage},
+            {n:"Exposition", v:p.Exposition},
+            {n:"Taille Adulte", v:p["Taille à maturité"]},
+            {n:"Persistance", v:p.Persistance},
+            {n:"Rusticité", v:p.Rusticité}
+        ];
+
+        document.getElementById('p-grid').innerHTML = rubriques.map(r => `
+            <div class="info-box ${r.highlight ? 'liseret' : ''}">
+                <div class="label">${r.n}</div>
+                <div class="value">${r.v || "-"}</div>
+            </div>
+        `).join('');
+
+        // 5. AFFICHAGE CONDITIONNEL (Jardin vs Catalogue)
+        if (p.est_dans_jardin) {
+            document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+            document.getElementById('p-notes').value = p.Note_Privee || "";
+            document.getElementById('date-plant').value = p.Date_Plantation || "";
+            
+            const histData = p.Historique_Data || "";
+            const container = document.getElementById('p-graph');
+            container.innerHTML = "";
+            
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toLocaleDateString('fr-FR');
+                const isWatered = histData.includes(dateStr);
+                
+                container.innerHTML += `
+                    <div class="bar-wrapper">
+                        <div class="bar ${isWatered ? 'active' : ''}"></div>
+                        <div class="bar-date">${dateStr.slice(0,5)}</div>
+                    </div>
+                `;
+            }
+        } else {
+            document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+        }
+
+        // Finalisation affichage
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').classList.add('loaded');
+        loadWeather();
+
+    } catch(e) { 
+        console.error("Erreur Load:", e);
+        document.getElementById('loader').innerHTML = "Erreur de connexion...";
+    }
 }
 
+// GARDER TOUTES TES AUTRES FONCTIONS (waterNow, saveData, loadWeather, etc.) TELLES QUELLES CI-DESSOUS
 async function waterNow() {
     if(!confirm("Confirmer l'arrosage d'aujourd'hui ?")) return;
     const res = await fetch(API_URL, {
@@ -229,7 +256,6 @@ function getLocation() {
     });
 }
 
-// Bouton Retour en haut
 const topBtn = document.getElementById("backToTop");
 window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block" : "none"; };
 topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
