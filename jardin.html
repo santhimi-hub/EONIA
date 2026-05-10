@@ -111,146 +111,130 @@
 </div>
 
 <script>
-    const API_URL = "https://eonia-api.santhimi.workers.dev";
-    const plantId = new URLSearchParams(window.location.search).get('id');
+const API_URL = "https://eonia-api.santhimi.workers.dev";
+const plantId = new URLSearchParams(window.location.search).get('id');
+const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
-    async function load() {
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ plantId, email: localStorage.getItem('user_email') || "invite@eonia.com" })
-            });
-            const data = await res.json();
-            const p = data.find(item => item.id === plantId);
-
-            if (p) {
-                document.getElementById('p-photo').src = p.Photo;
-                document.getElementById('p-titre').innerText = p["Nom commun"];
-                document.getElementById('p-sci').innerText = p["Nom scientifique"];
-                document.getElementById('p-desc').innerText = p.Description;
-
-                const rubriques = [
-                    {n:"Famille", v:p.Famille, highlight:true},
-                    {n:"Type", v:p.Type, highlight:true},
-                    {n:"Floraison", v:p.Floraison},
-                    {n:"Difficulté", v:p.Difficulté},
-                    {n:"Arrosage", v:p.Arrosage},
-                    {n:"Exposition", v:p.Exposition},
-                    {n:"Taille Adulte", v:p["Taille à maturité"]},
-                    {n:"Persistance", v:p.Persistance},
-                    {n:"Rusticité", v:p.Rusticité}
-                ];
-                document.getElementById('p-grid').innerHTML = rubriques.map(r => `
-                    <div class="info-box ${r.highlight ? 'liseret' : ''}">
-                        <div class="label">${r.n}</div>
-                        <div class="value">${r.v || "-"}</div>
-                    </div>
-                `).join('');
-
-                if (p.est_dans_jardin) {
-                    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
-                    document.getElementById('p-notes').value = p.Notes_Privées || "";
-                    document.getElementById('date-plant').value = p.Date_Plantation_ISO || "";
-                    
-                    const hist = p.Watering_History || [0, 0, 0, 0, 0, 0, 0];
-                    const days = ['18/04','19/04','20/04','21/04','22/04','23/04','24/04'];
-                    document.getElementById('p-graph').innerHTML = days.map((d, i) => `
-                        <div class="bar-wrapper" onclick="toggleBar(this)"><div class="bar ${hist[i] ? 'active' : ''}"></div><div class="bar-date">${d}</div></div>
-                    `).join('');
-                } else {
-                    document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
-                }
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('app').classList.add('loaded');
-              loadWeather();
-            }
-        } catch(e) { console.error(e); }
-    }
-
-    // GESTION BOUTON TOP
-    const topBtn = document.getElementById("backToTop");
-    window.onscroll = function() {
-        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { topBtn.style.display = "block"; } 
-        else { topBtn.style.display = "none"; }
-    };
-    topBtn.onclick = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
-
-    function toggleBar(el) { el.querySelector('.bar').classList.toggle('active'); }
-    function waterNow() {
-    const bars = document.querySelectorAll('.bar');
-
-    if (bars.length === 0) return;
-
-    bars[bars.length - 1].classList.add('active');
-
-    alert("💧 Arrosage enregistré !");
-}
-    function saveData() { alert("Modifications enregistrées !"); }
-
-    load();
-  async function loadWeather() {
+async function load() {
     try {
-        // ⚠️ tu peux changer la ville ici (Paris par défaut)
-      let lat = parseFloat(localStorage.getItem("eonia_lat"));
-let lon = parseFloat(localStorage.getItem("eonia_lon"));
-
-if (isNaN(lat) || isNaN(lon)) {
-    lat = 48.8566;
-    lon = 2.3522;
-}
-
-const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`;
-
-        const res = await fetch(url);
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+            body: JSON.stringify({ plantId, email: userEmail })
+        });
         const data = await res.json();
+        const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
-        const days = data.daily.time.slice(0, 4);
-        const temps = data.daily.temperature_2m_max.slice(0, 4);
-        const codes = data.daily.weathercode.slice(0, 4);
+        if (p) {
+            document.getElementById('p-photo').src = p.Photo;
+            document.getElementById('p-titre').innerText = p["Nom commun"];
+            document.getElementById('p-sci').innerText = p["Nom scientifique"];
+            document.getElementById('p-desc').innerText = p.Description;
 
-        const icons = (code) => {
-            if (code === 0) return "☀️";
-            if (code <= 3) return "⛅";
-            if (code <= 48) return "🌫️";
-            if (code <= 67) return "🌧️";
-            if (code <= 77) return "❄️";
-            return "🌦️";
-        };
-
-        document.getElementById("weatherBar").innerHTML = days.map((d, i) => {
-            const date = new Date(d);
-            const label = date.toLocaleDateString("fr-FR", { weekday: "short" });
-
-            return `
-                <div class="weather-item">
-                    <span>${label.toUpperCase()}</span>
-                    <div style="font-size:18px;">${icons(codes[i])}</div>
-                    <b>${Math.round(temps[i])}°</b>
+            const rubriques = [
+                {n:"Famille", v:p.Famille, highlight:true},
+                {n:"Type", v:p.Type, highlight:true},
+                {n:"Floraison", v:p.Floraison},
+                {n:"Difficulté", v:p.Difficulté},
+                {n:"Arrosage", v:p.Arrosage},
+                {n:"Exposition", v:p.Exposition},
+                {n:"Taille Adulte", v:p["Taille à maturité"]},
+                {n:"Persistance", v:p.Persistance},
+                {n:"Rusticité", v:p.Rusticité}
+            ];
+            document.getElementById('p-grid').innerHTML = rubriques.map(r => `
+                <div class="info-box ${r.highlight ? 'liseret' : ''}">
+                    <div class="label">${r.n}</div>
+                    <div class="value">${r.v || "-"}</div>
                 </div>
-            `;
-        }).join("");
+            `).join('');
 
-    } catch (e) {
-        console.log("Erreur météo", e);
-    }
+            if (p.est_dans_jardin) {
+                document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+                document.getElementById('p-notes').value = p.Note_Privee || "";
+                document.getElementById('date-plant').value = p.Date_Plantation || "";
+                
+                const histData = p.Historique_Data || "";
+                const container = document.getElementById('p-graph');
+                container.innerHTML = "";
+                
+                for(let i=6; i>=0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toLocaleDateString('fr-FR');
+                    const isWatered = histData.includes(dateStr);
+                    
+                    container.innerHTML += `
+                        <div class="bar-wrapper">
+                            <div class="bar ${isWatered ? 'active' : ''}"></div>
+                            <div class="bar-date">${dateStr.slice(0,5)}</div>
+                        </div>
+                    `;
+                }
+            } else {
+                document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+            }
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('app').classList.add('loaded');
+            loadWeather(); // Lancement de la météo après le chargement
+        }
+    } catch(e) { console.error("Erreur Load:", e); }
 }
-    function getLocation() {
-    navigator.geolocation.getCurrentPosition((position) => {
 
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+async function waterNow() {
+    if(!confirm("Confirmer l'arrosage d'aujourd'hui ?")) return;
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "water", plantId, email: userEmail })
+    });
+    if(res.ok) { alert("💧 Arrosage enregistré !"); location.reload(); }
+}
 
-        localStorage.setItem("eonia_lat", lat);
-        localStorage.setItem("eonia_lon", lon);
+async function saveData() {
+    const note = document.getElementById('p-notes').value;
+    const date_plantation = document.getElementById('date-plant').value;
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
+    });
+    if(res.ok) alert("💾 Journal mis à jour !");
+}
 
+async function loadWeather() {
+    let lat = localStorage.getItem("eonia_lat") || 48.85;
+    let lon = localStorage.getItem("eonia_lon") || 2.35;
+    try {
+        const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
+        const wData = await wRes.json();
+        const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
+        
+        document.getElementById("weatherBar").innerHTML = wData.daily.time.slice(0,4).map((d, i) => `
+            <div class="weather-item">
+                <span>${new Date(d).toLocaleDateString("fr-FR", {weekday:"short"}).toUpperCase()}</span>
+                <div style="font-size:18px;">${icons(wData.daily.weathercode[i])}</div>
+                <b>${Math.round(wData.daily.temperature_2m_max[i])}°</b>
+            </div>
+        `).join("");
+    } catch (e) { console.log("Météo non dispo"); }
+}
+
+function getLocation() {
+    navigator.geolocation.getCurrentPosition((pos) => {
+        localStorage.setItem("eonia_lat", pos.coords.latitude);
+        localStorage.setItem("eonia_lon", pos.coords.longitude);
         loadWeather();
-
-        alert("📍 Position enregistrée !");
-    }, () => {
-        alert("Impossible d'obtenir la position");
+        alert("📍 Position mise à jour !");
     });
 }
+
+// Bouton Retour en haut
+const topBtn = document.getElementById("backToTop");
+window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block" : "none"; };
+topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
+
+load();
 </script>
 </body>
 </html>
