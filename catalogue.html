@@ -191,44 +191,79 @@ async function openPlant(p) {
 }
 // --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
 function renderGrid() {
+
     const grid = document.getElementById('catalogue-grid');
     if (!grid) return;
+
     grid.innerHTML = "";
-    
-    const search = document.getElementById('searchBox').value.toLowerCase();
-    
+
+    const search =
+        document.getElementById('searchBox')
+        .value.toLowerCase();
+
     let filtered = allPlants.filter(p => {
-        const matchSearch = p["Nom commun"].toLowerCase().includes(search);
-        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        const isFav = favs.some(f => f.id === p.id);
-        
-        if (activeFilter === 'favoris') return matchSearch && isFav;
-        if (activeFilter !== 'all')
-    return matchSearch && p.Type?.includes(activeFilter);
 
-   if (currentView === 'jardin') {
+        const matchSearch =
+            p["Nom commun"]
+            .toLowerCase()
+            .includes(search);
 
-    filtered = filtered.filter(
-        p => p.est_dans_jardin === true
-    );
-}
+        const favs =
+            JSON.parse(
+                localStorage.getItem('eonia_favs') || '[]'
+            );
+
+        const isFav =
+            favs.some(f => f.id === p.id);
+
+        // favoris
+        if (activeFilter === 'favoris') {
+            return matchSearch && isFav;
+        }
+
+        // filtres type
+        if (activeFilter !== 'all') {
+            return matchSearch &&
+                   p.Type?.includes(activeFilter);
+        }
+
+        return matchSearch;
+    });
+
+    // vue MON JARDIN
+    if (currentView === 'jardin') {
+
+        filtered = filtered.filter(
+            p => p.est_dans_jardin === true
+        );
+    }
+
     filtered.forEach(p => {
-        const card = document.createElement('div');
+
+        const card =
+            document.createElement('div');
+
         card.className = 'plant-card';
-        card.onclick = () => openPlant(p); 
+
+        card.onclick = () => openPlant(p);
 
         card.innerHTML = `
             <div class="img-container">
                 <img src="${p.Photo}" class="plant-img" loading="lazy">
             </div>
+
             <div class="plant-info">
-                <div class="plant-name">${p["Nom commun"]}</div>
+                <div class="plant-name">
+                    ${p["Nom commun"]}
+                </div>
             </div>
         `;
+
         grid.appendChild(card);
     });
 
-    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
+    document.getElementById('plant-counter')
+        .innerText = `${filtered.length} PLANTES`;
 }
 
 // --- 3. CHARGEMENT DES DONNÉES ---
