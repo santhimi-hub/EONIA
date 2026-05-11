@@ -189,29 +189,6 @@ async function openPlant(p) {
     window.location.href =
         "jardin.html?id=" + p.id;
 }
-// Fonction qui parle au Worker
-async function verifyAndAssign(plantId, plaqueId, pin) {
-    try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json", 
-                "x-api-key": "EONIA_2026_SECRET" 
-            },
-            body: JSON.stringify({
-                action: "assign_plant",
-                email: userEmail,
-                plantId: plantId,
-                plaqueId: plaqueId,
-                pin: pin
-            })
-        });
-        return await res.json();
-    } catch (e) {
-        return { success: false, error: "Erreur de connexion au serveur." };
-    }
-}
-
 // --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
 function renderGrid() {
     const grid = document.getElementById('catalogue-grid');
@@ -226,9 +203,8 @@ function renderGrid() {
         const isFav = favs.some(f => f.id === p.id);
         
         if (activeFilter === 'favoris') return matchSearch && isFav;
-        if (activeFilter !== 'all') return matchSearch && p.Type === activeFilter;
-        return matchSearch;
-    });
+        if (activeFilter !== 'all')
+    return matchSearch && p.Type?.includes(activeFilter);
 
    if (currentView === 'jardin') {
 
@@ -298,7 +274,11 @@ function switchView(view) {
 }
 
 function logout() {
-    localStorage.clear();
+
+    localStorage.removeItem('auth_state');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('last_pin');
+
     window.location.href = "index.html";
 }
 
