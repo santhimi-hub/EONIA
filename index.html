@@ -140,51 +140,84 @@ document.addEventListener('keypress', function (e) {
 });
 
 async function validerConnexion() {
+
     const btn = document.getElementById('btn-entrer');
-    const mail = document.getElementById('email').value.toLowerCase().trim();
-    const pin = document.getElementById('pin').value.trim();
+
+    const mail = document.getElementById('email')
+        .value
+        .toLowerCase()
+        .trim();
+
+    const pin = document.getElementById('pin')
+        .value
+        .trim();
 
     if (!mail || pin.length !== 4 || isNaN(pin)) {
         alert("PIN invalide (4 chiffres requis)");
         return;
     }
 
-    btn.innerText = "VÉRIFICATION...";
     btn.disabled = true;
+    btn.innerText = "VÉRIFICATION...";
 
     try {
+
         const response = await fetch(WORKER_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: mail, pin: pin })
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "EONIA_2026_SECRET"
+            },
+            body: JSON.stringify({
+                action: "login",
+                email: mail,
+                pin: pin
+            })
         });
 
-        if (response.ok) {
+        const data = await response.json();
 
-            localStorage.setItem('auth_state', 'user');
-            localStorage.setItem('user_email', mail);
+        // 🔴 SI PIN FAUX
+        if (!data.success) {
 
-            const pendingPlaque = localStorage.getItem("pending_plaque");
+            alert(data.error || "PIN incorrect");
 
-            if (pendingPlaque) {
-                localStorage.setItem("active_plaque", pendingPlaque);
-                localStorage.removeItem("pending_plaque");
-
-                window.location.href =
-                    "catalogue.html?mode=activation&plaque=" + pendingPlaque;
-            } else {
-                window.location.href = "catalogue.html";
-            }
-
-        } else {
-            alert("Email ou PIN incorrect.");
-            btn.innerText = isActivationMode ? "ACTIVER MA PLAQUE" : "ENTRER";
             btn.disabled = false;
+            btn.innerText = isActivationMode
+                ? "ACTIVER MA PLAQUE"
+                : "ACCÉDER À MON JARDIN";
+
+            return;
         }
 
-    } catch (e) {
-        alert("Erreur réseau.");
+        // ✅ LOGIN OK
+        localStorage.setItem("auth_state", "user");
+        localStorage.setItem("user_email", mail);
+
+        const pendingPlaque =
+            localStorage.getItem("pending_plaque");
+
+        // activation plaque
+        if (pendingPlaque) {
+
+            window.location.href =
+                "catalogue.html?mode=activation&plaque="
+                + pendingPlaque;
+
+        } else {
+
+            window.location.href = "catalogue.html";
+        }
+
+    } catch(e) {
+
+        alert("Erreur réseau");
+
         btn.disabled = false;
+
+        btn.innerText = isActivationMode
+            ? "ACTIVER MA PLAQUE"
+            : "ACCÉDER À MON JARDIN";
     }
 }
 
