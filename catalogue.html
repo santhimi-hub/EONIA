@@ -139,38 +139,56 @@ let activeFilter = 'all';
 
 // --- 1. LE SYSTÈME DE VÉRIFICATION EN BOUCLE ---
 async function openPlant(p) {
-    const plaqueId = localStorage.getItem("pending_plaque");
 
+    const plaqueId =
+        localStorage.getItem("pending_plaque");
+
+    // activation plaque
     if (plaqueId) {
-        let isCorrect = false;
 
-        // Tant que le code n'est pas bon, on reste ici
-        while (!isCorrect) {
-            const pinSaisi = prompt("Veuillez saisir votre code PIN ÉONIA pour associer cette plaque :");
-            
-            // Si l'utilisateur clique sur "Annuler", on arrête tout et on reste sur le catalogue
-            if (pinSaisi === null) return; 
+        document.getElementById('eonia-loader')
+            .style.display = 'flex';
 
-            // Appel au Worker pour vérifier le PIN
-            const result = await verifyAndAssign(p.id, plaqueId, pinSaisi);
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "EONIA_2026_SECRET"
+            },
+            body: JSON.stringify({
+                action: "assign_plant",
+                email: userEmail,
+                plantId: p.id,
+                plaqueId: plaqueId,
+                pin: localStorage.getItem("last_pin")
+            })
+        });
 
-            if (result && result.success === true) {
-                isCorrect = true; // On sort de la boucle
-                alert("Plante associée avec succès 🌿");
-            } else {
-                // Si faux, on affiche l'erreur. La boucle while va relancer le prompt.
-                alert("⚠️ CODE INCORRECT : " + (result.error || "Veuillez réessayer."));
-            }
+        const data = await res.json();
+
+        document.getElementById('eonia-loader')
+            .style.display = 'none';
+
+        if (!data.success) {
+
+            alert(data.error || "Erreur");
+            return;
         }
+
+        localStorage.removeItem("pending_plaque");
+
+        alert("🌿 Plante associée");
+
+        window.location.href =
+            "jardin.html?id=" + p.id;
+
+        return;
     }
 
-    // On n'arrive ici que si :
-    // 1. Il n'y avait pas de plaque (consultation simple)
-    // 2. OU le code PIN saisi dans la boucle était correct
-    document.getElementById('eonia-loader').style.display = 'flex';
-    window.location.href = "jardin.html?id=" + p.id;
+    // consultation normale
+    window.location.href =
+        "jardin.html?id=" + p.id;
 }
-
 // Fonction qui parle au Worker
 async function verifyAndAssign(plantId, plaqueId, pin) {
     try {
@@ -212,10 +230,12 @@ function renderGrid() {
         return matchSearch;
     });
 
-    if (currentView === 'jardin') {
-        filtered = filtered.filter(p => p.est_dans_jardin);
-    }
+   if (currentView === 'jardin') {
 
+    filtered = filtered.filter(
+        p => p.est_dans_jardin === true
+    );
+}
     filtered.forEach(p => {
         const card = document.createElement('div');
         card.className = 'plant-card';
