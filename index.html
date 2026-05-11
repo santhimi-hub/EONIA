@@ -193,6 +193,7 @@ async function validerConnexion() {
         // ✅ LOGIN OK
         localStorage.setItem("auth_state", "user");
         localStorage.setItem("user_email", mail);
+        localStorage.setItem('last_pin', pin);
 
         const pendingPlaque =
             localStorage.getItem("pending_plaque");
