@@ -22,7 +22,12 @@
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
         /* NAVIGATION */
-        .client-nav { display: flex; justify-content: center; gap: 15px; margin: 20px auto; }
+        .client-nav {
+    display: none;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px auto;
+}
         .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
@@ -299,10 +304,33 @@ async function loadData() {
 
         const data = await res.json();
         if (!data.error) {
-            allPlants = data;
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-            renderGrid();
-        }
+
+    allPlants = data;
+
+    localStorage.setItem(
+        cacheKey,
+        JSON.stringify(data)
+    );
+
+    // vérifie si le client possède des plantes
+    const hasGarden =
+        data.some(
+            p => p.est_dans_jardin === true
+        );
+
+    // affiche le menu seulement si connecté
+    // ET possède au moins une plante
+    if (
+        isOwner &&
+        hasGarden
+    ) {
+        document.getElementById(
+            'client-menu'
+        ).style.display = 'flex';
+    }
+
+    renderGrid();
+}
     } catch (e) {
         console.error("Erreur de chargement:", e);
     }
