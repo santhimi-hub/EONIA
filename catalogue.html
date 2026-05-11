@@ -22,7 +22,7 @@
         #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
         /* NAVIGATION */
-        .client-nav { display: none; justify-content: center; gap: 15px; margin: 20px auto; }
+        .client-nav { display: flex; justify-content: center; gap: 15px; margin: 20px auto; }
         .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
@@ -129,8 +129,14 @@ const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 const urlParams = new URLSearchParams(window.location.search);
 const plaqueFromQR = urlParams.get('plaque');
 
-if (plaqueFromQR) {
-    localStorage.setItem("pending_plaque", plaqueFromQR);
+if (
+    plaqueFromQR &&
+    !localStorage.getItem("pending_plaque")
+) {
+    localStorage.setItem(
+        "pending_plaque",
+        plaqueFromQR
+    );
 }
 
 let currentView = 'catalogue';
@@ -175,12 +181,22 @@ async function openPlant(p) {
             return;
         }
 
-        localStorage.removeItem("pending_plaque");
-
         alert("🌿 Plante associée");
 
-        window.location.href =
-            "jardin.html?id=" + p.id;
+// suppression de la plaque temporaire
+localStorage.removeItem("pending_plaque");
+
+// enlève le ?plaque= de l'URL
+window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+);
+
+// redirection propre
+window.location.replace(
+    "jardin.html?id=" + p.id
+);
 
         return;
     }
