@@ -298,44 +298,32 @@ async function loadData() {
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': 'EONIA_2026_SECRET' // 🔑 IL MANQUAIT CELA
+            },
             body: JSON.stringify({ email: userEmail })
         });
 
         const data = await res.json();
-        if (!data.error) {
+        
+        if (data && !data.error) {
+            allPlants = data;
+            localStorage.setItem(cacheKey, JSON.stringify(data));
 
-    allPlants = data;
+            const hasGarden = data.some(p => p.est_dans_jardin === true);
 
-    localStorage.setItem(
-        cacheKey,
-        JSON.stringify(data)
-    );
-
-    // vérifie si le client possède des plantes
-    const hasGarden =
-        data.some(
-            p => p.est_dans_jardin === true
-        );
-
-    // affiche le menu seulement si connecté
-    // ET possède au moins une plante
-    if (
-        isOwner &&
-        hasGarden
-    ) {
-        document.getElementById(
-            'client-menu'
-        ).style.display = 'flex';
-    }
-
-    renderGrid();
-}
+            if (isOwner && hasGarden) {
+                document.getElementById('client-menu').style.display = 'flex';
+            }
+            renderGrid();
+        } else {
+            console.error("Erreur API :", data.error);
+        }
     } catch (e) {
         console.error("Erreur de chargement:", e);
     }
 }
-
 // --- 4. NAVIGATION & FILTRES ---
 function setFilter(t, b) {
     activeFilter = t;
