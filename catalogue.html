@@ -120,9 +120,21 @@
 <div id="ai-bubble" onclick="toggleAI()">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png">
 </div>
-<div id="ai-chat">
-    <h3 style="color:#4ade80; font-size:0.7rem; letter-spacing:2px; margin-bottom:10px; text-transform:uppercase;">Assistant Éonia</h3>
-    <p style="font-size:0.75rem; color:#ccc; line-height:1.4;">Besoin d'aide pour trouver une plante ou l'ajouter à votre jardin ? Je suis là pour vous conseiller.</p>
+<!-- La bulle fixe en bas à gauche -->
+<div id="ai-bubble" onclick="toggleAI()" style="position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; background: #000; border: 2px solid #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9000;">
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
+</div>
+
+<!-- La fenêtre de chat -->
+<div id="ai-chat" style="display: none; position: fixed; bottom: 95px; left: 20px; width: 300px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 20px; z-index: 9001; padding: 15px; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+    <h3 style="color:#4ade80; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase;">Assistant Éonia</h3>
+    <div id="ai-messages" style="height: 200px; overflow-y: auto; font-size: 0.8rem; color: #ccc; margin-bottom: 10px;">
+        <div>🌿 Bonjour ! Je suis ravi de vous voir. Une question sur nos plantes ou nos plaques ?</div>
+    </div>
+    <div style="display: flex; gap: 5px;">
+        <input type="text" id="ai-input" placeholder="Votre message..." style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:8px; border-radius:10px; outline:none;">
+        <button onclick="askAI()" style="background:#4ade80; border:none; padding:8px 12px; border-radius:10px; cursor:pointer;">></button>
+    </div>
 </div>
 
 <button id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
@@ -336,7 +348,33 @@ function logout() {
 
     window.location.href = "index.html";
 }
+function toggleAI() {
+    const chat = document.getElementById('ai-chat');
+    chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+}
 
+async function askAI() {
+    const input = document.getElementById('ai-input');
+    const msgBox = document.getElementById('ai-messages');
+    const question = input.value.trim();
+    if (!question) return;
+
+    msgBox.innerHTML += `<div style="text-align:right; color:#4ade80; margin-top:10px;">${question}</div>`;
+    input.value = "";
+
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+        body: JSON.stringify({ 
+            action: "ask_ai", 
+            prompt: question, 
+            context: allPlants.map(p => p["Nom commun"]).join(", ") 
+        })
+    });
+    const data = await res.json();
+    msgBox.innerHTML += `<div style="margin-top:10px; line-height:1.4;">✨ ${data.answer}</div>`;
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
 // Initialisation
 loadData();
 </script>
