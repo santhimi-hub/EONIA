@@ -215,79 +215,60 @@ window.location.replace(
 }
 // --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
 function renderGrid() {
-
     const grid = document.getElementById('catalogue-grid');
     if (!grid) return;
-
     grid.innerHTML = "";
 
-    const search =
-        document.getElementById('searchBox')
-        .value.toLowerCase();
+    const search = document.getElementById('searchBox').value.toLowerCase();
 
+    // 1. Filtrage
     let filtered = allPlants.filter(p => {
+        const name = (p["Nom commun"] || "").toLowerCase();
+        const matchSearch = name.includes(search);
+        
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const isFav = favs.some(f => f.id === p.id);
 
-        const matchSearch =
-            p["Nom commun"]
-            .toLowerCase()
-            .includes(search);
-
-        const favs =
-            JSON.parse(
-                localStorage.getItem('eonia_favs') || '[]'
-            );
-
-        const isFav =
-            favs.some(f => f.id === p.id);
-
-        // favoris
-        if (activeFilter === 'favoris') {
-            return matchSearch && isFav;
-        }
-
-        // filtres type
-        if (activeFilter !== 'all') {
-            return matchSearch &&
-                   p.Type?.includes(activeFilter);
-        }
-
+        if (activeFilter === 'favoris') return matchSearch && isFav;
+        if (activeFilter !== 'all') return matchSearch && (p.Type || "").includes(activeFilter);
         return matchSearch;
     });
 
-    // vue MON JARDIN
     if (currentView === 'jardin') {
-
-        filtered = filtered.filter(
-            p => p.est_dans_jardin === true
-        );
+        filtered = filtered.filter(p => p.est_dans_jardin === true);
     }
 
+    // 2. Rendu avec séparateurs alphabétiques
+    let lastLetter = "";
+
     filtered.forEach(p => {
+        const name = p["Nom commun"] || "";
+        const currentLetter = name.charAt(0).toUpperCase();
 
-        const card =
-            document.createElement('div');
+        // Si la lettre change, on ajoute le séparateur (A, B, C...)
+        if (currentLetter !== lastLetter && currentLetter !== "") {
+            const divider = document.createElement('div');
+            divider.className = 'letter-divider';
+            divider.innerText = currentLetter;
+            grid.appendChild(divider);
+            lastLetter = currentLetter;
+        }
 
+        const card = document.createElement('div');
         card.className = 'plant-card';
-
         card.onclick = () => openPlant(p);
-
         card.innerHTML = `
             <div class="img-container">
                 <img src="${p.Photo}" class="plant-img" loading="lazy">
             </div>
-
             <div class="plant-info">
-                <div class="plant-name">
-                    ${p["Nom commun"]}
-                </div>
+                <div class="plant-name">${p["Nom commun"]}</div>
             </div>
         `;
-
         grid.appendChild(card);
     });
 
-    document.getElementById('plant-counter')
-        .innerText = `${filtered.length} PLANTES`;
+    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
 }
 
 // --- 3. CHARGEMENT DES DONNÉES ---
