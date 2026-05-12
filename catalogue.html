@@ -86,7 +86,9 @@
 <div class="top-bar">
     <button class="logout-header-btn" onclick="logout()">Quitter</button>
 </div>
-
+<div id="activation-banner" style="display:none; background:#4ade80; color:#000; text-align:center; padding:10px; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; position:fixed; top:60px; width:100%; z-index:2000;">
+    🌿 Mode Activation : Choisissez la plante à lier à votre plaque
+</div>
 <header>
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
     <h1 class="brand-title">ÉONIA</h1>
@@ -289,6 +291,10 @@ function renderGrid() {
 
 // --- 3. CHARGEMENT DES DONNÉES ---
 async function loadData() {
+    if (localStorage.getItem("pending_plaque")) {
+        document.getElementById('activation-banner').style.display = 'block';
+    }
+
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
         allPlants = JSON.parse(cached);
