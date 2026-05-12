@@ -132,6 +132,8 @@ const API_URL = "https://eonia-api.santhimi.workers.dev";
 const plantId = new URLSearchParams(window.location.search).get('id');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
+// DANS JARDIN.HTML, REMPLACE LA FONCTION LOAD() ET AJOUTE LA RUBRIQUE FLORAISON :
+
 async function load() {
     try {
         const res = await fetch(API_URL, {
@@ -141,19 +143,21 @@ async function load() {
         });
         
         const data = await res.json();
-        const p = data.find(item => item.id === plantId || item.cleanId === plantId);
+        const p = data.find(item => item.id === plantId);
 
-        if (!p) { alert("Plante introuvable."); window.location.href = "catalogue.html"; return; }
+        if (!p) { window.location.href = "catalogue.html"; return; }
 
+        // REMPLISSAGE COMMUN
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
+        // GRILLE (FLORAISON RESTAURÉE)
         const rubriques = [
             {n:"Famille", v:p.Famille, highlight:true},
             {n:"Type", v:p.Type, highlight:true},
-            {n:"Floraison", v:p.Floraison},
+            {n:"Floraison", v:p.Floraison}, // <--- BIEN LÀ
             {n:"Difficulté", v:p.Difficulté},
             {n:"Arrosage", v:p.Arrosage},
             {n:"Exposition", v:p.Exposition},
@@ -169,40 +173,34 @@ async function load() {
             </div>
         `).join('');
 
-        if (p.est_dans_jardin) {
+        // SÉCURITÉ : MÉTÉO ET JOURNAL UNIQUEMENT SI PROPRIÉTAIRE
+        if (p.est_dans_jardin === true) {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+            document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
+            loadWeather(); // LANCÉ UNIQUEMENT ICI
+
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
             container.innerHTML = "";
-            
             for(let i=6; i>=0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
+                const d = new Date(); d.setDate(d.getDate() - i);
                 const dateStr = d.toLocaleDateString('fr-FR');
                 const isWatered = histData.includes(dateStr);
-                
-                container.innerHTML += `
-                    <div class="bar-wrapper">
-                        <div class="bar ${isWatered ? 'active' : ''}"></div>
-                        <div class="bar-date">${dateStr.slice(0,5)}</div>
-                    </div>
-                `;
+                container.innerHTML += `<div class="bar-wrapper"><div class="bar ${isWatered ? 'active' : ''}"></div><div class="bar-date">${dateStr.slice(0,5)}</div></div>`;
             }
         } else {
+            // MODE INVITÉ / CATALOGUE
+            document.getElementById('weatherBar').style.display = 'none';
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
 
         document.getElementById('loader').style.display = 'none';
         document.getElementById('app').classList.add('loaded');
-        loadWeather();
 
-    } catch(e) { 
-        console.error("Erreur Load:", e);
-        document.getElementById('loader').innerHTML = "Erreur de connexion...";
-    }
+    } catch(e) { console.error(e); }
 }
 
 async function waterNow() {
