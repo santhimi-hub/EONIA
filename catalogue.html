@@ -167,7 +167,12 @@
         } catch (e) { msgBox.innerHTML += `<div style="color:red; font-size:0.7rem;">Erreur réseau.</div>`; }
         msgBox.scrollTop = msgBox.scrollHeight;
     }
-
+document.getElementById("ai-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        askAI();
+    }
+});
     loadData();
 </script>
 </body>
