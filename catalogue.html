@@ -75,9 +75,6 @@
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
-<div id="plant-counter" style="text-align: center; color: #4ade80; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 500; text-transform: uppercase;">
-    0 PLANTE
-</div>
 
 <div id="ai-bubble" onclick="toggleAI()">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
@@ -147,15 +144,6 @@
             grid.appendChild(card);
         });
     }
-    const counterEl = document.getElementById('plant-counter');
-    if (counterEl) {
-        counterEl.innerText = `${filtered.length} ${filtered.length > 1 ? 'PLANTES' : 'PLANTE'}`;
-    }
-}
-    const counterEl = document.getElementById('plant-counter');
-if (counterEl) {
-    counterEl.innerText = `${filtered.length} ${filtered.length > 1 ? 'PLANTES' : 'PLANTE'}`;
-}
 
     function setFilter(t, b) {
         activeFilter = t;
