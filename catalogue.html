@@ -1,135 +1,121 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÉONIA — Collection & Jardin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
-    <style>
-        /* RESET & BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
-        
-        /* TOP BAR */
-        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logout-header-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: 0.3s; }
-        .logout-header-btn:hover { background: #4ade80; color: #000; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÉONIA — Collection & Jardin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* === RESET & BASE === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; padding-top: 60px; }
+        
+        /* TOP BAR */
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: flex-end; align-items: center; padding: 0 20px; z-index: 3000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logout-header-btn { background: none; border: 1px solid #4ade80; color: #4ade80; padding: 6px 16px; border-radius: 20px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: 0.3s; }
+        .logout-header-btn:hover { background: #4ade80; color: #000; }
 
-        /* HEADER */
-        header { text-align: center; padding: 30px 20px 20px 20px; }
-        .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
-        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
-        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
+        /* HEADER */
+        header { text-align: center; padding: 30px 20px 20px 20px; }
+        .logo-main { width: 70px; margin-bottom: 15px; opacity: 0.9; }
+        .brand-title { font-weight: 300; text-transform: uppercase; letter-spacing: 8px; font-size: 2.1rem; }
+        #page-title { font-size: 0.7rem; color: #4ade80; margin-top: 8px; letter-spacing: 3px; text-transform: uppercase; }
 
-        /* NAVIGATION */
-        .client-nav {
-    display: none;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px auto;
-}
-        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
+        /* NAVIGATION CLIENT */
+        .client-nav { display: none; justify-content: center; gap: 15px; margin: 20px auto; }
+        .nav-btn { background: none; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        /* CONTROLS */
-        .controls-area { max-width: 1000px; margin: 0 auto 10px auto; padding: 0 15px; text-align: center; }
-        .search-input { width: 100%; max-width: 450px; padding: 14px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .search-input:focus { border-color: #4ade80; background: #111; }
-        #plant-counter { font-size: 0.65rem; color: #4ade80; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        /* RECHERCHE & COMPTEUR */
+        .controls-area { max-width: 1000px; margin: 0 auto 10px auto; padding: 0 15px; text-align: center; }
+        .search-input { width: 100%; max-width: 450px; padding: 14px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 50px; color: #fff; text-align: center; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .search-input:focus { border-color: #4ade80; background: #111; }
+        #plant-counter { font-size: 0.65rem; color: #4ade80; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
 
-        /* FILTERS */
-        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-        .f-btn { background: none; border: 1px solid #1a1a1a; color: #777; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; transition: 0.3s; }
-        .f-btn.active { border-color: #4ade80; color: #4ade80; }
+        /* FILTRES */
+        .filter-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .f-btn { background: none; border: 1px solid #1a1a1a; color: #777; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; transition: 0.3s; }
+        .f-btn.active { border-color: #4ade80; color: #4ade80; }
 
-        /* GRID */
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; margin: 20px 0 10px 0; letter-spacing: 8px; border-bottom: 1px solid rgba(74, 222, 128, 0.1); padding-bottom: 5px; text-align: left; }
-        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; position: relative; }
-        .plant-card:hover { transform: translateY(-5px); border-color: #333; }
-        .img-container { width: 100%; height: 160px; overflow: hidden; background: #080808; position: relative; }
-        .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .plant-card:hover .plant-img { scale: 1.05; }
-        .plant-info { padding: 15px 10px; text-align: center; }
-        .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+        /* GRILLE DE PRODUITS */
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .letter-divider { grid-column: 1 / -1; font-size: 1.5rem; color: #4ade80; margin: 20px 0 10px 0; letter-spacing: 8px; border-bottom: 1px solid rgba(74, 222, 128, 0.1); padding-bottom: 5px; text-align: left; }
+        .plant-card { background: #0c0c0c; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; position: relative; }
+        .plant-card:hover { transform: translateY(-5px); border-color: #333; }
+        .img-container { width: 100%; height: 160px; overflow: hidden; background: #080808; position: relative; }
+        .plant-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .plant-card:hover .plant-img { scale: 1.05; }
+        .plant-info { padding: 15px 10px; text-align: center; }
+        .plant-name { font-size: 0.75rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
 
-        .card-fav-btn {
-            position: absolute; top: 10px; right: 10px; z-index: 5;
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;
-        }
-        .card-fav-btn svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; transition: 0.2s; }
-        .card-fav-btn.active svg { fill: #4ade80; stroke: #4ade80; }
+        /* CHARGEMENT & IA */
+        #eonia-loader { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .spin-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .load-txt { font-size: 0.6rem; letter-spacing: 3px; color: #4ade80; text-transform: uppercase; }
 
-        /* --- AJOUTS ÉONIA : LOADER, IA & TOP --- */
-        #eonia-loader { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .spin-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .load-txt { font-size: 0.6rem; letter-spacing: 3px; color: #4ade80; text-transform: uppercase; }
+        #ai-bubble { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; background: #000; border: 2px solid #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9000; box-shadow: 0 0 15px rgba(74,222,128,0.3); }
+        #ai-chat { display: none; position: fixed; bottom: 95px; left: 20px; width: 300px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 20px; z-index: 9001; padding: 15px; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
 
-        #ai-bubble { position: fixed; bottom: 25px; left: 20px; width: 60px; height: 60px; background: #000; border: 2px solid #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9000; box-shadow: 0 0 15px rgba(74,222,128,0.3); }
-        #ai-bubble img { width: 38px; }
-        #ai-chat { display: none; position: fixed; bottom: 95px; left: 20px; width: 300px; background: #0c0c0c; border: 1px solid #1a1a1a; border-radius: 20px; z-index: 9001; padding: 15px; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-
-        #topBtn { display: none; position: fixed; bottom: 25px; right: 20px; width: 50px; height: 50px; background: #4ade80; color: #000; border: none; border-radius: 50%; cursor: pointer; z-index: 9000; font-weight: bold; font-size: 1.2rem; }
-    </style>
+        #topBtn { display: none; position: fixed; bottom: 25px; right: 20px; width: 50px; height: 50px; background: #4ade80; color: #000; border: none; border-radius: 50%; cursor: pointer; z-index: 9000; font-weight: bold; font-size: 1.2rem; }
+    </style>
 </head>
 <body>
 
 <div id="eonia-loader">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spin-logo">
-    <div class="load-txt">Chargement de la plante...</div>
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spin-logo">
+    <div class="load-txt">Chargement de la plante...</div>
 </div>
 
 <div class="top-bar">
-    <button class="logout-header-btn" onclick="logout()">Quitter</button>
+    <button class="logout-header-btn" onclick="logout()">Quitter</button>
 </div>
+
 <div id="activation-banner" style="display:none; background:#4ade80; color:#000; text-align:center; padding:10px; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; position:fixed; top:60px; width:100%; z-index:2000;">
-    🌿 Mode Activation : Choisissez la plante à lier à votre plaque
+    🌿 Mode Activation : Choisissez la plante à lier à votre plaque
 </div>
+
 <header>
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
-    <h1 class="brand-title">ÉONIA</h1>
-    <p id="page-title">Notre Collection</p>
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
+    <h1 class="brand-title">ÉONIA</h1>
+    <p id="page-title">Notre Collection</p>
 </header>
 
 <div id="client-menu" class="client-nav">
-    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
-    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
+    <button id="btn-col" class="nav-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+    <button id="btn-jar" class="nav-btn" onclick="switchView('jardin')">Mon Jardin</button>
 </div>
 
 <div class="controls-area">
-    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
-    <div id="plant-counter">""...</div>
+    <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
+    <div id="plant-counter">""...</div>
 
-    <div class="filter-nav">
-        <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
-        <button class="f-btn" onclick="setFilter('favoris', this)">❤ Favoris</button>
-        <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
-        <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
-        <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
-        <button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
-        <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
-    </div>
+    <div class="filter-nav">
+        <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
+        <button class="f-btn" onclick="setFilter('favoris', this)">❤ Favoris</button>
+        <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
+        <button class="f-btn" onclick="setFilter('Arbre', this)">Arbres</button>
+        <button class="f-btn" onclick="setFilter('Fleur', this)">Fleurs</button>
+        <button class="f-btn" onclick="setFilter('Aromate', this)">Aromates</button>
+        <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
+    </div>
 </div>
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
 <div id="ai-bubble" onclick="toggleAI()">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
+    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
 </div>
 
 <div id="ai-chat">
-    <h3 style="color:#4ade80; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase;">Ambassadeur Éonia</h3>
-    <div id="ai-messages" style="height: 200px; overflow-y: auto; font-size: 0.8rem; color: #ccc; margin-bottom: 10px; padding-right: 5px;">
-        <div style="margin-bottom: 10px;">🌿 Bonjour ! Je suis ravi de vous accompagner. Quelle merveille cherchez-vous aujourd'hui ?</div>
-    </div>
-    <div style="display: flex; gap: 8px; border-top: 1px solid #1a1a1a; padding-top: 10px;">
-        <input type="text" id="ai-input" placeholder="Votre message..." style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:10px; border-radius:10px; outline:none; font-size: 0.75rem;">
-        <button onclick="askAI()" style="background:#4ade80; border:none; width: 35px; height: 35px; border-radius:10px; cursor:pointer; color: #000; font-weight: bold;">></button>
-    </div>
+    <h3 style="color:#4ade80; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase;">Ambassadeur Éonia</h3>
+    <div id="ai-messages" style="height: 200px; overflow-y: auto; font-size: 0.8rem; color: #ccc; margin-bottom: 10px; padding-right: 5px; line-height: 1.4;">
+        <div style="margin-bottom: 10px;">🌿 Bonjour ! Je suis ravi de vous accompagner. Quelle merveille cherchez-vous aujourd'hui ?</div>
+    </div>
+    <div style="display: flex; gap: 8px; border-top: 1px solid #1a1a1a; padding-top: 10px;">
+        <input type="text" id="ai-input" placeholder="Votre message..." style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:10px; border-radius:10px; outline:none; font-size: 0.75rem;">
+        <button onclick="askAI()" style="background:#4ade80; border:none; width: 35px; height: 35px; border-radius:10px; cursor:pointer; color: #000; font-weight: bold;">></button>
+    </div>
 </div>
 
 <button id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
@@ -143,254 +129,157 @@ const cacheKey = `eonia_cache_${userEmail || 'visitor'}`;
 const urlParams = new URLSearchParams(window.location.search);
 const plaqueFromQR = urlParams.get('plaque');
 
-if (
-    plaqueFromQR &&
-    !localStorage.getItem("pending_plaque")
-) {
-    localStorage.setItem(
-        "pending_plaque",
-        plaqueFromQR
-    );
+if (plaqueFromQR && !localStorage.getItem("pending_plaque")) {
+    localStorage.setItem("pending_plaque", plaqueFromQR);
 }
 
 let currentView = 'catalogue';
 let allPlants = [];
 let activeFilter = 'all';
 
-// --- 1. LE SYSTÈME DE VÉRIFICATION EN BOUCLE ---
 async function openPlant(p) {
-
-    const plaqueId =
-        localStorage.getItem("pending_plaque");
-
-    // activation plaque
-    if (plaqueId) {
-
-        document.getElementById('eonia-loader')
-            .style.display = 'flex';
-
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": "EONIA_2026_SECRET"
-            },
-            body: JSON.stringify({
-                action: "assign_plant",
-                email: userEmail,
-                plantId: p.id,
-                plaqueId: plaqueId,
-                pin: localStorage.getItem("last_pin")
-            })
-        });
-
-        const data = await res.json();
-
-        document.getElementById('eonia-loader')
-            .style.display = 'none';
-
-        if (!data.success) {
-
-            alert(data.error || "Erreur");
-            return;
-        }
-
-        alert("🌿 Plante associée");
-        localStorage.removeItem(cacheKey); 
-
-// suppression de la plaque temporaire
-localStorage.removeItem("pending_plaque");
-
-// enlève le ?plaque= de l'URL
-window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
-);
-
-// redirection propre
-window.location.replace(
-    "jardin.html?id=" + p.id
-);
-
-        return;
-    }
-
-    // consultation normale
-    window.location.href =
-        "jardin.html?id=" + p.id;
+    const plaqueId = localStorage.getItem("pending_plaque");
+    if (plaqueId) {
+        document.getElementById('eonia-loader').style.display = 'flex';
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-api-key": "EONIA_2026_SECRET" },
+            body: JSON.stringify({ action: "assign_plant", email: userEmail, plantId: p.id, plaqueId: plaqueId, pin: localStorage.getItem("last_pin") })
+        });
+        const data = await res.json();
+        document.getElementById('eonia-loader').style.display = 'none';
+        if (!data.success) { alert(data.error || "Erreur"); return; }
+        alert("🌿 Plante associée");
+        localStorage.removeItem(cacheKey); 
+        localStorage.removeItem("pending_plaque");
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.replace("jardin.html?id=" + p.id);
+        return;
+    }
+    window.location.href = "jardin.html?id=" + p.id;
 }
-// --- 2. GESTION DE L'AFFICHAGE (GRILLE) ---
+
 function renderGrid() {
-    const grid = document.getElementById('catalogue-grid');
-    if (!grid) return;
-    grid.innerHTML = "";
+    const grid = document.getElementById('catalogue-grid');
+    if (!grid) return;
+    grid.innerHTML = "";
+    const search = document.getElementById('searchBox').value.toLowerCase();
 
-    const search = document.getElementById('searchBox').value.toLowerCase();
+    let filtered = allPlants.filter(p => {
+        const name = (p["Nom commun"] || "").toLowerCase();
+        const matchSearch = name.includes(search);
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const isFav = favs.some(f => f.id === p.id);
+        if (activeFilter === 'favoris') return matchSearch && isFav;
+        if (activeFilter !== 'all') return matchSearch && (p.Type || "").includes(activeFilter);
+        return matchSearch;
+    });
 
-    // 1. Filtrage
-    let filtered = allPlants.filter(p => {
-        const name = (p["Nom commun"] || "").toLowerCase();
-        const matchSearch = name.includes(search);
-        
-        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-        const isFav = favs.some(f => f.id === p.id);
+    if (currentView === 'jardin') filtered = filtered.filter(p => p.est_dans_jardin === true);
 
-        if (activeFilter === 'favoris') return matchSearch && isFav;
-        if (activeFilter !== 'all') return matchSearch && (p.Type || "").includes(activeFilter);
-        return matchSearch;
-    });
-
-    if (currentView === 'jardin') {
-        filtered = filtered.filter(p => p.est_dans_jardin === true);
-    }
-
-    // 2. Rendu avec séparateurs alphabétiques
-    let lastLetter = "";
-
-    filtered.forEach(p => {
-        const name = p["Nom commun"] || "";
-        const currentLetter = name.charAt(0).toUpperCase();
-
-        // Si la lettre change, on ajoute le séparateur (A, B, C...)
-        if (currentLetter !== lastLetter && currentLetter !== "") {
-            const divider = document.createElement('div');
-            divider.className = 'letter-divider';
-            divider.innerText = currentLetter;
-            grid.appendChild(divider);
-            lastLetter = currentLetter;
-        }
-
-        const card = document.createElement('div');
-        card.className = 'plant-card';
-        card.onclick = () => openPlant(p);
-        card.innerHTML = `
-            <div class="img-container">
-                <img src="${p.Photo}" class="plant-img" loading="lazy">
-            </div>
-            <div class="plant-info">
-                <div class="plant-name">${p["Nom commun"]}</div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-
-    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
+    let lastLetter = "";
+    filtered.forEach(p => {
+        const name = p["Nom commun"] || "";
+        const currentLetter = name.charAt(0).toUpperCase();
+        if (currentLetter !== lastLetter && currentLetter !== "") {
+            const divider = document.createElement('div');
+            divider.className = 'letter-divider';
+            divider.innerText = currentLetter;
+            grid.appendChild(divider);
+            lastLetter = currentLetter;
+        }
+        const card = document.createElement('div');
+        card.className = 'plant-card';
+        card.onclick = () => openPlant(p);
+        card.innerHTML = `
+            <div class="img-container"><img src="${p.Photo}" class="plant-img" loading="lazy"></div>
+            <div class="plant-info"><div class="plant-name">${p["Nom commun"]}</div></div>
+        `;
+        grid.appendChild(card);
+    });
+    document.getElementById('plant-counter').innerText = `${filtered.length} PLANTES`;
 }
 
-// --- 3. CHARGEMENT DES DONNÉES ---
 async function loadData() {
-    if (localStorage.getItem("pending_plaque")) {
-        document.getElementById('activation-banner').style.display = 'block';
-    }
-
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        allPlants = JSON.parse(cached);
-        renderGrid();
-    }
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET'
-            },
-            body: JSON.stringify({ email: userEmail })
-        });
-
-        const data = await res.json();
-        
-        if (data && !data.error) {
-            allPlants = data;
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-
-            const hasGarden = data.some(p => p.est_dans_jardin === true);
-
-            if (isOwner && hasGarden) {
-                document.getElementById('client-menu').style.display = 'flex';
-            }
-            renderGrid();
-        } else {
-            console.error("Erreur API :", data.error);
-        }
-    } catch (e) {
-        console.error("Erreur de chargement:", e);
-    }
+    if (localStorage.getItem("pending_plaque")) document.getElementById('activation-banner').style.display = 'block';
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) { allPlants = JSON.parse(cached); renderGrid(); }
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ email: userEmail })
+        });
+        const data = await res.json();
+        if (data && !data.error) {
+            allPlants = data;
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            if (isOwner && data.some(p => p.est_dans_jardin === true)) document.getElementById('client-menu').style.display = 'flex';
+            renderGrid();
+        }
+    } catch (e) { console.error(e); }
 }
-// --- 4. NAVIGATION & FILTRES ---
+
 function setFilter(t, b) {
-    activeFilter = t;
-    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
-    if (b) b.classList.add('active');
-    renderGrid();
+    activeFilter = t;
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('active'));
+    if (b) b.classList.add('active');
+    renderGrid();
 }
 
 function switchView(view) {
-    currentView = view;
-    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
-    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
-    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
-    renderGrid();
+    currentView = view;
+    document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+    document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+    document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
+    renderGrid();
 }
 
 function logout() {
-    localStorage.removeItem('auth_state');
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('last_pin');
-    window.location.href = "index.html";
+    localStorage.removeItem('auth_state');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('last_pin');
+    window.location.href = "index.html";
 }
 
-// --- 5. LOGIQUE IA ---
 function toggleAI() {
-    const chat = document.getElementById('ai-chat');
-    chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
-    if (chat.style.display === 'flex') {
-        document.getElementById('ai-input').focus();
-    }
+    const chat = document.getElementById('ai-chat');
+    chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+    if (chat.style.display === 'flex') document.getElementById('ai-input').focus();
 }
 
 async function askAI() {
-    const input = document.getElementById('ai-input');
-    const msgBox = document.getElementById('ai-messages');
-    const question = input.value.trim();
-    if (!question) return;
+    const input = document.getElementById('ai-input');
+    const msgBox = document.getElementById('ai-messages');
+    const question = input.value.trim();
+    if (!question) return;
 
-    msgBox.innerHTML += `<div style="text-align:right; color:#4ade80; margin-bottom:12px; font-weight: 500;">${question}</div>`;
-    input.value = "";
-    msgBox.scrollTop = msgBox.scrollHeight;
+    msgBox.innerHTML += `<div style="text-align:right; color:#4ade80; margin-bottom:12px; font-weight:500;">${question}</div>`;
+    input.value = "";
+    msgBox.scrollTop = msgBox.scrollHeight;
 
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-            body: JSON.stringify({ 
-                action: "ask_ai", 
-                prompt: question, 
-                context: allPlants.map(p => p["Nom commun"]).join(", ") 
-            })
-        });
-
-        const data = await res.json();
-        if (data.success && data.answer) {
-            msgBox.innerHTML += `<div style="margin-bottom:15px; line-height:1.5; color: #eee;">✨ ${data.answer}</div>`;
-        } else {
-            msgBox.innerHTML += `<div style="color: #ff5555; font-size: 0.7rem;">L'ambassadeur jardine... Réessayez !</div>`;
-        }
-    } catch (e) {
-        msgBox.innerHTML += `<div style="color: #ff5555; font-size: 0.7rem;">Connexion perdue avec le jardin...</div>`;
-    }
-    msgBox.scrollTop = msgBox.scrollHeight;
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "ask_ai", prompt: question, context: allPlants.map(p => p["Nom commun"]).join(", ") })
+        });
+        const data = await res.json();
+        if (data.success && data.answer) {
+            msgBox.innerHTML += `<div style="margin-bottom:15px; line-height:1.5; color: #eee;">✨ ${data.answer}</div>`;
+        } else {
+            msgBox.innerHTML += `<div style="color: #ff5555; font-size: 0.7rem; margin-bottom: 10px;">L'ambassadeur jardine... Réessayez !</div>`;
+        }
+    } catch (e) {
+        msgBox.innerHTML += `<div style="color: #ff5555; font-size: 0.7rem; margin-bottom: 10px;">Connexion perdue...</div>`;
+    }
+    msgBox.scrollTop = msgBox.scrollHeight;
 }
 
 document.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && document.activeElement.id === 'ai-input') {
-        askAI();
-    }
+    if (e.key === 'Enter' && document.activeElement.id === 'ai-input') askAI();
 });
 
-// Initialisation
 loadData();
 </script>
 </body>
