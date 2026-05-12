@@ -129,7 +129,9 @@
 
 <script>
 const API_URL = "https://eonia-api.santhimi.workers.dev";
-const plantId = new URLSearchParams(window.location.search).get('id');
+const params = new URLSearchParams(window.location.search);
+const plantId = params.get('id');
+const plaqueId = params.get('plaqueId'); // <--- INDISPENSABLE pour le QR Code
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
 // DANS JARDIN.HTML, REMPLACE LA FONCTION LOAD() ET AJOUTE LA RUBRIQUE FLORAISON :
@@ -146,6 +148,13 @@ async function load() {
         const p = data.find(item => item.id === plantId);
 
         if (!p) { window.location.href = "catalogue.html"; return; }
+        // --- AJOUT CHIRURGICAL POUR LE QR CODE ---
+if (plaqueId && !p.est_dans_jardin) {
+    // Si on scanne une plaque qui n'appartient pas encore à l'utilisateur
+    setTimeout(() => {
+        proposerAssociation(plaqueId, p.id, p["Nom commun"]);
+    }, 1000);
+}
 
         // REMPLISSAGE COMMUN
         document.getElementById('p-photo').src = p.Photo;
@@ -254,6 +263,31 @@ function getLocation() {
 const topBtn = document.getElementById("backToTop");
 window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block" : "none"; };
 topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
+    async function proposerAssociation(plaqId, planId, nomPlante) {
+    const pin = prompt(`Plaque ${plaqId} détectée !\nEntrez un code PIN à 4 chiffres pour sécuriser votre ${nomPlante} :`);
+    if (!pin) return;
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ 
+                action: "assign_plant", 
+                plaqueId: plaqId, 
+                plantId: planId, 
+                email: userEmail,
+                pin: pin 
+            })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert("✨ Plante associée avec succès !");
+            location.reload();
+        } else {
+            alert("Erreur : " + result.error);
+        }
+    } catch(e) { alert("Erreur réseau"); }
+}
 
 load();
 </script>
