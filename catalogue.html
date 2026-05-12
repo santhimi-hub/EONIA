@@ -152,6 +152,10 @@
         counterEl.innerText = `${filtered.length} ${filtered.length > 1 ? 'PLANTES' : 'PLANTE'}`;
     }
 }
+    const counterEl = document.getElementById('plant-counter');
+if (counterEl) {
+    counterEl.innerText = `${filtered.length} ${filtered.length > 1 ? 'PLANTES' : 'PLANTE'}`;
+}
 
     function setFilter(t, b) {
         activeFilter = t;
