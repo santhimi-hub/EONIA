@@ -22,22 +22,29 @@
         /* BOUTON RETOUR EN HAUT */
         #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); }
 
-        /* --- CORRECTION MÉTÉO HORIZONTALE --- */
+        /* --- FORCE L'ALIGNEMENT HORIZONTAL --- */
         .weather-bar { 
-            display: flex; 
-            flex-direction: row; 
-            justify-content: space-around; 
-            align-items: center; 
+            display: flex !important; 
+            flex-direction: row !important; 
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important; 
+            align-items: center !important; 
             background: var(--card); 
             border: 1px solid var(--border); 
             border-radius: 20px; 
             padding: 15px; 
-            margin-bottom: 25px; 
+            margin-bottom: 25px;
         }
-        .weather-item { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .weather-item span { display: block; font-size: 0.55rem; font-weight: 600; color: #888; margin-bottom: 5px; }
-        .weather-item b { display: block; font-size: 0.7rem; color: #fff; margin-top: 5px; }
-        .w-icon { font-size: 1.2rem; line-height: 1; margin: 2px 0; }
+        .weather-item { 
+            flex: 1 !important; 
+            display: flex !important; 
+            flex-direction: column !important; 
+            align-items: center !important; 
+            text-align: center !important;
+        }
+        .weather-item span { font-size: 0.55rem; font-weight: 600; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .weather-item b { font-size: 0.75rem; color: #fff; margin-top: 5px; }
+        .w-icon { font-size: 1.3rem; line-height: 1; margin: 2px 0; }
 
         /* HERO & TITRES */
         .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
