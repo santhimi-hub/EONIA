@@ -189,6 +189,7 @@ async function openPlant(p) {
         }
 
         alert("🌿 Plante associée");
+        localStorage.removeItem(cacheKey); 
 
 // suppression de la plaque temporaire
 localStorage.removeItem("pending_plaque");
