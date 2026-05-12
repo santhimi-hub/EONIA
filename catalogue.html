@@ -73,8 +73,11 @@
         <button class="f-btn" onclick="setFilter('Potager', this)">Potager</button>
     </div>
 </div>
-
+<div id="plant-counter" style="text-align: center; color: #4ade80; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 500; text-transform: uppercase;">
+    Chargement...
+</div>
 <div id="catalogue-grid" class="catalog-container"></div>
+    <div id="plant-counter" style="text-align: center; color: #4ade80; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 500; text-transform: uppercase;">CHARGEMENT...</div>
 
 <div id="ai-bubble" onclick="toggleAI()">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
@@ -118,6 +121,8 @@
         const grid = document.getElementById('catalogue-grid');
         grid.innerHTML = "";
         const search = document.getElementById('searchBox').value.toLowerCase();
+        
+        // 1. On filtre les plantes selon la recherche et la vue (Collection ou Jardin)
         let filtered = allPlants.filter(p => {
             const name = (p["Nom commun"] || "").toLowerCase();
             if (currentView === 'jardin' && !p.est_dans_jardin) return false;
@@ -128,6 +133,14 @@
             return activeFilter === 'all' ? matchSearch : (matchSearch && (p.Type || "").includes(activeFilter));
         });
 
+        // 2. MISE À JOUR DU COMPTEUR (C'est ici que ça se passe !)
+        const counterEl = document.getElementById('plant-counter');
+        if (counterEl) {
+            const total = filtered.length;
+            counterEl.innerText = `${total} ${total > 1 ? 'PLANTES' : 'PLANTE'}`;
+        }
+
+        // 3. On génère l'affichage des cartes
         let lastLetter = "";
         filtered.forEach(p => {
             const currentLetter = (p["Nom commun"] || "").charAt(0).toUpperCase();
