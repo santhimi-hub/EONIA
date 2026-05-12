@@ -129,21 +129,14 @@ async function load() {
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', 
-                'x-api-key': 'EONIA_2026_SECRET'
-            },
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
             body: JSON.stringify({ plantId, email: userEmail })
         });
         
         const data = await res.json();
         const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
-        if (!p) {
-             alert("Plante introuvable.");
-             window.location.href = "catalogue.html";
-             return;
-        }
+        if (!p) { alert("Plante introuvable."); window.location.href = "catalogue.html"; return; }
 
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
