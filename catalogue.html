@@ -47,8 +47,7 @@
 
 <div class="top-bar">
     <button class="logout-btn" onclick="window.location.href='index.html'">← Accueil</button>
-    <button class="logout-btn" onclick="logout()">Quitter</button>
-</div>
+    </div>
 
 <header>
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
@@ -56,11 +55,15 @@
     <p id="page-title">Notre Collection</p>
 </header>
 
+<div id="client-menu" style="display:none; justify-content:center; gap:15px; margin:20px auto;">
+    <button id="btn-col" class="f-btn active" onclick="switchView('catalogue')">Notre Collection</button>
+    <button id="btn-jar" class="f-btn" onclick="switchView('jardin')">Mon Jardin</button>
+</div>
+
 <div class="controls-area">
     <input type="text" id="searchBox" class="search-input" placeholder="RECHERCHER UNE PLANTE..." oninput="renderGrid()">
     
     <div class="filter-nav">
-        <!-- TOUTES TES RUBRIQUES SONT ICI -->
         <button class="f-btn active" onclick="setFilter('all', this)">Tout</button>
         <button class="f-btn" onclick="setFilter('favoris', this)">❤ Favoris</button>
         <button class="f-btn" onclick="setFilter('Fruitier', this)">Fruitiers</button>
@@ -73,24 +76,11 @@
 
 <div id="catalogue-grid" class="catalog-container"></div>
 
-<div id="ai-bubble" onclick="toggleAI()">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
-</div>
-<div id="ai-chat">
-    <h3 style="color:#4ade80; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 12px; text-transform: uppercase;">L'Âme d'Éonia</h3>
-    <div id="ai-messages">
-        <div>✨ Je suis l'Âme d'Éonia. Comment puis-je guider vos pas aujourd'hui ?</div>
-    </div>
-    <div style="display: flex; gap: 8px; border-top: 1px solid #1a1a1a; padding-top: 15px;">
-        <input type="text" id="ai-input" placeholder="Votre message..." style="flex:1; background:#000; border:1px solid #222; color:#fff; padding:10px; border-radius:10px; outline:none; font-size: 0.75rem;">
-        <button onclick="askAI()" style="background:#4ade80; border:none; width: 35px; height: 35px; border-radius:10px; cursor:pointer;">></button>
-    </div>
-</div>
-
 <script>
     const API_URL = "https://eonia-api.santhimi.workers.dev";
     let allPlants = [];
     let activeFilter = 'all';
+    let currentView = 'catalogue'; // AJOUT : pour savoir si on regarde le jardin ou la collection
 
     async function loadData() {
         try {
@@ -100,7 +90,14 @@
                 body: JSON.stringify({ email: localStorage.getItem('user_email') || 'invite@eonia.com' })
             });
             const data = await res.json();
-            if (data && !data.error) { allPlants = data; renderGrid(); }
+            if (data && !data.error) { 
+                allPlants = data; 
+                // AJOUT : Si l'utilisateur a des plantes dans son jardin, on montre le menu
+                if (localStorage.getItem('user_email') !== 'invite@eonia.com' && data.some(p => p.est_dans_jardin)) {
+                    document.getElementById('client-menu').style.display = 'flex';
+                }
+                renderGrid(); 
+            }
         } catch (e) { console.error(e); }
     }
 
@@ -114,10 +111,15 @@
             const matchSearch = name.includes(search);
             const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
             const isFav = favs.some(f => f.id === p.id);
+
+            // Filtrage par vue (Collection ou Jardin)
+            if (currentView === 'jardin' && !p.est_dans_jardin) return false;
+
             if (activeFilter === 'favoris') return matchSearch && isFav;
             return activeFilter === 'all' ? matchSearch : (matchSearch && (p.Type || "").includes(activeFilter));
         });
 
+        // ... (Ton reste de renderGrid avec les lettres et les cartes est parfait)
         let lastLetter = "";
         filtered.forEach(p => {
             const currentLetter = (p["Nom commun"] || "").charAt(0).toUpperCase();
@@ -128,7 +130,6 @@
             }
             const card = document.createElement('div');
             card.className = 'plant-card';
-            // ICI : On envoie vers jardin.html. Le widget météo ne doit s'afficher que si plant.est_dans_jardin est vrai dans jardin.html.
             card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
             card.innerHTML = `
                 <div class="img-container"><img src="${p.Photo}" class="plant-img"></div>
@@ -136,6 +137,15 @@
             `;
             grid.appendChild(card);
         });
+    }
+
+    // AJOUT : Fonction pour switcher entre Jardin et Collection
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('btn-col').classList.toggle('active', view === 'catalogue');
+        document.getElementById('btn-jar').classList.toggle('active', view === 'jardin');
+        document.getElementById('page-title').innerText = view === 'catalogue' ? "Notre Collection" : "Mon Jardin";
+        renderGrid();
     }
 
     function setFilter(t, b) {
