@@ -24,17 +24,17 @@
 
         /* --- FORCE L'ALIGNEMENT HORIZONTAL --- */
         .weather-bar { 
-            display: flex !important; 
-            flex-direction: row !important; 
-            flex-wrap: nowrap !important;
-            justify-content: space-between !important; 
-            align-items: center !important; 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 15px; 
-            margin-bottom: 25px;
-        }
+    display: none; /* Caché par défaut pour les invités */
+    flex-direction: row; 
+    flex-wrap: nowrap;
+    justify-content: space-between; 
+    align-items: center; 
+    background: var(--card); 
+    border: 1px solid var(--border); 
+    border-radius: 20px; 
+    padding: 15px; 
+    margin-bottom: 25px;
+}
         .weather-item { 
             flex: 1 !important; 
             display: flex !important; 
