@@ -10,7 +10,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* LOADER D'ORIGINE */
+        /* LOADER */
         #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -19,74 +19,52 @@
         .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
-        /* BOUTON RETOUR EN HAUT */
-        #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); }
-/* Couleurs thermiques */
-        .temp-hot { color: #ff8c00 !important; }  /* Orange */
-        .temp-cold { color: #00aaff !important; } /* Bleu */
+        #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+
+        /* Couleurs thermiques */
+        .temp-hot { color: #ff8c00 !important; } 
+        .temp-cold { color: #00aaff !important; }
+
+        .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Indicateur de source */
-        .weather-status { 
-            width: 100%; 
-            font-size: 0.45rem; 
-            color: #444; 
-            text-align: center; 
-            margin-bottom: 10px; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            flex-basis: 100%;
-        }
-        /* --- FORCE L'ALIGNEMENT HORIZONTAL --- */
         .weather-bar { 
-    display: none; /* Caché par défaut pour les invités */
-    flex-direction: row; 
-    flex-wrap: wrap !important;
-    justify-content: space-between; 
-    align-items: center; 
-    background: var(--card); 
-    border: 1px solid var(--border); 
-    border-radius: 20px; 
-    padding: 15px; 
-    margin-bottom: 25px;
-}
-        .weather-item { 
-            flex: 1 !important; 
-            display: flex !important; 
-            flex-direction: column !important; 
-            align-items: center !important; 
-            text-align: center !important;
+            display: none; 
+            flex-direction: row; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin-bottom: 25px;
         }
+        .weather-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .weather-item span { font-size: 0.55rem; font-weight: 600; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         .weather-item b { font-size: 0.75rem; color: #fff; margin-top: 5px; }
         .w-icon { font-size: 1.3rem; line-height: 1; margin: 2px 0; }
 
-        /* HERO & TITRES */
         .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
         h1 { font-size: 2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
         .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
 
-        /* GRILLE RUBRIQUES */
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; }
         .info-box.liseret { border-left: 3px solid var(--accent); }
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
         .value { font-size: 0.85rem; color: #eee; }
 
-        /* ARROSAGE BÂTONS */
         .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
         .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; cursor: pointer; }
         .bar { width: 100%; background: #1a1a1a; border-radius: 4px; height: 15%; transition: 0.3s; }
         .bar.active { background: var(--blue); height: 85%; box-shadow: 0 0 10px rgba(0,170,255,0.4); }
         .bar-date { font-size: 0.5rem; color: #444; margin-top: 5px; }
 
-        /* INPUTS & BLOCS */
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
         textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-
-        /* BOUTONS */
+        
         .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; }
         .btn-save { background: var(--accent); color: #000; border: none; margin-top: 15px; }
 
@@ -103,25 +81,26 @@
 <button id="backToTop">↑</button>
 
 <div class="container" id="app">
-   <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR AU JARDIN</button>
-<!-- Un lien discret au lieu du gros bouton -->
-<div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
-    <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
-        📍 Ajuster la position
-    </a>
-</div>
+    <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR AU JARDIN</button>
 
-<div class="weather-bar mon-jardin-only" id="weatherBar"></div>
+    <!-- LIEN DE GÉOLOC DISCRET -->
+    <div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
+        <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
+            📍 Activer la météo locale
+        </a>
+    </div>
+
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
-    <!-- REMPLACE LES LIGNES 116 À 124 PAR CECI -->
-<div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
-    <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
-        📍 Activer la météo locale
-    </a>
-</div>
+    <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
+    <h1 id="p-titre">...</h1>
+    <div id="p-sci" class="sci-name">...</div>
 
-<div class="weather-bar mon-jardin-only" id="weatherBar"></div>
+    <div class="mon-jardin-only dash-block">
+        <div class="block-title">SUIVI D'ARROSAGE</div>
+        <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
+        <div class="graph-container" id="p-graph"></div>
+    </div>
 
     <div class="info-grid" id="p-grid"></div>
 
@@ -162,26 +141,22 @@ async function load() {
         });
         
         const data = await res.json();
-        const p = data.find(item => item.id === plantId || item.cleanId === plantId);
+        // Gestion robuste si data est un tableau ou un objet seul
+        const p = Array.isArray(data) ? data.find(item => item.id === plantId || item.cleanId === plantId) : data;
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        // --- 1. GESTION DU QR CODE ---
-        // On récupère la plaque si elle est dans l'URL
-        const params = new URLSearchParams(window.location.search);
-        const qrrPlaque = params.get('plaque') || params.get('plaqueId');
-
-        if (qrrPlaque && !p.est_dans_jardin) {
-            setTimeout(() => { proposerAssociation(qrrPlaque, p.id, p["Nom commun"]); }, 500);
+        // --- ASSOCIATION QR CODE ---
+        if (plaqueId && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(plaqueId, p.id, p["Nom commun"]); }, 1000);
         }
 
-        // --- 2. REMPLISSAGE DES TEXTES ---
+        // REMPLISSAGE UI
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
-        // Grille d'infos
         const rubriques = [
             {n:"Famille", v:p.Famille, highlight:true}, {n:"Type", v:p.Type, highlight:true},
             {n:"Floraison", v:p.Floraison}, {n:"Difficulté", v:p.Difficulté},
@@ -196,25 +171,24 @@ async function load() {
             </div>
         `).join('');
 
-        // --- 3. ON ENLÈVE LE LOADER ICI (IMPORTANT) ---
-        // On cache le chargement AVANT de lancer la météo ou l'association
+        // --- ON CACHE LE LOADER ICI POUR DÉBLOQUER LA VUE ---
         document.getElementById('loader').style.display = 'none';
         document.getElementById('app').classList.add('loaded');
 
-        // --- 4. MODE PROPRIÉTAIRE ---
+        // --- MODE PROPRIÉTAIRE ---
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            // Mise à jour du petit lien discret
+            // Mise à jour du texte du lien géo
             const geoLink = document.getElementById('geo-link');
             if (geoLink) {
                 geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
             }
 
-            checkLocation(); // Lance la demande de météo (elle ne bloquera plus le loader)
+            checkLocation(); 
 
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
@@ -228,50 +202,50 @@ async function load() {
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
 
-    } catch(e) { console.error(e); }
+    } catch(e) { 
+        console.error(e); 
+        document.getElementById('loader').style.display = 'none';
+    }
 }
-// GESTION AUTOMATIQUE POSITION & NOTION
+
+// GESTION AUTOMATIQUE POSITION
 function checkLocation() {
-    // Vérifie si la position est déjà connue localement
     const hasLat = localStorage.getItem("eonia_lat");
-    
     if (!hasLat) {
-        if (confirm("Pour une météo précise de votre jardin, ÉONIA souhaite utiliser votre position. Acceptez-vous ?")) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                localStorage.setItem("eonia_lat", lat);
-                localStorage.setItem("eonia_lon", lon);
-                
-                // Envoi automatique à ton API pour mettre à jour la ligne Notion du client
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-                    body: JSON.stringify({ 
-                        action: "update_location", 
-                        plantId, 
-                        email: userEmail, 
-                        lat: lat, 
-                        lon: lon 
-                    })
-                });
-                loadWeather();
-            }, () => { 
-                loadWeather(); // En cas d'erreur technique, météo par défaut
-            });
-        } else {
-            loadWeather(); // Si l'utilisateur refuse, météo Paris par défaut
-        }
+        // On ne demande pas confirm() ici pour ne pas bloquer, on attend que l'utilisateur clique sur le lien s'il veut
+        loadWeather(); 
     } else {
-        loadWeather(); // Position déjà enregistrée
+        loadWeather(); 
+    }
+}
+
+// FONCTION APPELÉE PAR LE LIEN DISCRET
+function getLocation() {
+    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo locale ?")) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            localStorage.setItem("eonia_lat", lat);
+            localStorage.setItem("eonia_lon", lon);
+            
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
+            });
+            
+            const geoLink = document.getElementById('geo-link');
+            if (geoLink) geoLink.innerText = "📍 Ajuster la position";
+            
+            loadWeather();
+            alert("📍 Position mise à jour !");
+        }, () => alert("Erreur : Position non accessible."));
     }
 }
 
 async function loadWeather() {
     const storedLat = localStorage.getItem("eonia_lat");
     const storedLon = localStorage.getItem("eonia_lon");
-    
-    // Si pas de GPS, on utilise Paris (48.85, 2.35)
     let lat = storedLat || 48.85;
     let lon = storedLon || 2.35;
 
@@ -279,19 +253,14 @@ async function loadWeather() {
         const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
         const wData = await wRes.json();
         const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
-        
-        // Logique de couleur thermique
         const getTempClass = (t) => {
-            if (t >= 25) return 'temp-hot'; // Orange pour la chaleur
-            if (t <= 10) return 'temp-cold'; // Bleu pour le froid
+            if (t >= 25) return 'temp-hot';
+            if (t <= 10) return 'temp-cold';
             return '';
         };
 
         const statusText = storedLat ? "Météo locale" : "Météo générale (Paris)";
-
-        // Génération du HTML avec le texte de statut et les couleurs
-        let html = `<div class="weather-status">${statusText}</div>`;
-        html += `<div style="display:flex; width:100%; justify-content:space-between;">`;
+        let html = `<div class="weather-status">${statusText}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
         
         html += wData.daily.time.slice(0,4).map((d, i) => {
             const temp = Math.round(wData.daily.temperature_2m_max[i]);
@@ -303,13 +272,8 @@ async function loadWeather() {
                 </div>
             `;
         }).join("");
-        
-        html += `</div>`;
-        
-        document.getElementById("weatherBar").innerHTML = html;
-    } catch (e) { 
-        console.log("Météo non dispo"); 
-    }
+        document.getElementById("weatherBar").innerHTML = html + `</div>`;
+    } catch (e) { console.log("Météo non dispo"); }
 }
 
 async function waterNow() {
@@ -345,7 +309,6 @@ async function proposerAssociation(plaqId, planId, nomPlante) {
         const result = await res.json();
         if (result.success) { 
             alert("✨ Plante associée !"); 
-            // On redirige sur la page de la plante sans le paramètre plaqueId
             window.location.href = `jardin.html?id=${planId}`; 
         }
     } catch(e) { alert("Erreur réseau"); }
@@ -356,30 +319,6 @@ window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block
 topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
 
 load();
-    // AJOUTE ÇA TOUT EN BAS AVANT </script>
-function getLocation() {
-    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo ?")) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            localStorage.setItem("eonia_lat", lat);
-            localStorage.setItem("eonia_lon", lon);
-            
-            // Mise à jour sur Notion
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
-            });
-
-            const geoLink = document.getElementById('geo-link');
-            if (geoLink) geoLink.innerText = "📍 Ajuster la position";
-            
-            loadWeather();
-            alert("📍 Position mise à jour !");
-        }, () => alert("Erreur : Position non accessible."));
-    }
-}
 </script>
 </body>
 </html>
