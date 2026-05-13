@@ -165,22 +165,23 @@ async function load() {
         const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
         if (!p) { window.location.href = "catalogue.html"; return; }
-        // AJOUTE ÇA LIGNE 160 ENVIRON (DANS LOAD)
-const geoLink = document.getElementById('geo-link');
-if (geoLink) {
-    geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
-}
 
-        // --- ASSOCIATION QR CODE ---
-        if (plaqueId && !p.est_dans_jardin) {
-            setTimeout(() => { proposerAssociation(plaqueId, p.id, p["Nom commun"]); }, 1000);
+        // --- 1. GESTION DU QR CODE ---
+        // On récupère la plaque si elle est dans l'URL
+        const params = new URLSearchParams(window.location.search);
+        const qrrPlaque = params.get('plaque') || params.get('plaqueId');
+
+        if (qrrPlaque && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(qrrPlaque, p.id, p["Nom commun"]); }, 500);
         }
 
+        // --- 2. REMPLISSAGE DES TEXTES ---
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
+        // Grille d'infos
         const rubriques = [
             {n:"Famille", v:p.Famille, highlight:true}, {n:"Type", v:p.Type, highlight:true},
             {n:"Floraison", v:p.Floraison}, {n:"Difficulté", v:p.Difficulté},
@@ -195,14 +196,25 @@ if (geoLink) {
             </div>
         `).join('');
 
-        // --- MODE PROPRIÉTAIRE ---
+        // --- 3. ON ENLÈVE LE LOADER ICI (IMPORTANT) ---
+        // On cache le chargement AVANT de lancer la météo ou l'association
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').classList.add('loaded');
+
+        // --- 4. MODE PROPRIÉTAIRE ---
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            checkLocation(); // Automatisation de la météo et Notion
+            // Mise à jour du petit lien discret
+            const geoLink = document.getElementById('geo-link');
+            if (geoLink) {
+                geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
+            }
+
+            checkLocation(); // Lance la demande de météo (elle ne bloquera plus le loader)
 
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
@@ -216,12 +228,8 @@ if (geoLink) {
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
 
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('app').classList.add('loaded');
-
     } catch(e) { console.error(e); }
 }
-
 // GESTION AUTOMATIQUE POSITION & NOTION
 function checkLocation() {
     // Vérifie si la position est déjà connue localement
@@ -335,7 +343,11 @@ async function proposerAssociation(plaqId, planId, nomPlante) {
             body: JSON.stringify({ action: "assign_plant", plaqueId: plaqId, plantId: planId, email: userEmail, pin: pin })
         });
         const result = await res.json();
-        if (result.success) { alert("✨ Plante associée !"); location.reload(); }
+        if (result.success) { 
+            alert("✨ Plante associée !"); 
+            // On redirige sur la page de la plante sans le paramètre plaqueId
+            window.location.href = `jardin.html?id=${planId}`; 
+        }
     } catch(e) { alert("Erreur réseau"); }
 }
 
