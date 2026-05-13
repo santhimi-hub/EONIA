@@ -141,17 +141,15 @@ async function load() {
         });
         
         const data = await res.json();
-        // Gestion robuste si data est un tableau ou un objet seul
         const p = Array.isArray(data) ? data.find(item => item.id === plantId || item.cleanId === plantId) : data;
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        // --- ASSOCIATION QR CODE ---
-        if (plaqueId && !p.est_dans_jardin) {
-            setTimeout(() => { proposerAssociation(plaqueId, p.id, p["Nom commun"]); }, 1000);
-        }
+        // --- ÉTAPE CRITIQUE : ON ENLÈVE LE LOADER MAINTENANT ---
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').classList.add('loaded');
 
-        // REMPLISSAGE UI
+        // --- ENSUITE ON REMPLIT LES INFOS ---
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
@@ -171,56 +169,24 @@ async function load() {
             </div>
         `).join('');
 
-        // --- ON CACHE LE LOADER ICI POUR DÉBLOQUER LA VUE ---
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('app').classList.add('loaded');
+        // --- GESTION DES DROITS (PROPRIO VS VISITEUR) ---
+        const isTrulyOwner = (userEmail !== "invite@eonia.com" && p.est_dans_jardin);
 
-        // --- MODE PROPRIÉTAIRE ---
-      // --- DANS LA FONCTION LOAD() ---
-
-// Définition de qui regarde la fiche
-const isTrulyOwner = (userEmail !== "invite@eonia.com" && userEmail === p.Owner_Email);
-
-if (isTrulyOwner) {
-    // AFFICHAGE PROPRIÉTAIRE : Accès complet
-    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
-    document.getElementById('weatherBar').style.display = 'flex';
-    document.getElementById('p-notes').value = p.Note_Privee || "";
-    document.getElementById('date-plant').value = p.Date_Plantation || "";
-    
-    // Météo et GPS
-    const geoLink = document.getElementById('geo-link');
-    if (geoLink) geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
-    checkLocation();
-
-    // Graphique d'arrosage
-    renderWaterGraph(p.Historique_Data);
-
-} else {
-    // AFFICHAGE VISITEUR : Fiche publique uniquement
-    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'none');
-    
-    // OPTIONNEL : Afficher la date de plantation même aux inconnus
-    if (p.Date_Plantation) {
-        const grid = document.getElementById('p-grid');
-        grid.innerHTML += `
-            <div class="info-box liseret">
-                <div class="label">Mémoire plantée le</div>
-                <div class="value">${new Date(p.Date_Plantation).toLocaleDateString('fr-FR')}</div>
-            </div>
-        `;
-    }
-}
+        if (isTrulyOwner) {
+            document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+            document.getElementById('weatherBar').style.display = 'flex';
+            document.getElementById('p-notes').value = p.Note_Privee || "";
+            document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            // Mise à jour du texte du lien géo
+            // Mise à jour du lien géo
             const geoLink = document.getElementById('geo-link');
             if (geoLink) {
                 geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
             }
 
-            checkLocation(); 
+            loadWeather(); // On lance la météo sans confirm() automatique pour ne pas bloquer
 
+            // Graphique
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
             container.innerHTML = "";
@@ -231,6 +197,12 @@ if (isTrulyOwner) {
             }
         } else {
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+        }
+
+        // --- ASSOCIATION (SI BESOIN) ---
+        if (plaqueId && !p.est_dans_jardin) {
+            // Petit délai pour laisser l'interface respirer
+            setTimeout(() => { proposerAssociation(plaqueId, p.id, p["Nom commun"]); }, 800);
         }
 
     } catch(e) { 
@@ -344,10 +316,14 @@ async function proposerAssociation(plaqId, planId, nomPlante) {
         });
         const result = await res.json();
         if (result.success) { 
-            alert("✨ Plante associée !"); 
+            alert("✨ Mémoire activée !"); 
             window.location.href = `jardin.html?id=${planId}`; 
+        } else {
+            alert("Erreur: " + result.error);
         }
-    } catch(e) { alert("Erreur réseau"); }
+    } catch(e) { 
+        alert("Erreur réseau"); 
+    }
 }
 
 const topBtn = document.getElementById("backToTop");
