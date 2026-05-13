@@ -176,11 +176,42 @@ async function load() {
         document.getElementById('app').classList.add('loaded');
 
         // --- MODE PROPRIÉTAIRE ---
-        if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
-            document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
-            document.getElementById('weatherBar').style.display = 'flex';
-            document.getElementById('p-notes').value = p.Note_Privee || "";
-            document.getElementById('date-plant').value = p.Date_Plantation || "";
+      // --- DANS LA FONCTION LOAD() ---
+
+// Définition de qui regarde la fiche
+const isTrulyOwner = (userEmail !== "invite@eonia.com" && userEmail === p.Owner_Email);
+
+if (isTrulyOwner) {
+    // AFFICHAGE PROPRIÉTAIRE : Accès complet
+    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+    document.getElementById('weatherBar').style.display = 'flex';
+    document.getElementById('p-notes').value = p.Note_Privee || "";
+    document.getElementById('date-plant').value = p.Date_Plantation || "";
+    
+    // Météo et GPS
+    const geoLink = document.getElementById('geo-link');
+    if (geoLink) geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
+    checkLocation();
+
+    // Graphique d'arrosage
+    renderWaterGraph(p.Historique_Data);
+
+} else {
+    // AFFICHAGE VISITEUR : Fiche publique uniquement
+    document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'none');
+    
+    // OPTIONNEL : Afficher la date de plantation même aux inconnus
+    if (p.Date_Plantation) {
+        const grid = document.getElementById('p-grid');
+        grid.innerHTML += `
+            <div class="info-box liseret">
+                <div class="label">Mémoire plantée le</div>
+                <div class="value">${new Date(p.Date_Plantation).toLocaleDateString('fr-FR')}</div>
+            </div>
+        `;
+    }
+}
             
             // Mise à jour du texte du lien géo
             const geoLink = document.getElementById('geo-link');
@@ -298,6 +329,11 @@ async function saveData() {
 }
 
 async function proposerAssociation(plaqId, planId, nomPlante) {
+    // Sécurité visuelle : si la plante a déjà un propriétaire, on n'ouvre même pas le prompt
+    if (p.Owner_Email && p.Owner_Email !== "") {
+        console.log("Cette plaque appartient déjà à un jardin.");
+        return;
+    }
     const pin = prompt(`Plaque ${plaqId} détectée !\nEntrez un code PIN à 4 chiffres pour sécuriser votre ${nomPlante} :`);
     if (!pin) return;
     try {
