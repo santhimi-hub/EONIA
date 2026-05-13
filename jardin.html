@@ -21,7 +21,6 @@
 
         #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); }
 
-        /* Couleurs thermiques */
         .temp-hot { color: #ff8c00 !important; }
         .temp-cold { color: #00aaff !important; }
 
@@ -55,12 +54,6 @@
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
         .value { font-size: 0.85rem; color: #eee; }
 
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; cursor: pointer; }
-        .bar { width: 100%; background: #1a1a1a; border-radius: 4px; height: 15%; transition: 0.3s; }
-        .bar.active { background: var(--blue); height: 85%; box-shadow: 0 0 10px rgba(0,170,255,0.4); }
-        .bar-date { font-size: 0.5rem; color: #444; margin-top: 5px; }
-
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
         textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
@@ -83,7 +76,6 @@
 <div class="container" id="app">
     <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR AU JARDIN</button>
 
-    <!-- LIEN GÉO DISCRET -->
     <div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
         <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
             📍 Activer la météo locale
@@ -99,7 +91,7 @@
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
-        <div class="graph-container" id="p-graph"></div>
+        <div class="graph-container" id="p-graph" style="display:flex; align-items:flex-end; justify-content:space-between; height:80px; margin-top:20px;"></div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
@@ -129,8 +121,7 @@
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
-// DÉTECTION PLAQUE (Check les deux noms possibles)
-const plaqueIdFromUrl = params.get('plaque') || params.get('plaqueId');
+const qPlaque = params.get('plaque') || params.get('plaqueId'); // Supporte les deux formats
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
 async function load() {
@@ -146,16 +137,11 @@ async function load() {
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        // --- 1. LIBÉRATION DU LOADER (AVANT LES PROMPTS) ---
+        // --- ÉTAPE CRUCIALE : ON ENLÈVE LE LOADER ICI ---
         document.getElementById('loader').style.display = 'none';
         document.getElementById('app').classList.add('loaded');
 
-        // --- 2. ASSOCIATION (DÉTECTION PLAQUE) ---
-        if (plaqueIdFromUrl && (p.est_dans_jardin === false || p.est_dans_jardin === "false")) {
-            setTimeout(() => { proposerAssociation(plaqueIdFromUrl, p.id, p["Nom commun"]); }, 800);
-        }
-
-        // REMPLISSAGE UI
+        // REMPLISSAGE DES TEXTES
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
@@ -175,43 +161,34 @@ async function load() {
             </div>
         `).join('');
 
-        // --- 3. LOGIQUE PROPRIÉTAIRE (PROPRIO VS VISITEUR) ---
-        // On vérifie si l'utilisateur connecté est le propriétaire enregistré
-        const isTrulyOwner = (userEmail !== "invite@eonia.com" && p.est_dans_jardin);
-
-        if (isTrulyOwner) {
+        // --- MODE PROPRIÉTAIRE ---
+        if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            // Mise à jour du lien géo
             const geoLink = document.getElementById('geo-link');
-            if (geoLink) {
-                geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
-            }
+            if (geoLink) geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
 
             checkLocation(); 
 
-            // Graphique
+            // Historique d'arrosage
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
             container.innerHTML = "";
             for(let i=6; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 const dateStr = d.toLocaleDateString('fr-FR');
-                container.innerHTML += `<div class="bar-wrapper"><div class="bar ${histData.includes(dateStr) ? 'active' : ''}"></div><div class="bar-date">${dateStr.slice(0,5)}</div></div>`;
+                container.innerHTML += `<div class="bar-wrapper" style="display:flex;flex-direction:column;align-items:center;width:12%;"><div class="bar ${histData.includes(dateStr) ? 'active' : ''}" style="width:100%;background:#1a1a1a;border-radius:4px;height:${histData.includes(dateStr)?'85':'15'}%;transition:0.3s;${histData.includes(dateStr)?'background:var(--blue);':''}"></div><div class="bar-date" style="font-size:0.5rem;color:#444;margin-top:5px;">${dateStr.slice(0,5)}</div></div>`;
             }
         } else {
-            // VISITEUR : On affiche la date de plantation si dispo, mais pas le reste
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
-            if(p.Date_Plantation) {
-                 document.getElementById('p-grid').innerHTML += `
-                    <div class="info-box liseret">
-                        <div class="label">Mémoire plantée le</div>
-                        <div class="value">${new Date(p.Date_Plantation).toLocaleDateString('fr-FR')}</div>
-                    </div>`;
-            }
+        }
+
+        // --- ASSOCIATION (APRÈS AFFICHAGE DU DASHBOARD) ---
+        if (qPlaque && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(qPlaque, p.id, p["Nom commun"]); }, 1000);
         }
 
     } catch(e) { console.error(e); document.getElementById('loader').style.display = 'none'; }
@@ -219,33 +196,29 @@ async function load() {
 
 function checkLocation() {
     if (!localStorage.getItem("eonia_lat")) {
-        loadWeather(); 
-    } else {
-        loadWeather(); 
-    }
+        if (confirm("Activer la météo locale pour votre jardin ?")) { getLocation(); }
+        else { loadWeather(); }
+    } else { loadWeather(); }
 }
 
 function getLocation() {
-    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo locale ?")) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            localStorage.setItem("eonia_lat", lat);
-            localStorage.setItem("eonia_lon", lon);
-            
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
-            });
-            
-            const geoLink = document.getElementById('geo-link');
-            if (geoLink) geoLink.innerText = "📍 Ajuster la position";
-            
-            loadWeather();
-            alert("📍 Position mise à jour !");
-        }, () => alert("Position non accessible."));
-    }
+    if (!navigator.geolocation) { alert("GPS non supporté"); return; }
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        localStorage.setItem("eonia_lat", lat);
+        localStorage.setItem("eonia_lon", lon);
+        
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+            body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
+        });
+        
+        if (document.getElementById('geo-link')) document.getElementById('geo-link').innerText = "📍 Ajuster la position";
+        loadWeather();
+        alert("📍 Position enregistrée !");
+    }, () => alert("Accès position refusé."));
 }
 
 async function loadWeather() {
@@ -257,13 +230,13 @@ async function loadWeather() {
         const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
         const getTempClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
 
-        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo Paris"}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
+        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo générale (Paris)"}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
         html += wData.daily.time.slice(0,4).map((d, i) => {
             const temp = Math.round(wData.daily.temperature_2m_max[i]);
-            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icons(wData.daily.weathercode[i])}</div><b class="${getTempClass(temp)}">${temp}°</b></div>`;
+            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR", {weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icons(wData.daily.weathercode[i])}</div><b class="${getTempClass(temp)}">${temp}°</b></div>`;
         }).join("");
         document.getElementById("weatherBar").innerHTML = html + "</div>";
-    } catch (e) { }
+    } catch (e) { console.log("Météo indisponible"); }
 }
 
 async function waterNow() {
@@ -299,10 +272,9 @@ async function proposerAssociation(plaqId, planId, nomPlante) {
         const result = await res.json();
         if (result.success) { 
             alert("✨ Mémoire activée !"); 
-            // On redirige sur l'URL propre pour nettoyer le mode association
             window.location.href = `jardin.html?id=${planId}`; 
         } else {
-            alert("Erreur: " + result.error);
+            alert("Erreur : " + result.error);
         }
     } catch(e) { alert("Erreur réseau"); }
 }
