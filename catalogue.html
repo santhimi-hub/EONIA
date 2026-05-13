@@ -58,6 +58,9 @@
 <div class="top-bar">
     <a href="index.html" class="nav-link-top">← Accueil</a>
 </div>
+    <div id="activation-banner" style="display:none; background:#4ade80; color:#000; text-align:center; padding:10px; font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; position:fixed; top:60px; width:100%; z-index:2000;">
+    🌿 Mode Activation : Choisissez la plante à lier à votre plaque
+</div>
 
 <header>
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="logo-main">
@@ -115,23 +118,40 @@ if (plaqueId) {
     window.onload = () => { document.getElementById('page-title').innerText = "Choisir ma plante"; };
 }
 
-    async function loadData() {
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-                body: JSON.stringify({ email: localStorage.getItem('user_email') || 'invite@eonia.com' })
-            });
-            const data = await res.json();
-            if (data && !data.error) { 
-                allPlants = data;
-                if (localStorage.getItem('user_email') !== 'invite@eonia.com' && data.some(p => p.est_dans_jardin)) {
-                    document.getElementById('client-menu').style.display = 'flex';
-                }
-                renderGrid(); 
-            }
-        } catch (e) { console.error(e); }
+   async function loadData() {
+    // Affiche la bannière si une plaque est détectée
+    if (plaqueId) {
+        const banner = document.getElementById('activation-banner');
+        if (banner) banner.style.display = 'block';
     }
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ email: localStorage.getItem('user_email') || 'invite@eonia.com' })
+        });
+        const data = await res.json();
+        
+        if (data && !data.error) { 
+            allPlants = data;
+            
+            // Affiche le menu "Mon Jardin" si l'utilisateur a des plantes
+            const isOwner = (localStorage.getItem('user_email') && localStorage.getItem('user_email') !== 'invite@eonia.com');
+            const hasGarden = data.some(p => p.est_dans_jardin === true);
+            
+            if (isOwner && hasGarden) {
+                const menu = document.getElementById('client-menu');
+                if (menu) menu.style.display = 'flex';
+            }
+            
+            renderGrid(); 
+        }
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('plant-counter').innerText = "ERREUR DE CHARGEMENT";
+    }
+}
 async function openPlant(p) {
     // Si on a une plaque en attente d'activation
     if (plaqueId) {
@@ -164,60 +184,61 @@ async function openPlant(p) {
     window.location.href = `jardin.html?id=${p.id}`;
 }
     function renderGrid() {
-        const grid = document.getElementById('catalogue-grid');
-        grid.innerHTML = "";
-        const search = document.getElementById('searchBox').value.toLowerCase();
+    const grid = document.getElementById('catalogue-grid');
+    const counterEl = document.getElementById('plant-counter');
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    
+    // 1. Filtrage strict
+    let filtered = allPlants.filter(p => {
+        const name = (p["Nom commun"] || "").toLowerCase();
+        if (currentView === 'jardin' && !p.est_dans_jardin) return false;
         
-        // 1. On filtre les plantes selon la recherche et la vue (Collection ou Jardin)
-        let filtered = allPlants.filter(p => {
-            const name = (p["Nom commun"] || "").toLowerCase();
-            if (currentView === 'jardin' && !p.est_dans_jardin) return false;
-            const matchSearch = name.includes(search);
-            const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-            const isFav = favs.some(f => f.id === p.id);
-            if (activeFilter === 'favoris') return matchSearch && isFav;
-            return activeFilter === 'all' ? matchSearch : (matchSearch && (p.Type || "").includes(activeFilter));
-        });
+        const matchSearch = name.includes(search);
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const isFav = favs.some(f => f.id === p.id);
+        
+        if (activeFilter === 'favoris') return matchSearch && isFav;
+        return activeFilter === 'all' ? matchSearch : (matchSearch && (p.Type || "").includes(activeFilter));
+    });
 
-        // 2. MISE À JOUR DU COMPTEUR (C'est ici que ça se passe !)
-        const counterEl = document.getElementById('plant-counter');
-        if (counterEl) {
-            const total = filtered.length;
-            counterEl.innerText = `${total} ${total > 1 ? 'PLANTES' : 'PLANTE'}`;
+    // 2. Mise à jour du compteur
+    if (counterEl) {
+        const total = filtered.length;
+        counterEl.innerText = `${total} ${total > 1 ? 'PLANTES' : 'PLANTE'}`;
+    }
+
+    // 3. Affichage des cartes
+    let lastLetter = "";
+    filtered.forEach(p => {
+        const currentLetter = (p["Nom commun"] || "").charAt(0).toUpperCase();
+        if (currentLetter !== lastLetter) {
+            const divider = document.createElement('div');
+            divider.className = 'letter-divider'; 
+            divider.innerText = currentLetter;
+            grid.appendChild(divider); 
+            lastLetter = currentLetter;
         }
+        
+        const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
+        const isFav = favs.some(f => f.id === p.id);
 
-        // 3. On génère l'affichage des cartes
-        let lastLetter = "";
-        filtered.forEach(p => {
-            const currentLetter = (p["Nom commun"] || "").charAt(0).toUpperCase();
-            if (currentLetter !== lastLetter) {
-                const divider = document.createElement('div');
-                divider.className = 'letter-divider'; divider.innerText = currentLetter;
-                grid.appendChild(divider); lastLetter = currentLetter;
-            }
-            const favs = JSON.parse(localStorage.getItem('eonia_favs') || '[]');
-    const isFav = favs.some(f => f.id === p.id);
-
-    const card = document.createElement('div');
-    card.className = 'plant-card';
-    card.onclick = () => openPlant(p);
-
-    card.innerHTML = `
-        <div class="img-container">
-            <!-- BOUTON COEUR -->
-            <div class="card-fav-btn ${isFav ? 'active' : ''}" 
-                 onclick="event.stopPropagation(); toggleFav('${p.id}', this)">
-                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        const card = document.createElement('div');
+        card.className = 'plant-card';
+        card.onclick = () => openPlant(p);
+        card.innerHTML = `
+            <div class="img-container">
+                <div class="card-fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${p.id}', this)">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <img src="${p.Photo}" class="plant-img" loading="lazy">
             </div>
-            <img src="${p.Photo}" class="plant-img" loading="lazy">
-        </div>
-        <div class="plant-info">
-            <div class="plant-name">${p["Nom commun"]}</div>
-        </div>
-    `;
-    grid.appendChild(card);
-});
-        }
+            <div class="plant-info"><div class="plant-name">${p["Nom commun"]}</div></div>`;
+        grid.appendChild(card);
+    });
+}
 
     function setFilter(t, b) {
         activeFilter = t;
