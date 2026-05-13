@@ -77,7 +77,6 @@
     Chargement...
 </div>
 <div id="catalogue-grid" class="catalog-container"></div>
-    <div id="plant-counter" style="text-align: center; color: #4ade80; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 500; text-transform: uppercase;">CHARGEMENT...</div>
 
 <div id="ai-bubble" onclick="toggleAI()">
     <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" style="width:38px;">
@@ -98,6 +97,14 @@
     let allPlants = [];
     let activeFilter = 'all';
     let currentView = 'catalogue';
+    // AJOUT : On récupère l'ID de la plaque envoyé par l'index
+const urlParams = new URLSearchParams(window.location.search);
+const plaqueId = urlParams.get('plaque'); 
+
+// Si on est en mode activation, on change le titre pour guider l'utilisateur
+if (plaqueId) {
+    window.onload = () => { document.getElementById('page-title').innerText = "Choisir ma plante"; };
+}
 
     async function loadData() {
         try {
@@ -116,7 +123,37 @@
             }
         } catch (e) { console.error(e); }
     }
+async function openPlant(p) {
+    // Si on a une plaque en attente d'activation
+    if (plaqueId) {
+        const confirmer = confirm(`Lier votre plaque ÉONIA à cette plante : ${p["Nom commun"]} ?`);
+        if (!confirmer) return;
 
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-api-key": "EONIA_2026_SECRET" },
+                body: JSON.stringify({
+                    action: "assign_plant",
+                    email: localStorage.getItem('user_email'),
+                    plantId: p.id,
+                    plaqueId: plaqueId,
+                    pin: localStorage.getItem("last_pin") // Utilise le PIN saisi à l'index
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("🌿 Mémoire activée !");
+                window.location.href = `jardin.html?id=${p.id}`; // Redirection vers la plante enfin associée
+            } else {
+                alert("Erreur : " + data.error);
+            }
+        } catch (e) { alert("Erreur de connexion"); }
+        return;
+    }
+    // Sinon, c'est une visite normale
+    window.location.href = `jardin.html?id=${p.id}`;
+}
     function renderGrid() {
         const grid = document.getElementById('catalogue-grid');
         grid.innerHTML = "";
@@ -151,7 +188,7 @@
             }
             const card = document.createElement('div');
             card.className = 'plant-card';
-            card.onclick = () => window.location.href = `jardin.html?id=${p.id}`;
+            card.onclick = () => openPlant(p);
             card.innerHTML = `<div class="img-container"><img src="${p.Photo}" class="plant-img"></div>
                               <div class="plant-info"><div class="plant-name">${p["Nom commun"]}</div></div>`;
             grid.appendChild(card);
