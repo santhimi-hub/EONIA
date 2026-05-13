@@ -114,15 +114,14 @@
 <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
-    <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
-    <h1 id="p-titre">...</h1>
-    <div id="p-sci" class="sci-name">...</div>
+    <!-- REMPLACE LES LIGNES 116 À 124 PAR CECI -->
+<div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
+    <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
+        📍 Activer la météo locale
+    </a>
+</div>
 
-    <div class="mon-jardin-only dash-block">
-              <div class="block-title">SUIVI D'ARROSAGE</div>
-        <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
-        <div class="graph-container" id="p-graph"></div>
-    </div>
+<div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
     <div class="info-grid" id="p-grid"></div>
 
@@ -166,6 +165,11 @@ async function load() {
         const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
         if (!p) { window.location.href = "catalogue.html"; return; }
+        // AJOUTE ÇA LIGNE 160 ENVIRON (DANS LOAD)
+const geoLink = document.getElementById('geo-link');
+if (geoLink) {
+    geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
+}
 
         // --- ASSOCIATION QR CODE ---
         if (plaqueId && !p.est_dans_jardin) {
@@ -340,6 +344,30 @@ window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block
 topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
 
 load();
+    // AJOUTE ÇA TOUT EN BAS AVANT </script>
+function getLocation() {
+    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo ?")) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            localStorage.setItem("eonia_lat", lat);
+            localStorage.setItem("eonia_lon", lon);
+            
+            // Mise à jour sur Notion
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
+            });
+
+            const geoLink = document.getElementById('geo-link');
+            if (geoLink) geoLink.innerText = "📍 Ajuster la position";
+            
+            loadWeather();
+            alert("📍 Position mise à jour !");
+        }, () => alert("Erreur : Position non accessible."));
+    }
+}
 </script>
 </body>
 </html>
