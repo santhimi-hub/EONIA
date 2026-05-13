@@ -131,10 +131,8 @@
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
-const plaqueId = params.get('plaqueId'); // <--- INDISPENSABLE pour le QR Code
+const plaqueId = params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-
-// DANS JARDIN.HTML, REMPLACE LA FONCTION LOAD() ET AJOUTE LA RUBRIQUE FLORAISON :
 
 async function load() {
     try {
@@ -145,36 +143,27 @@ async function load() {
         });
         
         const data = await res.json();
-        const p = data.find(item => item.id === plantId);
+        const p = data.find(item => item.id === plantId || item.cleanId === plantId);
 
         if (!p) { window.location.href = "catalogue.html"; return; }
-        // --- AJOUT CHIRURGICAL POUR LE QR CODE ---
-if (plaqueId && !p.est_dans_jardin) {
-    // Si on scanne une plaque qui n'appartient pas encore à l'utilisateur
-    setTimeout(() => {
-        proposerAssociation(plaqueId, p.id, p["Nom commun"]);
-    }, 1000);
-}
 
-        // REMPLISSAGE COMMUN
+        // --- ASSOCIATION QR CODE ---
+        if (plaqueId && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(plaqueId, p.id, p["Nom commun"]); }, 1000);
+        }
+
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
-        // GRILLE (FLORAISON RESTAURÉE)
         const rubriques = [
-            {n:"Famille", v:p.Famille, highlight:true},
-            {n:"Type", v:p.Type, highlight:true},
-            {n:"Floraison", v:p.Floraison}, // <--- BIEN LÀ
-            {n:"Difficulté", v:p.Difficulté},
-            {n:"Arrosage", v:p.Arrosage},
-            {n:"Exposition", v:p.Exposition},
-            {n:"Taille Adulte", v:p["Taille à maturité"]},
-            {n:"Persistance", v:p.Persistance},
+            {n:"Famille", v:p.Famille, highlight:true}, {n:"Type", v:p.Type, highlight:true},
+            {n:"Floraison", v:p.Floraison}, {n:"Difficulté", v:p.Difficulté},
+            {n:"Arrosage", v:p.Arrosage}, {n:"Exposition", v:p.Exposition},
+            {n:"Taille Adulte", v:p["Taille à maturité"]}, {n:"Persistance", v:p.Persistance},
             {n:"Rusticité", v:p.Rusticité}
         ];
-
         document.getElementById('p-grid').innerHTML = rubriques.map(r => `
             <div class="info-box ${r.highlight ? 'liseret' : ''}">
                 <div class="label">${r.n}</div>
@@ -182,14 +171,14 @@ if (plaqueId && !p.est_dans_jardin) {
             </div>
         `).join('');
 
-        // SÉCURITÉ : MÉTÉO ET JOURNAL UNIQUEMENT SI PROPRIÉTAIRE
-        if (p.est_dans_jardin === true) {
+        // --- MODE PROPRIÉTAIRE ---
+        if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            loadWeather(); // LANCÉ UNIQUEMENT ICI
+            checkLocation(); // Automatisation de la météo et Notion
 
             const histData = p.Historique_Data || "";
             const container = document.getElementById('p-graph');
@@ -197,12 +186,9 @@ if (plaqueId && !p.est_dans_jardin) {
             for(let i=6; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 const dateStr = d.toLocaleDateString('fr-FR');
-                const isWatered = histData.includes(dateStr);
-                container.innerHTML += `<div class="bar-wrapper"><div class="bar ${isWatered ? 'active' : ''}"></div><div class="bar-date">${dateStr.slice(0,5)}</div></div>`;
+                container.innerHTML += `<div class="bar-wrapper"><div class="bar ${histData.includes(dateStr) ? 'active' : ''}"></div><div class="bar-date">${dateStr.slice(0,5)}</div></div>`;
             }
         } else {
-            // MODE INVITÉ / CATALOGUE
-            document.getElementById('weatherBar').style.display = 'none';
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
 
@@ -212,25 +198,26 @@ if (plaqueId && !p.est_dans_jardin) {
     } catch(e) { console.error(e); }
 }
 
-async function waterNow() {
-    if(!confirm("Confirmer l'arrosage d'aujourd'hui ?")) return;
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-        body: JSON.stringify({ action: "water", plantId, email: userEmail })
-    });
-    if(res.ok) { alert("💧 Arrosage enregistré !"); location.reload(); }
-}
-
-async function saveData() {
-    const note = document.getElementById('p-notes').value;
-    const date_plantation = document.getElementById('date-plant').value;
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
-    });
-    if(res.ok) alert("💾 Journal mis à jour !");
+// GESTION AUTOMATIQUE POSITION
+function checkLocation() {
+    if (!localStorage.getItem("eonia_lat")) {
+        if (confirm("Autoriser ÉONIA à utiliser votre position pour une météo précise du jardin ?")) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                localStorage.setItem("eonia_lat", lat);
+                localStorage.setItem("eonia_lon", lon);
+                
+                // MAJ Notion via l'API
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+                    body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
+                });
+                loadWeather();
+            }, () => { loadWeather(); });
+        } else { loadWeather(); }
+    } else { loadWeather(); }
 }
 
 async function loadWeather() {
@@ -240,7 +227,6 @@ async function loadWeather() {
         const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
         const wData = await wRes.json();
         const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
-        
         document.getElementById("weatherBar").innerHTML = wData.daily.time.slice(0,4).map((d, i) => `
             <div class="weather-item">
                 <span>${new Date(d).toLocaleDateString("fr-FR", {weekday:"short"}).toUpperCase()}</span>
@@ -248,46 +234,47 @@ async function loadWeather() {
                 <b>${Math.round(wData.daily.temperature_2m_max[i])}°</b>
             </div>
         `).join("");
-    } catch (e) { console.log("Météo non dispo"); }
+    } catch (e) { console.log("Météo error"); }
 }
 
-function getLocation() {
-    navigator.geolocation.getCurrentPosition((pos) => {
-        localStorage.setItem("eonia_lat", pos.coords.latitude);
-        localStorage.setItem("eonia_lon", pos.coords.longitude);
-        loadWeather();
-        alert("📍 Position mise à jour !");
+async function waterNow() {
+    if(!confirm("Confirmer l'arrosage ?")) return;
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "water", plantId, email: userEmail })
     });
+    if(res.ok) location.reload();
+}
+
+async function saveData() {
+    const note = document.getElementById('p-notes').value;
+    const date_plantation = document.getElementById('date-plant').value;
+    await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
+    });
+    alert("💾 Journal mis à jour !");
+}
+
+async function proposerAssociation(plaqId, planId, nomPlante) {
+    const pin = prompt(`Plaque ${plaqId} détectée !\nEntrez un code PIN à 4 chiffres pour sécuriser votre ${nomPlante} :`);
+    if (!pin) return;
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "assign_plant", plaqueId: plaqId, plantId: planId, email: userEmail, pin: pin })
+        });
+        const result = await res.json();
+        if (result.success) { alert("✨ Plante associée !"); location.reload(); }
+    } catch(e) { alert("Erreur réseau"); }
 }
 
 const topBtn = document.getElementById("backToTop");
 window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block" : "none"; };
 topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
-    async function proposerAssociation(plaqId, planId, nomPlante) {
-    const pin = prompt(`Plaque ${plaqId} détectée !\nEntrez un code PIN à 4 chiffres pour sécuriser votre ${nomPlante} :`);
-    if (!pin) return;
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-            body: JSON.stringify({ 
-                action: "assign_plant", 
-                plaqueId: plaqId, 
-                plantId: planId, 
-                email: userEmail,
-                pin: pin 
-            })
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert("✨ Plante associée avec succès !");
-            location.reload();
-        } else {
-            alert("Erreur : " + result.error);
-        }
-    } catch(e) { alert("Erreur réseau"); }
-}
 
 load();
 </script>
