@@ -119,6 +119,10 @@ if (plaqueId) {
 }
 
    async function loadData() {
+       // Si on arrive ici sans plaque dans l'URL, on nettoie la mémoire "en attente"
+    if (!plaqueId) {
+        localStorage.removeItem("pending_plaque");
+    }
     // Affiche la bannière si une plaque est détectée
     if (plaqueId) {
         const banner = document.getElementById('activation-banner');
@@ -153,10 +157,21 @@ if (plaqueId) {
     }
 }
 async function openPlant(p) {
-    // Si on a une plaque en attente d'activation
-    if (plaqueId) {
+    // RÉGLAGE : Si la plante est déjà dans le jardin, on l'ouvre normalement, point barre.
+    if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
+        window.location.href = `jardin.html?id=${p.id}`;
+        return;
+    }
+
+    // Sinon, on regarde si on a une plaque à activer
+    const pendingPlaque = plaqueId || localStorage.getItem("pending_plaque");
+
+    if (pendingPlaque) {
         const confirmer = confirm(`Lier votre plaque ÉONIA à cette plante : ${p["Nom commun"]} ?`);
-        if (!confirmer) return;
+        if (!confirmer) {
+            window.location.href = `jardin.html?id=${p.id}`;
+            return;
+        }
 
         try {
             const res = await fetch(API_URL, {
@@ -166,21 +181,24 @@ async function openPlant(p) {
                     action: "assign_plant",
                     email: localStorage.getItem('user_email'),
                     plantId: p.id,
-                    plaqueId: plaqueId,
-                    pin: localStorage.getItem("last_pin") // Utilise le PIN saisi à l'index
+                    plaqueId: pendingPlaque,
+                    pin: localStorage.getItem("last_pin")
                 })
             });
             const data = await res.json();
             if (data.success) {
+                // TRÈS IMPORTANT : On efface la plaque de la mémoire une fois l'association réussie
+                localStorage.removeItem("pending_plaque");
                 alert("🌿 Mémoire activée !");
-                window.location.href = `jardin.html?id=${p.id}`; // Redirection vers la plante enfin associée
+                window.location.href = `jardin.html?id=${p.id}`;
             } else {
                 alert("Erreur : " + data.error);
             }
         } catch (e) { alert("Erreur de connexion"); }
         return;
     }
-    // Sinon, c'est une visite normale
+    
+    // Consultation normale
     window.location.href = `jardin.html?id=${p.id}`;
 }
     function renderGrid() {
