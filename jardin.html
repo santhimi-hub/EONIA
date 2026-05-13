@@ -21,12 +21,26 @@
 
         /* BOUTON RETOUR EN HAUT */
         #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); }
-
+/* Couleurs thermiques */
+        .temp-hot { color: #ff8c00 !important; }  /* Orange */
+        .temp-cold { color: #00aaff !important; } /* Bleu */
+        
+        /* Indicateur de source */
+        .weather-status { 
+            width: 100%; 
+            font-size: 0.45rem; 
+            color: #444; 
+            text-align: center; 
+            margin-bottom: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            flex-basis: 100%;
+        }
         /* --- FORCE L'ALIGNEMENT HORIZONTAL --- */
         .weather-bar { 
     display: none; /* Caché par défaut pour les invités */
     flex-direction: row; 
-    flex-wrap: nowrap;
+    flex-wrap: wrap !important;
     justify-content: space-between; 
     align-items: center; 
     background: var(--card); 
@@ -198,43 +212,86 @@ async function load() {
     } catch(e) { console.error(e); }
 }
 
-// GESTION AUTOMATIQUE POSITION
+// GESTION AUTOMATIQUE POSITION & NOTION
 function checkLocation() {
-    if (!localStorage.getItem("eonia_lat")) {
-        if (confirm("Autoriser ÉONIA à utiliser votre position pour une météo précise du jardin ?")) {
+    // Vérifie si la position est déjà connue localement
+    const hasLat = localStorage.getItem("eonia_lat");
+    
+    if (!hasLat) {
+        if (confirm("Pour une météo précise de votre jardin, ÉONIA souhaite utiliser votre position. Acceptez-vous ?")) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
                 localStorage.setItem("eonia_lat", lat);
                 localStorage.setItem("eonia_lon", lon);
                 
-                // MAJ Notion via l'API
+                // Envoi automatique à ton API pour mettre à jour la ligne Notion du client
                 await fetch(API_URL, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-                    body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
+                    body: JSON.stringify({ 
+                        action: "update_location", 
+                        plantId, 
+                        email: userEmail, 
+                        lat: lat, 
+                        lon: lon 
+                    })
                 });
                 loadWeather();
-            }, () => { loadWeather(); });
-        } else { loadWeather(); }
-    } else { loadWeather(); }
+            }, () => { 
+                loadWeather(); // En cas d'erreur technique, météo par défaut
+            });
+        } else {
+            loadWeather(); // Si l'utilisateur refuse, météo Paris par défaut
+        }
+    } else {
+        loadWeather(); // Position déjà enregistrée
+    }
 }
 
 async function loadWeather() {
-    let lat = localStorage.getItem("eonia_lat") || 48.85;
-    let lon = localStorage.getItem("eonia_lon") || 2.35;
+    const storedLat = localStorage.getItem("eonia_lat");
+    const storedLon = localStorage.getItem("eonia_lon");
+    
+    // Si pas de GPS, on utilise Paris (48.85, 2.35)
+    let lat = storedLat || 48.85;
+    let lon = storedLon || 2.35;
+
     try {
         const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
         const wData = await wRes.json();
         const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
-        document.getElementById("weatherBar").innerHTML = wData.daily.time.slice(0,4).map((d, i) => `
-            <div class="weather-item">
-                <span>${new Date(d).toLocaleDateString("fr-FR", {weekday:"short"}).toUpperCase()}</span>
-                <div class="w-icon">${icons(wData.daily.weathercode[i])}</div>
-                <b>${Math.round(wData.daily.temperature_2m_max[i])}°</b>
-            </div>
-        `).join("");
-    } catch (e) { console.log("Météo error"); }
+        
+        // Logique de couleur thermique
+        const getTempClass = (t) => {
+            if (t >= 25) return 'temp-hot'; // Orange pour la chaleur
+            if (t <= 10) return 'temp-cold'; // Bleu pour le froid
+            return '';
+        };
+
+        const statusText = storedLat ? "Météo locale" : "Météo générale (Paris)";
+
+        // Génération du HTML avec le texte de statut et les couleurs
+        let html = `<div class="weather-status">${statusText}</div>`;
+        html += `<div style="display:flex; width:100%; justify-content:space-between;">`;
+        
+        html += wData.daily.time.slice(0,4).map((d, i) => {
+            const temp = Math.round(wData.daily.temperature_2m_max[i]);
+            return `
+                <div class="weather-item">
+                    <span>${new Date(d).toLocaleDateString("fr-FR", {weekday:"short"}).toUpperCase()}</span>
+                    <div class="w-icon">${icons(wData.daily.weathercode[i])}</div>
+                    <b class="${getTempClass(temp)}">${temp}°</b>
+                </div>
+            `;
+        }).join("");
+        
+        html += `</div>`;
+        
+        document.getElementById("weatherBar").innerHTML = html;
+    } catch (e) { 
+        console.log("Météo non dispo"); 
+    }
 }
 
 async function waterNow() {
