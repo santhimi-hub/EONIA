@@ -10,7 +10,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* LOADER D'ORIGINE */
+        /* LOADER */
         #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner-logo { width: 60px; animation: spin 2s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -19,26 +19,13 @@
         .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
-        #backToTop { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: var(--accent); color: #000; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4); }
-
+        /* Couleurs thermiques */
         .temp-hot { color: #ff8c00 !important; }
         .temp-cold { color: #00aaff !important; }
 
-        .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; flex-basis: 100%; }
-        
-        .weather-bar { 
-            display: none; 
-            flex-direction: row; 
-            flex-wrap: wrap !important;
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 15px; 
-            margin-bottom: 25px;
-        }
-        .weather-item { flex: 1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; }
+        .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .weather-bar { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 25px; }
+        .weather-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .weather-item span { font-size: 0.55rem; font-weight: 600; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         .weather-item b { font-size: 0.75rem; color: #fff; margin-top: 5px; }
         .w-icon { font-size: 1.3rem; line-height: 1; margin: 2px 0; }
@@ -53,12 +40,6 @@
         .info-box.liseret { border-left: 3px solid var(--accent); }
         .label { color: var(--accent); font-size: 0.5rem; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
         .value { font-size: 0.85rem; color: #eee; }
-
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 12%; cursor: pointer; }
-        .bar { width: 100%; background: #1a1a1a; border-radius: 4px; height: 15%; transition: 0.3s; }
-        .bar.active { background: var(--blue); height: 85%; box-shadow: 0 0 10px rgba(0,170,255,0.4); }
-        .bar-date { font-size: 0.5rem; color: #444; margin-top: 5px; }
 
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
@@ -77,12 +58,9 @@
     <div class="load-txt">Téléchargement...</div>
 </div>
 
-<button id="backToTop">↑</button>
-
 <div class="container" id="app">
     <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR AU JARDIN</button>
 
-    <!-- LIEN DISCRET -->
     <div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
         <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
             📍 Activer la météo locale
@@ -98,7 +76,7 @@
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
-        <div class="graph-container" id="p-graph"></div>
+        <div id="p-graph" style="display:flex; align-items:flex-end; justify-content:space-between; height:80px; margin-top:20px; padding: 0 10px;"></div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
@@ -128,8 +106,8 @@
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
-// DÉTECTION PLAQUE (On accepte plaque OU plaqueId)
-const plaqueIdDetectee = params.get('plaque') || params.get('plaqueId');
+// DÉTECTION PLAQUE (On cherche les deux formats de noms possibles)
+const plaqueScan = params.get('plaque') || params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
 async function load() {
@@ -141,12 +119,13 @@ async function load() {
         });
         
         const data = await res.json();
-        const p = data.find(item => item.id === plantId || item.cleanId === plantId);
+        const p = Array.isArray(data) ? data.find(item => item.id === plantId || item.cleanId === plantId) : data;
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        // --- ON ENLÈVE LE LOADER EN PREMIER ---
-        document.getElementById('loader').style.display = 'none';
+        // --- ACTION : ON DÉTRUIT LE LOADER ---
+        const loader = document.getElementById('loader');
+        if (loader) loader.remove();
         document.getElementById('app').classList.add('loaded');
 
         // REMPLISSAGE
@@ -169,44 +148,42 @@ async function load() {
             </div>
         `).join('');
 
-        // --- ASSOCIATION (APRÈS FERMETURE DU LOADER) ---
-        if (plaqueIdDetectee && !p.est_dans_jardin) {
-            setTimeout(() => { proposerAssociation(plaqueIdDetectee, p.id, p["Nom commun"]); }, 1000);
-        }
-
-        // MODE PROPRIÉTAIRE
+        // LOGIQUE PROPRIÉTAIRE
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
-            const geoLink = document.getElementById('geo-link');
-            if (geoLink) geoLink.innerText = localStorage.getItem("eonia_lat") ? "📍 Ajuster la position" : "📍 Activer la météo locale";
+            if (localStorage.getItem("eonia_lat")) {
+                document.getElementById('geo-link').innerText = "📍 Ajuster la position";
+            }
+            loadWeather();
 
-            checkLocation(); 
-
-            const histData = p.Historique_Data || "";
-            const container = document.getElementById('p-graph');
-            container.innerHTML = "";
+            // Graphique
+            const hist = p.Historique_Data || "";
+            const graph = document.getElementById('p-graph');
+            graph.innerHTML = "";
             for(let i=6; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate() - i);
-                const dateStr = d.toLocaleDateString('fr-FR');
-                container.innerHTML += `<div class="bar-wrapper"><div class="bar ${histData.includes(dateStr) ? 'active' : ''}"></div><div class="bar-date">${dateStr.slice(0,5)}</div></div>`;
+                const ds = d.toLocaleDateString('fr-FR');
+                const active = hist.includes(ds);
+                graph.innerHTML += `
+                    <div style="display:flex; flex-direction:column; align-items:center; width:12%;">
+                        <div style="width:100%; background:${active ? 'var(--blue)' : '#1a1a1a'}; border-radius:4px; height:${active ? '85' : '15'}%; transition:0.3s; box-shadow:${active ? '0 0 10px rgba(0,170,255,0.4)' : 'none'};"></div>
+                        <div style="font-size:0.5rem; color:#444; margin-top:5px;">${ds.slice(0,5)}</div>
+                    </div>`;
             }
         } else {
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
 
-    } catch(e) { console.error(e); document.getElementById('loader').style.display = 'none'; }
-}
+        // --- DÉCLENCHEMENT ASSOCIATION (SI PLAQUE DÉTECTÉE) ---
+        if (plaqueScan && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(plaqueScan, p.id, p["Nom commun"]); }, 500);
+        }
 
-function checkLocation() {
-    if (!localStorage.getItem("eonia_lat")) {
-        loadWeather(); 
-    } else {
-        loadWeather(); 
-    }
+    } catch(e) { console.error(e); if(document.getElementById('loader')) document.getElementById('loader').remove(); }
 }
 
 function getLocation() {
@@ -223,12 +200,10 @@ function getLocation() {
                 body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
             });
             
-            const geoLink = document.getElementById('geo-link');
-            if (geoLink) geoLink.innerText = "📍 Ajuster la position";
-            
+            document.getElementById('geo-link').innerText = "📍 Ajuster la position";
             loadWeather();
-            alert("📍 Position mise à jour !");
-        }, () => alert("Position non accessible."));
+            alert("📍 Position enregistrée !");
+        }, () => alert("Position refusée ou indisponible."));
     }
 }
 
@@ -236,18 +211,19 @@ async function loadWeather() {
     const lat = localStorage.getItem("eonia_lat") || 48.85;
     const lon = localStorage.getItem("eonia_lon") || 2.35;
     try {
-        const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
-        const wData = await wRes.json();
-        const icons = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
-        const getTempClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
+        const w = await res.json();
+        const icon = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
+        const tClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
 
-        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo Paris"}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
-        html += wData.daily.time.slice(0,4).map((d, i) => {
-            const temp = Math.round(wData.daily.temperature_2m_max[i]);
-            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icons(wData.daily.weathercode[i])}</div><b class="${getTempClass(temp)}">${temp}°</b></div>`;
+        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo Paris"}</div>`;
+        html += `<div style="display:flex; width:100%; justify-content:space-between;">`;
+        html += w.daily.time.slice(0,4).map((d, i) => {
+            const t = Math.round(w.daily.temperature_2m_max[i]);
+            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(w.daily.weathercode[i])}</div><b class="${tClass(t)}">${t}°</b></div>`;
         }).join("");
         document.getElementById("weatherBar").innerHTML = html + "</div>";
-    } catch (e) { }
+    } catch (e) {}
 }
 
 async function waterNow() {
@@ -263,38 +239,32 @@ async function waterNow() {
 async function saveData() {
     const note = document.getElementById('p-notes').value;
     const date_plantation = document.getElementById('date-plant').value;
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-            body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
-        });
-        alert("💾 Journal mis à jour !");
-    } catch(e) { alert("Erreur d'enregistrement."); }
+    await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
+    });
+    alert("💾 Journal mis à jour !");
 }
 
-async function proposerAssociation(plaqId, planId, nomPlante) {
-    const pin = prompt(`Plaque ${plaqId} détectée !\nEntrez un code PIN à 4 chiffres pour sécuriser votre ${nomPlante} :`);
+async function proposerAssociation(plaq, plan, nom) {
+    const pin = prompt(`Plaque ${plaq} détectée !\nCréez un code PIN à 4 chiffres pour votre ${nom} :`);
     if (!pin) return;
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-            body: JSON.stringify({ action: "assign_plant", plaqueId: plaqId, plantId: planId, email: userEmail, pin: pin })
+            body: JSON.stringify({ action: "assign_plant", plaqueId: plaq, plantId: plan, email: userEmail, pin: pin })
         });
-        const result = await res.json();
-        if (result.success) { 
+        const r = await res.json();
+        if (r.success) { 
             alert("✨ Mémoire activée !"); 
-            window.location.href = `jardin.html?id=${planId}`; 
+            window.location.href = `jardin.html?id=${plan}`; 
         } else {
-            alert("Erreur : " + result.error);
+            alert("Erreur : " + r.error);
         }
-    } catch(e) { alert("Erreur réseau."); }
+    } catch(e) { alert("Erreur de connexion."); }
 }
-
-const topBtn = document.getElementById("backToTop");
-window.onscroll = () => { topBtn.style.display = (window.scrollY > 300) ? "block" : "none"; };
-topBtn.onclick = () => { window.scrollTo({top: 0, behavior: 'smooth'}); };
 
 load();
 </script>
