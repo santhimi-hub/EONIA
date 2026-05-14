@@ -348,15 +348,10 @@ async function saveData() {
 }
 
 async function proposerAssociation(plaq, plan, nom) {
-
-    const pin = prompt(
-        `Plaque ${plaq} détectée !\nCréez un code PIN à 4 chiffres pour votre ${nom} :`
-    );
-
+    const pin = prompt(`Plaque ${plaq} détectée !\nCréez un code PIN à 4 chiffres pour votre ${nom} :`);
     if (!pin) return;
 
     try {
-
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -375,65 +370,60 @@ async function proposerAssociation(plaq, plan, nom) {
         const r = await res.json();
 
         if (r.success) {
+            alert("✨ Mémoire activée !");
 
-    alert("✨ Mémoire activée !");
+            const autorisation = confirm(
+                "📍 ÉONIA — MÉTÉO DU JARDIN\n\nSouhaitez-vous activer la météo locale ?\n\n✔ météo de votre jardin\n✔ conseils adaptés\n✔ suivi intelligent\n\nVous pouvez changer plus tard."
+            );
 
-    const goToGarden = () => {
-        window.location.href = `jardin.html?id=${plan}`;
-    };
+            if (!autorisation) {
+                // Si l'utilisateur refuse la météo, on redirige immédiatement
+                window.location.href = `jardin.html?id=${plan}`;
+                return;
+            }
 
- const autorisation = confirm(
-`📍 ÉONIA — MÉTÉO DU JARDIN
+            // Si l'utilisateur accepte la météo
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
 
-Souhaitez-vous activer la météo locale ?
+                    localStorage.setItem("eonia_lat", lat);
+                    localStorage.setItem("eonia_lon", lon);
 
-✔ météo de votre jardin
-✔ conseils adaptés
-✔ suivi intelligent
-
-Vous pouvez changer plus tard.`
-);
-
-if (!autorisation) {
-    window.location.href = `jardin.html?id=${plan}`;
-    return;
-}
-    navigator.geolocation.getCurrentPosition(
-
-        async (pos) => {
-
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-
-            localStorage.setItem("eonia_lat", lat);
-            localStorage.setItem("eonia_lon", lon);
-
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': 'EONIA_2026_SECRET'
+                    try {
+                        await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-api-key': 'EONIA_2026_SECRET'
+                            },
+                            body: JSON.stringify({
+                                action: "update_location",
+                                plantId: plan,
+                                email: userEmail,
+                                lat,
+                                lon
+                            })
+                        });
+                        alert("📍 Position enregistrée !");
+                    } catch (e) {
+                        console.error("Erreur mise à jour position");
+                    }
+                    // Redirection après enregistrement
+                    window.location.href = `jardin.html?id=${plan}`;
                 },
-                body: JSON.stringify({
-                    action: "update_location",
-                    plantId: plan,
-                    email: userEmail,
-                    lat,
-                    lon
-                })
-            });
-
-            alert("📍 Position enregistrée !");
-            goToGarden();
-
-        },
-
-        () => {
-            alert("Position refusée.");
-            goToGarden();
+                () => {
+                    alert("Position refusée ou indisponible.");
+                    window.location.href = `jardin.html?id=${plan}`;
+                }
+            );
+        } else {
+            alert("Erreur : " + r.error);
         }
-
-    );
+    } catch (e) {
+        alert("Erreur de connexion.");
+    }
 } else {
 
                 // Si refus géolocalisation
