@@ -196,9 +196,18 @@ async function openPlant(p) {
 
     // Demande météo locale
     const geo = confirm(
-        "📍 Souhaitez-vous activer la météo locale de votre jardin ?"
-    );
+`📍 MÉTÉO LOCALE ÉONIA
 
+Autoriser la localisation permet :
+
+• une météo réelle de votre jardin
+• des alertes gel/chaleur
+• des conseils d’arrosage intelligents
+
+Vous pourrez modifier ce choix plus tard.
+
+Activer maintenant ?`
+);
    if (geo) {
 
     alert("📍 ÉONIA souhaite accéder à votre position pour afficher la météo réelle de votre jardin.");
