@@ -376,59 +376,64 @@ async function proposerAssociation(plaq, plan, nom) {
 
         if (r.success) {
 
-            // ÉTAPE 1
-            alert("✨ Mémoire activée !");
+    alert("✨ Mémoire activée !");
 
-            // ÉTAPE 2
-            const autorisation = confirm(
-                "📍 Souhaitez-vous activer la météo locale de votre jardin ?"
-            );
+    const goToGarden = () => {
+        window.location.href = `jardin.html?id=${plan}`;
+    };
 
-            if (autorisation) {
+    const autorisation = confirm(
+`📍 ÉONIA — MÉTÉO DU JARDIN
 
-                navigator.geolocation.getCurrentPosition(
+Souhaitez-vous activer la météo locale ?
 
-                    async (pos) => {
+✔ météo réelle du jardin
+✔ conseils adaptés
+✔ suivi intelligent`
+    );
 
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
+    if (!autorisation) {
+        goToGarden();
+        return;
+    }
 
-                        localStorage.setItem("eonia_lat", lat);
-                        localStorage.setItem("eonia_lon", lon);
+    navigator.geolocation.getCurrentPosition(
 
-                        // Sauvegarde serveur
-                        await fetch(API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-api-key': 'EONIA_2026_SECRET'
-                            },
-                            body: JSON.stringify({
-                                action: "update_location",
-                                plantId: plan,
-                                email: userEmail,
-                                lat,
-                                lon
-                            })
-                        });
+        async (pos) => {
 
-                        alert("📍 Position enregistrée !");
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
 
-                        // ÉTAPE FINALE
-                        window.location.href = `jardin.html?id=${plan}`;
+            localStorage.setItem("eonia_lat", lat);
+            localStorage.setItem("eonia_lon", lon);
 
-                    },
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'EONIA_2026_SECRET'
+                },
+                body: JSON.stringify({
+                    action: "update_location",
+                    plantId: plan,
+                    email: userEmail,
+                    lat,
+                    lon
+                })
+            });
 
-                    () => {
+            alert("📍 Position enregistrée !");
+            goToGarden();
 
-                        alert("Position refusée.");
+        },
 
-                        window.location.href = `jardin.html?id=${plan}`;
-                    }
+        () => {
+            alert("Position refusée.");
+            goToGarden();
+        }
 
-                );
-
-            } else {
+    );
+} else {
 
                 // Si refus géolocalisation
                 window.location.href = `jardin.html?id=${plan}`;
