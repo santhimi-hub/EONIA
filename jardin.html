@@ -354,128 +354,62 @@ async function proposerAssociation(plaq, plan, nom) {
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET'
-            },
-            body: JSON.stringify({
-                action: "assign_plant",
-                plaqueId: plaq,
-                plantId: plan,
-                email: userEmail,
-                pin: pin
-            })
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "assign_plant", plaqueId: plaq, plantId: plan, email: userEmail, pin: pin })
         });
 
         const r = await res.json();
 
         if (r.success) {
             alert("✨ Mémoire activée !");
-
-            const autorisation = confirm(
-                "📍 ÉONIA — MÉTÉO DU JARDIN\n\nSouhaitez-vous activer la météo locale ?\n\n✔ météo de votre jardin\n✔ conseils adaptés\n✔ suivi intelligent\n\nVous pouvez changer plus tard."
-            );
+            const autorisation = confirm("📍 ÉONIA — MÉTÉO DU JARDIN\n\nSouhaitez-vous activer la météo locale ?\n\n✔ météo de votre jardin\n✔ conseils adaptés\n✔ suivi intelligent\n\nVous pouvez changer plus tard.");
 
             if (!autorisation) {
-                // Si l'utilisateur refuse la météo, on redirige immédiatement
                 window.location.href = `jardin.html?id=${plan}`;
                 return;
             }
 
-            // Si l'utilisateur accepte la météo
-            navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                localStorage.setItem("eonia_lat", lat);
+                localStorage.setItem("eonia_lon", lon);
 
-                    localStorage.setItem("eonia_lat", lat);
-                    localStorage.setItem("eonia_lon", lon);
-
-                    try {
-                        await fetch(API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'x-api-key': 'EONIA_2026_SECRET'
-                            },
-                            body: JSON.stringify({
-                                action: "update_location",
-                                plantId: plan,
-                                email: userEmail,
-                                lat,
-                                lon
-                            })
-                        });
-                        alert("📍 Position enregistrée !");
-                    } catch (e) {
-                        console.error("Erreur mise à jour position");
-                    }
-                    // Redirection après enregistrement
-                    window.location.href = `jardin.html?id=${plan}`;
-                },
-                () => {
-                    alert("Position refusée ou indisponible.");
-                    window.location.href = `jardin.html?id=${plan}`;
-                }
-            );
-        } else {
-            alert("Erreur : " + r.error);
-        }
-    } catch (e) {
-        alert("Erreur de connexion.");
-    }
-} else {
-
-                // Si refus géolocalisation
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+                        body: JSON.stringify({ action: "update_location", plantId: plan, email: userEmail, lat, lon })
+                    });
+                    alert("📍 Position enregistrée !");
+                } catch (e) { console.error("Erreur position"); }
                 window.location.href = `jardin.html?id=${plan}`;
-            }
-
+            }, () => {
+                alert("Position refusée ou indisponible.");
+                window.location.href = `jardin.html?id=${plan}`;
+            });
         } else {
-
             alert("Erreur : " + r.error);
         }
-
-    } catch(e) {
-
-        alert("Erreur de connexion.");
-    }
+    } catch (e) { alert("Erreur de connexion."); }
 }
+
 async function removeWater() {
-
     if (!confirm("Supprimer le dernier arrosage ?")) return;
-
     try {
-
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET'
-            },
-            body: JSON.stringify({
-                action: "remove_water",
-                plantId,
-                email: userEmail
-            })
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "remove_water", plantId, email: userEmail })
         });
-
         const data = await res.json();
-
         if (data.success) {
-
             alert("✖ Dernier arrosage supprimé");
-
             location.reload();
-
         } else {
-
             alert("Erreur : " + data.error);
         }
-
-    } catch(e) {
-
-        alert("Erreur de connexion.");
-    }
+    } catch(e) { alert("Erreur de connexion."); }
 }
 load();
 </script>
