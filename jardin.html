@@ -258,47 +258,24 @@ for(let i = 6; i >= 0; i--) {
 }
 
 function getLocation() {
-
-    const ok = confirm(
-        "📍 ÉONIA utilise votre position uniquement pour la météo du jardin.\n\nAutoriser la géolocalisation ?"
-    );
-
-    if (!ok) return;
-
-    navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-
+    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo locale ?")) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
             const lat = pos.coords.latitude;
             const lon = pos.coords.longitude;
-
             localStorage.setItem("eonia_lat", lat);
             localStorage.setItem("eonia_lon", lon);
-
+            
             await fetch(API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': 'EONIA_2026_SECRET'
-                },
-                body: JSON.stringify({
-                    action: "update_location",
-                    plantId,
-                    email: userEmail,
-                    lat,
-                    lon
-                })
+                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
             });
-
-            // 🔥 IMPORTANT : ON REDIRIGE TOUJOURS
-            window.location.href = `jardin.html?id=${plantId}`;
-
-        },
-        () => {
-            alert("❌ Position refusée.");
-            // même en refus → on reste sur la plante
-            window.location.href = `jardin.html?id=${plantId}`;
-        }
-    );
+            
+            document.getElementById('geo-link').innerText = "📍 Ajuster la position";
+            loadWeather();
+            alert("📍 Position enregistrée !");
+        }, () => alert("Position refusée ou indisponible."));
+    }
 }
 
 async function loadWeather() {
