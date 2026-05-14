@@ -75,8 +75,44 @@
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
-        <button class="btn-main" style="border-color:var(--blue); color:var(--blue);" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
-        <div id="p-graph" style="display:flex; align-items:flex-end; justify-content:space-between; height:80px; margin-top:20px; padding: 0 10px;"></div>
+       <button class="btn-main"
+style="border-color:var(--blue); color:var(--blue);"
+onclick="waterNow()">
+💧 ARROSER AUJOURD'HUI
+</button>
+
+<button class="btn-main"
+style="
+margin-top:10px;
+border-color:#ff5555;
+color:#ff5555;
+"
+onclick="removeWater()">
+✖ ANNULER LE DERNIER ARROSAGE
+</button>
+
+<div id="last-water"
+style="
+margin-top:15px;
+font-size:0.65rem;
+color:#666;
+text-align:center;
+letter-spacing:1px;
+text-transform:uppercase;
+">
+Aucun arrosage enregistré
+</div>
+
+<div id="p-graph"
+style="
+display:flex;
+align-items:flex-end;
+justify-content:space-between;
+height:80px;
+margin-top:20px;
+padding:0 10px;
+">
+</div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
@@ -162,22 +198,57 @@ async function load() {
 
             // Graphique
             const hist = p.Historique_Data || "";
-            const graph = document.getElementById('p-graph');
-            graph.innerHTML = "";
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const ds = d.toLocaleDateString('fr-FR');
-                const active = hist.includes(ds);
-                graph.innerHTML += `
-                    <div style="display:flex; flex-direction:column; align-items:center; width:12%;">
-                        <div style="width:100%; background:${active ? 'var(--blue)' : '#1a1a1a'}; border-radius:4px; height:${active ? '85' : '15'}%; transition:0.3s; box-shadow:${active ? '0 0 10px rgba(0,170,255,0.4)' : 'none'};"></div>
-                        <div style="font-size:0.5rem; color:#444; margin-top:5px;">${ds.slice(0,5)}</div>
-                    </div>`;
-            }
-        } else {
-            document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
-        }
+const dates = hist.split(",");
 
+const graph = document.getElementById('p-graph');
+graph.innerHTML = "";
+
+// DERNIER ARROSAGE
+if (dates.length > 0 && dates[0] !== "") {
+    document.getElementById("last-water").innerText =
+        "Dernier arrosage : " + dates[dates.length - 1];
+}
+
+for(let i = 6; i >= 0; i--) {
+
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+
+    const ds = d.toLocaleDateString('fr-FR');
+
+    const active = dates.includes(ds);
+
+    graph.innerHTML += `
+        <div style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            width:12%;
+        ">
+
+            <div style="
+                width:100%;
+                background:${active ? 'var(--blue)' : '#1a1a1a'};
+                border-radius:6px;
+                height:${active ? '85%' : '15%'};
+                transition:0.3s;
+                box-shadow:${active ? '0 0 12px rgba(0,170,255,0.45)' : 'none'};
+            "></div>
+
+            <div style="
+                font-size:0.5rem;
+                color:#555;
+                margin-top:6px;
+            ">
+                ${ds.slice(0,5)}
+            </div>
+
+        </div>
+    `;
+}
+} else {
+    document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+}
         // --- DÉCLENCHEMENT ASSOCIATION (SI PLAQUE DÉTECTÉE) ---
         if (plaqueScan && !p.est_dans_jardin) {
             setTimeout(() => { proposerAssociation(plaqueScan, p.id, p["Nom commun"]); }, 500);
@@ -227,13 +298,42 @@ async function loadWeather() {
 }
 
 async function waterNow() {
-    if(!confirm("Confirmer l'arrosage ?")) return;
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-        body: JSON.stringify({ action: "water", plantId, email: userEmail })
-    });
-    if(res.ok) location.reload();
+
+    if (!confirm("Confirmer l'arrosage ?")) return;
+
+    try {
+
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': 'EONIA_2026_SECRET'
+            },
+            body: JSON.stringify({
+                action: "water",
+                plantId,
+                email: userEmail
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            alert("💧 Arrosage enregistré !");
+
+            // Recharge la page pour mettre à jour le graphique
+            location.reload();
+
+        } else {
+
+            alert("Erreur : " + data.error);
+        }
+
+    } catch(e) {
+
+        alert("Erreur de connexion.");
+    }
 }
 
 async function saveData() {
@@ -344,7 +444,43 @@ async function proposerAssociation(plaq, plan, nom) {
         alert("Erreur de connexion.");
     }
 }
+async function removeWater() {
 
+    if (!confirm("Supprimer le dernier arrosage ?")) return;
+
+    try {
+
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': 'EONIA_2026_SECRET'
+            },
+            body: JSON.stringify({
+                action: "remove_water",
+                plantId,
+                email: userEmail
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            alert("✖ Dernier arrosage supprimé");
+
+            location.reload();
+
+        } else {
+
+            alert("Erreur : " + data.error);
+        }
+
+    } catch(e) {
+
+        alert("Erreur de connexion.");
+    }
+}
 load();
 </script>
 </body>
