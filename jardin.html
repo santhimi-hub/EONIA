@@ -382,21 +382,22 @@ async function proposerAssociation(plaq, plan, nom) {
         window.location.href = `jardin.html?id=${plan}`;
     };
 
-    const autorisation = confirm(
+ const autorisation = confirm(
 `📍 ÉONIA — MÉTÉO DU JARDIN
 
 Souhaitez-vous activer la météo locale ?
 
-✔ météo réelle du jardin
+✔ météo de votre jardin
 ✔ conseils adaptés
-✔ suivi intelligent`
-    );
+✔ suivi intelligent
 
-    if (!autorisation) {
-        goToGarden();
-        return;
-    }
+Vous pouvez changer plus tard.`
+);
 
+if (!autorisation) {
+    window.location.href = `jardin.html?id=${plan}`;
+    return;
+}
     navigator.geolocation.getCurrentPosition(
 
         async (pos) => {
