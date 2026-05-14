@@ -199,9 +199,11 @@ async function openPlant(p) {
         "📍 Souhaitez-vous activer la météo locale de votre jardin ?"
     );
 
-    if (geo) {
+   if (geo) {
 
-        navigator.geolocation.getCurrentPosition(
+    alert("📍 ÉONIA souhaite accéder à votre position pour afficher la météo réelle de votre jardin.");
+
+    navigator.geolocation.getCurrentPosition(
 
             async (pos) => {
 
