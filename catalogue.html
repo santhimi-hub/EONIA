@@ -187,13 +187,69 @@ async function openPlant(p) {
             });
             const data = await res.json();
             if (data.success) {
-                // TRÈS IMPORTANT : On efface la plaque de la mémoire une fois l'association réussie
-                localStorage.removeItem("pending_plaque");
-                alert("🌿 Mémoire activée !");
+
+    // Nettoyage mémoire plaque
+    localStorage.removeItem("pending_plaque");
+
+    // Message activation
+    alert("🌿 Mémoire activée !");
+
+    // Demande météo locale
+    const geo = confirm(
+        "📍 Souhaitez-vous activer la météo locale de votre jardin ?"
+    );
+
+    if (geo) {
+
+        navigator.geolocation.getCurrentPosition(
+
+            async (pos) => {
+
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+
+                // Sauvegarde locale
+                localStorage.setItem("eonia_lat", lat);
+                localStorage.setItem("eonia_lon", lon);
+
+                // Sauvegarde serveur
+                await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": "EONIA_2026_SECRET"
+                    },
+                    body: JSON.stringify({
+                        action: "update_location",
+                        plantId: p.id,
+                        email: localStorage.getItem('user_email'),
+                        lat,
+                        lon
+                    })
+                });
+
+                alert("📍 Position enregistrée !");
+
+                // Redirection finale
                 window.location.href = `jardin.html?id=${p.id}`;
-            } else {
-                alert("Erreur : " + data.error);
+
+            },
+
+            () => {
+
+                alert("Position refusée.");
+
+                window.location.href = `jardin.html?id=${p.id}`;
             }
+
+        );
+
+    } else {
+
+        // Si refus météo
+        window.location.href = `jardin.html?id=${p.id}`;
+    }
+}
         } catch (e) { alert("Erreur de connexion"); }
         return;
     }
