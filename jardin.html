@@ -27,13 +27,11 @@
         .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
-        /* HEADER D'ACCUEIL (DISCRET EN HAUT) */
-        .user-greeting { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 15px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .user-greeting b { color: var(--accent); font-weight: 500; }
-
-        /* TITRES */
-        h1 { font-size: 1.5rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
-        .sci-name { color: var(--accent); font-size: 0.75rem; font-style: italic; margin-bottom: 20px; opacity: 0.7; }
+        /* HEADER & WELCOME */
+        .welcome-header { margin-bottom: 20px; border-left: 1px solid var(--accent); padding-left: 15px; }
+        .greeting-text { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 4px; }
+        h1 { font-size: 1.3rem; font-weight: 300; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .sci-name { color: var(--accent); font-size: 0.75rem; font-style: italic; margin-top: 2px; opacity: 0.7; }
 
         /* Couleurs thermiques */
         .temp-hot { color: var(--orange) !important; }
@@ -46,7 +44,7 @@
         .weather-item b { font-size: 0.75rem; color: #fff; margin-top: 5px; }
         .w-icon { font-size: 1.3rem; line-height: 1; margin: 2px 0; }
 
-        .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
+        .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
 
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
@@ -74,11 +72,8 @@
 
         .water-tracking-status { margin-top: 15px; font-size: 0.65rem; color: #888; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
         .water-next-status { font-size: 0.6rem; color: #555; text-align: center; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
-        
-        /* CORRECTION CONSEIL DE SAISON */
         .care-recommendation { margin: 15px 0 5px; padding: 15px; background: #080808; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; color: #aaa; line-height: 1.5; }
-        .care-recommendation b { color: #fff; font-weight: 600; font-size: 0.75rem; } /* Forcer la taille normale */
-
+        
         .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 25px; padding: 0 10px; }
         .graph-day-column { display: flex; flex-direction: column; align-items: center; width: 12%; }
         .graph-bar-pill { width: 100%; border-radius: 6px; transition: 0.3s; }
@@ -86,14 +81,28 @@
         .graph-bar-pill.inactive { background: #1a1a1a; height: 15%; }
         .graph-day-label { font-size: 0.5rem; color: #555; margin-top: 6px; }
 
+        /* VITALITÉ (Format Épuré Premium) */
         .vitality-wrapper { display: flex; flex-direction: column; align-items: center; margin: 10px 0 20px; }
         .vitality-circle { width: 75px; height: 75px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; background: #050505; box-shadow: 0 0 20px rgba(74, 222, 128, 0.15); }
         #vitality-score { font-size: 1.1rem; font-weight: 600; color: #fff; }
         .vitality-label { margin-top: 8px; color: #666; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; }
 
+        /* INTERFACE MODALE DIAGNOSTIC IA */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
         .modal-content { background: #0c0c0c; border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 500px; width: 100%; animation: fadeUp .3s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 0.65rem; color: var(--red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        .diagnostic-result { margin-top: 20px; padding: 15px; background: #050505; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; line-height: 1.6; color: #ccc; display: none; text-align: left; }
+
+        /* ANIMATIONS */
+        .dash-block, .info-box, .weather-bar { animation: fadeUp .45s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-box { transition: all .25s ease; }
+        .info-box:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(74, 222, 128, 0.2); }
         .mon-jardin-only, .collection-only { display: none; }
     </style>
 </head>
@@ -105,23 +114,26 @@
 </div>
 
 <div class="container" id="app">
-    
-    <div id="user-greeting-bar" class="user-greeting">...</div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:6px 12px; border-radius:40px; font-size:0.5rem; cursor:pointer;">← CATALOGUE</button>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+        <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 15px; border-radius:40px; font-size:0.55rem; cursor:pointer;">← RETOUR</button>
+        
         <div class="mon-jardin-only">
-            <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.45rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">📍 Météo locale</a>
+            <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
+                📍 Météo locale
+            </a>
         </div>
+    </div>
+
+    <div class="welcome-header">
+        <div id="greeting-box" class="greeting-text">...</div>
+        <h1 id="p-titre">Chargement...</h1>
+        <div id="p-sci" class="sci-name">...</div>
     </div>
 
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
     
-    <h1 id="p-titre">...</h1>
-    <div id="p-sci" class="sci-name">...</div>
-
     <div class="mon-jardin-only" style="text-align:left;">
         <div id="plant-status-badge" class="status-badge">Analyse...</div>
 
@@ -144,10 +156,22 @@
         
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
         <div id="next-water" class="water-next-status"></div>
+        
+        <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels</button>
+        
         <div id="p-graph" class="graph-container"></div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
+
+    <div class="mon-jardin-only" style="margin-bottom: 25px;">
+        <button class="btn-main btn-cancel" onclick="plantDiagnostic()">🚑 MA PLANTE VA MAL (DIAGNOSTIC IA)</button>
+    </div>
+
+    <div class="dash-block">
+        <div class="block-title">INFORMATIONS GÉNÉRALES</div>
+        <p id="p-desc" style="color:#888; font-size:0.85rem; line-height:1.6;"></p>
+    </div>
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">TABLEAU DE BORD - JOURNAL</div>
@@ -160,7 +184,7 @@
             <input type="date" id="date-plant">
         </div>
         <label class="label">Mes notes privées</label>
-        <textarea id="p-notes" rows="4" placeholder="Notez ici vos observations..."></textarea>
+        <textarea id="p-notes" rows="4" placeholder="Offert par..."></textarea>
         <button class="btn-main btn-save" onclick="saveData()">💾 ENREGISTRER</button>
     </div>
 
@@ -169,13 +193,28 @@
     </div>
 </div>
 
+<div id="diagnosticModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-title">🚑 DIAGNOSTIC BOTANIQUE IA</div>
+        <label class="label" style="text-align: left; display: block;">Décrivez les symptômes observés :</label>
+        <textarea id="diag-symptoms" rows="4" placeholder="Ex: Les feuilles du bas jaunissent..."></textarea>
+        
+        <button id="btn-submit-diag" class="btn-main btn-cancel" style="margin-top:15px;" onclick="submitDiagnostic()">🧬 LANCER L'ANALYSE EXPERTE</button>
+        <button class="btn-main btn-sub" onclick="closeDiagnostic()">FERMER</button>
+        
+        <div id="diag-result" class="diagnostic-result"></div>
+    </div>
+</div>
+
 <script>
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
+const plaqueScan = params.get('plaque') || params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
 let globalIntervalDays = 7; 
+let globalPlantName = "Ma plante";
 
 async function load() {
     try {
@@ -190,24 +229,30 @@ async function load() {
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        if(document.getElementById('loader')) document.getElementById('loader').remove();
+        const loader = document.getElementById('loader');
+        if (loader) loader.remove();
         document.getElementById('app').classList.add('loaded');
 
-        // --- ACCUEIL HUMAIN ---
+        // --- GESTION DE L'ACCUEIL ---
         const hour = new Date().getHours();
-        const nickname = localStorage.getItem('user_name') || "";
-        let greet = (hour < 12) ? "Bonjour" : (hour < 19) ? "Bon après-midi" : "Bonsoir";
-        document.getElementById('user-greeting-bar').innerHTML = `${greet}${nickname ? ' <b>' + nickname + '</b>' : ''}`;
-        document.getElementById('user-nickname').value = nickname;
-
-        // --- INFOS PLANTE ---
+        const storedName = localStorage.getItem('user_name') || "";
+        let greeting = (hour < 12) ? "☀️ Bonjour" : (hour < 19) ? "🌿 Bon après-midi" : "🌙 Bonsoir";
+        
+        document.getElementById('greeting-box').innerText = storedName ? `${greeting}, ${storedName}` : greeting;
         document.getElementById('p-titre').innerText = p["Nom commun"];
+        document.getElementById('user-nickname').value = storedName;
+        // ---------------------------
+
+        globalPlantName = p["Nom commun"];
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
+        document.getElementById('p-desc').innerText = p.Description;
 
         const rubriques = [
             {n:"Famille", v:p.Famille, highlight:true}, {n:"Type", v:p.Type, highlight:true},
+            {n:"Floraison", v:p.Floraison}, {n:"Difficulté", v:p.Difficulté},
             {n:"Arrosage", v:p.Arrosage}, {n:"Exposition", v:p.Exposition},
+            {n:"Taille Adulte", v:p["Taille à maturité"]}, {n:"Persistance", v:p.Persistance},
             {n:"Rusticité", v:p.Rusticité}
         ];
         document.getElementById('p-grid').innerHTML = rubriques.map(r => `
@@ -219,62 +264,207 @@ async function load() {
 
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
+            document.getElementById('weatherBar').style.display = 'flex';
             document.getElementById('p-notes').value = p.Note_Privee || "";
             document.getElementById('date-plant').value = p.Date_Plantation || "";
+            
+            if (localStorage.getItem("eonia_lat")) {
+                document.getElementById('geo-link').innerText = "📍 Modifier position";
+            }
             loadWeather();
             generateSeasonalTip();
 
+            const wateringText = (p.Arrosage || "").toLowerCase();
+            if (wateringText.includes("2 fois") || wateringText.includes("modéré")) globalIntervalDays = 4;
+            else if (wateringText.includes("3 fois") || wateringText.includes("important")) globalIntervalDays = 2;
+            else if (wateringText.includes("15 jours") || wateringText.includes("faible")) globalIntervalDays = 14;
+            else globalIntervalDays = 7; 
+
             const hist = p.Historique_Data || "";
             const dates = hist.split(",").map(d => d.trim()).filter(d => d !== "");
+
+            const badge = document.getElementById("plant-status-badge");
+            const nextWaterElement = document.getElementById("next-water");
+            const vitalityScore = document.getElementById("vitality-score");
+            const plantMood = document.getElementById("plant-mood");
             
             if (dates.length > 0) {
-                document.getElementById("last-water").innerText = "Dernier arrosage : " + dates[dates.length - 1];
-                document.getElementById("vitality-score").innerText = "98%";
-                document.getElementById("plant-status-badge").innerText = "✨ Hydratée";
-                document.getElementById("plant-status-badge").className = "status-badge status-good";
+                const lastWaterStr = dates[dates.length - 1];
+                document.getElementById("last-water").innerText = "Dernier arrosage : " + lastWaterStr;
+                
+                const parts = lastWaterStr.split('/');
+                const lastWaterDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                lastWaterDate.setHours(0,0,0,0);
+                
+                const diffTime = Math.abs(today - lastWaterDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                const nextWaterDate = new Date(lastWaterDate);
+                nextWaterDate.setDate(lastWaterDate.getDate() + globalIntervalDays);
+                
+                nextWaterElement.innerText = "Prochain estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
+                document.getElementById('btn-calendar').style.display = 'block';
+
+                if (today > nextWaterDate) {
+                    badge.innerText = "⚠️ En attente d'eau";
+                    badge.className = "status-badge status-alert";
+                    vitalityScore.innerText = "50%";
+                    plantMood.innerHTML = "⚠️ <b>Stress hydrique détectée :</b> Le sol est sec depuis trop longtemps.";
+                } else if (diffDays >= globalIntervalDays - 1) {
+                    badge.innerText = "💧 À surveiller";
+                    badge.className = "status-badge status-warning";
+                    vitalityScore.innerText = "80%";
+                    plantMood.innerHTML = "⏳ <b>Substrat s'asséchant :</b> La plante entre en phase de vigilance.";
+                } else {
+                    badge.innerText = "✨ Parfaitement hydratée";
+                    badge.className = "status-badge status-good";
+                    vitalityScore.innerText = "98%";
+                    plantMood.innerHTML = "✨ <b>Dynamique optimale :</b> Photosynthèse et turgescence excellentes.";
+                }
             } else {
-                document.getElementById("vitality-score").innerText = "100%";
+                badge.innerText = "🌱 Nouvelle recrue";
+                badge.className = "status-badge status-good";
+                nextWaterElement.innerText = "En attente du 1er arrosage";
+                vitalityScore.innerText = "100%";
+                plantMood.innerHTML = "🌱 <b>Phase d'intégration :</b> En attente de votre premier suivi.";
             }
+
+            const graphHtmlElements = [];
+            for(let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const ds = d.toLocaleDateString('fr-FR');
+                const active = dates.includes(ds);
+
+                graphHtmlElements.push(`
+                    <div class="graph-day-column">
+                        <div class="graph-bar-pill ${active ? 'active' : 'inactive'}"></div>
+                        <div class="graph-day-label">${ds.slice(0,5)}</div>
+                    </div>
+                `);
+            }
+            document.getElementById('p-graph').innerHTML = graphHtmlElements.join('');
         } else {
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
-    } catch(e) { console.error(e); }
+
+        if (plaqueScan && !p.est_dans_jardin) {
+            setTimeout(() => { proposerAssociation(plaqueScan, p.id, p["Nom commun"]); }, 500);
+        }
+
+    } catch(e) { console.error(e); if(document.getElementById('loader')) document.getElementById('loader').remove(); }
 }
 
 function generateSeasonalTip() {
     const month = new Date().getMonth(); 
     const tipBox = document.getElementById("seasonal-tip-box");
-    let tip = "";
-    if (month >= 2 && month <= 4) tip = "🌿 <b>Printemps :</b> Période active. Apport d'engrais organique toutes les deux semaines.";
-    else if (month >= 5 && month <= 7) tip = "☀️ <b>Été :</b> Arrosez tôt le matin pour éviter le choc thermique.";
-    else if (month >= 8 && month <= 10) tip = "🍂 <b>Automne :</b> Réduisez progressivement les arrosages.";
-    else tip = "❄️ <b>Hiver :</b> Repos végétatif. Laissez bien sécher le terreau.";
-    tipBox.innerHTML = tip;
+    if (!tipBox) return;
+
+    let tipText = "";
+    if (month >= 2 && month <= 4) tipText = "🌿 <b>Printemps :</b> Période active. Apport d'engrais organique toutes les deux semaines.";
+    else if (month >= 5 && month <= 7) tipText = "☀️ <b>Été :</b> Arrosez tôt le matin pour éviter le choc thermique.";
+    else if (month >= 8 && month <= 10) tipText = "🍂 <b>Automne :</b> Réduisez progressivement les arrosages.";
+    else tipText = "❄️ <b>Hiver :</b> Repos végétatif. Laissez bien sécher le terreau.";
+
+    tipBox.innerHTML = tipText;
     tipBox.style.display = "block";
+}
+
+function getLocation() {
+    if (confirm("Autoriser la météo locale ?")) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            localStorage.setItem("eonia_lat", lat);
+            localStorage.setItem("eonia_lon", lon);
+            loadWeather();
+            alert("📍 Position enregistrée !");
+        }, () => alert("Position refusée."));
+    }
+}
+
+async function loadWeather() {
+    const lat = localStorage.getItem("eonia_lat") || 48.85;
+    const lon = localStorage.getItem("eonia_lon") || 2.35;
+    try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
+        const w = await res.json();
+        const icon = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
+        const tClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
+
+        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Votre Jardin" : "Météo Paris"}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
+        html += w.daily.time.slice(0,4).map((d, i) => {
+            const t = Math.round(w.daily.temperature_2m_max[i]);
+            const code = w.daily.weathercode[i];
+            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(code)}</div><b class="${tClass(t)}">${t}°</b></div>`;
+        }).join("");
+        document.getElementById("weatherBar").innerHTML = html + "</div>";
+    } catch (e) { console.error("Erreur météo:", e); }
+}
+
+async function waterNow() {
+    if (!confirm("Confirmer l'arrosage ?")) return;
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "water", plantId, email: userEmail })
+        });
+        const data = await res.json();
+        if (data.success) { alert("💧 Arrosage enregistré !"); location.reload(); }
+    } catch(e) { alert("Erreur de connexion."); }
 }
 
 async function saveData() {
     const note = document.getElementById('p-notes').value;
-    const date = document.getElementById('date-plant').value;
-    const nick = document.getElementById('user-nickname').value;
-    localStorage.setItem('user_name', nick);
+    const date_plantation = document.getElementById('date-plant').value;
+    const nickname = document.getElementById('user-nickname').value;
+
+    // On enregistre le prénom localement
+    localStorage.setItem('user_name', nickname);
+
     await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation: date })
+        body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
     });
-    alert("💾 Mis à jour !");
-    location.reload();
+    alert("💾 Données mises à jour !");
+    location.reload(); // Pour actualiser le message d'accueil en haut
 }
 
-async function waterNow() {
-    if (!confirm("Arrosage effectué ?")) return;
-    await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-        body: JSON.stringify({ action: "water", plantId, email: userEmail })
-    });
-    location.reload();
+async function removeWater() {
+    if (!confirm("Supprimer le dernier arrosage ?")) return;
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "remove_water", plantId, email: userEmail })
+        });
+        const data = await res.json();
+        if (data.success) { alert("✖ Supprimé"); location.reload(); }
+    } catch(e) { alert("Erreur."); }
+}
+
+function plantDiagnostic() { document.getElementById('diagnosticModal').classList.add('active'); }
+function closeDiagnostic() { document.getElementById('diagnosticModal').classList.remove('active'); }
+
+async function submitDiagnostic() {
+    const symptoms = document.getElementById('diag-symptoms').value.trim();
+    if (!symptoms) return;
+    const resultBox = document.getElementById('diag-result');
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "<em>Analyse en cours...</em>";
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "diagnostic_ia", plantId, email: userEmail, symptoms })
+        });
+        const data = await res.json();
+        resultBox.innerHTML = data.diagnostic.replace(/\n/g, '<br>');
+    } catch (e) { resultBox.innerHTML = "Erreur analyse."; }
 }
 
 load();
