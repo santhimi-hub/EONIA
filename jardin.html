@@ -229,7 +229,23 @@ async function load() {
 
         globalPlantName = p["Nom commun"];
         document.getElementById('p-photo').src = p.Photo;
-        document.getElementById('p-titre').innerText = p["Nom commun"];
+
+        // --- MESSAGE D'ACCUEIL DYNAMIQUE ET PERSONNALISÉ ---
+        const hour = new Date().getHours();
+        const userName = localStorage.getItem('user_name'); // Récupère le prénom s'il existe
+        let greeting = "";
+
+        if (hour < 12) greeting = "☀️ Bonjour";
+        else if (hour < 19) greeting = "🌿 Bon après-midi";
+        else greeting = "🌙 Bonsoir";
+
+        if (userName) {
+            greeting += ` ${userName}`; // Ajoute le prénom si disponible
+        }
+
+        document.getElementById('p-titre').innerHTML = `${greeting}<br><span style="font-size:1.4rem; font-weight:300; display:block; margin-top:5px;">${p["Nom commun"]}</span>`;
+        // ----------------------------------------------------
+
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
