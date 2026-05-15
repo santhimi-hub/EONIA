@@ -200,6 +200,9 @@
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main btn-water" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
+        <button class="btn-main" onclick="plantDiagnostic()">
+🚑 MA PLANTE VA MAL
+        </button>
         <button class="btn-main btn-cancel" onclick="removeWater()">✖ ANNULER LE DERNIER ARROSAGE</button>
         
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
@@ -440,12 +443,29 @@ async function loadWeather() {
         
         document.getElementById("weatherBar").innerHTML = html + "</div>";
 
-        if(carriesRain) {
-            const tipBox = document.getElementById("seasonal-tip-box");
-            if(tipBox) {
-                tipBox.innerHTML += "<br><br>🌧️ <b>Alerte Météo :</b> De la pluie est annoncée aujourd'hui ou demain dans votre secteur. Si votre plante est en extérieur, différez votre arrosage manuel.";
-            }
-        }
+        let smartTip = "";
+
+const todayTemp = Math.round(w.daily.temperature_2m_max[0]);
+
+if(todayTemp >= 30){
+    smartTip += "🔥 <b>Forte chaleur :</b> surveillez le dessèchement du substrat.<br><br>";
+}
+
+if(todayTemp <= 5){
+    smartTip += "❄️ <b>Température froide :</b> attention au gel et aux courants d'air.<br><br>";
+}
+
+if(carriesRain){
+    smartTip += "🌧️ <b>Pluie annoncée :</b> vous pouvez probablement différer l’arrosage.";
+}
+
+if(smartTip !== ""){
+    const tipBox = document.getElementById("seasonal-tip-box");
+
+    if(tipBox){
+        tipBox.innerHTML += "<br><br>" + smartTip;
+    }
+}
     } catch (e) { console.error("Erreur météo:", e); }
 }
 
