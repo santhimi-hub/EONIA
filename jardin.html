@@ -6,7 +6,14 @@
     <title>ÉONIA — Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #4ade80; --bg: #000; --card: #0c0c0c; --border: #1a1a1a; --blue: #00aaff; }
+        :root { 
+            --accent: #4ade80; 
+            --bg: #000; 
+            --card: #0c0c0c; 
+            --border: #1a1a1a; 
+            --blue: #00aaff; 
+            --red: #ff5555;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
 
@@ -45,8 +52,21 @@
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
         textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
         
-        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; }
+        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; transition: all 0.2s ease; }
+        .btn-main:hover { opacity: 0.8; }
+        .btn-water { border-color: var(--blue); color: var(--blue); }
+        .btn-cancel { border-color: var(--red); color: var(--red); }
         .btn-save { background: var(--accent); color: #000; border: none; margin-top: 15px; }
+
+        /* Classes de suivi d'arrosage */
+        .water-tracking-status { margin-top: 15px; font-size: 0.65rem; color: #666; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
+        .care-recommendation { margin-top: 10px; font-size: 0.7rem; color: var(--blue); text-align: center; font-style: italic; display: none; }
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
+        .graph-day-column { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .graph-bar-pill { width: 100%; border-radius: 6px; transition: 0.3s; }
+        .graph-bar-pill.active { background: var(--blue); height: 85%; box-shadow: 0 0 12px rgba(0, 170, 255, 0.45); }
+        .graph-bar-pill.inactive { background: #1a1a1a; height: 15%; }
+        .graph-day-label { font-size: 0.5rem; color: #555; margin-top: 6px; }
 
         .mon-jardin-only, .collection-only { display: none; }
     </style>
@@ -75,44 +95,12 @@
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
-       <button class="btn-main"
-style="border-color:var(--blue); color:var(--blue);"
-onclick="waterNow()">
-💧 ARROSER AUJOURD'HUI
-</button>
-
-<button class="btn-main"
-style="
-margin-top:10px;
-border-color:#ff5555;
-color:#ff5555;
-"
-onclick="removeWater()">
-✖ ANNULER LE DERNIER ARROSAGE
-</button>
-
-<div id="last-water"
-style="
-margin-top:15px;
-font-size:0.65rem;
-color:#666;
-text-align:center;
-letter-spacing:1px;
-text-transform:uppercase;
-">
-Aucun arrosage enregistré
-</div>
-
-<div id="p-graph"
-style="
-display:flex;
-align-items:flex-end;
-justify-content:space-between;
-height:80px;
-margin-top:20px;
-padding:0 10px;
-">
-</div>
+        <button class="btn-main btn-water" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
+        <button class="btn-main btn-cancel" onclick="removeWater()">✖ ANNULER LE DERNIER ARROSAGE</button>
+        
+        <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
+        <div id="care-tip" class="care-recommendation"></div>
+        <div id="p-graph" class="graph-container"></div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
@@ -142,7 +130,6 @@ padding:0 10px;
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
-// DÉTECTION PLAQUE (On cherche les deux formats de noms possibles)
 const plaqueScan = params.get('plaque') || params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
@@ -159,12 +146,10 @@ async function load() {
 
         if (!p) { window.location.href = "catalogue.html"; return; }
 
-        // --- ACTION : ON DÉTRUIT LE LOADER ---
         const loader = document.getElementById('loader');
         if (loader) loader.remove();
         document.getElementById('app').classList.add('loaded');
 
-        // REMPLISSAGE
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
@@ -184,7 +169,6 @@ async function load() {
             </div>
         `).join('');
 
-        // LOGIQUE PROPRIÉTAIRE
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
             document.getElementById('weatherBar').style.display = 'flex';
@@ -196,60 +180,33 @@ async function load() {
             }
             loadWeather();
 
-            // Graphique
             const hist = p.Historique_Data || "";
-const dates = hist.split(",");
+            const dates = hist.split(",");
 
-const graph = document.getElementById('p-graph');
-graph.innerHTML = "";
+            if (dates.length > 0 && dates[0] !== "") {
+                document.getElementById("last-water").innerText = "Dernier arrosage : " + dates[dates.length - 1];
+            }
 
-// DERNIER ARROSAGE
-if (dates.length > 0 && dates[0] !== "") {
-    document.getElementById("last-water").innerText =
-        "Dernier arrosage : " + dates[dates.length - 1];
-}
+            // Génération optimisée du graphique (Single Render)
+            const graphHtmlElements = [];
+            for(let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const ds = d.toLocaleDateString('fr-FR');
+                const active = dates.includes(ds);
 
-for(let i = 6; i >= 0; i--) {
+                graphHtmlElements.push(`
+                    <div class="graph-day-column">
+                        <div class="graph-bar-pill ${active ? 'active' : 'inactive'}"></div>
+                        <div class="graph-day-label">${ds.slice(0,5)}</div>
+                    </div>
+                `);
+            }
+            document.getElementById('p-graph').innerHTML = graphHtmlElements.join('');
+        } else {
+            document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+        }
 
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-
-    const ds = d.toLocaleDateString('fr-FR');
-
-    const active = dates.includes(ds);
-
-    graph.innerHTML += `
-        <div style="
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            width:12%;
-        ">
-
-            <div style="
-                width:100%;
-                background:${active ? 'var(--blue)' : '#1a1a1a'};
-                border-radius:6px;
-                height:${active ? '85%' : '15%'};
-                transition:0.3s;
-                box-shadow:${active ? '0 0 12px rgba(0,170,255,0.45)' : 'none'};
-            "></div>
-
-            <div style="
-                font-size:0.5rem;
-                color:#555;
-                margin-top:6px;
-            ">
-                ${ds.slice(0,5)}
-            </div>
-
-        </div>
-    `;
-}
-} else {
-    document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
-}
-        // --- DÉCLENCHEMENT ASSOCIATION (SI PLAQUE DÉTECTÉE) ---
         if (plaqueScan && !p.est_dans_jardin) {
             setTimeout(() => { proposerAssociation(plaqueScan, p.id, p["Nom commun"]); }, 500);
         }
@@ -289,51 +246,44 @@ async function loadWeather() {
 
         let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo Paris"}</div>`;
         html += `<div style="display:flex; width:100%; justify-content:space-between;">`;
+        
+        let carriesRain = false;
         html += w.daily.time.slice(0,4).map((d, i) => {
             const t = Math.round(w.daily.temperature_2m_max[i]);
-            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(w.daily.weathercode[i])}</div><b class="${tClass(t)}">${t}°</b></div>`;
+            const code = w.daily.weathercode[i];
+            // Si pluie détectée aujourd'hui (index 0) ou demain (index 1)
+            if (i <= 1 && code > 3 && code <= 67) carriesRain = true;
+            
+            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(code)}</div><b class="${tClass(t)}">${t}°</b></div>`;
         }).join("");
+        
         document.getElementById("weatherBar").innerHTML = html + "</div>";
-    } catch (e) {}
+
+        // Ajustement dynamique des conseils d'arrosage
+        const tipElement = document.getElementById('care-tip');
+        if(tipElement && carriesRain) {
+            tipElement.innerText = "💡 Note : Pluie prévue prochainement. Pensez à espacer votre arrosage.";
+            tipElement.style.display = "block";
+        }
+    } catch (e) { console.error("Erreur météo:", e); }
 }
 
 async function waterNow() {
-
     if (!confirm("Confirmer l'arrosage ?")) return;
-
     try {
-
         const res = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'EONIA_2026_SECRET'
-            },
-            body: JSON.stringify({
-                action: "water",
-                plantId,
-                email: userEmail
-            })
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "water", plantId, email: userEmail })
         });
-
         const data = await res.json();
-
         if (data.success) {
-
             alert("💧 Arrosage enregistré !");
-
-            // Recharge la page pour mettre à jour le graphique
             location.reload();
-
         } else {
-
             alert("Erreur : " + data.error);
         }
-
-    } catch(e) {
-
-        alert("Erreur de connexion.");
-    }
+    } catch(e) { alert("Erreur de connexion."); }
 }
 
 async function saveData() {
@@ -357,7 +307,6 @@ async function proposerAssociation(plaq, plan, nom) {
             headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
             body: JSON.stringify({ action: "assign_plant", plaqueId: plaq, plantId: plan, email: userEmail, pin: pin })
         });
-
         const r = await res.json();
 
         if (r.success) {
