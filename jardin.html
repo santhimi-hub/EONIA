@@ -27,6 +27,12 @@
         .container { max-width: 850px; margin: auto; padding: 20px 15px 120px; opacity: 0; transition: 0.5s; }
         .container.loaded { opacity: 1; }
 
+        /* HEADER & WELCOME */
+        .welcome-header { margin-bottom: 20px; border-left: 1px solid var(--accent); padding-left: 15px; }
+        .greeting-text { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 4px; }
+        h1 { font-size: 1.3rem; font-weight: 300; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .sci-name { color: var(--accent); font-size: 0.75rem; font-style: italic; margin-top: 2px; opacity: 0.7; }
+
         /* Couleurs thermiques */
         .temp-hot { color: var(--orange) !important; }
         .temp-cold { color: var(--blue) !important; }
@@ -40,8 +46,6 @@
 
         .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 25px; }
         .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
-        h1 { font-size: 2rem; font-weight: 200; text-transform: uppercase; letter-spacing: 1px; }
-        .sci-name { color: var(--accent); font-size: 0.85rem; font-style: italic; margin-bottom: 20px; opacity: 0.8; }
 
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
         .info-box { background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 12px; }
@@ -51,7 +55,7 @@
 
         .dash-block { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
-        textarea, input[type="date"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
+        textarea, input[type="date"], input[type="text"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
         
         .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; transition: all 0.2s ease; }
         .btn-main:hover { opacity: 0.8; }
@@ -110,23 +114,29 @@
 </div>
 
 <div class="container" id="app">
-    <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 18px; border-radius:40px; font-size:0.6rem; cursor:pointer; margin-bottom:20px;">← RETOUR AU JARDIN</button>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+        <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 15px; border-radius:40px; font-size:0.55rem; cursor:pointer;">← RETOUR</button>
+        
+        <div class="mon-jardin-only">
+            <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
+                📍 Météo locale
+            </a>
+        </div>
+    </div>
 
-    <div class="mon-jardin-only" style="text-align: right; margin-bottom: 5px; padding-right: 15px;">
-        <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">
-            📍 Activer la météo locale
-        </a>
+    <div class="welcome-header">
+        <div id="greeting-box" class="greeting-text">...</div>
+        <h1 id="p-titre">Chargement...</h1>
+        <div id="p-sci" class="sci-name">...</div>
     </div>
 
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
     
-    <!-- Statut de la plante en Badge Premium -->
     <div class="mon-jardin-only" style="text-align:left;">
         <div id="plant-status-badge" class="status-badge">Analyse...</div>
 
-        <!-- VITALITÉ -->
         <div class="vitality-wrapper">
             <div class="vitality-circle">
                 <div id="vitality-score">-</div>
@@ -134,14 +144,9 @@
             <div class="vitality-label">Vitalité estimée</div>
         </div>
 
-        <!-- HUMEUR ET DIAGNOSTIC BIOLOGIQUE -->
         <div id="plant-mood" class="care-recommendation">Analyse des données en cours...</div>
     </div>
 
-    <h1 id="p-titre">...</h1>
-    <div id="p-sci" class="sci-name">...</div>
-
-    <!-- Conseils Saisonniers & Météo -->
     <div class="mon-jardin-only" id="seasonal-tip-box" class="care-recommendation" style="display:none;"></div>
 
     <div class="mon-jardin-only dash-block">
@@ -152,15 +157,13 @@
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
         <div id="next-water" class="water-next-status"></div>
         
-        <!-- Ajouter au calendrier -->
-        <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels d'arrosage</button>
+        <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels</button>
         
         <div id="p-graph" class="graph-container"></div>
     </div>
 
     <div class="info-grid" id="p-grid"></div>
 
-    <!-- ACTION D'ASSISTANCE URGENCE -->
     <div class="mon-jardin-only" style="margin-bottom: 25px;">
         <button class="btn-main btn-cancel" onclick="plantDiagnostic()">🚑 MA PLANTE VA MAL (DIAGNOSTIC IA)</button>
     </div>
@@ -172,6 +175,10 @@
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">TABLEAU DE BORD - JOURNAL</div>
+        <div style="margin-bottom:15px;">
+            <label class="label">Mon Prénom / Pseudo</label>
+            <input type="text" id="user-nickname" placeholder="Ex: Thomas">
+        </div>
         <div style="margin-bottom:15px;">
             <label class="label">Date de plantation</label>
             <input type="date" id="date-plant">
@@ -186,12 +193,11 @@
     </div>
 </div>
 
-<!-- FENÊTRE MODALE DU DIAGNOSTIC EXPERT IA -->
 <div id="diagnosticModal" class="modal">
     <div class="modal-content">
         <div class="modal-title">🚑 DIAGNOSTIC BOTANIQUE IA</div>
         <label class="label" style="text-align: left; display: block;">Décrivez les symptômes observés :</label>
-        <textarea id="diag-symptoms" rows="4" placeholder="Ex: Les feuilles du bas jaunissent, taches brunes, pointes sèches..."></textarea>
+        <textarea id="diag-symptoms" rows="4" placeholder="Ex: Les feuilles du bas jaunissent..."></textarea>
         
         <button id="btn-submit-diag" class="btn-main btn-cancel" style="margin-top:15px;" onclick="submitDiagnostic()">🧬 LANCER L'ANALYSE EXPERTE</button>
         <button class="btn-main btn-sub" onclick="closeDiagnostic()">FERMER</button>
@@ -227,25 +233,18 @@ async function load() {
         if (loader) loader.remove();
         document.getElementById('app').classList.add('loaded');
 
+        // --- GESTION DE L'ACCUEIL ---
+        const hour = new Date().getHours();
+        const storedName = localStorage.getItem('user_name') || "";
+        let greeting = (hour < 12) ? "☀️ Bonjour" : (hour < 19) ? "🌿 Bon après-midi" : "🌙 Bonsoir";
+        
+        document.getElementById('greeting-box').innerText = storedName ? `${greeting}, ${storedName}` : greeting;
+        document.getElementById('p-titre').innerText = p["Nom commun"];
+        document.getElementById('user-nickname').value = storedName;
+        // ---------------------------
+
         globalPlantName = p["Nom commun"];
         document.getElementById('p-photo').src = p.Photo;
-
-        // --- MESSAGE D'ACCUEIL DYNAMIQUE ET PERSONNALISÉ ---
-        const hour = new Date().getHours();
-        const userName = localStorage.getItem('user_name'); // Récupère le prénom s'il existe
-        let greeting = "";
-
-        if (hour < 12) greeting = "☀️ Bonjour";
-        else if (hour < 19) greeting = "🌿 Bon après-midi";
-        else greeting = "🌙 Bonsoir";
-
-        if (userName) {
-            greeting += ` ${userName}`; // Ajoute le prénom si disponible
-        }
-
-        document.getElementById('p-titre').innerHTML = `${greeting}<br><span style="font-size:1.4rem; font-weight:300; display:block; margin-top:5px;">${p["Nom commun"]}</span>`;
-        // ----------------------------------------------------
-
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
@@ -270,7 +269,7 @@ async function load() {
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             
             if (localStorage.getItem("eonia_lat")) {
-                document.getElementById('geo-link').innerText = "📍 Ajuster la position";
+                document.getElementById('geo-link').innerText = "📍 Modifier position";
             }
             loadWeather();
             generateSeasonalTip();
@@ -305,31 +304,31 @@ async function load() {
                 const nextWaterDate = new Date(lastWaterDate);
                 nextWaterDate.setDate(lastWaterDate.getDate() + globalIntervalDays);
                 
-                nextWaterElement.innerText = "Prochain arrosage estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
+                nextWaterElement.innerText = "Prochain estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
                 document.getElementById('btn-calendar').style.display = 'block';
 
                 if (today > nextWaterDate) {
                     badge.innerText = "⚠️ En attente d'eau";
                     badge.className = "status-badge status-alert";
                     vitalityScore.innerText = "50%";
-                    plantMood.innerHTML = "⚠️ <b>Stress hydrique détecté :</b> Le substrat est sec depuis trop longtemps. Ses fonctions métaboliques ralentissent, un apport d'eau immédiat est requis.";
+                    plantMood.innerHTML = "⚠️ <b>Stress hydrique détectée :</b> Le sol est sec depuis trop longtemps.";
                 } else if (diffDays >= globalIntervalDays - 1) {
                     badge.innerText = "💧 À surveiller";
                     badge.className = "status-badge status-warning";
                     vitalityScore.innerText = "80%";
-                    plantMood.innerHTML = "⏳ <b>Substrat s'asséchant :</b> La plante entre en phase de vigilance hydrique. Le sol s'épuise en humidité superficielle, prévoyez son arrosage.";
+                    plantMood.innerHTML = "⏳ <b>Substrat s'asséchant :</b> La plante entre en phase de vigilance.";
                 } else {
                     badge.innerText = "✨ Parfaitement hydratée";
                     badge.className = "status-badge status-good";
                     vitalityScore.innerText = "98%";
-                    plantMood.innerHTML = "✨ <b>Dynamique optimale :</b> Photosynthèse et turgescence cellulaires excellentes. Le rythme des cycles d'arrosage est parfaitement respecté.";
+                    plantMood.innerHTML = "✨ <b>Dynamique optimale :</b> Photosynthèse et turgescence excellentes.";
                 }
             } else {
                 badge.innerText = "🌱 Nouvelle recrue";
                 badge.className = "status-badge status-good";
-                nextWaterElement.innerText = "Planification en attente du premier arrosage";
+                nextWaterElement.innerText = "En attente du 1er arrosage";
                 vitalityScore.innerText = "100%";
-                plantMood.innerHTML = "🌱 <b>Phase d'intégration :</b> Suivi initial démarré. En attente de l'enregistrement de votre premier arrosage pour affiner ses statistiques.";
+                plantMood.innerHTML = "🌱 <b>Phase d'intégration :</b> En attente de votre premier suivi.";
             }
 
             const graphHtmlElements = [];
@@ -364,39 +363,25 @@ function generateSeasonalTip() {
     if (!tipBox) return;
 
     let tipText = "";
-    if (month >= 2 && month <= 4) { 
-        tipText = "🌿 <b>Conseil de saison (Printemps) :</b> Votre plante entame sa période active. C'est le moment idéal pour accompagner son développement avec un apport d'engrais organique doux toutes les deux semaines.";
-    } else if (month >= 5 && month <= 7) { 
-        tipText = "☀️ <b>Conseil de saison (Été) :</b> Les températures augmentent. Surveillez l'évaporation du substrat en surface et privilégiez un arrosage tôt le matin ou en fin de soirée pour éviter le choc thermique.";
-    } else if (month >= 8 && month <= 10) { 
-        tipText = "🍂 <b>Conseil de saison (Automne) :</b> La luminosité baisse et la croissance ralentit. Réduisez progressivement la fréquence des apports en eau et stoppez les fertilisants.";
-    } else { 
-        tipText = "❄️ <b>Conseil de saison (Hiver) :</b> Repos végétatif complet. Laissez le terreau sécher plus en profondeur entre deux arrosages légers et protégez la plante des courants d'air froid.";
-    }
+    if (month >= 2 && month <= 4) tipText = "🌿 <b>Printemps :</b> Période active. Apport d'engrais organique toutes les deux semaines.";
+    else if (month >= 5 && month <= 7) tipText = "☀️ <b>Été :</b> Arrosez tôt le matin pour éviter le choc thermique.";
+    else if (month >= 8 && month <= 10) tipText = "🍂 <b>Automne :</b> Réduisez progressivement les arrosages.";
+    else tipText = "❄️ <b>Hiver :</b> Repos végétatif. Laissez bien sécher le terreau.";
 
     tipBox.innerHTML = tipText;
-    tipBox.className = "care-recommendation";
     tipBox.style.display = "block";
 }
 
 function getLocation() {
-    if (confirm("Autoriser ÉONIA à utiliser votre position pour la météo locale ?")) {
+    if (confirm("Autoriser la météo locale ?")) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
             const lat = pos.coords.latitude;
             const lon = pos.coords.longitude;
             localStorage.setItem("eonia_lat", lat);
             localStorage.setItem("eonia_lon", lon);
-            
-            await fetch(API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
-                body: JSON.stringify({ action: "update_location", plantId, email: userEmail, lat, lon })
-            });
-            
-            document.getElementById('geo-link').innerText = "📍 Ajuster la position";
             loadWeather();
             alert("📍 Position enregistrée !");
-        }, () => alert("Position refusée ou indisponible."));
+        }, () => alert("Position refusée."));
     }
 }
 
@@ -409,123 +394,14 @@ async function loadWeather() {
         const icon = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
         const tClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
 
-        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Météo locale" : "Météo Paris"}</div>`;
-        html += `<div style="display:flex; width:100%; justify-content:space-between;">`;
-        
-        let carriesRain = false;
+        let html = `<div class="weather-status">${localStorage.getItem("eonia_lat") ? "Votre Jardin" : "Météo Paris"}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
         html += w.daily.time.slice(0,4).map((d, i) => {
             const t = Math.round(w.daily.temperature_2m_max[i]);
             const code = w.daily.weathercode[i];
-            if (i <= 1 && code > 3 && code <= 67) carriesRain = true;
-            
             return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(code)}</div><b class="${tClass(t)}">${t}°</b></div>`;
         }).join("");
-        
         document.getElementById("weatherBar").innerHTML = html + "</div>";
-
-        let smartTip = "";
-        const todayTemp = Math.round(w.daily.temperature_2m_max[0]);
-
-        if(todayTemp >= 30){
-            smartTip += "🔥 <b>Forte chaleur :</b> surveillez le dessèchement du substrat.<br><br>";
-        }
-        if(todayTemp <= 5){
-            smartTip += "❄️ <b>Température froide :</b> attention au gel et aux courants d'air.<br><br>";
-        }
-        if(carriesRain){
-            smartTip += "🌧️ <b>Pluie annoncée :</b> vous pouvez probablement différer l’arrosage.";
-        }
-
-        if(smartTip !== ""){
-            const tipBox = document.getElementById("seasonal-tip-box");
-            if(tipBox){
-                tipBox.innerHTML += "<br><br>" + smartTip;
-            }
-        }
     } catch (e) { console.error("Erreur météo:", e); }
-}
-
-function addToCalendar() {
-    const title = `ÉONIA — Arrosage ${globalPlantName}`;
-    const description = `Penser à vérifier et arroser votre ${globalPlantName}. Suivi disponible sur votre dashboard ÉONIA.`;
-    
-    const icsContent = [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//ÉONIA//Botanical Heritage//FR",
-        "BEGIN:VEVENT",
-        `SUMMARY:${title}`,
-        `DESCRIPTION:${description}`,
-        `DTSTART:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'}`,
-        `RRULE:FREQ=DAILY;INTERVAL=${globalIntervalDays}`,
-        "DURATION:PT15M",
-        "BEGIN:VALARM",
-        "TRIGGER:-PT9H",
-        "ACTION:DISPLAY",
-        `DESCRIPTION:${title}`,
-        "END:VALARM",
-        "END:VEVENT",
-        "END:VCALENDAR"
-    ].join("\r\n");
-
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `eonia-arrosage-${plantId}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-/* GESTION ET AFFICHAGE DE LA MODALE IA */
-function plantDiagnostic() {
-    document.getElementById('diagnosticModal').classList.add('active');
-}
-
-function closeDiagnostic() {
-    document.getElementById('diagnosticModal').classList.remove('active');
-    document.getElementById('diag-symptoms').value = "";
-    document.getElementById('diag-result').style.display = "none";
-    document.getElementById('diag-result').innerHTML = "";
-}
-
-async function submitDiagnostic() {
-    const symptoms = document.getElementById('diag-symptoms').value.trim();
-    if (!symptoms) { alert("Veuillez décrire brièvement les symptômes."); return; }
-
-    const btn = document.getElementById('btn-submit-diag');
-    const resultBox = document.getElementById('diag-result');
-    
-    btn.innerText = "🧬 SÉQUENÇAGE EN COURS...";
-    btn.disabled = true;
-    resultBox.style.display = "block";
-    resultBox.innerHTML = "<em>ÉONIA Intelligence analyse vos données biologiques et environnementales...</em>";
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-            body: JSON.stringify({ 
-                action: "diagnostic_ia", 
-                plantId: plantId, 
-                email: userEmail, 
-                symptoms: symptoms 
-            })
-        });
-        const data = await res.json();
-        
-        if (data.success && data.diagnostic) {
-            // Remplacement des sauts de ligne pour un affichage propre
-            resultBox.innerHTML = `<b>Analyse ÉONIA :</b><br><br>${data.diagnostic.replace(/\n/g, '<br>')}`;
-        } else {
-            resultBox.innerHTML = "⚠️ <b>Erreur :</b> " + (data.error || "Impossible de joindre l'expert IA.");
-        }
-    } catch (e) {
-        resultBox.innerHTML = "⚠️ Une erreur de connexion est survenue lors de la transmission des données.";
-    } finally {
-        btn.innerText = "🧬 LANCER L'ANALYSE EXPERTE";
-        btn.disabled = false;
-    }
 }
 
 async function waterNow() {
@@ -537,70 +413,25 @@ async function waterNow() {
             body: JSON.stringify({ action: "water", plantId, email: userEmail })
         });
         const data = await res.json();
-        if (data.success) {
-            alert("💧 Arrosage enregistré !");
-            location.reload();
-        } else {
-            alert("Erreur : " + data.error);
-        }
+        if (data.success) { alert("💧 Arrosage enregistré !"); location.reload(); }
     } catch(e) { alert("Erreur de connexion."); }
 }
 
 async function saveData() {
     const note = document.getElementById('p-notes').value;
     const date_plantation = document.getElementById('date-plant').value;
+    const nickname = document.getElementById('user-nickname').value;
+
+    // On enregistre le prénom localement
+    localStorage.setItem('user_name', nickname);
+
     await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
         body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
     });
-    alert("💾 Journal mis à jour !");
-}
-
-async function proposerAssociation(plaq, plan, nom) {
-    const pin = prompt(`Plaque ${plaq} détectée !\nCréez un code PIN à 4 chiffres pour votre ${nom} :`);
-    if (!pin) return;
-
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-            body: JSON.stringify({ action: "assign_plant", plaqueId: plaq, plantId: plan, email: userEmail, pin: pin })
-        });
-        const r = await res.json();
-
-        if (r.success) {
-            alert("✨ Mémoire activée !");
-            const autorisation = confirm("📍 ÉONIA — MÉTÉO DU JARDIN\n\nSouhaitez-vous activer la météo locale ?\n\n✔ météo de votre jardin\n✔ conseils adaptés\n✔ suivi intelligent\n\nVous pouvez changer plus tard.");
-
-            if (!autorisation) {
-                window.location.href = `jardin.html?id=${plan}`;
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                localStorage.setItem("eonia_lat", lat);
-                localStorage.setItem("eonia_lon", lon);
-
-                try {
-                    await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
-                        body: JSON.stringify({ action: "update_location", plantId: plan, email: userEmail, lat, lon })
-                    });
-                    alert("📍 Position enregistrée !");
-                } catch (e) { console.error("Erreur position"); }
-                window.location.href = `jardin.html?id=${plan}`;
-            }, () => {
-                alert("Position refusée ou indisponible.");
-                window.location.href = `jardin.html?id=${plan}`;
-            });
-        } else {
-            alert("Erreur : " + r.error);
-        }
-    } catch (e) { alert("Erreur de connexion."); }
+    alert("💾 Données mises à jour !");
+    location.reload(); // Pour actualiser le message d'accueil en haut
 }
 
 async function removeWater() {
@@ -612,14 +443,30 @@ async function removeWater() {
             body: JSON.stringify({ action: "remove_water", plantId, email: userEmail })
         });
         const data = await res.json();
-        if (data.success) {
-            alert("✖ Dernier arrosage supprimé");
-            location.reload();
-        } else {
-            alert("Erreur : " + data.error);
-        }
-    } catch(e) { alert("Erreur de connexion."); }
+        if (data.success) { alert("✖ Supprimé"); location.reload(); }
+    } catch(e) { alert("Erreur."); }
 }
+
+function plantDiagnostic() { document.getElementById('diagnosticModal').classList.add('active'); }
+function closeDiagnostic() { document.getElementById('diagnosticModal').classList.remove('active'); }
+
+async function submitDiagnostic() {
+    const symptoms = document.getElementById('diag-symptoms').value.trim();
+    if (!symptoms) return;
+    const resultBox = document.getElementById('diag-result');
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "<em>Analyse en cours...</em>";
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ action: "diagnostic_ia", plantId, email: userEmail, symptoms })
+        });
+        const data = await res.json();
+        resultBox.innerHTML = data.diagnostic.replace(/\n/g, '<br>');
+    } catch (e) { resultBox.innerHTML = "Erreur analyse."; }
+}
+
 load();
 </script>
 </body>
