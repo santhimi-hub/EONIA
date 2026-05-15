@@ -206,9 +206,17 @@
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
         <!-- Prochain arrosage estimé -->
         <div id="next-water" class="water-next-status"></div>
-        <button class="btn-main" onclick="plantDiagnostic()">
-🚑 MA PLANTE VA MAL
-        </button>
+        <div class="timeline-box">
+
+    <div class="timeline-item">
+        🌱 Suivi botanique activé
+    </div>
+
+    <div class="timeline-item">
+        💧 Historique d’arrosage actif
+    </div>
+
+        </div>
         <!-- Ajouter au calendrier -->
         <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels d'arrosage</button>
         
@@ -230,6 +238,20 @@
         </div>
         <label class="label">Mes notes privées</label>
         <textarea id="p-notes" rows="4" placeholder="Offert par..."></textarea>
+        <div style="margin-top:20px;">
+    <label class="label">Journal photo</label>
+
+    <input 
+        type="file" 
+        accept="image/*"
+        id="photo-upload"
+        style="
+            width:100%;
+            margin-top:10px;
+            color:#888;
+        "
+    >
+        </div>
         <button class="btn-main btn-save" onclick="saveData()">💾 ENREGISTRER</button>
     </div>
 
