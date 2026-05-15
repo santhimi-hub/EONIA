@@ -13,6 +13,7 @@
             --border: #1a1a1a; 
             --blue: #00aaff; 
             --red: #ff5555;
+            --orange: #ff8c00;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -27,8 +28,8 @@
         .container.loaded { opacity: 1; }
 
         /* Couleurs thermiques */
-        .temp-hot { color: #ff8c00 !important; }
-        .temp-cold { color: #00aaff !important; }
+        .temp-hot { color: var(--orange) !important; }
+        .temp-cold { color: var(--blue) !important; }
 
         .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .weather-bar { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 25px; }
@@ -57,11 +58,19 @@
         .btn-water { border-color: var(--blue); color: var(--blue); }
         .btn-cancel { border-color: var(--red); color: var(--red); }
         .btn-save { background: var(--accent); color: #000; border: none; margin-top: 15px; }
+        .btn-sub { border-color: #444; color: #aaa; font-size: 0.55rem; padding: 10px; margin-top: 15px; }
 
-        /* Classes de suivi d'arrosage */
-        .water-tracking-status { margin-top: 15px; font-size: 0.65rem; color: #666; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
-        .care-recommendation { margin-top: 10px; font-size: 0.7rem; color: var(--blue); text-align: center; font-style: italic; display: none; }
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 20px; padding: 0 10px; }
+        /* NOUVEAUX STYLES ÉONIA PREMIUM */
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.55rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; background: #111; border: 1px solid #222; }
+        .status-good { color: var(--accent); border-color: rgba(74, 222, 128, 0.2); }
+        .status-warning { color: var(--orange); border-color: rgba(255, 140, 0, 0.2); }
+        .status-alert { color: var(--red); border-color: rgba(255, 85, 85, 0.2); }
+
+        .water-tracking-status { margin-top: 15px; font-size: 0.65rem; color: #888; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
+        .water-next-status { font-size: 0.6rem; color: #555; text-align: center; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+        .care-recommendation { margin: 15px 0 5px; padding: 15px; background: #080808; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; color: #aaa; line-height: 1.5; }
+        
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 25px; padding: 0 10px; }
         .graph-day-column { display: flex; flex-direction: column; align-items: center; width: 12%; }
         .graph-bar-pill { width: 100%; border-radius: 6px; transition: 0.3s; }
         .graph-bar-pill.active { background: var(--blue); height: 85%; box-shadow: 0 0 12px rgba(0, 170, 255, 0.45); }
@@ -90,8 +99,15 @@
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
 
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
+    
+    <!-- Statut de la plante en Badge Premium -->
+    <div class="mon-jardin-only" style="text-align: left;"><div id="plant-status-badge" class="status-badge">Analyse...</div></div>
+
     <h1 id="p-titre">...</h1>
     <div id="p-sci" class="sci-name">...</div>
+
+    <!-- Conseils Saisonniers & Météo -->
+    <div class="mon-jardin-only" id="seasonal-tip-box" class="care-recommendation" style="display:none;"></div>
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
@@ -99,7 +115,12 @@
         <button class="btn-main btn-cancel" onclick="removeWater()">✖ ANNULER LE DERNIER ARROSAGE</button>
         
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
-        <div id="care-tip" class="care-recommendation"></div>
+        <!-- Prochain arrosage estimé -->
+        <div id="next-water" class="water-next-status"></div>
+        
+        <!-- Ajouter au calendrier -->
+        <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels d'arrosage</button>
+        
         <div id="p-graph" class="graph-container"></div>
     </div>
 
@@ -133,6 +154,10 @@ const plantId = params.get('id');
 const plaqueScan = params.get('plaque') || params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
+// Variables globales pour stocker les calculs d'arrosage
+let globalIntervalDays = 7; 
+let globalPlantName = "Ma plante";
+
 async function load() {
     try {
         const res = await fetch(API_URL, {
@@ -150,6 +175,7 @@ async function load() {
         if (loader) loader.remove();
         document.getElementById('app').classList.add('loaded');
 
+        globalPlantName = p["Nom commun"];
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
@@ -179,12 +205,58 @@ async function load() {
                 document.getElementById('geo-link').innerText = "📍 Ajuster la position";
             }
             loadWeather();
+            generateSeasonalTip();
+
+            // Extraction intelligente de la fréquence d'arrosage textuelle (ex: "1 fois par semaine")
+            const wateringText = (p.Arrosage || "").toLowerCase();
+            if (wateringText.includes("2 fois") || wateringText.includes("modéré")) globalIntervalDays = 4;
+            else if (wateringText.includes("3 fois") || wateringText.includes("important")) globalIntervalDays = 2;
+            else if (wateringText.includes("15 jours") || wateringText.includes("faible")) globalIntervalDays = 14;
+            else globalIntervalDays = 7; 
 
             const hist = p.Historique_Data || "";
-            const dates = hist.split(",");
+            const dates = hist.split(",").map(d => d.trim()).filter(d => d !== "");
 
-            if (dates.length > 0 && dates[0] !== "") {
-                document.getElementById("last-water").innerText = "Dernier arrosage : " + dates[dates.length - 1];
+            // Calculs UX Prédictifs & Statuts
+            const badge = document.getElementById("plant-status-badge");
+            const nextWaterElement = document.getElementById("next-water");
+            
+            if (dates.length > 0) {
+                const lastWaterStr = dates[dates.length - 1];
+                document.getElementById("last-water").innerText = "Dernier arrosage : " + lastWaterStr;
+                
+                // Parse de la date d'arrosage (Format attendu DD/MM/YYYY)
+                const parts = lastWaterStr.split('/');
+                const lastWaterDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                lastWaterDate.setHours(0,0,0,0);
+                
+                const diffTime = Math.abs(today - lastWaterDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Calcul de la date du prochain arrosage
+                const nextWaterDate = new Date(lastWaterDate);
+                nextWaterDate.setDate(lastWaterDate.getDate() + globalIntervalDays);
+                
+                nextWaterElement.innerText = "Prochain arrosage estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
+                document.getElementById('btn-calendar').style.display = 'block';
+
+                // Attribution dynamique de la jauge d'état ÉONIA
+                if (today > nextWaterDate) {
+                    badge.innerText = "⚠️ En attente d'eau";
+                    badge.className = "status-badge status-alert";
+                } else if (diffDays >= globalIntervalDays - 1) {
+                    badge.innerText = "💧 À surveiller";
+                    badge.className = "status-badge status-warning";
+                } else {
+                    badge.innerText = "✨ Parfaitement hydratée";
+                    badge.className = "status-badge status-good";
+                }
+            } else {
+                badge.innerText = "🌱 Nouvelle recrue";
+                badge.className = "status-badge status-good";
+                nextWaterElement.innerText = "Planification en attente du premier arrosage";
             }
 
             // Génération optimisée du graphique (Single Render)
@@ -212,6 +284,28 @@ async function load() {
         }
 
     } catch(e) { console.error(e); if(document.getElementById('loader')) document.getElementById('loader').remove(); }
+}
+
+// Fonction de Conseils Saisonniers automatisés (Mai 2026 = Printemps)
+function generateSeasonalTip() {
+    const month = new Date().getMonth(); // 4 = Mai
+    const tipBox = document.getElementById("seasonal-tip-box");
+    if (!tipBox) return;
+
+    let tipText = "";
+    if (month >= 2 && month <= 4) { // Mars, Avril, Mai
+        tipText = "🌿 <b>Conseil de saison (Printemps) :</b> Votre plante entame sa période active. C'est le moment idéal pour accompagner son développement avec un apport d'engrais organique doux toutes les deux semaines.";
+    } else if (month >= 5 && month <= 7) { // Juin, Juillet, Août
+        tipText = "☀️ <b>Conseil de saison (Été) :</b> Les températures augmentent. Surveillez l'évaporation du substrat en surface et privilégiez un arrosage tôt le matin ou en fin de soirée pour éviter le choc thermique.";
+    } else if (month >= 8 && month <= 10) { // Septembre, Octobre, Novembre
+        tipText = "🍂 <b>Conseil de saison (Automne) :</b> La luminosité baisse et la croissance ralentit. Réduisez progressivement la fréquence des apports en eau et stoppez les fertilisants.";
+    } else { // Hiver
+        tipText = "❄️ <b>Conseil de saison (Hiver) :</b> Repos végétatif complet. Laissez le terreau sécher plus en profondeur entre deux arrosages légers et protégez la plante des courants d'air froid.";
+    }
+
+    tipBox.innerHTML = tipText;
+    tipBox.className = "care-recommendation";
+    tipBox.style.display = "block";
 }
 
 function getLocation() {
@@ -251,7 +345,6 @@ async function loadWeather() {
         html += w.daily.time.slice(0,4).map((d, i) => {
             const t = Math.round(w.daily.temperature_2m_max[i]);
             const code = w.daily.weathercode[i];
-            // Si pluie détectée aujourd'hui (index 0) ou demain (index 1)
             if (i <= 1 && code > 3 && code <= 67) carriesRain = true;
             
             return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(code)}</div><b class="${tClass(t)}">${t}°</b></div>`;
@@ -259,13 +352,47 @@ async function loadWeather() {
         
         document.getElementById("weatherBar").innerHTML = html + "</div>";
 
-        // Ajustement dynamique des conseils d'arrosage
-        const tipElement = document.getElementById('care-tip');
-        if(tipElement && carriesRain) {
-            tipElement.innerText = "💡 Note : Pluie prévue prochainement. Pensez à espacer votre arrosage.";
-            tipElement.style.display = "block";
+        if(carriesRain) {
+            const tipBox = document.getElementById("seasonal-tip-box");
+            if(tipBox) {
+                tipBox.innerHTML += "<br><br>🌧️ <b>Alerte Météo :</b> De la pluie est annoncée aujourd'hui ou demain dans votre secteur. Si votre plante est en extérieur, différez votre arrosage manuel.";
+            }
         }
     } catch (e) { console.error("Erreur météo:", e); }
+}
+
+// Générateur de fichier .ics (Ajouter au Calendrier) totalement natif
+function addToCalendar() {
+    const title = `ÉONIA — Arrosage ${globalPlantName}`;
+    const description = `Penser à vérifier et arroser votre ${globalPlantName}. Suivi disponible sur votre dashboard ÉONIA.`;
+    
+    // Fréquence au format iCalendar standard (FREQ=DAILY;INTERVAL=X)
+    const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//ÉONIA//Botanical Heritage//FR",
+        "BEGIN:VEVENT",
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${description}`,
+        `DTSTART:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'}`,
+        `RRULE:FREQ=DAILY;INTERVAL=${globalIntervalDays}`,
+        "DURATION:PT15M",
+        "BEGIN:VALARM",
+        "TRIGGER:-PT9H",
+        "ACTION:DISPLAY",
+        `DESCRIPTION:${title}`,
+        "END:VALARM",
+        "END:VEVENT",
+        "END:VCALENDAR"
+    ].join("\r\n");
+
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `eonia-arrosage-${plantId}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 async function waterNow() {
