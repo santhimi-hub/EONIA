@@ -76,74 +76,22 @@
         .graph-bar-pill.active { background: var(--blue); height: 85%; box-shadow: 0 0 12px rgba(0, 170, 255, 0.45); }
         .graph-bar-pill.inactive { background: #1a1a1a; height: 15%; }
         .graph-day-label { font-size: 0.5rem; color: #555; margin-top: 6px; }
-/* VITALITÉ */
 
-.vitality-wrapper{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin:15px 0 20px;
-}
+        /* VITALITÉ (Format Épuré Premium) */
+        .vitality-wrapper { display: flex; flex-direction: column; align-items: center; margin: 10px 0 20px; }
+        .vitality-circle { width: 75px; height: 75px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; background: #050505; box-shadow: 0 0 20px rgba(74, 222, 128, 0.15); }
+        #vitality-score { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .vitality-label { margin-top: 8px; color: #666; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; }
 
-.vitality-circle{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:4px solid var(--accent);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#050505;
-    box-shadow:0 0 30px rgba(74,222,128,0.18);
-}
-
-#vitality-score{
-    font-size:1.7rem;
-    font-weight:600;
-    color:#fff;
-}
-
-.vitality-label{
-    margin-top:12px;
-    color:#666;
-    font-size:0.6rem;
-    text-transform:uppercase;
-    letter-spacing:2px;
-}
-
-/* ANIMATIONS */
-
-.dash-block,
-.info-box,
-.weather-bar{
-    animation:fadeUp .45s ease;
-}
-
-@keyframes fadeUp{
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.info-box{
-    transition:all .25s ease;
-}
-
-.info-box:hover{
-    transform:translateY(-3px);
-    border-color:var(--accent);
-}
-
-.btn-main:hover{
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(74,222,128,0.2);
-}
+        /* ANIMATIONS */
+        .dash-block, .info-box, .weather-bar { animation: fadeUp .45s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-box { transition: all .25s ease; }
+        .info-box:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(74, 222, 128, 0.2); }
         .mon-jardin-only, .collection-only { display: none; }
     </style>
 </head>
@@ -169,28 +117,20 @@
     
     <!-- Statut de la plante en Badge Premium -->
     <div class="mon-jardin-only" style="text-align:left;">
+        <div id="plant-status-badge" class="status-badge">Analyse...</div>
 
-    <div id="plant-status-badge" class="status-badge">
-        Analyse...
-    </div>
-
-    <!-- VITALITÉ -->
-    <div class="vitality-wrapper">
-        <div class="vitality-circle">
-            <div id="vitality-score">100%</div>
+        <!-- VITALITÉ -->
+        <div class="vitality-wrapper">
+            <div class="vitality-circle">
+                <div id="vitality-score">-</div>
+            </div>
+            <div class="vitality-label">Vitalité estimée</div>
         </div>
 
-        <div class="vitality-label">
-            Vitalité estimée
-        </div>
+        <!-- HUMEUR ET DIAGNOSTIC BIOLOGIQUE -->
+        <div id="plant-mood" class="care-recommendation">Analyse des données en cours...</div>
     </div>
 
-    <!-- HUMEUR -->
-    <div id="plant-mood" class="care-recommendation">
-        Analyse comportementale...
-    </div>
-
-</div>
     <h1 id="p-titre">...</h1>
     <div id="p-sci" class="sci-name">...</div>
 
@@ -200,15 +140,11 @@
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main btn-water" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
-        
         <button class="btn-main btn-cancel" onclick="removeWater()">✖ ANNULER LE DERNIER ARROSAGE</button>
         
         <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
-        <!-- Prochain arrosage estimé -->
         <div id="next-water" class="water-next-status"></div>
-        <button class="btn-main" onclick="plantDiagnostic()">
-🚑 MA PLANTE VA MAL
-        </button>
+        
         <!-- Ajouter au calendrier -->
         <button id="btn-calendar" class="btn-main btn-sub" style="display:none;" onclick="addToCalendar()">📅 Planifier les rappels d'arrosage</button>
         
@@ -216,6 +152,11 @@
     </div>
 
     <div class="info-grid" id="p-grid"></div>
+
+    <!-- ACTION D'ASSISTANCE URGENCE -->
+    <div class="mon-jardin-only" style="margin-bottom: 25px;">
+        <button class="btn-main btn-cancel" onclick="plantDiagnostic()">🚑 MA PLANTE VA MAL (DIAGNOSTIC)</button>
+    </div>
 
     <div class="dash-block">
         <div class="block-title">INFORMATIONS GÉNÉRALES</div>
@@ -245,7 +186,6 @@ const plantId = params.get('id');
 const plaqueScan = params.get('plaque') || params.get('plaqueId');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
 
-// Variables globales pour stocker les calculs d'arrosage
 let globalIntervalDays = 7; 
 let globalPlantName = "Ma plante";
 
@@ -298,7 +238,6 @@ async function load() {
             loadWeather();
             generateSeasonalTip();
 
-            // Extraction intelligente de la fréquence d'arrosage textuelle (ex: "1 fois par semaine")
             const wateringText = (p.Arrosage || "").toLowerCase();
             if (wateringText.includes("2 fois") || wateringText.includes("modéré")) globalIntervalDays = 4;
             else if (wateringText.includes("3 fois") || wateringText.includes("important")) globalIntervalDays = 2;
@@ -308,15 +247,15 @@ async function load() {
             const hist = p.Historique_Data || "";
             const dates = hist.split(",").map(d => d.trim()).filter(d => d !== "");
 
-            // Calculs UX Prédictifs & Statuts
             const badge = document.getElementById("plant-status-badge");
             const nextWaterElement = document.getElementById("next-water");
+            const vitalityScore = document.getElementById("vitality-score");
+            const plantMood = document.getElementById("plant-mood");
             
             if (dates.length > 0) {
                 const lastWaterStr = dates[dates.length - 1];
                 document.getElementById("last-water").innerText = "Dernier arrosage : " + lastWaterStr;
                 
-                // Parse de la date d'arrosage (Format attendu DD/MM/YYYY)
                 const parts = lastWaterStr.split('/');
                 const lastWaterDate = new Date(parts[2], parts[1] - 1, parts[0]);
                 const today = new Date();
@@ -326,31 +265,37 @@ async function load() {
                 const diffTime = Math.abs(today - lastWaterDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 
-                // Calcul de la date du prochain arrosage
                 const nextWaterDate = new Date(lastWaterDate);
                 nextWaterDate.setDate(lastWaterDate.getDate() + globalIntervalDays);
                 
                 nextWaterElement.innerText = "Prochain arrosage estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
                 document.getElementById('btn-calendar').style.display = 'block';
 
-                // Attribution dynamique de la jauge d'état ÉONIA
+                // Gestion dynamique et logique des statuts, vitalité et humeurs de la plante
                 if (today > nextWaterDate) {
                     badge.innerText = "⚠️ En attente d'eau";
                     badge.className = "status-badge status-alert";
+                    vitalityScore.innerText = "50%";
+                    plantMood.innerHTML = "⚠️ <b>Stress hydrique détecté :</b> Le substrat est sec depuis trop longtemps. Ses fonctions métaboliques ralentissent, un apport d'eau immédiat est requis.";
                 } else if (diffDays >= globalIntervalDays - 1) {
                     badge.innerText = "💧 À surveiller";
                     badge.className = "status-badge status-warning";
+                    vitalityScore.innerText = "80%";
+                    plantMood.innerHTML = "⏳ <b>Substrat s'asséchant :</b> La plante entre en phase de vigilance hydrique. Le sol s'épuise en humidité superficielle, prévoyez son arrosage.";
                 } else {
                     badge.innerText = "✨ Parfaitement hydratée";
                     badge.className = "status-badge status-good";
+                    vitalityScore.innerText = "98%";
+                    plantMood.innerHTML = "✨ <b>Dynamique optimale :</b> Photosynthèse et turgescence cellulaires excellentes. Le rythme des cycles d'arrosage est parfaitement respecté.";
                 }
             } else {
                 badge.innerText = "🌱 Nouvelle recrue";
                 badge.className = "status-badge status-good";
                 nextWaterElement.innerText = "Planification en attente du premier arrosage";
+                vitalityScore.innerText = "100%";
+                plantMood.innerHTML = "🌱 <b>Phase d'intégration :</b> Suivi initial démarré. En attente de l'enregistrement de votre premier arrosage pour affiner ses statistiques.";
             }
 
-            // Génération optimisée du graphique (Single Render)
             const graphHtmlElements = [];
             for(let i = 6; i >= 0; i--) {
                 const d = new Date();
@@ -377,20 +322,19 @@ async function load() {
     } catch(e) { console.error(e); if(document.getElementById('loader')) document.getElementById('loader').remove(); }
 }
 
-// Fonction de Conseils Saisonniers automatisés (Mai 2026 = Printemps)
 function generateSeasonalTip() {
-    const month = new Date().getMonth(); // 4 = Mai
+    const month = new Date().getMonth(); 
     const tipBox = document.getElementById("seasonal-tip-box");
     if (!tipBox) return;
 
     let tipText = "";
-    if (month >= 2 && month <= 4) { // Mars, Avril, Mai
+    if (month >= 2 && month <= 4) { 
         tipText = "🌿 <b>Conseil de saison (Printemps) :</b> Votre plante entame sa période active. C'est le moment idéal pour accompagner son développement avec un apport d'engrais organique doux toutes les deux semaines.";
-    } else if (month >= 5 && month <= 7) { // Juin, Juillet, Août
+    } else if (month >= 5 && month <= 7) { 
         tipText = "☀️ <b>Conseil de saison (Été) :</b> Les températures augmentent. Surveillez l'évaporation du substrat en surface et privilégiez un arrosage tôt le matin ou en fin de soirée pour éviter le choc thermique.";
-    } else if (month >= 8 && month <= 10) { // Septembre, Octobre, Novembre
+    } else if (month >= 8 && month <= 10) { 
         tipText = "🍂 <b>Conseil de saison (Automne) :</b> La luminosité baisse et la croissance ralentit. Réduisez progressivement la fréquence des apports en eau et stoppez les fertilisants.";
-    } else { // Hiver
+    } else { 
         tipText = "❄️ <b>Conseil de saison (Hiver) :</b> Repos végétatif complet. Laissez le terreau sécher plus en profondeur entre deux arrosages légers et protégez la plante des courants d'air froid.";
     }
 
@@ -444,37 +388,31 @@ async function loadWeather() {
         document.getElementById("weatherBar").innerHTML = html + "</div>";
 
         let smartTip = "";
+        const todayTemp = Math.round(w.daily.temperature_2m_max[0]);
 
-const todayTemp = Math.round(w.daily.temperature_2m_max[0]);
+        if(todayTemp >= 30){
+            smartTip += "🔥 <b>Forte chaleur :</b> surveillez le dessèchement du substrat.<br><br>";
+        }
+        if(todayTemp <= 5){
+            smartTip += "❄️ <b>Température froide :</b> attention au gel et aux courants d'air.<br><br>";
+        }
+        if(carriesRain){
+            smartTip += "🌧️ <b>Pluie annoncée :</b> vous pouvez probablement différer l’arrosage.";
+        }
 
-if(todayTemp >= 30){
-    smartTip += "🔥 <b>Forte chaleur :</b> surveillez le dessèchement du substrat.<br><br>";
-}
-
-if(todayTemp <= 5){
-    smartTip += "❄️ <b>Température froide :</b> attention au gel et aux courants d'air.<br><br>";
-}
-
-if(carriesRain){
-    smartTip += "🌧️ <b>Pluie annoncée :</b> vous pouvez probablement différer l’arrosage.";
-}
-
-if(smartTip !== ""){
-    const tipBox = document.getElementById("seasonal-tip-box");
-
-    if(tipBox){
-        tipBox.innerHTML += "<br><br>" + smartTip;
-    }
-}
+        if(smartTip !== ""){
+            const tipBox = document.getElementById("seasonal-tip-box");
+            if(tipBox){
+                tipBox.innerHTML += "<br><br>" + smartTip;
+            }
+        }
     } catch (e) { console.error("Erreur météo:", e); }
 }
 
-// Générateur de fichier .ics (Ajouter au Calendrier) totalement natif
 function addToCalendar() {
     const title = `ÉONIA — Arrosage ${globalPlantName}`;
     const description = `Penser à vérifier et arroser votre ${globalPlantName}. Suivi disponible sur votre dashboard ÉONIA.`;
     
-    // Fréquence au format iCalendar standard (FREQ=DAILY;INTERVAL=X)
     const icsContent = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
@@ -501,6 +439,10 @@ function addToCalendar() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function plantDiagnostic() {
+    window.location.href = `diagnostic.html?id=${plantId}`;
 }
 
 async function waterNow() {
