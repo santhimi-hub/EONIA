@@ -28,24 +28,23 @@
         .container.loaded { opacity: 1; }
 
         /* HEADER D'ACCUEIL (TOUT EN HAUT) */
-        .user-greeting { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .user-greeting { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #fff; margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .user-name-highlight { color: var(--accent); font-weight: 600; }
 
         /* TITRE DE LA PLANTE (SOUS PHOTO) */
         .plant-identity { margin-bottom: 25px; margin-top: 20px; }
         h1 { font-size: 1.4rem; font-weight: 300; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
         .sci-name { color: var(--accent); font-size: 0.75rem; font-style: italic; margin-top: 2px; opacity: 0.7; }
 
-        /* MÉTÉO ET RÉSULTATS */
-        .temp-hot { color: var(--orange) !important; }
-        .temp-cold { color: var(--blue) !important; }
-
-        .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        /* MÉTÉO */
         .weather-bar { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 25px; }
         .weather-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .weather-item span { font-size: 0.55rem; font-weight: 600; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         .weather-item b { font-size: 0.75rem; color: #fff; margin-top: 5px; }
         .w-icon { font-size: 1.3rem; line-height: 1; margin: 2px 0; }
+        .weather-status { width: 100%; font-size: 0.45rem; color: #444; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* CONTENU VISUEL */
         .hero-wrapper { width: calc(100% + 40px); margin-left: -20px; border-radius: 0 0 30px 30px; overflow: hidden; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
         .hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
 
@@ -59,60 +58,46 @@
         .block-title { font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
         textarea, input[type="date"], input[type="text"] { width: 100%; background: #080808; border: 1px solid #1a1a1a; color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-top: 5px; outline: none; }
         
-        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; transition: all 0.2s ease; }
-        .btn-main:hover { opacity: 0.8; }
+        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; margin-top: 10px; display: block; text-align: center; text-decoration: none; }
         .btn-water { border-color: var(--blue); color: var(--blue); }
         .btn-cancel { border-color: var(--red); color: var(--red); }
         .btn-save { background: var(--accent); color: #000; border: none; margin-top: 15px; }
-        .btn-sub { border-color: #444; color: #aaa; font-size: 0.55rem; padding: 10px; margin-top: 15px; }
 
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.55rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; background: #111; border: 1px solid #222; }
         .status-good { color: var(--accent); border-color: rgba(74, 222, 128, 0.2); }
-        .status-warning { color: var(--orange); border-color: rgba(255, 140, 0, 0.2); }
-        .status-alert { color: var(--red); border-color: rgba(255, 85, 85, 0.2); }
 
-        .water-tracking-status { margin-top: 15px; font-size: 0.65rem; color: #888; text-align: center; letter-spacing: 1px; text-transform: uppercase; }
-        .water-next-status { font-size: 0.6rem; color: #555; text-align: center; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
         .care-recommendation { margin: 15px 0 5px; padding: 15px; background: #080808; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; color: #aaa; line-height: 1.5; }
         
-        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 25px; padding: 0 10px; }
-        .graph-day-column { display: flex; flex-direction: column; align-items: center; width: 12%; }
-        .graph-bar-pill { width: 100%; border-radius: 6px; transition: 0.3s; }
-        .graph-bar-pill.active { background: var(--blue); height: 85%; box-shadow: 0 0 12px rgba(0, 170, 255, 0.45); }
-        .graph-bar-pill.inactive { background: #1a1a1a; height: 15%; }
-        .graph-day-label { font-size: 0.5rem; color: #555; margin-top: 6px; }
-
         .vitality-wrapper { display: flex; flex-direction: column; align-items: center; margin: 10px 0 20px; }
-        .vitality-circle { width: 75px; height: 75px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; background: #050505; box-shadow: 0 0 20px rgba(74, 222, 128, 0.15); }
+        .vitality-circle { width: 75px; height: 75px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; background: #050505; }
         #vitality-score { font-size: 1.1rem; font-weight: 600; color: #fff; }
         .vitality-label { margin-top: 8px; color: #666; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .graph-container { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 25px; padding: 0 10px; }
+        .graph-day-column { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .graph-bar-pill { width: 100%; border-radius: 6px; }
+        .graph-bar-pill.active { background: var(--blue); height: 85%; }
+        .graph-bar-pill.inactive { background: #1a1a1a; height: 15%; }
+        .graph-day-label { font-size: 0.5rem; color: #555; margin-top: 6px; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
-        .modal-content { background: #0c0c0c; border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 500px; width: 100%; animation: fadeUp .3s ease; max-height: 90vh; overflow-y: auto; }
-        
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .mon-jardin-only, .collection-only { display: none; }
+        .modal-content { background: #0c0c0c; border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 500px; width: 100%; }
+        .diagnostic-result { margin-top: 20px; padding: 15px; background: #050505; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; color: #ccc; display: none; }
+
+        .mon-jardin-only { display: none; }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo">
-    <div class="load-txt">Téléchargement...</div>
-</div>
+<div id="loader"><img src="https://raw.githubusercontent.com/santhimi-hub/EONIA/main/file_00000000f43c7243819c00a508d83afc.png" class="spinner-logo"></div>
 
 <div class="container" id="app">
     <div id="greeting-box" class="user-greeting">...</div>
 
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
         <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 15px; border-radius:40px; font-size:0.55rem; cursor:pointer;">← RETOUR</button>
-        <div class="mon-jardin-only">
-            <a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; opacity: 0.6;">📍 Météo locale</a>
-        </div>
+        <div class="mon-jardin-only"><a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; text-decoration: none;">📍 Météo locale</a></div>
     </div>
 
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
@@ -120,31 +105,26 @@
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
     
     <div class="plant-identity">
-        <h1 id="p-titre">...</h1>
+        <h1 id="p-titre">Chargement...</h1>
         <div id="p-sci" class="sci-name">...</div>
     </div>
 
-    <div class="mon-jardin-only" style="text-align:left;">
+    <div class="mon-jardin-only">
         <div id="plant-status-badge" class="status-badge">Analyse...</div>
-
         <div class="vitality-wrapper">
-            <div class="vitality-circle">
-                <div id="vitality-score">-</div>
-            </div>
+            <div class="vitality-circle"><div id="vitality-score">-</div></div>
             <div class="vitality-label">Vitalité estimée</div>
         </div>
-
-        <div id="plant-mood" class="care-recommendation">Analyse des données en cours...</div>
+        <div id="plant-mood" class="care-recommendation">Chargement...</div>
+        <div id="seasonal-tip-box" class="care-recommendation" style="display:none;"></div>
     </div>
-
-    <div class="mon-jardin-only" id="seasonal-tip-box" class="care-recommendation" style="display:none;"></div>
 
     <div class="mon-jardin-only dash-block">
         <div class="block-title">SUIVI D'ARROSAGE</div>
         <button class="btn-main btn-water" onclick="waterNow()">💧 ARROSER AUJOURD'HUI</button>
         <button class="btn-main btn-cancel" onclick="removeWater()">✖ ANNULER LE DERNIER ARROSAGE</button>
-        <div id="last-water" class="water-tracking-status">Aucun arrosage enregistré</div>
-        <div id="next-water" class="water-next-status"></div>
+        <div id="last-water" style="margin-top:10px; font-size:0.65rem; text-align:center; color:#888;"></div>
+        <div id="next-water" style="font-size:0.6rem; text-align:center; color:#555; margin-top:5px;"></div>
         <div id="p-graph" class="graph-container"></div>
     </div>
 
@@ -163,30 +143,33 @@
         <div class="block-title">TABLEAU DE BORD - JOURNAL</div>
         <div style="margin-bottom:15px;">
             <label class="label">Mon Prénom / Pseudo</label>
-            <input type="text" id="user-nickname" placeholder="Ex: Thomas">
+            <input type="text" id="user-nickname" placeholder="Ex: Sandra">
         </div>
         <div style="margin-bottom:15px;">
             <label class="label">Date de plantation</label>
             <input type="date" id="date-plant">
         </div>
         <label class="label">Mes notes privées</label>
-        <textarea id="p-notes" rows="4" placeholder="Offert par..."></textarea>
+        <textarea id="p-notes" rows="4"></textarea>
         <button class="btn-main btn-save" onclick="saveData()">💾 ENREGISTRER</button>
     </div>
+</div>
 
-    <div class="collection-only">
-        <a href="commander.html" class="btn-main" style="background:var(--accent); color:#000; border:none;">🛒 COMMANDER MA PLAQUE ÉONIA</a>
+<div id="diagnosticModal" class="modal">
+    <div class="modal-content">
+        <div class="block-title" style="color:var(--red)">🚑 DIAGNOSTIC IA</div>
+        <textarea id="diag-symptoms" rows="4" placeholder="Décrivez les symptômes..."></textarea>
+        <button class="btn-main btn-cancel" onclick="submitDiagnostic()">🧬 ANALYSER</button>
+        <button class="btn-main" style="border-color:#444; color:#888;" onclick="closeDiagnostic()">FERMER</button>
+        <div id="diag-result" class="diagnostic-result"></div>
     </div>
 </div>
 
 <script>
-// Tes fonctions d'origine restent intactes pour ne pas perdre de données
 const API_URL = "https://eonia-api.santhimi.workers.dev";
 const params = new URLSearchParams(window.location.search);
 const plantId = params.get('id');
 const userEmail = localStorage.getItem('user_email') || "invite@eonia.com";
-
-let globalIntervalDays = 7; 
 
 async function load() {
     try {
@@ -195,40 +178,28 @@ async function load() {
             headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
             body: JSON.stringify({ plantId, email: userEmail })
         });
-        
         const data = await res.json();
         const p = Array.isArray(data) ? data.find(item => item.id === plantId || item.cleanId === plantId) : data;
+        if (!p) return;
 
-        if (!p) { window.location.href = "catalogue.html"; return; }
-
-        if(document.getElementById('loader')) document.getElementById('loader').remove();
+        document.getElementById('loader').remove();
         document.getElementById('app').classList.add('loaded');
 
-        // GESTION DE L'ACCUEIL
+        // GESTION PRÉNOM EN VERT
         const hour = new Date().getHours();
         const storedName = localStorage.getItem('user_name') || "";
         let greeting = (hour < 12) ? "☀️ Bonjour" : (hour < 19) ? "🌿 Bon après-midi" : "🌙 Bonsoir";
-        document.getElementById('greeting-box').innerText = storedName ? `${greeting} ${storedName}` : greeting;
+        document.getElementById('greeting-box').innerHTML = `${greeting} <span class="user-name-highlight">${storedName}</span>`;
         document.getElementById('user-nickname').value = storedName;
 
-        // INFOS PLANTE
         document.getElementById('p-titre').innerText = p["Nom commun"];
         document.getElementById('p-photo').src = p.Photo;
         document.getElementById('p-sci').innerText = p["Nom scientifique"];
         document.getElementById('p-desc').innerText = p.Description;
 
-        const rubriques = [
-            {n:"Famille", v:p.Famille, highlight:true}, {n:"Type", v:p.Type, highlight:true},
-            {n:"Floraison", v:p.Floraison}, {n:"Difficulté", v:p.Difficulté},
-            {n:"Arrosage", v:p.Arrosage}, {n:"Exposition", v:p.Exposition},
-            {n:"Rusticité", v:p.Rusticité}
-        ];
-        document.getElementById('p-grid').innerHTML = rubriques.map(r => `
-            <div class="info-box ${r.highlight ? 'liseret' : ''}">
-                <div class="label">${r.n}</div>
-                <div class="value">${r.v || "-"}</div>
-            </div>
-        `).join('');
+        // INFOS
+        const rubriques = [{n:"Famille", v:p.Famille, h:true}, {n:"Type", v:p.Type, h:true}, {n:"Arrosage", v:p.Arrosage}, {n:"Exposition", v:p.Exposition}, {n:"Rusticité", v:p.Rusticité}];
+        document.getElementById('p-grid').innerHTML = rubriques.map(r => `<div class="info-box ${r.h?'liseret':''}"><div class="label">${r.n}</div><div class="value">${r.v||"-"}</div></div>`).join('');
 
         if (p.est_dans_jardin === true || p.est_dans_jardin === "true") {
             document.querySelectorAll('.mon-jardin-only').forEach(el => el.style.display = 'block');
@@ -236,11 +207,49 @@ async function load() {
             document.getElementById('date-plant').value = p.Date_Plantation || "";
             loadWeather();
             generateSeasonalTip();
-            // ... reste de ta logique de calcul d'arrosage ...
-        } else {
-            document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
+            
+            const dates = (p.Historique_Data || "").split(",").map(d => d.trim()).filter(d => d !== "");
+            if (dates.length > 0) {
+                document.getElementById("last-water").innerText = "Dernier arrosage : " + dates[dates.length - 1];
+                document.getElementById("vitality-score").innerText = "98%";
+                document.getElementById("plant-status-badge").innerText = "✨ Parfaitement hydratée";
+                document.getElementById("plant-status-badge").className = "status-badge status-good";
+                document.getElementById("plant-mood").innerHTML = "✨ <b>Dynamique optimale :</b> Photosynthèse excellente.";
+            } else {
+                document.getElementById("vitality-score").innerText = "100%";
+            }
+
+            const graphHtml = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate()-i);
+                const ds = d.toLocaleDateString('fr-FR');
+                graphHtml.push(`<div class="graph-day-column"><div class="graph-bar-pill ${dates.includes(ds)?'active':'inactive'}"></div><div class="graph-day-label">${ds.slice(0,5)}</div></div>`);
+            }
+            document.getElementById('p-graph').innerHTML = graphHtml.join('');
         }
     } catch(e) { console.error(e); }
+}
+
+async function loadWeather() {
+    const lat = localStorage.getItem("eonia_lat") || 48.85;
+    const lon = localStorage.getItem("eonia_lon") || 2.35;
+    try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
+        const w = await res.json();
+        const icon = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
+        let html = `<div class="weather-status">Météo Locale</div><div style="display:flex; width:100%; justify-content:space-between;">`;
+        html += w.daily.time.slice(0,4).map((d, i) => `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(w.daily.weathercode[i])}</div><b>${Math.round(w.daily.temperature_2m_max[i])}°</b></div>`).join("");
+        document.getElementById("weatherBar").innerHTML = html + "</div>";
+        document.getElementById("weatherBar").style.display = "flex";
+    } catch (e) { console.error(e); }
+}
+
+function getLocation() {
+    navigator.geolocation.getCurrentPosition((pos) => {
+        localStorage.setItem("eonia_lat", pos.coords.latitude);
+        localStorage.setItem("eonia_lon", pos.coords.longitude);
+        loadWeather();
+    });
 }
 
 async function saveData() {
@@ -248,22 +257,29 @@ async function saveData() {
     const date_plantation = document.getElementById('date-plant').value;
     const nickname = document.getElementById('user-nickname').value;
     localStorage.setItem('user_name', nickname);
-
     await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
         body: JSON.stringify({ action: "save_journal", plantId, email: userEmail, note, date_plantation })
     });
-    alert("💾 Données mises à jour !");
     location.reload();
 }
+
+async function waterNow() {
+    await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET'},
+        body: JSON.stringify({ action: "water", plantId, email: userEmail })
+    });
+    location.reload();
+}
+
+function plantDiagnostic() { document.getElementById('diagnosticModal').classList.add('active'); }
+function closeDiagnostic() { document.getElementById('diagnosticModal').classList.remove('active'); }
 
 function generateSeasonalTip() {
     const month = new Date().getMonth(); 
     const tipBox = document.getElementById("seasonal-tip-box");
-    let tipText = (month >= 2 && month <= 4) ? "🌿 <b>Printemps :</b> Période active." : "☀️ <b>Saison :</b> Période de croissance.";
-    tipBox.innerHTML = tipText;
-    tipBox.style.display = "block";
+    let tip = (month >= 2 && month <= 4) ? "🌿 <b>Printemps :</b> Période active. Apport d'engrais toutes les deux semaines." : "☀️ <b>Saison :</b> Croissance en cours.";
+    tipBox.innerHTML = tip; tipBox.style.display = "block";
 }
 
 load();
