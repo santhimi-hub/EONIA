@@ -83,6 +83,13 @@
         #vitality-score { font-size: 1.1rem; font-weight: 600; color: #fff; }
         .vitality-label { margin-top: 8px; color: #666; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; }
 
+        /* INTERFACE MODALE DIAGNOSTIC IA */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background: #0c0c0c; border: 1px solid var(--border); border-radius: 20px; padding: 25px; max-width: 500px; width: 100%; animation: fadeUp .3s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 0.65rem; color: var(--red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+        .diagnostic-result { margin-top: 20px; padding: 15px; background: #050505; border: 1px dashed var(--border); border-radius: 12px; font-size: 0.75rem; line-height: 1.6; color: #ccc; display: none; text-align: left; }
+
         /* ANIMATIONS */
         .dash-block, .info-box, .weather-bar { animation: fadeUp .45s ease; }
         @keyframes fadeUp {
@@ -155,7 +162,7 @@
 
     <!-- ACTION D'ASSISTANCE URGENCE -->
     <div class="mon-jardin-only" style="margin-bottom: 25px;">
-        <button class="btn-main btn-cancel" onclick="plantDiagnostic()">🚑 MA PLANTE VA MAL (DIAGNOSTIC)</button>
+        <button class="btn-main btn-cancel" onclick="plantDiagnostic()">🚑 MA PLANTE VA MAL (DIAGNOSTIC IA)</button>
     </div>
 
     <div class="dash-block">
@@ -176,6 +183,20 @@
 
     <div class="collection-only">
         <a href="commander.html" class="btn-main" style="background:var(--accent); color:#000; border:none;">🛒 COMMANDER MA PLAQUE ÉONIA</a>
+    </div>
+</div>
+
+<!-- FENÊTRE MODALE DU DIAGNOSTIC EXPERT IA -->
+<div id="diagnosticModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-title">🚑 DIAGNOSTIC BOTANIQUE IA</div>
+        <label class="label" style="text-align: left; display: block;">Décrivez les symptômes observés :</label>
+        <textarea id="diag-symptoms" rows="4" placeholder="Ex: Les feuilles du bas jaunissent, taches brunes, pointes sèches..."></textarea>
+        
+        <button id="btn-submit-diag" class="btn-main btn-cancel" style="margin-top:15px;" onclick="submitDiagnostic()">🧬 LANCER L'ANALYSE EXPERTE</button>
+        <button class="btn-main btn-sub" onclick="closeDiagnostic()">FERMER</button>
+        
+        <div id="diag-result" class="diagnostic-result"></div>
     </div>
 </div>
 
@@ -271,7 +292,6 @@ async function load() {
                 nextWaterElement.innerText = "Prochain arrosage estimé : " + nextWaterDate.toLocaleDateString('fr-FR');
                 document.getElementById('btn-calendar').style.display = 'block';
 
-                // Gestion dynamique et logique des statuts, vitalité et humeurs de la plante
                 if (today > nextWaterDate) {
                     badge.innerText = "⚠️ En attente d'eau";
                     badge.className = "status-badge status-alert";
@@ -441,8 +461,55 @@ function addToCalendar() {
     document.body.removeChild(link);
 }
 
+/* GESTION ET AFFICHAGE DE LA MODALE IA */
 function plantDiagnostic() {
-    window.location.href = `diagnostic.html?id=${plantId}`;
+    document.getElementById('diagnosticModal').classList.add('active');
+}
+
+function closeDiagnostic() {
+    document.getElementById('diagnosticModal').classList.remove('active');
+    document.getElementById('diag-symptoms').value = "";
+    document.getElementById('diag-result').style.display = "none";
+    document.getElementById('diag-result').innerHTML = "";
+}
+
+async function submitDiagnostic() {
+    const symptoms = document.getElementById('diag-symptoms').value.trim();
+    if (!symptoms) { alert("Veuillez décrire brièvement les symptômes."); return; }
+
+    const btn = document.getElementById('btn-submit-diag');
+    const resultBox = document.getElementById('diag-result');
+    
+    btn.innerText = "🧬 SÉQUENÇAGE EN COURS...";
+    btn.disabled = true;
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "<em>ÉONIA Intelligence analyse vos données biologiques et environnementales...</em>";
+
+    try {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'EONIA_2026_SECRET' },
+            body: JSON.stringify({ 
+                action: "diagnostic_ia", 
+                plantId: plantId, 
+                email: userEmail, 
+                symptoms: symptoms 
+            })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.diagnostic) {
+            // Remplacement des sauts de ligne pour un affichage propre
+            resultBox.innerHTML = `<b>Analyse ÉONIA :</b><br><br>${data.diagnostic.replace(/\n/g, '<br>')}`;
+        } else {
+            resultBox.innerHTML = "⚠️ <b>Erreur :</b> " + (data.error || "Impossible de joindre l'expert IA.");
+        }
+    } catch (e) {
+        resultBox.innerHTML = "⚠️ Une erreur de connexion est survenue lors de la transmission des données.";
+    } finally {
+        btn.innerText = "🧬 LANCER L'ANALYSE EXPERTE";
+        btn.disabled = false;
+    }
 }
 
 async function waterNow() {
