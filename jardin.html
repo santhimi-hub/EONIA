@@ -104,11 +104,12 @@
 </div>
 
 <div class="container" id="app">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="margin-bottom: 15px;">
         <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 15px; border-radius:40px; font-size:0.55rem; cursor:pointer;">← RETOUR</button>
-        <div class="welcome-header" style="margin-bottom: 0; border-left: 1px solid var(--accent); padding-left: 15px;">
-            <div id="greeting-box" class="greeting-text" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888;">...</div>
-        </div>
+    </div>
+
+    <div class="welcome-header" style="margin-bottom: 20px; border-left: 1px solid var(--accent); padding-left: 15px;">
+        <div id="greeting-box" class="greeting-text" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888;">...</div>
     </div>
 
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
@@ -242,6 +243,7 @@ async function load() {
             else if (wText.includes("15 jours") || wText.includes("faible")) globalIntervalDays = 14;
 
             const dates = (p.Historique_Data || "").split(",").map(d => d.trim()).filter(d => d !== "");
+            
             if (dates.length > 0) {
                 const lastWaterStr = dates[dates.length - 1];
                 document.getElementById("last-water").innerText = "Dernier arrosage : " + lastWaterStr;
@@ -256,15 +258,22 @@ async function load() {
                 document.getElementById("vitality-score").innerText = (diff < 0) ? "65%" : "98%";
                 document.getElementById("plant-status-badge").className = (diff < 0) ? "status-badge status-alert" : "status-badge status-good";
                 document.getElementById("plant-status-badge").innerText = (diff < 0) ? "⚠️ Soif détectée" : "✨ Parfaitement hydratée";
+                
+                // Analyse dynamique si historique existant
+                if (diff < 0) {
+                    document.getElementById("plant-mood").innerText = "⚠️ Alerte hydrique : Le substrat manque de fraîcheur, freinant l'irrigation des racines. Un arrosage immédiat permettra de redresser la vitalité des feuilles.";
+                } else {
+                    document.getElementById("plant-mood").innerText = "🌿 Analyse biologique équilibrée : L'indice d'arrosage actuel répond idéalement aux besoins métaboliques. Le rythme de croissance est préservé.";
+                }
+            } else {
+                // FALLBACK : Si aucun arrosage n'est encore enregistré dans la base
+                document.getElementById("last-water").innerText = "Aucun arrosage enregistré";
+                document.getElementById("next-water").innerText = "En attente du premier cycle 💧";
+                document.getElementById("vitality-score").innerText = "100%";
+                document.getElementById("plant-status-badge").className = "status-badge status-good";
+                document.getElementById("plant-status-badge").innerText = "✨ Nouvelle recrue";
+                document.getElementById("plant-mood").innerText = "🌱 Initialisation de la mémoire : Aucun arrosage n'a encore été marqué pour cette plante. Cliquez sur le bouton 'Arroser aujourd'hui' pour démarrer le suivi intelligent.";
             }
-            const graphHtml = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
-                const ds = d.toLocaleDateString('fr-FR');
-                graphHtml.push(`<div class="graph-day-column"><div class="graph-bar-pill ${dates.includes(ds)?'active':'inactive'}"></div><div class="graph-day-label">${ds.slice(0,5)}</div></div>`);
-            }
-            document.getElementById('p-graph').innerHTML = graphHtml.join('');
-        } else {
             // RÉSOU LE PROBLÈME DU BOUTON DE COMMANDE
             document.querySelectorAll('.collection-only').forEach(el => el.style.display = 'block');
         }
