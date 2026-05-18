@@ -275,14 +275,35 @@ async function load() {
 }
 
 async function loadWeather() {
-    const lat = localStorage.getItem("eonia_lat") || 48.85;
-    const lon = localStorage.getItem("eonia_lon") || 2.35;
+    const lat = localStorage.getItem("eonia_lat");
+    const lon = localStorage.getItem("eonia_lon");
+    
+    // Texte cliquable dans le cadre
+    let labelGeo = lat ? "📍 MÉTÉO LOCALE (CLIQUEZ POUR AJUSTER LA POSITION)" : "📍 ACTIVER LA MÉTÉO DE VOTRE JARDIN";
+
+    // Si pas de coordonnées, on affiche uniquement le bouton d'activation dans le cadre
+    if (!lat || !lon) {
+        document.getElementById("weatherBar").innerHTML = `
+            <div onclick="getLocation()" style="width:100%; text-align:center; padding:12px; cursor:pointer; color:var(--accent); font-size:0.6rem; letter-spacing:1px; text-transform:uppercase; font-weight:600;">
+                ${labelGeo}
+            </div>`;
+        document.getElementById("weatherBar").style.display = "flex";
+        return;
+    }
+
     try {
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode&timezone=auto`);
         const w = await res.json();
         const icon = (c) => (c === 0 ? "☀️" : c <= 3 ? "⛅" : c <= 67 ? "🌧️" : "☁️");
-        let html = `<div class="weather-status">Météo Locale</div><div style="display:flex; width:100%; justify-content:space-between;">`;
-        html += w.daily.time.slice(0,4).map((d, i) => `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(w.daily.weathercode[i])}</div><b>${Math.round(w.daily.temperature_2m_max[i])}°</b></div>`).join("");
+        const tClass = (t) => (t >= 25 ? 'temp-hot' : (t <= 10 ? 'temp-cold' : ''));
+        
+        // Le titre de la météo devient le déclencheur pour se re-géolocaliser
+        let html = `<div onclick="getLocation()" style="width:100%; font-size:0.48rem; color:#666; text-align:center; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; font-weight:600;">${labelGeo}</div><div style="display:flex; width:100%; justify-content:space-between;">`;
+        html += w.daily.time.slice(0,4).map((d, i) => {
+            const temp = Math.round(w.daily.temperature_2m_max[i]);
+            return `<div class="weather-item"><span>${new Date(d).toLocaleDateString("fr-FR",{weekday:"short"}).toUpperCase()}</span><div class="w-icon">${icon(w.daily.weathercode[i])}</div><b class="${tClass(temp)}">${temp}°</b></div>`;
+        }).join("");
+        
         document.getElementById("weatherBar").innerHTML = html + "</div>";
         document.getElementById("weatherBar").style.display = "flex";
     } catch (e) { console.error(e); }
