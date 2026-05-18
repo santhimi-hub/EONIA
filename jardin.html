@@ -104,19 +104,21 @@
 </div>
 
 <div class="container" id="app">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <button onclick="window.location.href='catalogue.html'" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:7px 15px; border-radius:40px; font-size:0.55rem; cursor:pointer;">← RETOUR</button>
-        <div class="mon-jardin-only"><a href="javascript:void(0)" onclick="getLocation()" id="geo-link" style="color: #4ade80; font-size: 0.5rem; text-transform: uppercase; text-decoration: none;">📍 Météo locale</a></div>
-    </div>
-
-    <div class="welcome-header">
-        <div id="greeting-box" class="greeting-text">...</div>
-        <h1 id="p-titre">Chargement...</h1>
-        <div id="p-sci" class="sci-name">...</div>
+        <div class="welcome-header" style="margin-bottom: 0; border-left: 1px solid var(--accent); padding-left: 15px;">
+            <div id="greeting-box" class="greeting-text" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888;">...</div>
+        </div>
     </div>
 
     <div class="weather-bar mon-jardin-only" id="weatherBar"></div>
+
     <div class="hero-wrapper"><img id="p-photo" class="hero-img"></div>
+    
+    <div class="plant-title-block" style="margin: 20px 0 25px; padding-left: 5px;">
+        <h1 id="p-titre">Chargement...</h1>
+        <div id="p-sci" class="sci-name" style="color: var(--accent); font-size: 0.8rem; font-style: italic; margin-top: 4px; opacity: 0.7;">...</div>
+    </div>
     
     <div class="mon-jardin-only">
         <div id="plant-status-badge" class="status-badge">Analyse...</div>
